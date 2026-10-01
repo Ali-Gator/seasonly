@@ -43,7 +43,7 @@ Every route handler under `apps/web/src/app` SHALL be wrapped in `withErrorCaptu
 
 An unhandled error in a production server route SHALL arrive in Sentry, and a production page view SHALL arrive in PostHog.
 
-**Unenforced:** needs production credentials and the live services; proven once per phase by the phase exit check (`/api/sentry-check` and a page view), recorded in the change's tasks.
+**Unenforced:** needs production credentials and the live services; proven once per phase by the phase exit check (a throwaway route that throws, deleted once Sentry shows the error, and a page view), recorded in the change's tasks.
 
 #### Scenario: A server route throws in production
 

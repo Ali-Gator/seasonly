@@ -28,4 +28,4 @@
 - [x] 4.2 A test citing a missing spec anchor fails CI (the citation gate names file and line)
 - [x] 4.3 `packages/analysis` importing `react` fails lint; `window` fails typecheck
 - [x] 4.4 A change with no spec delta and no `skip_specs` fails `openspec validate` (exit 1)
-- [ ] 4.5 Sentry receives a test error (done: SEASONLY-1 from a Vercel deployment) and PostHog a pageview from production — PostHog open until its key is set
+- [x] 4.5 Sentry receives a test error (SEASONLY-1 from a Vercel deployment) and PostHog a pageview from production (project Seasonly, 2026-10-01); `/api/sentry-check` then deleted
