@@ -1,0 +1,7 @@
+packages:
+  - apps/*
+  - packages/*
+allowBuilds:
+  "@sentry/cli": true
+  core-js: false # postinstall only prints a funding banner
+  sharp: true

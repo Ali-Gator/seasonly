@@ -1,0 +1,19 @@
+schema: spec-driven
+
+context: |
+  Product: Seasonly (seasonly.me) finds a person's seasonal color type (12-season
+  system) from one selfie and gives a personal palette report. Audience: women 18–35,
+  global English, arriving on phones from TikTok and Instagram. Web MVP launches
+  2026-10-26; a Claude/ChatGPT plugin (quiz only, no photo) follows.
+  Concept, Tracker and phase plan:
+  https://claude.ai/code/artifact/23434923-c1ff-47d6-8ce6-7c86fd14856c
+
+  Stack: pnpm workspace, Node 22. apps/web is Next.js 16 App Router, React 19,
+  TypeScript strict, Tailwind v4, deployed on Vercel (Root Directory apps/web).
+  packages/analysis is the pure TypeScript analysis core (photo checks, color
+  sampling, 12-season classifier, palettes) shared by every surface.
+  Supabase (Postgres + private Storage), AI SDK via Vercel AI Gateway, Resend,
+  PostHog (analytics + flags), Sentry, Vitest, Playwright, an eval set under evals/.
+
+  Governance: openspec/specs/constitution/spec.md. A change name starts with its
+  Tracker ID, e.g. t4-analysis-core.

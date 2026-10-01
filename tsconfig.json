@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["esnext"],
+    "types": ["node"]
+  },
+  "include": [
+    "scripts/**/*.ts",
+    "e2e/**/*.ts",
+    "evals/**/*.ts",
+    "packages/*/src/**/*.test.ts",
+    "*.config.ts"
+  ]
+}
