@@ -25,6 +25,20 @@ Sentry SHALL be disabled when `NEXT_PUBLIC_SENTRY_DSN` is unset, and PostHog SHA
 - **WHEN** both keys are set
 - **THEN** Sentry is enabled with that DSN and PostHog initialises with that key
 
+### Requirement: Every route handler reports its unhandled errors
+
+Every route handler under `apps/web/src/app` SHALL be wrapped in `withErrorCapture`, which sends an unhandled error to Sentry and waits for delivery before rethrowing it. Next's `onRequestError` hook alone SHALL NOT be relied on: in a Vercel production build it does not fire for route handlers, and the function can freeze before an unflushed event leaves.
+
+#### Scenario: A wrapped handler throws
+
+- **WHEN** a handler wrapped in `withErrorCapture` throws
+- **THEN** the error is captured, Sentry is flushed, and the same error is rethrown
+
+#### Scenario: A route handler without the wrapper
+
+- **WHEN** a `route.ts` under `apps/web/src/app` does not use `withErrorCapture`
+- **THEN** the unit suite fails, naming the file
+
 ### Requirement: Production errors and page views reach their services
 
 An unhandled error in a production server route SHALL arrive in Sentry, and a production page view SHALL arrive in PostHog.

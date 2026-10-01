@@ -9,8 +9,4 @@ export async function register() {
   }
 }
 
-export async function onRequestError(...args: Parameters<typeof Sentry.captureRequestError>) {
-  Sentry.captureRequestError(...args);
-  const flushed = await Sentry.flush(2000);
-  console.log("onRequestError", { client: Boolean(Sentry.getClient()), flushed });
-}
+export const onRequestError = Sentry.captureRequestError;
