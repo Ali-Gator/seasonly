@@ -4,7 +4,7 @@ Governing spec: `openspec/specs/constitution/spec.md` (where truth lives, how it
 
 ## Layout
 
-pnpm workspace, Node 22. `apps/web` is the Next.js app (Vercel Root Directory). `packages/analysis` is the pure analysis core every surface shares — see `openspec/specs/architecture-boundaries/spec.md`. `evals/` holds the labeled-photo manifest (photos are git-ignored). `supabase/` holds migrations.
+pnpm workspace, Node 22.18+ (scripts and the analysis core run as TypeScript in plain Node). `apps/web` is the Next.js app (Vercel Root Directory). `packages/analysis` is the pure analysis core every surface shares — see `openspec/specs/architecture-boundaries/spec.md`. `evals/` holds the labeled-photo manifest (photos are git-ignored). `supabase/` holds migrations.
 
 ## Workflow: Spec -> Tests -> Code
 
@@ -16,7 +16,7 @@ Work is an OpenSpec change under `openspec/changes/t<N>-<slug>/` (`T<N>` = its T
 
 - A capability touched for the first time uses `## ADDED Requirements`, never `MODIFIED`.
 - Archiving a brand-new capability keeps only its Purpose and Requirements. Re-add Public Interface, Behavior and Edge Cases to `openspec/specs/<capability>/spec.md` after archive.
-- Add the capability's row to `openspec/specs/README.md` at archive, not before: until the permanent spec exists, the row blocks every edit to its paths.
+- Add the capability's row to `openspec/specs/README.md` at archive, not before: until the permanent spec exists, the row blocks every edit to its paths. Leave exempt files (below) out of rows; the hook never gates them.
 - A change touching only exempt paths (below) sets `skip_specs: true` in its `.openspec.yaml` instead of inventing a requirement.
 - `openspec validate --changes` runs in CI, not in the pre-commit hook: a half-planned change stays committable.
 
@@ -33,10 +33,11 @@ Tests (`__tests__`, `*.test.*`, `*.spec.*`), docs and markdown, config files (`*
 ## Hooks (`.claude/settings.json`)
 
 1. **check-spec-exists** — blocks `Edit`, `Write` and visible `Bash` writes to a mapped path whose spec is missing. It guards against forgetting, not evasion: a path no README row matches is never blocked, and the Bash shapes it cannot read are pinned in `scripts/__tests__/hook-bash-write-targets.test.ts`.
-2. **pre-commit-tests** — runs `format:check`, `lint`, `typecheck`, `test:unit` before any agent `git commit` — `openspec/specs/spec-workflow/spec.md#requirement-every-agent-commit-passes-the-fast-gates`.
+2. **pre-commit-tests** — runs `format:check`, `lint`, `typecheck`, `test:unit` before any agent `git commit` — {@link openspec/specs/spec-workflow/spec.md#requirement-every-agent-commit-passes-the-fast-gates}.
 
 ## Conventions
 
 - pnpm only. Everything written to the repo is English; chat replies are English unless asked otherwise.
-- Env vars: `openspec/specs/env/spec.md`. Add a variable to the code, `apps/web/.env.example` and the catalogue together, then run `pnpm verify:env`.
+- Env vars: `openspec/specs/env/spec.md`. Add a variable to the code, `apps/web/.env.example`, the catalogue and `scripts/verify-env.ts` together, then run `pnpm verify:env` (or `pnpm verify:env 1` for phase 1).
+- Route handlers: {@link openspec/specs/observability/spec.md#requirement-every-route-handler-reports-its-unhandled-errors}.
 - Eval photos never enter git; `evals/manifest.json` does.

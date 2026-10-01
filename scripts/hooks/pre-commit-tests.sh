@@ -30,9 +30,11 @@ fi
 
 PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 
-# Check if node_modules exist
+# No dependencies means no checks can run; refuse rather than pass unchecked (a
+# fresh worktree is the usual case).
 if [[ ! -d "$PROJECT_ROOT/node_modules" ]]; then
-  exit 0
+  echo "BLOCKED: dependencies are not installed. Run 'pnpm install' first." >&2
+  exit 2
 fi
 
 cd "$PROJECT_ROOT"
@@ -61,31 +63,14 @@ if ! pnpm typecheck 2>&1; then
 fi
 echo "Types OK." >&2
 
-# Run unit tests (only if test files exist).
-#
-# `test:unit`, not `test`: Playwright runs in .github/workflows/e2e.yml on every push,
-# which also covers hand-typed commits this hook never sees. `pnpm test` stays the
-# manual phase-completion gate.
-#
-# The probe scans every workspace root that holds tests. In runtrip-v2 it scanned
-# `src/` only; a workspace has no root `src/`, so that probe would find nothing and
-# skip the suite on every commit.
-#
-# `-print -quit`, not `| head -1`. The pipe version stopped the gate dead: `head`
-# exits after the first line, `find` keeps writing into a closed pipe, takes SIGPIPE,
-# and `set -o pipefail` + `set -e` turn that 141 into the script's own exit status.
-# 141 is not 2, so Claude Code reads it as a non-blocking error and allows the commit
-# with the unit suite silently skipped. `|| true` covers find's other non-zero exit
-# (a root that does not exist). Pinned in scripts/__tests__/hook-precommit-unit-gate.test.ts.
-TEST_FILES=$(find "$PROJECT_ROOT/apps" "$PROJECT_ROOT/packages" "$PROJECT_ROOT/scripts" \
-  -name node_modules -prune -o \( -name "*.test.*" -o -name "*.spec.*" \) -print -quit 2>/dev/null || true)
-if [[ -n "$TEST_FILES" ]]; then
-  echo "Running unit tests..." >&2
-  if ! pnpm test:unit 2>&1; then
-    echo "BLOCKED: Tests failed. Fix tests before committing." >&2
-    exit 2
-  fi
-  echo "Tests passed." >&2
+# Unit tests always run: scripts/__tests__ holds the governance tests, so there is
+# always a suite. `test:unit`, not `test`: Playwright runs in e2e.yml on every push,
+# which also covers hand-typed commits this hook never sees.
+echo "Running unit tests..." >&2
+if ! pnpm test:unit 2>&1; then
+  echo "BLOCKED: Tests failed. Fix tests before committing." >&2
+  exit 2
 fi
+echo "Tests passed." >&2
 
 exit 0

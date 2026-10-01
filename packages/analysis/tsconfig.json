@@ -4,7 +4,12 @@
     // No DOM, no Node: the core runs unchanged in a browser, a server route and,
     // later, iOS. A `window` or `process` reference is a type error here.
     "lib": ["es2023"],
-    "types": []
+    "types": [],
+    // Plain Node runs this source directly: imports need explicit `.ts` extensions
+    // and only erasable syntax (no enum, no namespace).
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "erasableSyntaxOnly": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["src/**/*.test.ts"]

@@ -27,7 +27,10 @@ const SCAN: [dir: string, ext: RegExp][] = [
   ["scripts", /\.(ts|sh|py)$/],
   ["e2e", /\.ts$/],
   ["evals", /\.ts$/],
+  [".github", /\.ya?ml$/],
 ];
+// Single files that cite specs outside the scanned roots. They count as code, not tests.
+const SCAN_FILES = ["eslint.config.mjs", "CLAUDE.md", "openspec/specs/README.md"];
 
 // The capability segment is strict on purpose: it rejects shell interpolation
 // (`$spec`) and lets a sentence-final period end a file-level link. The anchor is
@@ -160,10 +163,12 @@ function walk(dir: string, ext: RegExp): string[] {
 }
 
 function repoCitations(): Citation[] {
-  return SCAN.flatMap(([dir, ext]) =>
-    walk(path.join(REPO_ROOT, dir), ext).flatMap((full) =>
-      extractCitations(path.relative(REPO_ROOT, full), fs.readFileSync(full, "utf-8")),
-    ),
+  const files = [
+    ...SCAN.flatMap(([dir, ext]) => walk(path.join(REPO_ROOT, dir), ext)),
+    ...SCAN_FILES.map((f) => path.join(REPO_ROOT, f)).filter(fs.existsSync),
+  ];
+  return files.flatMap((full) =>
+    extractCitations(path.relative(REPO_ROOT, full), fs.readFileSync(full, "utf-8")),
   );
 }
 

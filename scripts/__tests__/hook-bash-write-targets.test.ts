@@ -97,7 +97,8 @@ describe("the gate wired end to end", () => {
       // Literal path segments that are also regex metacharacters. Neither spec
       // exists here, so a matching path blocks and a non-matching one does not.
       "| `dynamic` | `apps/web/src/app/x/[slug]/**` |\n" +
-      "| `grouped` | `apps/web/src/app/y/(marketing)/**` |\n",
+      "| `grouped` | `apps/web/src/app/y/(marketing)/**` |\n" +
+      "\nA note that mentions a | pipe and apps/web/src/lib/real.ts in prose.\n",
   );
   writeFileSync(join(root, "openspec/specs/exists/spec.md"), "# a spec that exists\n");
 
@@ -163,6 +164,22 @@ describe("the gate wired end to end", () => {
     ]) {
       expect(exitCode({ tool_name: "Bash", tool_input: { command } })).toBe(0);
     }
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-write-relative-to-a-package} */
+  it("resolves a relative Bash target against the session cwd", () => {
+    const command = "echo x > src/lib/fake.ts";
+    expect(
+      exitCode({ tool_name: "Bash", cwd: join(root, "apps/web"), tool_input: { command } }),
+    ).toBe(2);
+    expect(exitCode({ tool_name: "Bash", cwd: root, tool_input: { command } })).toBe(0);
+  });
+
+  it("ignores a prose line that contains a pipe", () => {
+    // The README's prose sits next to the table; a `|` in it must not read as a row.
+    expect(
+      exitCode({ tool_name: "Write", tool_input: { file_path: "apps/web/src/lib/real.ts" } }),
+    ).toBe(0);
   });
 
   it("exits 0 on a payload it cannot parse at all", () => {

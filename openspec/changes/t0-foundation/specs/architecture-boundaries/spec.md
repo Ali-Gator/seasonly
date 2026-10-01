@@ -8,12 +8,17 @@ Keeps the analysis core portable. Every surface (web, Claude/ChatGPT plugin, lat
 
 ### Requirement: The analysis core imports no platform or framework code
 
-Source under `packages/analysis` SHALL import only the language's standard library, its own modules and `zod`. An import of a framework (`react`, `next`), a service SDK (`@supabase/*`, `ai`, `@ai-sdk/*`) or a Node built-in SHALL fail lint, and a reference to a DOM or Node global SHALL fail type checking.
+Source under `packages/analysis` SHALL import only the language's standard library, its own modules (with explicit `.ts` extensions, and only erasable TypeScript syntax, so plain Node can run it) and `zod`. An import of a framework (`react`, `next`), a service SDK (`@supabase/*`, `ai`, `@ai-sdk/*`) or a Node built-in SHALL fail lint, and a reference to a DOM or Node global SHALL fail type checking.
 
 #### Scenario: The core imports react
 
 - **WHEN** a file under `packages/analysis/src` imports `react`
 - **THEN** lint fails on that import
+
+#### Scenario: The core references a DOM global
+
+- **WHEN** a file under `packages/analysis/src` reads `window`
+- **THEN** type checking fails on that reference
 
 #### Scenario: The core imports a Node built-in
 

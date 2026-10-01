@@ -13,7 +13,6 @@ Catalogues every environment variable the code reads and checks a deployment has
 | `SENTRY_AUTH_TOKEN`              | 0     | no       | no                 | Sentry → Settings → Auth Tokens (org token)        |
 | `NEXT_PUBLIC_POSTHOG_KEY`        | 0     | yes      | yes                | PostHog → Project settings → Project API key       |
 | `NEXT_PUBLIC_POSTHOG_HOST`       | 0     | no       | yes                | Defaults to `https://us.i.posthog.com`             |
-| `VERIFY_ENV_PHASE`               | 0     | no       | no                 | Read by `pnpm verify:env` only; the phase to check |
 
 ## ADDED Requirements
 

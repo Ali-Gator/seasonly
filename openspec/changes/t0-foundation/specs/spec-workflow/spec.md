@@ -49,6 +49,12 @@ routing an edit around the gate is not approval to skip the spec.
 - **WHEN** an edit targets a source path whose mapped spec exists
 - **THEN** the edit proceeds
 
+#### Scenario: A write relative to a package
+
+- **WHEN** the session's working directory is `apps/web` and a shell command writes to
+  `src/lib/x.ts`
+- **THEN** the gate checks `apps/web/src/lib/x.ts`
+
 #### Scenario: Write target the gate cannot read
 
 - **WHEN** a shell command writes to a mapped path through a shape the gate does not
@@ -139,7 +145,7 @@ touches it, not as a precondition for the migration.
 
 ### Requirement: Citations are gated at every commit
 
-The citation checks the constitution requires — every anchored citation resolves, and every requirement is proven by a citing test or marked unenforced — SHALL run in the unit test suite, and therefore in the pre-commit gate, and SHALL also run in the CI workflow that validates OpenSpec changes, so a commit made outside the agent's hook is gated too. They SHALL scan the source and test files under `apps/`, `packages/`, `scripts/`, `e2e/` and `evals/`, and SHALL count end-to-end specs as tests, since several requirements are proven only in the browser. A failure SHALL name every offending citation by file and line and every unproven requirement by capability and name, not only the first.
+The citation checks the constitution requires — every anchored citation resolves, and every requirement is proven by a citing test or marked unenforced — SHALL run in the unit test suite, and therefore in the pre-commit gate, and SHALL also run in CI (`ci.yml`) on every push, so a commit made outside the agent's hook is gated too. They SHALL scan the source and test files under `apps/`, `packages/`, `scripts/`, `e2e/` and `evals/`, and SHALL count end-to-end specs as tests, since several requirements are proven only in the browser. A failure SHALL name every offending citation by file and line and every unproven requirement by capability and name, not only the first.
 
 A citation SHALL also resolve against a requirement or scenario that an unarchived change adds or renames under `openspec/changes/<change>/specs/<capability>/spec.md`, so a test written before its change is archived can already cite the permanent spec path. Only archived requirements SHALL be subject to the proven-by-a-test check.
 
@@ -182,27 +188,36 @@ not provide and no path depends on row order.
 ### Requirement: Every agent commit passes the fast gates
 
 A `git commit` run by an agent SHALL be refused unless formatting, lint, type checking and
-the unit suite all pass. The unit suite SHALL run whenever any workspace root (`apps/`,
-`packages/`, `scripts/`) holds a test file, and a failure of the gate itself SHALL never
-read as success.
+the unit suite all pass. A gate that cannot run its checks SHALL refuse the commit, and a
+refusal SHALL always exit with the code the agent harness treats as blocking.
 
 #### Scenario: A failing unit test
 
 - **WHEN** an agent commits while a unit test fails
 - **THEN** the commit is refused with exit code 2
 
-#### Scenario: Tests outside the app
+#### Scenario: Dependencies not installed
 
-- **WHEN** the only test files live under `packages/`
-- **THEN** the gate still runs the unit suite
+- **WHEN** an agent commits in a checkout with no installed dependencies
+- **THEN** the commit is refused with exit code 2 and told to run `pnpm install`
 
 ### Requirement: A change is tied to its Tracker row
 
 A change SHALL be named `t<N>-<slug>`, where `T<N>` is its row in the Tracker tab of the
-concept doc. Archiving the change SHALL set that row's status and add one line to the
-Tracker log.
+concept doc.
 
 #### Scenario: A change without a Tracker ID
 
 - **WHEN** a change directory under `openspec/changes/` is not named `t<N>-<slug>`
 - **THEN** the unit suite fails, naming the directory
+
+### Requirement: Archiving a change updates the Tracker
+
+Archiving a change SHALL set its Tracker row's status and add one line to the Tracker log.
+
+**Unenforced:** the Tracker is a doc outside the repository; the archive skill carries the step and the phase review checks it.
+
+#### Scenario: A change is archived
+
+- **WHEN** `t4-analysis-core` is archived
+- **THEN** row T4's status is updated and the log gains a line for it

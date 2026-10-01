@@ -41,11 +41,36 @@ describe("route handlers", () => {
     });
   }
 
+  const METHOD = "GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS";
+
+  /** Each exported HTTP method that is not `export const M = withErrorCapture(...)`. */
+  function unwrapped(file: string, text: string): string[] {
+    const bad = [
+      ...text.matchAll(new RegExp(`export\\s+(?:async\\s+)?function\\s+(${METHOD})\\b`, "g")),
+    ].map((m) => `${file}: ${m[1]}`);
+    for (const m of text.matchAll(
+      new RegExp(`export\\s+const\\s+(${METHOD})\\s*=\\s*(\\S+?)\\(`, "g"),
+    )) {
+      if (m[2] !== "withErrorCapture") bad.push(`${file}: ${m[1]}`);
+    }
+    return bad;
+  }
+
   /** {@link openspec/specs/observability/spec.md#scenario-a-route-handler-without-the-wrapper} */
   it("are all wrapped in withErrorCapture", () => {
-    const unwrapped = routes(APP)
-      .filter((f) => !fs.readFileSync(f, "utf8").includes("withErrorCapture("))
-      .map((f) => path.relative(APP, f));
-    expect(unwrapped).toEqual([]);
+    const bad = routes(APP).flatMap((f) =>
+      unwrapped(path.relative(APP, f), fs.readFileSync(f, "utf8")),
+    );
+    expect(bad).toEqual([]);
+  });
+
+  it("names a bare function handler and a handler wrapped in something else", () => {
+    const text = [
+      "// withErrorCapture( in a comment does not count",
+      "export const GET = withErrorCapture(() => new Response());",
+      "export async function POST() { return new Response(); }",
+      "export const PUT = other(() => new Response());",
+    ].join("\n");
+    expect(unwrapped("r.ts", text)).toEqual(["r.ts: POST", "r.ts: PUT"]);
   });
 });

@@ -8,7 +8,7 @@ export function baseSentryOptions() {
   return {
     dsn,
     enabled: Boolean(dsn),
-    environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? process.env.NEXT_PUBLIC_VERCEL_ENV,
+    environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT || process.env.NEXT_PUBLIC_VERCEL_ENV,
     tracesSampleRate: 0.1,
   };
 }

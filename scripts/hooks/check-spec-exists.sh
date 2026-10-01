@@ -27,6 +27,10 @@ json_field() {
 
 FILE_PATH=$(json_field file_path)
 COMMAND=$(json_field command)
+# The session's working directory (top level of the payload, not tool_input). A Bash
+# write like `echo x > src/a.ts` after `cd apps/web` is relative to it, not to the
+# repo root; without it every package-relative write would match no row.
+CWD=$(printf '%s' "$INPUT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('cwd','') or '')" 2>/dev/null || true)
 
 # No python3 (or an unparseable payload): fall back to the legacy extraction for
 # Edit/Write, which is the case that must never silently stop being gated. Bash
@@ -126,10 +130,15 @@ missing_spec_for() {
 
   # Find the capability whose globs cover this source path
   local spec globs glob escaped meta pattern spec_file=""
-  while IFS='|' read -r _ spec globs _; do
-    # Clean up whitespace
-    spec=$(echo "$spec" | xargs | sed 's/`//g')
-    globs=$(echo "$globs" | xargs | sed 's/`//g')
+  while IFS='|' read -r lead spec globs _; do
+    # Table rows only: a prose line holding a `|` is not a row.
+    [[ -n "${lead//[[:space:]]/}" ]] && continue
+    # Trim with parameter expansion, not xargs: xargs strips quotes and backslashes
+    # and fails outright on an apostrophe, which silently skipped the row.
+    spec=${spec//\`/}
+    spec=${spec#"${spec%%[![:space:]]*}"}
+    spec=${spec%"${spec##*[![:space:]]}"}
+    globs=${globs//\`/}
 
     # Skip header/separator rows
     [[ "$spec" == "Capability" || "$spec" == "---" || -z "$spec" ]] && continue
@@ -137,7 +146,9 @@ missing_spec_for() {
     # Check each glob pattern against the relative path
     IFS=',' read -ra GLOB_ARRAY <<< "$globs"
     for glob in "${GLOB_ARRAY[@]}"; do
-      glob=$(echo "$glob" | xargs)
+      glob=${glob#"${glob%%[![:space:]]*}"}
+      glob=${glob%"${glob##*[![:space:]]}"}
+      [[ -z "$glob" ]] && continue
 
       # Convert glob to a regex-friendly pattern.
       #
@@ -184,7 +195,11 @@ missing_spec_for() {
 while IFS= read -r target; do
   [[ -z "$target" ]] && continue
 
-  # Make path relative to project root; ./src/x.ts must match the glob src/x.ts
+  # Resolve a relative target against the session cwd, then make it relative to the
+  # project root; ./src/x.ts must match the glob src/x.ts.
+  if [[ "$target" != /* && -n "$CWD" ]]; then
+    target="$CWD/${target#./}"
+  fi
   rel="${target#"$PROJECT_ROOT"/}"
   rel="${rel#./}"
 

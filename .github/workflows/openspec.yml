@@ -23,4 +23,4 @@ jobs:
           node-version: 22
       # Scoped package: bare `openspec` on npm is an unrelated placeholder. Pinned, and
       # fetched rather than installed: nothing in the app imports it.
-      - run: npx -y @fission-ai/openspec@1.13.0 validate --changes --no-interactive
+      - run: npx -y @fission-ai/openspec@1.13.0 validate --all --no-interactive

@@ -1,7 +1,8 @@
 /**
  * Reports which catalogued environment variables are set and well-formed for a
- * phase. Runnable (`pnpm verify:env`, `VERIFY_ENV_PHASE=1 pnpm verify:env`) and
- * importable for tests. Shape checks only — no network.
+ * phase. Runnable (`pnpm verify:env`) and
+ * importable for tests. Shape checks only — no network. The phase is the first
+ * argument: `pnpm verify:env 1`.
  *
  * {@link openspec/specs/env/spec.md#requirement-verifyenv-reports-every-variable-for-a-phase}
  */
@@ -13,9 +14,15 @@ export type EnvStatus = "ok" | "missing" | "invalid" | "skipped";
 export type EnvResult = { name: string; status: EnvStatus; detail?: string };
 export type EnvReport = { ok: boolean; results: EnvResult[] };
 
-type Probe = { name: string; phase: number; optional?: boolean; hint: string; shape?: RegExp };
+export type Probe = {
+  name: string;
+  phase: number;
+  optional?: boolean;
+  hint: string;
+  shape?: RegExp;
+};
 
-const PROBES: Probe[] = [
+export const PROBES: Probe[] = [
   {
     name: "NEXT_PUBLIC_SENTRY_DSN",
     phase: 0,
@@ -90,7 +97,7 @@ export function verifyEnv({
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const report = verifyEnv({ phase: Number(process.env.VERIFY_ENV_PHASE ?? 0) });
+  const report = verifyEnv({ phase: Number(process.argv[2] ?? 0) });
   for (const r of report.results) {
     console.log(`${r.status.padEnd(8)} ${r.name}${r.detail ? `  — ${r.detail}` : ""}`);
   }
