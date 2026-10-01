@@ -22,20 +22,15 @@ const PLATFORM = new Set([
   "NEXT_PUBLIC_VERCEL_ENV",
 ]);
 const DIRECT_READ = /process\.env(?:\.([A-Z_][A-Z0-9_]*)|\[\s*["']([A-Z_][A-Z0-9_]*)["']\s*\])/g;
-const CATALOGUE_FILES = [
-  "openspec/specs/env/spec.md",
-  "openspec/changes/t0-foundation/specs/env/spec.md",
-];
+const CATALOGUE = path.join(REPO_ROOT, "openspec/specs/env/spec.md");
 
 type Entry = { name: string; phase: number; optional: boolean };
 
 /** Rows of the catalogue table: | `NAME` | phase | required | browser | hint |. */
 function catalogue(): Entry[] {
-  const file = CATALOGUE_FILES.map((f) => path.join(REPO_ROOT, f)).find(fs.existsSync);
-  if (!file) throw new Error("env catalogue not found");
   return [
     ...fs
-      .readFileSync(file, "utf8")
+      .readFileSync(CATALOGUE, "utf8")
       .matchAll(/^\|\s*`([A-Z_][A-Z0-9_]*)`\s*\|\s*(\d+)\s*\|\s*(yes|no)\s*\|/gm),
   ].map((m) => ({ name: m[1] ?? "", phase: Number(m[2]), optional: m[3] === "no" }));
 }
