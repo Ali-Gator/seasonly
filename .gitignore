@@ -1,0 +1,28 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+*.pem
+
+# env: only the templates are committed
+.env*
+!.env.example
+
+# test output
+test-results/
+playwright-report/
+
+# eval photos never enter git; evals/manifest.json does
+evals/photos/
+
+# local tooling
+.vercel
+.idea/
+.vscode/
+.playwright-mcp/
+.claude/settings.local.json
+.claude/worktrees/

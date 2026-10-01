@@ -1,0 +1,31 @@
+name: CI
+
+# The fast gates on every push: the same checks the pre-commit hook runs on agent
+# commits, so a hand-typed commit is gated too. The unit suite includes the spec
+# citation gate (scripts/__tests__/spec-citations.test.ts).
+# {@link openspec/specs/spec-workflow/spec.md#requirement-citations-are-gated-at-every-commit}
+
+on:
+  push:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test:unit
+      - run: pnpm test:eval

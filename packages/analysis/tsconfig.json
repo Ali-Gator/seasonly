@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // No DOM, no Node: the core runs unchanged in a browser, a server route and,
+    // later, iOS. A `window` or `process` reference is a type error here.
+    "lib": ["es2023"],
+    "types": []
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.test.ts"]
+}

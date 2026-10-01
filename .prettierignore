@@ -1,0 +1,7 @@
+node_modules
+.next
+pnpm-lock.yaml
+.agents
+.claude/skills/ai-sdk
+.claude/commands
+.claude/skills/openspec-*
