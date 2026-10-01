@@ -5,14 +5,17 @@ import * as Sentry from "@sentry/nextjs";
 // (getsentry/sentry-javascript#21713, seen in runtrip-v2).
 import "../../../../sentry.server.config";
 
-// ponytail: throws on purpose so Phase 0 can prove production errors reach Sentry.
+// ponytail: deliberate Phase 0 probe — proves server events reach Sentry.
 // Delete once the Phase 0 exit check is recorded.
-export function GET(): never {
+export async function GET(request: Request): Promise<Response> {
   const client = Sentry.getClient();
-  console.log("sentry-check", {
-    client: Boolean(client),
-    enabled: client?.getOptions().enabled,
-    dsn: Boolean(client?.getDsn()),
-  });
-  throw new Error("sentry-check: deliberate Phase 0 probe");
+  const error = new Error("sentry-check: deliberate Phase 0 probe");
+  if (new URL(request.url).searchParams.has("explicit")) {
+    const eventId = Sentry.captureException(error);
+    const flushed = await Sentry.flush(5000);
+    console.log("sentry-check explicit", { eventId, flushed });
+    return new Response("captured", { status: 500 });
+  }
+  console.log("sentry-check", { client: Boolean(client), enabled: client?.getOptions().enabled });
+  throw error;
 }
