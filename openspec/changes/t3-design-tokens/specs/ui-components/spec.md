@@ -34,7 +34,7 @@ A swatch grid SHALL render one swatch per color, in the order given, as a list t
 
 ### Requirement: A button is a link when it navigates and a button when it acts
 
-A button SHALL come in the design system's three variants (primary, secondary and ghost), with primary as the default. It SHALL take the full column width when asked. With a destination, it SHALL render a link to that destination. Without one, it SHALL render a native button that does not submit a form unless a submit type is given. Disabled and `aria-disabled` buttons SHALL keep their label and show the disabled style.
+A button SHALL come in the design system's three variants (primary, secondary and ghost), with primary as the default. It SHALL take the full column width when asked. With a destination, it SHALL render a link to that destination. Without one, it SHALL render a native button that does not submit a form unless a submit type is given. A disabled or `aria-disabled` button SHALL keep its label and that attribute, and show the disabled style.
 
 #### Scenario: A button without a destination
 
@@ -45,6 +45,11 @@ A button SHALL come in the design system's three variants (primary, secondary an
 
 - **WHEN** a ghost button is rendered with destination `/analyze` at full width
 - **THEN** it is a link to `/analyze` in the ghost variant at full width
+
+#### Scenario: A disabled button
+
+- **WHEN** a button labeled "Analyzing your photo" is rendered with `aria-disabled="true"`
+- **THEN** it keeps `aria-disabled="true"` and its label text
 
 ### Requirement: An icon is decorative unless it is labeled
 
@@ -85,12 +90,17 @@ A report section SHALL render its title as a second-level heading and SHALL be a
 
 ### Requirement: Every class a component renders has a design-system style
 
-Every class name these components render SHALL have a rule in the web app's stylesheets, copied from the design system's `bundle.css`. The stylesheets SHALL take their colors, spacing, radii, shadows and sizes from the design-token variables, and SHALL NOT request any external resource. The layout classes artboards use directly (`.sn-card`, `.sn-stack`, `.sn-slot`) SHALL be defined too.
+Every class name these components render SHALL have a rule in the web app's stylesheets, copied from the design system's `bundle.css`. The component stylesheet SHALL take every color from the design-token variables. It SHALL NOT request any external resource. The layout classes artboards use directly (`.sn-card`, `.sn-stack`, `.sn-slot`) SHALL be defined too.
 
 #### Scenario: A component class has no rule
 
-- **WHEN** a component renders a class name that no rule in the web app's stylesheets defines
+- **WHEN** a component renders a class name that no rule in the web app's stylesheets defines, or `.sn-card`, `.sn-stack` or `.sn-slot` is not defined
 - **THEN** the unit suite fails, naming the class
+
+#### Scenario: A color is hard-coded
+
+- **WHEN** the component stylesheet contains a hex, `rgb()` or `rgba()` color literal
+- **THEN** the unit suite fails, naming it
 
 #### Scenario: A stylesheet loads an external resource
 

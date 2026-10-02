@@ -7,7 +7,7 @@
 - [ ] 2.1 Write `apps/web/src/components/ds/ds.test.tsx`. Render with `renderToStaticMarkup` (design.md, decision 4) and cover every scenario in `specs/ui-components/spec.md`:
   - **Swatch:** lowercase hex shown uppercase; name and hex are text; the chip is `aria-hidden` and has the color as its background; the large variant.
   - **SwatchGrid:** `PALETTES["soft-autumn"].best` gives one labeled list of 24 items in order; the default is 4 columns.
-  - **Button:** no `href` gives `<button type="button">` in the primary variant; a ghost, block button with `href="/analyze"` gives a link with the ghost and block classes.
+  - **Button:** no `href` gives `<button type="button">` in the primary variant; a ghost, block button with `href="/analyze"` gives a link with the ghost and block classes; `aria-disabled="true"` passes through with the label kept.
   - **Icon:** hidden without a label; `role="img"` with `aria-label` when labeled.
   - **Note:** the danger default icon is `cross`, success is `check`, neutral is `info`; a chosen icon wins; the title and body are text.
   - **ReportSection:** two sections are each labeled by their own `h2` id.
@@ -15,7 +15,8 @@
   Done when the tests fail for the missing modules.
 
 - [ ] 2.2 In the same file, test the stylesheet requirement:
-  - every class token rendered by every component variant has a `.<token>` selector in `globals.css` or `ds.css`;
+  - every class token rendered by every component variant, plus `sn-card`, `sn-stack` and `sn-slot`, has a `.<token>` selector in `globals.css` or `ds.css`;
+  - `ds.css` has no hex, `rgb(` or `rgba(` color literal;
   - `ds.css` has no `@import` and no non-`data:` `url(`.
 
   Done when the tests fail for the missing `ds.css`.

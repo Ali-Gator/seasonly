@@ -69,7 +69,7 @@ apps/web/src/components/ds/
 `ds.test.tsx` renders each scenario with `renderToStaticMarkup` and asserts on the HTML string. It checks text, attributes, class names and element types, so no DOM is needed. It cites each requirement's anchor in `openspec/specs/ui-components/spec.md`.
 
 - The "every class has a style" test renders every component in every variant. It collects each `class="…"` token and checks that a selector `.<token>` appears in `globals.css` or `ds.css`, read as text the way `tokens.test.ts` reads `globals.css`.
-- The "no external resource" test fails on any `@import` and on any `url(` that is not a `data:` URL in `ds.css`.
+- The "no external resource" test fails on any `@import` and on any `url(` that is not a `data:` URL in `ds.css`. The color test fails on any hex, `rgb(` or `rgba(` literal there. The ported rules already use only token variables for color. Their few literal `2px` gaps stay, because the design system writes them that way.
 - Alternative: jsdom with Testing Library. Rejected: two new dev dependencies and a second Vitest environment, for assertions a string can already answer. Add them when a component gets behavior, such as focus or events.
 - `PALETTES["soft-autumn"].best` feeds the grid scenario, so the test uses real approved data.
 
