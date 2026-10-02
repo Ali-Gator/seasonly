@@ -12,6 +12,7 @@ The second column is parsed, not read: comma-separated globs and nothing else. N
 | `season-classifier` | `packages/analysis/src/classifier/**`                                                                    |
 | `season-palettes`   | `packages/analysis/src/palettes/**`                                                                      |
 | `photo-check`       | `packages/analysis/src/photo-check/**`                                                                   |
+| `ui-components`     | `apps/web/src/components/ds/**`                                                                          |
 
 Rows never overlap and every row matches a file: {@link openspec/specs/spec-workflow/spec.md#requirement-mapping-rows-never-overlap}. Each capability owns its own folder, so row order never matters.
 

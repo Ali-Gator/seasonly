@@ -1,0 +1,188 @@
+/* Ported from the design system's bundle.css: the rules for the components in this folder and the
+   layout classes artboards use directly. The .sn-btn base, primary, secondary, block and focus
+   rules live in globals.css with the site chrome. Checked by ds.test.tsx. */
+@layer components {
+  .sn-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .sn-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .sn-icon {
+    flex: none;
+  }
+
+  /* Slot: where a photo goes. Neutral, labelled, never an illustration. */
+  .sn-slot {
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: var(--sunken);
+    border-radius: var(--radius-sm);
+  }
+  .sn-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .sn-slot__label {
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--ink-subtle);
+  }
+
+  /* Button. .sn-btn.sn-btn--ghost outranks the .sn-btn base in globals.css, which comes later in
+     this layer and would otherwise reset the underline. */
+  .sn-btn.sn-btn--ghost {
+    background: transparent;
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--line-strong);
+  }
+  .sn-btn.sn-btn--ghost:hover {
+    background: var(--sunken);
+    color: var(--ink); /* over the a:hover color in globals.css */
+  }
+  /* The :hover forms outrank the variant hovers in globals.css, which come later in this layer. */
+  .sn-btn:disabled,
+  .sn-btn[aria-disabled="true"],
+  .sn-btn:disabled:hover,
+  .sn-btn[aria-disabled="true"]:hover {
+    background: var(--sunken);
+    color: var(--ink-subtle);
+    border-color: transparent;
+    cursor: not-allowed;
+  }
+
+  /* Swatch */
+  .sn-swatch {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+  .sn-swatch__chip {
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    box-shadow: inset 0 0 0 1px var(--swatch-edge);
+  }
+  .sn-swatch figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sn-swatch__name {
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .sn-swatch__hex {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+    text-transform: uppercase;
+  }
+  .sn-swatch--lg .sn-swatch__chip {
+    aspect-ratio: 4 / 3;
+  }
+  .sn-swatch--lg .sn-swatch__name {
+    font-size: 15px;
+    line-height: 20px;
+    font-weight: 600;
+  }
+  .sn-swatch-grid {
+    display: grid;
+    gap: var(--space-4) var(--space-3);
+    padding: var(--space-4);
+    margin: 0;
+    list-style: none;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+  }
+
+  /* Card */
+  .sn-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+  }
+
+  /* Report section */
+  .sn-report {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--line);
+  }
+  .sn-report__intro {
+    color: var(--ink-muted);
+  }
+  .sn-report__body {
+    margin-top: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  /* Note: a verdict or reassurance block. Tone colors only with a word and an icon. */
+  .sn-note {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .sn-note__icon {
+    margin-top: 2px;
+  }
+  .sn-note__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .sn-note__title {
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 20px;
+  }
+  .sn-note__body {
+    font-size: 15px;
+    line-height: 23px;
+  }
+  .sn-note--danger {
+    background: var(--danger-soft);
+    border-color: transparent;
+  }
+  .sn-note--danger .sn-note__icon,
+  .sn-note--danger .sn-note__title {
+    color: var(--danger);
+  }
+  .sn-note--success {
+    background: var(--success-soft);
+    border-color: transparent;
+  }
+  .sn-note--success .sn-note__icon,
+  .sn-note--success .sn-note__title {
+    color: var(--success);
+  }
+}
