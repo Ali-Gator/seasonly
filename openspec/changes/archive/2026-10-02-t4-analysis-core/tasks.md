@@ -61,11 +61,11 @@
 ## 5. Review and archive
 
 - [x] 5.1 Run the phase review (`phase-review` skill) on the branch, then fix or answer every finding. Done when the review's findings are resolved.
-- [ ] 5.2 Archive the change. Then:
+- [x] 5.2 Archive the change. Then:
   - re-add Public Interface, Behavior and Edge Cases to `openspec/specs/color-sampling/spec.md`, `season-classifier/spec.md` and `season-palettes/spec.md`;
   - update `site-structure`'s Public Interface to say the slugs come from `@seasonly/analysis`;
   - add three README rows: `packages/analysis/src/sampling/**`, `packages/analysis/src/classifier/**`, `packages/analysis/src/palettes/**`.
 
   Done when `openspec validate --changes` passes and the unit suite (mapping-row and citation gates) is green.
 
-- [ ] 5.3 Add a Tracker Log line for the archived change, and note that canvas palettes other than Soft Autumn can now be replaced with the approved data. Done when the Log shows the line.
+- [x] 5.3 Add a Tracker Log line for the archived change, and note that canvas palettes other than Soft Autumn can now be replaced with the approved data. Done when the Log shows the line.
