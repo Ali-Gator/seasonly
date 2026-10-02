@@ -17,6 +17,7 @@ import {
   REGIONS,
   samplePhoto,
   srgbToLab,
+  traitsOf,
   type PhotoInput,
   type Traits,
 } from "./index.ts";
@@ -224,7 +225,7 @@ describe("traits", () => {
   });
 
   /** {@link openspec/specs/color-sampling/spec.md#scenario-higher-contrast} */
-  it("rises in clarity as hair lighter than the skin darkens", () => {
+  it("never falls in clarity as hair lighter than the skin darkens", () => {
     const steps = [250, 240, 230, 220].map((v) =>
       traits({ skin: [200, 160, 130], hair: [v, v * 0.92, v * 0.74] }),
     );
@@ -242,6 +243,32 @@ describe("traits", () => {
         traits({ hair: [30, 28, 27] }).temperature - traits({ hair: [30, 30, 32] }).temperature,
       ),
     ).toBeLessThan(0.1);
+  });
+
+  /** {@link openspec/specs/color-sampling/spec.md#requirement-colors-reduce-to-temperature-value-and-clarity} */
+  it("never cools as a hair or skin hue turns toward yellow at the same chroma", () => {
+    // Lab colors at fixed L and chroma, hue swept from pink-red to yellow-green.
+    const atHue = (L: number, C: number, deg: number) => ({
+      L,
+      a: C * Math.cos((deg * Math.PI) / 180),
+      b: C * Math.sin((deg * Math.PI) / 180),
+    });
+    const skin = atHue(70, 22, 55);
+    for (const C of [3, 6, 9, 15]) {
+      const temps = [0, 15, 30, 45, 60, 75, 90].map(
+        (h) =>
+          traitsOf({ skin, hair: atHue(30, C, h), eyes: null, lips: null })?.temperature ?? NaN,
+      );
+      for (let k = 1; k < temps.length; k++)
+        expect(temps[k]).toBeGreaterThanOrEqual(temps[k - 1] ?? 2);
+    }
+    const skinTemps = [20, 35, 50, 65, 80].map(
+      (h) =>
+        traitsOf({ skin: atHue(70, 22, h), hair: null, eyes: null, lips: null })?.temperature ??
+        NaN,
+    );
+    for (let k = 1; k < skinTemps.length; k++)
+      expect(skinTemps[k]).toBeGreaterThanOrEqual(skinTemps[k - 1] ?? 2);
   });
 
   /** {@link openspec/specs/color-sampling/spec.md#scenario-traits-stay-in-range} */

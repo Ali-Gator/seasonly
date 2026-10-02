@@ -39,7 +39,7 @@ A region's color SHALL be a robust central value of its pixels that ignores spec
 
 ### Requirement: Colors reduce to temperature, value and clarity
 
-Sampling SHALL reduce the region colors to three traits, each a number from −1 to 1 rounded to three decimals: temperature (cool −1 to warm 1, from skin hue, eye and hair color), value (deep −1 to light 1, from skin, hair and eye lightness) and clarity (soft −1 to bright 1, from skin and eye chroma and the lightness contrast between skin, hair and eyes). Absent regions SHALL be left out of each trait rather than counted as zero. A warmer, lighter or more vivid input SHALL never produce a cooler, deeper or softer trait.
+Sampling SHALL reduce the region colors to three traits, each a number from −1 to 1 rounded to three decimals: temperature (cool −1 to warm 1, from skin and hair hue), value (deep −1 to light 1, from skin, hair and eye lightness) and clarity (soft −1 to bright 1, from skin and eye chroma and how much darker the hair or eyes are than the skin). Absent regions SHALL be left out of each trait rather than counted as zero. A hue with almost no chroma (black, grey or white hair) SHALL count for less, so rounding noise in its angle cannot swing temperature. A skin or hair hue turned toward yellow at the same chroma, a lighter skin, hair or eye color, or a more vivid skin or eye color SHALL never produce a cooler, deeper or softer trait.
 
 #### Scenario: Warmer skin
 
