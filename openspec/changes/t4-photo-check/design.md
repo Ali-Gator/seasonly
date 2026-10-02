@@ -73,7 +73,7 @@ The input is `PhotoInput` with nullable landmarks, so the flow passes the same o
 
 ### 3. Order of the steps
 
-1. **No landmarks:** check the buffer length (the one refusal that does not need landmarks; same message as sampling), then return `no-face` with every measurement null.
+1. **No landmarks:** check width, height and buffer length with the same messages as sampling (the refusals that do not need landmarks), then return `no-face` with every measurement null.
 2. **Sample:** call `samplePhoto(input)`. It validates the input, so malformed input is refused with sampling's own errors, and it gives the skin color.
 3. **Face:** compute the bounding box of all landmarks in pixels. If any landmark is outside the image, or the box is narrower than `MIN_FACE_WIDTH`, return `no-face`. Also return `no-face` if `sample.traits` is null. With the minimum width this should never trigger, but it guarantees the requirement "A photo that passes can be sampled" by construction.
 4. **Eye whites:** see decision 4. If measured, check `dark` and then `tint`.
@@ -116,7 +116,7 @@ The thresholds are set against the Monk Skin Tone scale (skintone.google, CC BY 
 
 So the grayscale floor sits well below 3.8, the hue band has margin on both sides, and the hue gate at chroma 6 keeps the unstable hue of near-gray deep skin from counting. The test copies the 10 hex values from the MST source with a citation.
 
-The 120 px minimum leaves the sclera at a few hundred pixels and the skin region far above sampling's 50.
+On the canonical fixture face at 120 px wide, both eye openings together hold about 134 pixels, so the eye whites stay measurable at the minimum width; a test pins this, and `MIN_FACE_WIDTH` rises if a corrected ring list says otherwise. The skin region is far above sampling's 50.
 
 ### 6. Retake copy in the core
 
@@ -135,15 +135,15 @@ Each entry also has the message and tip text exactly as the canvas files have th
 
 ### 7. Synthetic photos for tests
 
-The tests reuse the `__tests__/` fixture (`face478`, `paint`). Each paints skin (cheeks and forehead), eye openings in a near-white sclera (`#F0EDE8`) and irises in a dark brown. Each problem then comes from one edit that trips only its own signal:
+The tests reuse the `__tests__/` fixture (`face478`, `paint`). Its canonical landmarks span x 0.008–0.992 and y 0.107–0.954, so the face is inside the frame. Each test paints skin (cheeks and forehead), eye openings in a near-white sclera (`#F0EDE8`: L* 93.8, C\*ab 2.8) and irises in a dark brown. Each problem then comes from one edit that trips only its own signal, well past its limit (chroma edits about twice it), so tuning the constants in `t6-eval-set` does not turn a test edit into a borderline case (values from this core's `srgbToLab`):
 
 | Problem      | Edit                                                                       |
 | ------------ | -------------------------------------------------------------------------- |
-| `dark`       | every channel × 0.33                                                       |
-| `tint`, warm | blue × 0.7, green × 0.9                                                    |
-| `tint`, cool | red × 0.8                                                                  |
+| `dark`       | every channel × 0.33 (eye white L* 33)                                     |
+| `tint`, warm | blue × 0.7, green × 0.9 (eye white C\*ab 29)                               |
+| `tint`, cool | red × 0.6 (eye white C\*ab 30)                                             |
 | `filter`     | Rec. 709 luma to gray; the sclera stays neutral, so `tint` is not reported |
-| magenta skin | skin repainted, sclera untouched                                           |
+| magenta skin | skin repainted `#C890B8` (C\*ab 30, hue 336°), sclera untouched            |
 | closed eyes  | upper-lid landmarks moved onto the lower lid                               |
 | small face   | landmarks scaled about the face center                                     |
 | cut-off face | landmarks shifted past the edge                                            |
