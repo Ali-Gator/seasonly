@@ -66,6 +66,7 @@ test.describe("not found", () => {
       expect(response?.status()).toBe(404);
       expect(await robotsMeta(page)).toContain("noindex");
       await expect(page.locator("header")).toHaveCount(1);
+      await expect(page.locator("main")).toHaveCount(1);
     });
   }
 });
