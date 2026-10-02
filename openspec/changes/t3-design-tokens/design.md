@@ -57,6 +57,7 @@ apps/web/src/components/ds/
 ### 3. CSS: a separate `ds.css`, imported once
 
 - `ds.css` holds the `bundle.css` rules for the six components (`.sn-icon`, `.sn-btn--ghost`, the disabled button rules, `.sn-swatch*`, `.sn-swatch-grid`, `.sn-note*`, `.sn-report*`) and the layout classes artboards use directly (`.sn-card`, `.sn-stack`, `.sn-slot*`), plus `.sn-visually-hidden`.
+- `ds.css` adds no rule for the two hook classes (decision 4); the bundle has none.
 - It drops the Google Fonts `@import`, the `.sn-screen` reset, and rules for components that are not ported.
 - The whole file sits in one `@layer components { … }` block, so Tailwind utilities still override it, as in `globals.css`.
 - `globals.css` gets `@import "../components/ds/ds.css";` right after `@import "tailwindcss";`, because CSS needs `@import` before other rules.
@@ -69,6 +70,7 @@ apps/web/src/components/ds/
 `ds.test.tsx` renders each scenario with `renderToStaticMarkup` and asserts on the HTML string. It checks text, attributes, class names and element types, so no DOM is needed. It cites each requirement's anchor in `openspec/specs/ui-components/spec.md`.
 
 - The "every class has a style" test renders every component in every variant. It collects each `class="…"` token and checks that a selector `.<token>` appears in `globals.css` or `ds.css`, read as text the way `tokens.test.ts` reads `globals.css`.
+- A named list exempts the two classes the bundle renders as hooks with no rule. `sn-note--neutral` needs none because neutral is the base `.sn-note`. `sn-report__overline` takes its look from `.overline`. The test also fails when a listed hook stops being rendered or gains a rule, so the list cannot go stale.
 - The "no external resource" test fails on any `@import` and on any `url(` that is not a `data:` URL in `ds.css`. The color test fails on any hex, `rgb(` or `rgba(` literal there. The ported rules already use only token variables for color. Their few literal `2px` gaps stay, because the design system writes them that way.
 - Alternative: jsdom with Testing Library. Rejected: two new dev dependencies and a second Vitest environment, for assertions a string can already answer. Add them when a component gets behavior, such as focus or events.
 - `PALETTES["soft-autumn"].best` feeds the grid scenario, so the test uses real approved data.

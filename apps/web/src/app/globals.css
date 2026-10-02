@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../components/ds/ds.css";
 
 /* Design-system tokens, named as in the MVP canvas base.css. Checked against
    src/styles/tokens.json by src/styles/tokens.test.ts; sample-* tokens are demo data and stay out. */

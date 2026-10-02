@@ -90,11 +90,11 @@ A report section SHALL render its title as a second-level heading and SHALL be a
 
 ### Requirement: Every class a component renders has a design-system style
 
-Every class name these components render SHALL have a rule in the web app's stylesheets, copied from the design system's `bundle.css`. The component stylesheet SHALL take every color from the design-token variables. It SHALL NOT request any external resource. The layout classes artboards use directly (`.sn-card`, `.sn-stack`, `.sn-slot`) SHALL be defined too.
+Every class name these components render SHALL have a rule in the web app's stylesheets, copied from the design system's `bundle.css`. The exception is a class the design system renders only as a hook, with no rule of its own (`sn-note--neutral`, `sn-report__overline`). Such a class SHALL be listed by name as a hook. The component stylesheet SHALL take every color from the design-token variables. It SHALL NOT request any external resource. The layout classes artboards use directly (`.sn-card`, `.sn-stack`, `.sn-slot`) SHALL be defined too.
 
 #### Scenario: A component class has no rule
 
-- **WHEN** a component renders a class name that no rule in the web app's stylesheets defines, or `.sn-card`, `.sn-stack` or `.sn-slot` is not defined
+- **WHEN** a component renders a class name that no rule in the web app's stylesheets defines and that is not listed as a hook, or `.sn-card`, `.sn-stack` or `.sn-slot` is not defined
 - **THEN** the unit suite fails, naming the class
 
 #### Scenario: A color is hard-coded
