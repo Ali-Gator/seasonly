@@ -40,16 +40,18 @@
     color: var(--ink-subtle);
   }
 
-  /* Button */
-  .sn-btn--ghost {
+  /* Button. .sn-btn.sn-btn--ghost outranks the .sn-btn base in globals.css, which comes later in
+     this layer and would otherwise reset the underline. */
+  .sn-btn.sn-btn--ghost {
     background: transparent;
     color: var(--ink);
     text-decoration: underline;
     text-underline-offset: 3px;
     text-decoration-color: var(--line-strong);
   }
-  .sn-btn--ghost:hover {
+  .sn-btn.sn-btn--ghost:hover {
     background: var(--sunken);
+    color: var(--ink); /* over the a:hover color in globals.css */
   }
   /* The :hover forms outrank the variant hovers in globals.css, which come later in this layer. */
   .sn-btn:disabled,

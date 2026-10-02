@@ -51,6 +51,12 @@ describe("SwatchGrid", () => {
     });
   });
 
+  /** {@link openspec/specs/ui-components/spec.md#requirement-a-swatch-grid-shows-every-color-of-a-list-in-order} */
+  it("lays out in the number of columns asked for", () => {
+    const out = html(<SwatchGrid colors={best} columns={3} />);
+    expect(out).toContain("grid-template-columns:repeat(3, minmax(0, 1fr))");
+  });
+
   /** {@link openspec/specs/ui-components/spec.md#scenario-no-column-count-is-given} */
   it("lays out in 4 columns by default", () => {
     const out = html(<SwatchGrid colors={best} />);
@@ -209,6 +215,7 @@ describe("Stylesheets", () => {
 
   /** {@link openspec/specs/ui-components/spec.md#scenario-a-component-class-has-no-rule} */
   it("has a rule for every class the components render, and for the layout classes", () => {
+    expect(read("../../app/globals.css")).toContain('@import "../components/ds/ds.css";');
     const css = all();
     const missing = [...classes, "sn-card", "sn-stack", "sn-slot"].filter(
       (cls) => !HOOKS.includes(cls) && !hasRule(css, cls),
@@ -225,7 +232,9 @@ describe("Stylesheets", () => {
 
   /** {@link openspec/specs/ui-components/spec.md#scenario-a-color-is-hard-coded} */
   it("takes every color in ds.css from a token variable", () => {
-    expect(ds().match(/#[0-9a-f]{3,8}\b|rgba?\(/gi) ?? []).toEqual([]);
+    expect(
+      ds().match(/#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/gi) ?? [],
+    ).toEqual([]);
   });
 
   /** {@link openspec/specs/ui-components/spec.md#scenario-a-stylesheet-loads-an-external-resource} */

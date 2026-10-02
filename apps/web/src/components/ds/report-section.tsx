@@ -25,7 +25,7 @@ export function ReportSection({
   className,
 }: ReportSectionProps) {
   const autoId = useId();
-  const headingId = id ?? autoId;
+  const headingId = id || autoId;
   return (
     <section className={cx("sn-report", className)} aria-labelledby={headingId}>
       {overline && <p className="overline sn-report__overline">{overline}</p>}
