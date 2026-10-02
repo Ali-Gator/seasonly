@@ -137,7 +137,7 @@ Each answer adds to a partial trait vector, and `unsure` adds nothing. The weigh
 
 The neutral answers `mix`, `both`, `burn-tan` and `medium` add 0 to every axis. They are treated exactly like `unsure`, so they neither pull a photo toward neutral nor count as something to classify on. Each axis is clamped to [−1, 1].
 
-- **With a photo:** on each axis that at least one non-neutral answer touched, combined = 0.7 × photo + 0.3 × quiz. Untouched axes keep the photo value.
+- **With a photo:** on each axis that at least one non-neutral answer touched, combined = 0.8 × photo + 0.2 × quiz. Untouched axes keep the photo value. At 0.7 / 0.3, a photo on Soft Summer's point with green veins and gold jewelry crossed to Soft Autumn (temperature +0.02); at 0.8 it stays cool (−0.12).
 - **Without a photo:** the quiz vector is used as is, and an untouched axis stays at 0. If no answer moves any axis (every answer `unsure` or neutral), the result is `null`: a quiz of neutral answers alone would land equidistant from Soft Summer, Soft Autumn and Deep Autumn, which is a guess.
 - **Agreement:** `photo-only` when no answer moves any axis, `quiz-only` without a photo; otherwise `differ` when the photo's and the quiz's temperatures have opposite signs and both are at least 0.15 from zero; otherwise `agree`.
 
