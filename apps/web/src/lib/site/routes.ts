@@ -4,33 +4,37 @@
  *
  * @see openspec/specs/site-structure/spec.md
  */
+import { SEASON_SLUGS as CORE_SEASON_SLUGS, type SeasonSlug } from "@seasonly/analysis";
 import type { Metadata } from "next";
 
 /** The canonical host. A constant: it never changes per environment. */
 export const ORIGIN = "https://seasonly.me";
 
-/** The 12 seasons in family order. `summary` is the one-line description from the seasons index. */
-export const SEASONS = [
-  { slug: "light-spring", summary: "Warm and light. Fresh, delicate colors with a golden base." },
-  { slug: "true-spring", summary: "The warmest Spring. Clear, golden and sunny." },
-  { slug: "bright-spring", summary: "Clear and vivid, leaning warm. High contrast suits it." },
-  { slug: "light-summer", summary: "Cool and light. Soft pastels with a blue base." },
-  { slug: "true-summer", summary: "The coolest Summer. Rose, blue and soft grey." },
-  { slug: "soft-summer", summary: "Cool and muted. Smoky, dusty colors, never sharp." },
-  { slug: "soft-autumn", summary: "Warm and muted. Earthy colors with a little dust in them." },
-  { slug: "true-autumn", summary: "The warmest Autumn. Rich, spicy and golden." },
-  { slug: "deep-autumn", summary: "Deep and warm. Dark, rich earth tones." },
-  { slug: "deep-winter", summary: "Deep and cool. Dark, rich jewel tones." },
-  { slug: "true-winter", summary: "The coolest Winter. Pure, icy and high contrast." },
-  {
-    slug: "bright-winter",
-    summary: "Clear and vivid, leaning cool. Brilliant colors, high contrast.",
-  },
-] as const;
+/** The one-line description of each season from the seasons index. */
+const SUMMARIES: Record<SeasonSlug, string> = {
+  "light-spring": "Warm and light. Fresh, delicate colors with a golden base.",
+  "true-spring": "The warmest Spring. Clear, golden and sunny.",
+  "bright-spring": "Clear and vivid, leaning warm. High contrast suits it.",
+  "light-summer": "Cool and light. Soft pastels with a blue base.",
+  "true-summer": "The coolest Summer. Rose, blue and soft grey.",
+  "soft-summer": "Cool and muted. Smoky, dusty colors, never sharp.",
+  "soft-autumn": "Warm and muted. Earthy colors with a little dust in them.",
+  "true-autumn": "The warmest Autumn. Rich, spicy and golden.",
+  "deep-autumn": "Deep and warm. Dark, rich earth tones.",
+  "deep-winter": "Deep and cool. Dark, rich jewel tones.",
+  "true-winter": "The coolest Winter. Pure, icy and high contrast.",
+  "bright-winter": "Clear and vivid, leaning cool. Brilliant colors, high contrast.",
+};
 
-export type SeasonSlug = (typeof SEASONS)[number]["slug"];
+/** The 12 seasons in family order, from the analysis core. */
+export const SEASON_SLUGS: readonly SeasonSlug[] = CORE_SEASON_SLUGS;
 
-export const SEASON_SLUGS: readonly SeasonSlug[] = SEASONS.map((s) => s.slug);
+export type { SeasonSlug };
+
+/** The 12 seasons with their summaries, in family order. */
+export const SEASONS: readonly { slug: SeasonSlug; summary: string }[] = SEASON_SLUGS.map(
+  (slug) => ({ slug, summary: SUMMARIES[slug] }),
+);
 
 /** Common alternative season names, each 308-redirected to its fixed slug. */
 export const SEASON_ALIASES: Readonly<Record<string, SeasonSlug>> = {

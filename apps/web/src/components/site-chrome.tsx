@@ -1,3 +1,4 @@
+import { seasonFamily } from "@seasonly/analysis";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -87,7 +88,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
               key={family}
               id={`ft-${family}`}
               title={capitalize(family)}
-              links={SEASONS.filter((s) => s.slug.endsWith(`-${family}`)).map((s) => [
+              links={SEASONS.filter((s) => seasonFamily(s.slug) === family).map((s) => [
                 `/seasons/${s.slug}`,
                 seasonName(s.slug),
               ])}

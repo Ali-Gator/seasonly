@@ -2,22 +2,9 @@
  * The labeled photo set. Photos live in `evals/photos/` (git-ignored); this manifest
  * is committed. Phase 1 (t6-eval-set) fills it and adds the consistency runner.
  */
-export const SEASONS = [
-  "light-spring",
-  "warm-spring",
-  "clear-spring",
-  "light-summer",
-  "cool-summer",
-  "soft-summer",
-  "soft-autumn",
-  "warm-autumn",
-  "deep-autumn",
-  "deep-winter",
-  "cool-winter",
-  "clear-winter",
-] as const;
+import { SEASON_SLUGS, type SeasonSlug } from "../packages/analysis/src/index.ts";
 
-export type Season = (typeof SEASONS)[number];
+export type Season = SeasonSlug;
 
 export type EvalPhoto = {
   /** Path under evals/photos/, e.g. `p01/daylight-1.jpg`. */
@@ -50,7 +37,7 @@ export function manifestProblems(value: unknown): string[] {
       files.add(p.file);
     }
     if (typeof p?.person !== "string" || !p.person) problems.push(`${at}.person: required`);
-    if (!SEASONS.includes(p?.season as Season))
+    if (!SEASON_SLUGS.includes(p?.season as Season))
       problems.push(`${at}.season: not one of the 12 seasons`);
     if (typeof p?.light !== "string" || !p.light) problems.push(`${at}.light: required`);
     const prior = seasonOf.get(p?.person);

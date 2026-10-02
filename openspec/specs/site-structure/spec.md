@@ -10,8 +10,8 @@ Fixes the public URL map of seasonly.me — which routes exist, how they render,
 // apps/web/src/lib/site/routes.ts
 export const ORIGIN = "https://seasonly.me";
 export const SEASONS: readonly { slug: SeasonSlug; summary: string }[]; // family order
-export type SeasonSlug; // the 12 fixed slugs
-export const SEASON_SLUGS: readonly SeasonSlug[];
+export type SeasonSlug; // the 12 fixed slugs, from @seasonly/analysis
+export const SEASON_SLUGS: readonly SeasonSlug[]; // @seasonly/analysis's list (season-palettes)
 export const SEASON_ALIASES: Readonly<Record<string, SeasonSlug>>; // alternative name -> slug
 export function seasonName(slug: SeasonSlug): string; // "soft-autumn" -> "Soft Autumn"
 

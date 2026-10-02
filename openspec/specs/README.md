@@ -4,10 +4,13 @@ Each row maps a capability to the source paths it covers; its spec is at `opensp
 
 The second column is parsed, not read: comma-separated globs and nothing else. Notes go under the table.
 
-| Capability       | Source path globs                                                                                        |
-| ---------------- | -------------------------------------------------------------------------------------------------------- |
-| `observability`  | `apps/web/src/lib/observability/**`, `apps/web/instrumentation.ts`, `apps/web/instrumentation-client.ts` |
-| `site-structure` | `apps/web/src/lib/site/**`, `apps/web/src/app/sitemap.ts`, `apps/web/src/app/robots.ts`                  |
+| Capability          | Source path globs                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------------------------- |
+| `observability`     | `apps/web/src/lib/observability/**`, `apps/web/instrumentation.ts`, `apps/web/instrumentation-client.ts` |
+| `site-structure`    | `apps/web/src/lib/site/**`, `apps/web/src/app/sitemap.ts`, `apps/web/src/app/robots.ts`                  |
+| `color-sampling`    | `packages/analysis/src/sampling/**`                                                                      |
+| `season-classifier` | `packages/analysis/src/classifier/**`                                                                    |
+| `season-palettes`   | `packages/analysis/src/palettes/**`                                                                      |
 
 Rows never overlap and every row matches a file: {@link openspec/specs/spec-workflow/spec.md#requirement-mapping-rows-never-overlap}. Each capability owns its own folder, so row order never matters.
 
