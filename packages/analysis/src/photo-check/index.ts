@@ -87,7 +87,7 @@ function isFiltered(skin: Lab): boolean {
  * Reads its input, never writes it.
  */
 export function checkPhoto(input: PhotoCheckInput): PhotoCheck {
-  const { landmarks, width, height, pixels } = input;
+  const { landmarks, width, height, pixels, hairMask } = input;
   if (!landmarks) {
     // Sampling's refusals that need no landmarks, with its messages.
     if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1)
@@ -95,6 +95,10 @@ export function checkPhoto(input: PhotoCheckInput): PhotoCheck {
     if (pixels.length !== width * height * 4)
       throw new RangeError(
         `pixels: length ${pixels.length}, expected ${width * height * 4} (${width} × ${height} × 4)`,
+      );
+    if (hairMask && hairMask.length !== width * height)
+      throw new RangeError(
+        `hairMask: length ${hairMask.length}, expected ${width * height} (${width} × ${height})`,
       );
     return { problem: "no-face", measures: { faceWidth: null, eyeWhite: null, skin: null } };
   }
@@ -106,7 +110,8 @@ export function checkPhoto(input: PhotoCheckInput): PhotoCheck {
   const measures: PhotoMeasures = { faceWidth, eyeWhite: null, skin };
   const result = (problem: PhotoProblem | null): PhotoCheck => ({ problem, measures });
 
-  const outside = landmarks.some((p) => p.x < 0 || p.x > 1 || p.y < 0 || p.y > 1);
+  // Written so a NaN coordinate counts as outside.
+  const outside = landmarks.some((p) => !(p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1));
   // A null traits never follows from a face this wide; checked so a pass always samples.
   if (outside || faceWidth < MIN_FACE_WIDTH || !sample.traits) return result("no-face");
 

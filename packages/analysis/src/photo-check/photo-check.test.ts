@@ -121,6 +121,15 @@ function closedEyes(): Point[] {
 }
 
 const problem = (photo: PhotoCheckInput) => checkPhoto(photo).problem;
+/** The message `samplePhoto` refuses this input with; empty when it does not. */
+function samplingError(photo: PhotoInput): string {
+  try {
+    samplePhoto(photo);
+  } catch (e) {
+    return (e as Error).message;
+  }
+  return "";
+}
 const chroma = (c: { a: number; b: number }) => Math.hypot(c.a, c.b);
 
 /** Every photo this file expects to pass, for the sampling guarantee. */
@@ -129,6 +138,7 @@ const PASSING: [name: string, photo: () => PhotoInput][] = [
   ["MST 10", () => face({ skin: DEEPEST })],
   ["eyes closed", () => face({ landmarks: closedEyes() })],
   ["a face at the minimum width", () => face({ landmarks: atMinWidth() })],
+  ["468 landmarks, no irises", () => ({ ...face(), landmarks: LM.slice(0, 468) })],
   ...MST.map((skin, i): [string, () => PhotoInput] => [`MST ${i + 1}`, () => face({ skin })]),
 ];
 
@@ -178,10 +188,12 @@ describe("checkPhoto", () => {
     });
 
     /** {@link openspec/specs/photo-check/spec.md#scenario-a-face-partly-out-of-frame} */
-    it("reports no-face when landmarks fall outside the image", () => {
-      expect(problem(face({ landmarks: LM.map((p) => ({ x: p.x + 0.1, y: p.y })) }))).toBe(
-        "no-face",
-      );
+    it.each([
+      ["past the right edge", LM.map((p) => ({ x: p.x + 0.1, y: p.y }))],
+      ["past the bottom edge", LM.map((p) => ({ x: p.x, y: p.y + 0.1 }))],
+      ["not a number", LM.map((p, i) => (i === 10 ? { x: NaN, y: NaN } : p))],
+    ])("reports no-face for a landmark %s", (_, landmarks) => {
+      expect(problem(face({ landmarks }))).toBe("no-face");
     });
 
     /** Design decision 5: the eye whites stay measurable at the smallest face that passes. */
@@ -257,6 +269,14 @@ describe("checkPhoto", () => {
       expect(problem(face({ skin: [0xc8, 0x90, 0xb8] }))).toBe("filter");
     });
 
+    it("reports filter for green skin under neutral eye whites", () => {
+      expect(problem(face({ skin: [160, 180, 130] }))).toBe("filter"); // C*ab 28, hue 124°
+    });
+
+    it("ignores the hue of near-gray skin", () => {
+      expect(problem(face({ skin: [120, 124, 130] }))).toBeNull(); // C*ab 3.8, hue −94°
+    });
+
     it("reports filter for oversaturated skin of a natural hue", () => {
       const check = checkPhoto(face({ skin: [255, 100, 0] }));
       expect(check.problem).toBe("filter");
@@ -301,14 +321,16 @@ describe("checkPhoto", () => {
     /** {@link openspec/specs/photo-check/spec.md#scenario-a-short-buffer-with-no-face} */
     it("refuses a short buffer without landmarks exactly as sampling does", () => {
       const short = { ...face(), pixels: face().pixels.slice(1) };
-      let sampled = "";
-      try {
-        samplePhoto(short);
-      } catch (e) {
-        sampled = (e as Error).message;
-      }
+      const sampled = samplingError(short);
       expect(sampled).toContain(String(short.pixels.length));
       expect(() => checkPhoto({ ...short, landmarks: null })).toThrow(new RangeError(sampled));
+    });
+
+    it("refuses a wrong-size hair mask without landmarks exactly as sampling does", () => {
+      const masked = { ...face(), hairMask: new Uint8Array(10) };
+      expect(samplingError(masked)).toContain("hairMask: length 10");
+      const sampled = samplingError(masked);
+      expect(() => checkPhoto({ ...masked, landmarks: null })).toThrow(new RangeError(sampled));
     });
 
     /** {@link openspec/specs/photo-check/spec.md#scenario-too-few-landmarks} */

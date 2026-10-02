@@ -73,9 +73,9 @@ The input is `PhotoInput` with nullable landmarks, so the flow passes the same o
 
 ### 3. Order of the steps
 
-1. **No landmarks:** check width, height and buffer length with the same messages as sampling (the refusals that do not need landmarks), then return `no-face` with every measurement null.
+1. **No landmarks:** check width, height, buffer length and hair-mask length with the same messages as sampling (the refusals that do not need landmarks), then return `no-face` with every measurement null.
 2. **Sample:** call `samplePhoto(input)`. It validates the input, so malformed input is refused with sampling's own errors, and it gives the skin color.
-3. **Face:** compute the bounding box of all landmarks in pixels. If any landmark is outside the image, or the box is narrower than `MIN_FACE_WIDTH`, return `no-face`. Also return `no-face` if `sample.traits` is null. With the minimum width this should never trigger, but it guarantees the requirement "A photo that passes can be sampled" by construction.
+3. **Face:** compute the bounding box of all landmarks in pixels. If any landmark is outside the image or not a number, or the box is narrower than `MIN_FACE_WIDTH`, return `no-face`. Also return `no-face` if `sample.traits` is null. With the minimum width this should never trigger, but it guarantees the requirement "A photo that passes can be sampled" by construction.
 4. **Eye whites:** see decision 4. If measured, check `dark` and then `tint`.
 5. **Filter:** check the skin color (decision 5).
 
