@@ -3,16 +3,16 @@ import type { ReactNode } from "react";
 
 import { SEASONS, seasonName } from "@/lib/site/routes";
 
-// Header and footer from the approved canvas (artboards 14, phone and 1280).
+// Site and flow chrome from the approved canvas (artboards 14 and 02–13) and the 404 (21).
 
 const FAMILIES = ["spring", "summer", "autumn", "winter"] as const;
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-function Wordmark() {
+export function Wordmark({ size = "text-[1.6em] lg:text-[1.75em]" }: { size?: string }) {
   return (
     <Link href="/" className="inline-flex min-h-11 items-center self-start no-underline">
-      <span className="sn-wordmark text-[1.6em] lg:text-[1.75em]">Seasonly</span>
+      <span className={`sn-wordmark ${size}`}>Seasonly</span>
     </Link>
   );
 }
@@ -108,5 +108,24 @@ export function SiteShell({ children }: { children: ReactNode }) {
         </p>
       </footer>
     </div>
+  );
+}
+
+/** The 404 message, inside whichever chrome the 404 renders in. */
+export function NotFoundMessage() {
+  return (
+    <section className="flex flex-col gap-(--space-4) pt-(--space-8)">
+      <p className="overline">Page not found</p>
+      <h1 className="h1">This page doesn&apos;t exist</h1>
+      <p className="lead text-(--ink-muted)">The link may be old, or the address mistyped.</p>
+      <div className="mt-(--space-4) flex flex-col gap-(--space-3)">
+        <Link href="/" className="sn-btn sn-btn--primary sn-btn--block">
+          Go to the home page
+        </Link>
+        <Link href="/seasons" className="sn-btn sn-btn--secondary sn-btn--block">
+          Browse the 12 seasons
+        </Link>
+      </div>
+    </section>
   );
 }

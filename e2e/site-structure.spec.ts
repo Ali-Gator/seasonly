@@ -49,6 +49,14 @@ test.describe("public routes", () => {
     expect(await robotsMeta(page)).toContain("noindex");
   });
 
+  // design.md decision 6: the flow header is the wordmark alone, with no nav and no footer.
+  test("the flow shows only the wordmark header", async ({ page }) => {
+    await page.goto("/analyze");
+    await expect(page.locator("header a")).toHaveCount(1);
+    await expect(page.locator('header a[href="/"]')).toHaveCount(1);
+    await expect(page.locator("nav, footer")).toHaveCount(0);
+  });
+
   /** {@link openspec/specs/site-structure/spec.md#scenario-a-stub-page} */
   test("a stub page carries noindex", async ({ page }) => {
     await page.goto("/terms");

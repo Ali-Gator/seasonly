@@ -1,7 +1,16 @@
 import type { ReactNode } from "react";
 
-// The flow keeps its focus: no site header or footer (canvas artboards 02–13). Each page brings
-// its own column, so the root 404, which renders inside this layout for /r/<id>, is not nested in one.
+import { Wordmark } from "@/components/site-chrome";
+
+// The flow keeps its focus: one phone column, a header bar with only the wordmark, no nav or footer
+// (design.md decision 6, canvas artboards 02–13). Steps add their progress bar below it.
 export default function FlowLayout({ children }: { children: ReactNode }) {
-  return children;
+  return (
+    <div className="sn-screen flex flex-col gap-(--space-6)">
+      <header className="flex min-h-(--size-tap) items-center">
+        <Wordmark size="text-[1.4em]" />
+      </header>
+      {children}
+    </div>
+  );
 }

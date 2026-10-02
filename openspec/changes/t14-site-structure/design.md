@@ -51,9 +51,11 @@ Each route ships now as a minimal page (the h1 plus one line in the approved lay
 
 `/analyze` keeps every step in client state. The photo never needs to survive a navigation, refresh restarts the flow, and analytics events mark the steps (the `t5-funnel-analytics` capability). There are no per-step URLs to guard against direct entry.
 
+- Back button (for `t5-analysis-flow`): with one URL, the browser's Back would leave `/analyze` and lose the flow. Each step therefore pushes a history entry with `history.pushState` (same URL, the step in `state`) and listens for `popstate`, so Back returns to the previous step. The URL never changes, so nothing becomes deep-linkable.
+
 ### 6. Shared chrome
 
-Two route groups split the chrome. `(site)/layout.tsx` carries the shared header (wordmark → `/`, Seasons, How it works) and footer (all 12 season links, the GPT-alternative page, Privacy, Terms); the footer gives every page a crawl path to each season page. `(flow)/layout.tsx` holds `/analyze` and `/r/<id>` with a minimal header and no footer, so the flow keeps its focus. The root layout keeps only `<html>`, fonts and Speed Insights. The exact chrome comes from the approved artboards.
+Two route groups split the chrome. `(site)/layout.tsx` carries the shared header (wordmark → `/`, Seasons, How it works) and footer (all 12 season links, the GPT-alternative page, Privacy, Terms); the footer gives every page a crawl path to each season page. `(flow)/layout.tsx` holds `/analyze` and `/r/<id>` with no footer and no nav, so the flow keeps its focus. Its header is one bar with the wordmark linking to `/` and nothing else: it keeps the brand in view while people hand over a photo of their face, and gives them a way out other than Back. The report screens add their own controls (Share) beside it; the step progress bar sits below it, inside the page. The root layout keeps only `<html>`, fonts and Speed Insights. The exact chrome comes from the approved artboards.
 
 ### 7. Artboards to add to the MVP canvas
 

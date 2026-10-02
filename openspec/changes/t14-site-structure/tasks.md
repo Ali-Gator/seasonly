@@ -31,6 +31,6 @@
 
 ## 5. Ship and archive
 
-- [ ] 5.1 Check a Vercel preview: `/sitemap.xml` is empty of stubs, `/robots.txt` matches the spec, and a season page shows the apex canonical. Done when each is confirmed on the preview URL.
+- [ ] 5.1 Check a Vercel preview: `/sitemap.xml` is empty of stubs, `/robots.txt` matches the spec, a season page shows the apex canonical, and `/seasons/Soft-Autumn` answers 404 (Vercel is case-sensitive; local `next start` on macOS is not). Done when each is confirmed on the preview URL.
 - [ ] 5.2 Run phase review, archive, re-add Public Interface, Behavior and Edge Cases to `openspec/specs/site-structure/spec.md` and `openspec/specs/design-tokens/spec.md` (no README row for `design-tokens`: its files are all spec-exempt), and add its README mapping row (`apps/web/src/lib/site/**`, `apps/web/src/app/sitemap.ts`, `apps/web/src/app/robots.ts`). Done when `openspec validate --changes` passes and the Tracker Log has a line.
 - [ ] 5.3 Replace the "Routes reserved now" line in the architecture doc's "SEO and performance" section with a link to the `site-structure` spec. Done when the doc shows the link.
