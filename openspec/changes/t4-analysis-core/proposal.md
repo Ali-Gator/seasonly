@@ -27,6 +27,6 @@ None. `site-structure` keeps its 12 slugs. Its route map imports them from the c
 - New code under `packages/analysis/src/sampling/`, `src/classifier/` and `src/palettes/`, re-exported from `src/index.ts`. The placeholder constant goes away.
 - `packages/analysis/package.json` gains `zod`. `architecture-boundaries` already allows it.
 - `apps/web/src/lib/site/routes.ts` takes `SEASON_SLUGS` and `SeasonSlug` from `@seasonly/analysis` and keeps its season summaries as page copy. `evals/manifest.ts` takes the slugs from the core.
-- Downstream: `t5-analysis-flow` runs MediaPipe in the browser and passes landmarks and the hair mask in. `t4-photo-check` rejects bad photos before sampling. `t4-report-text` writes the prose. `t6-eval-set` tunes this change's provisional thresholds against labeled photos.
+- Downstream: `t5-analysis-flow` runs MediaPipe in the browser and passes landmarks and the hair mask in. It also sends a PostHog event when the classifier returns no result with reason `answers-cancel` (contradicting quiz answers, no photo), so those cases can be evaluated. `t4-photo-check` rejects bad photos before sampling. `t4-report-text` writes the prose. `t6-eval-set` tunes this change's provisional thresholds against labeled photos.
 - Season palettes on the canvas other than Soft Autumn stay provisional until this change's palette data is approved.
 - Out of scope: photo quality checks (`t4-photo-check`), report prose and the vision call (`t4-report-text`), white-balance correction, accuracy targets (`t6-eval-set`).

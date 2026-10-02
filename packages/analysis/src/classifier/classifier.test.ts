@@ -14,6 +14,7 @@ import {
   QUIZ_VALUES,
   QuizAnswersSchema,
   REFERENCE_POINTS,
+  type NoResult,
   type QuizAnswers,
   type SeasonResult,
 } from "./index.ts";
@@ -39,8 +40,8 @@ const between = (a: Traits, b: Traits, t: number): Traits =>
     a.value + (b.value - a.value) * t,
     a.clarity + (b.clarity - a.clarity) * t,
   );
-const result = (r: SeasonResult | null): SeasonResult => {
-  if (!r) throw new Error("expected a result");
+const result = (r: SeasonResult | NoResult): SeasonResult => {
+  if (!r.season) throw new Error(`expected a result, got ${r.reason}`);
   return r;
 };
 
@@ -159,7 +160,7 @@ describe("quiz alone", () => {
         for (const sun of values.sun)
           for (const hair of values.hair) {
             const r = classify({ photo: null, answers: { veins, jewelry, sun, hair } });
-            if (!r) continue;
+            if (!r.season) continue;
             expect(r.confidence).toBeLessThanOrEqual(0.6);
             expect(Math.round(r.confidence * 100) / 100).toBe(r.confidence);
           }
@@ -167,13 +168,26 @@ describe("quiz alone", () => {
 
   /** {@link openspec/specs/season-classifier/spec.md#scenario-nothing-to-go-on} */
   it("returns nothing when every answer is unsure", () => {
-    expect(classify({ answers: ALL_UNSURE })).toBeNull();
-    expect(classify({})).toBeNull();
+    expect(classify({ answers: ALL_UNSURE })).toEqual({ season: null, reason: "no-answers" });
+    expect(classify({})).toEqual({ season: null, reason: "no-answers" });
   });
 
   /** {@link openspec/specs/season-classifier/spec.md#scenario-only-neutral-answers} */
   it("returns nothing when every answer is neutral", () => {
-    expect(classify({ answers: ALL_NEUTRAL })).toBeNull();
+    expect(classify({ answers: ALL_NEUTRAL })).toEqual({ season: null, reason: "no-answers" });
+  });
+
+  /** {@link openspec/specs/season-classifier/spec.md#scenario-answers-that-cancel-out} */
+  it("returns nothing, saying so, when the answers cancel out", () => {
+    for (const answers of [
+      { veins: "green", jewelry: "silver" },
+      { veins: "blue", jewelry: "gold", sun: "burn-tan" },
+    ] as const)
+      expect(classify({ answers })).toEqual({ season: null, reason: "answers-cancel" });
+    // With a photo there is always a result.
+    expect(
+      classify({ photo: at(0.3, 0, 0), answers: { veins: "green", jewelry: "silver" } }).season,
+    ).not.toBeNull();
   });
 });
 
@@ -232,7 +246,7 @@ describe("determinism", () => {
   /** {@link openspec/specs/season-classifier/spec.md#scenario-one-photo-analyzed-twice} */
   it("gives deeply equal results for one photo analyzed twice in one process", () => {
     const [a, b] = [analyzeFixtureFace(), analyzeFixtureFace()];
-    expect(a.result).not.toBeNull();
+    expect(a.result.season).not.toBeNull();
     expect(a).toEqual(b);
   });
 

@@ -29,6 +29,15 @@ export interface SeasonResult {
   traits: Traits;
 }
 
+/**
+ * No photo and nothing to classify on. `answers-cancel`: answers that contradict each other
+ * summed to zero on every trait. Callers report it, so the quiz can be revisited.
+ */
+export interface NoResult {
+  season: null;
+  reason: "no-answers" | "answers-cancel";
+}
+
 export interface ClassifyInput {
   photo?: Traits | null;
   answers?: QuizAnswers;
@@ -58,10 +67,12 @@ function quizTraits(answers: QuizAnswers): { traits: Traits; touched: Set<Axis> 
   return { traits, touched };
 }
 
-/** Null when there is no photo and no answer that moves any trait. */
-export function classify({ photo = null, answers = {} }: ClassifyInput): SeasonResult | null {
+/** A no-result only without a photo, when the answers give nothing to classify on. */
+export function classify({ photo = null, answers = {} }: ClassifyInput): SeasonResult | NoResult {
   const quiz = quizTraits(answers);
-  if (!photo && quiz.touched.size === 0) return null;
+  if (!photo && quiz.touched.size === 0) return { season: null, reason: "no-answers" };
+  if (!photo && AXES.every((axis) => quiz.traits[axis] === 0))
+    return { season: null, reason: "answers-cancel" };
 
   const mix = (axis: Axis, p: Traits) =>
     quiz.touched.has(axis)
