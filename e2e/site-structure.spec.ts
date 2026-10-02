@@ -118,6 +118,9 @@ test.describe("design tokens", () => {
       expect(google).toEqual([]);
       await expect(page.locator("body")).toHaveCSS("background-color", "rgb(247, 247, 247)");
       await expect(page.locator("body")).toHaveCSS("color", "rgb(26, 26, 26)");
+      // The next/font families resolve first; an undefined --font-bodoni would void the whole stack.
+      await expect(page.locator("body")).toHaveCSS("font-family", /Instrument Sans/);
+      await expect(page.locator("h1")).toHaveCSS("font-family", /Bodoni Moda/);
     });
   }
 });

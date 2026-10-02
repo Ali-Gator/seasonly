@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
 
-import { indexedUrls, ROUTES, SEASON_ALIASES, SEASON_SLUGS } from "./routes";
+import { indexedUrls, ROUTES, SEASON_SLUGS } from "./routes";
 
 const FORBIDDEN = /\/(analyze|r|api)(\/|$)/;
 
@@ -16,16 +16,17 @@ describe("sitemap", () => {
   });
 
   /** {@link openspec/specs/site-structure/spec.md#requirement-the-sitemap-lists-exactly-the-indexed-pages} */
-  it("expands the season route to all 12 slugs once ready, and nothing else", () => {
-    const urls = indexedUrls(ROUTES.map((r) => ({ ...r, ready: true })));
-    for (const slug of SEASON_SLUGS) expect(urls).toContain(`https://seasonly.me/seasons/${slug}`);
-    expect(urls.filter((u) => u.startsWith("https://seasonly.me/seasons/"))).toHaveLength(12);
-    expect(urls.every((u) => u.startsWith("https://seasonly.me"))).toBe(true);
-    expect(urls.filter((u) => FORBIDDEN.test(u) || u.includes("["))).toEqual([]);
-    for (const alias of Object.keys(SEASON_ALIASES)) {
-      expect(urls).not.toContain(`https://seasonly.me/seasons/${alias}`);
-    }
-    expect(new Set(urls).size).toBe(urls.length);
+  it("lists exactly these URLs once every route is ready", () => {
+    expect(indexedUrls(ROUTES.map((r) => ({ ...r, ready: true })))).toEqual([
+      "https://seasonly.me",
+      "https://seasonly.me/seasons",
+      ...SEASON_SLUGS.map((s) => `https://seasonly.me/seasons/${s}`),
+      "https://seasonly.me/how-it-works",
+      "https://seasonly.me/sample-report",
+      "https://seasonly.me/color-analysis-gpt-alternative",
+      "https://seasonly.me/privacy",
+      "https://seasonly.me/terms",
+    ]);
   });
 });
 
@@ -36,5 +37,17 @@ describe("robots", () => {
       rules: { userAgent: "*", allow: "/", disallow: "/api/" },
       sitemap: "https://seasonly.me/sitemap.xml",
     });
+  });
+});
+
+describe("report page", () => {
+  /** {@link openspec/specs/site-structure/spec.md#scenario-a-report-page} */
+  it("gives a report any id without throwing, and noindex", async () => {
+    const { generateMetadata } = await import("@/app/(flow)/r/[id]/page");
+    for (const id of ["k7m2qx", "a/b", " "]) {
+      const meta = await generateMetadata({ params: Promise.resolve({ id }) });
+      expect(meta.robots, id).toEqual({ index: false });
+      expect(String(meta.alternates?.canonical), id).not.toMatch(/\/r\/.*[/ ]/);
+    }
   });
 });

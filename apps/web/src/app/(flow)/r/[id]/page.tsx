@@ -6,7 +6,8 @@ import { pageMetadata } from "@/lib/site/routes";
 type Props = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  return pageMetadata(`/r/${(await params).id}`);
+  // params arrive decoded; re-encode so an id holding `/` or a space still maps to this route.
+  return pageMetadata(`/r/${encodeURIComponent((await params).id)}`);
 }
 
 // No report exists until t5-report-delivery, so every id is unknown.
