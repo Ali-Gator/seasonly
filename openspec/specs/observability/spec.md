@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Errors go to Sentry, product events and feature flags to PostHog, real-user Core Web Vitals to Vercel Speed Insights. Each is wired in `apps/web` and stays off until its key is set, so a build or preview without credentials still works. Known gap: server-component and page render errors still rely on Next's `onRequestError`, which did not fire for route handlers in a Vercel production build (verified 2026-10-01); the first change that adds a dynamic server-rendered page proves or closes it.
+Errors go to Sentry, product events and feature flags to PostHog, real-user Core Web Vitals to Vercel Speed Insights. Each is wired in `apps/web` and stays off until its key is set, so a build or preview without credentials still works. Known gap: server-component and page render errors still rely on Next's `onRequestError`, which did not fire for route handlers in a Vercel production build (verified 2026-10-01); `t5-report-delivery`, which gives `/r/[id]` its first real on-request render, proves or closes it (`/r/[id]` only answers 404 until then).
 
 ## Requirements
 
