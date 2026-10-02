@@ -116,7 +116,7 @@ The thresholds are set against the Monk Skin Tone scale (skintone.google, CC BY 
 
 So the grayscale floor sits well below 3.8, the hue band has margin on both sides, and the hue gate at chroma 6 keeps the unstable hue of near-gray deep skin from counting. The test copies the 10 hex values from the MST source with a citation.
 
-On the canonical fixture face at 120 px wide, both eye openings together hold about 134 pixels, so the eye whites stay measurable at the minimum width; a test pins this, and `MIN_FACE_WIDTH` rises if a corrected ring list says otherwise. The skin region is far above sampling's 50.
+On the canonical fixture face at 120 px wide, both eye openings together hold about 128 pixels, so the eye whites stay measurable at the minimum width; a test pins this, and `MIN_FACE_WIDTH` rises if a corrected ring list says otherwise. The skin region is far above sampling's 50.
 
 ### 6. Retake copy in the core
 
