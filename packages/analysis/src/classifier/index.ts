@@ -84,7 +84,9 @@ export function classify({ photo = null, answers = {} }: ClassifyInput): SeasonR
   const [first, second] = ranked as [(typeof ranked)[number], (typeof ranked)[number]];
 
   const scale = photo ? 1 : QUIZ_ONLY_CONFIDENCE;
-  const confidence = round(scale * (1 - Math.sqrt(first.d2) / Math.sqrt(second.d2)), 2);
+  const margin = round(scale * (1 - Math.sqrt(first.d2) / Math.sqrt(second.d2)), 2);
+  // Rounding would show 1 just off a point; 1 is kept for exactly on one.
+  const confidence = first.d2 > 0 ? Math.min(margin, 0.99) : margin;
 
   const opposed =
     Math.sign(photo?.temperature ?? 0) * Math.sign(quiz.traits.temperature) < 0 &&

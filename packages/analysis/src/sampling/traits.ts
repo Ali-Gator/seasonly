@@ -32,8 +32,13 @@ const HAIR_L = [40, 25] as const;
 const EYES_L = [40, 20] as const;
 const SKIN_C = [20, 8] as const;
 const EYES_C = [20, 15] as const;
-/** Largest lightness gap from the skin to the hair or the eyes. */
+/** How much darker than the skin the hair or the eyes are, whichever is darker. */
 const CONTRAST = [30, 20] as const;
+/**
+ * Chroma at which a hue counts in full. Below it a hue's weight shrinks with the chroma, so
+ * black, grey or white hair, whose hue angle is rounding noise, does not swing temperature.
+ */
+const HUE_FULL_CHROMA = 10;
 
 /** Weights within each trait's mean. */
 const W = {
@@ -49,21 +54,31 @@ const chroma = (c: Lab) => Math.hypot(c.a, c.b);
 /** Rounded to three decimals, and never −0. */
 const round3 = (v: number) => Math.round(v * 1000) / 1000 || 0;
 
-/** Weighted mean of `[value, weight]` terms; absent regions are left out, not counted as 0. */
+/** A hue's `[term, weight]`, its weight scaled down for near-neutral colors. */
+const hueTerm = (c: Lab, range: readonly [number, number], weight: number): [number, number] => [
+  n(hue(c), range),
+  weight * Math.min(1, chroma(c) / HUE_FULL_CHROMA),
+];
+
+/**
+ * Weighted mean of `[value, weight]` terms; absent regions are left out, not counted as 0.
+ * 0 when no term has weight.
+ */
 function mean(terms: ([number, number] | null)[]): number {
   const present = terms.filter((t) => t !== null);
   const total = present.reduce((s, [, w]) => s + w, 0);
-  return round3(present.reduce((s, [v, w]) => s + v * w, 0) / total);
+  return total ? round3(present.reduce((s, [v, w]) => s + v * w, 0) / total) : 0;
 }
 
 /** Null without skin: there is nothing to measure against. */
 export function traitsOf({ skin, eyes, hair }: RegionColors): Traits | null {
   if (!skin) return null;
-  const gaps = [hair, eyes].flatMap((c) => (c ? [Math.abs(skin.L - c.L)] : []));
+  // Signed, so darker hair or eyes never lower the contrast.
+  const gaps = [hair, eyes].flatMap((c) => (c ? [skin.L - c.L] : []));
   return {
     temperature: mean([
-      [n(hue(skin), SKIN_HUE), W.temperature.skin],
-      hair && [n(hue(hair), HAIR_HUE), W.temperature.hair],
+      hueTerm(skin, SKIN_HUE, W.temperature.skin),
+      hair && hueTerm(hair, HAIR_HUE, W.temperature.hair),
     ]),
     value: mean([
       [n(skin.L, SKIN_L), W.value.skin],

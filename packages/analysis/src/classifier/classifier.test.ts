@@ -11,6 +11,7 @@ import { seasonFamily, SEASON_SLUGS } from "../palettes/index.ts";
 import type { Traits } from "../sampling/index.ts";
 import {
   classify,
+  QUIZ_VALUES,
   QuizAnswersSchema,
   REFERENCE_POINTS,
   type QuizAnswers,
@@ -77,6 +78,12 @@ describe("confidence", () => {
   it("is 1 on a reference point", () => {
     for (const slug of SEASON_SLUGS)
       expect(result(classify({ photo: REFERENCE_POINTS[slug] })).confidence).toBe(1);
+  });
+
+  it("stays below 1 just off a reference point", () => {
+    const r = result(classify({ photo: at(0.401, 0, -0.8) }));
+    expect(r.season).toBe("soft-autumn");
+    expect(r.confidence).toBe(0.99);
   });
 
   /** {@link openspec/specs/season-classifier/spec.md#scenario-halfway-between-two-seasons} */
@@ -146,12 +153,7 @@ describe("quiz alone", () => {
   });
 
   it("never goes above 0.6 confidence, with two decimals", () => {
-    const values = {
-      veins: ["green", "blue", "mix", "unsure"],
-      jewelry: ["gold", "silver", "both", "unsure"],
-      sun: ["burn", "burn-tan", "tan", "unsure"],
-      hair: ["dark", "medium", "blonde", "red", "unsure"],
-    } as const;
+    const values = QUIZ_VALUES;
     for (const veins of values.veins)
       for (const jewelry of values.jewelry)
         for (const sun of values.sun)

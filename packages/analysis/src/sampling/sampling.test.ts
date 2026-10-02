@@ -223,6 +223,27 @@ describe("traits", () => {
     expect(steps.at(-1)?.clarity).toBeGreaterThan(steps[0]?.clarity ?? 2);
   });
 
+  /** {@link openspec/specs/color-sampling/spec.md#scenario-higher-contrast} */
+  it("rises in clarity as hair lighter than the skin darkens", () => {
+    const steps = [250, 240, 230, 220].map((v) =>
+      traits({ skin: [200, 160, 130], hair: [v, v * 0.92, v * 0.74] }),
+    );
+    for (let k = 1; k < steps.length; k++)
+      expect(steps[k]?.clarity).toBeGreaterThanOrEqual(steps[k - 1]?.clarity ?? 2);
+  });
+
+  /** {@link openspec/specs/color-sampling/spec.md#requirement-colors-reduce-to-temperature-value-and-clarity} */
+  it("barely moves temperature between black and near-black hair", () => {
+    const black = traits({ hair: [0, 0, 0] }).temperature;
+    for (const v of [10, 20, 30])
+      expect(Math.abs(traits({ hair: [v, v, v] }).temperature - black)).toBeLessThan(0.05);
+    expect(
+      Math.abs(
+        traits({ hair: [30, 28, 27] }).temperature - traits({ hair: [30, 30, 32] }).temperature,
+      ),
+    ).toBeLessThan(0.1);
+  });
+
   /** {@link openspec/specs/color-sampling/spec.md#scenario-traits-stay-in-range} */
   it("stays within −1 and 1 with at most three decimals", () => {
     const colors: RGB[] = [

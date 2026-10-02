@@ -91,13 +91,17 @@ Conversion is sRGB → linear → XYZ (D65) → CIELAB, with the standard formul
 
 All constants below are provisional and live in `sampling/traits.ts`. `t6-eval-set` tunes them. `n(v, mid, half)` = `clamp((v − mid) / half, −1, 1)`; `h` = hue angle in degrees, `C` = chroma, `L` = lightness.
 
-| Trait       | Inputs, each normalized, then averaged with weights                                                                                                 |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| temperature | skin `n(h, 55, 15)` ×2; hair `n(h, 60, 20)` ×1 when present                                                                                         |
-| value       | skin `n(L, 62, 15)` ×2; hair `n(L, 40, 25)` ×1 when present; eyes `n(L, 40, 20)` ×0.5 when present                                                  |
-| clarity     | skin `n(C, 20, 8)` ×1; eyes `n(C, 20, 15)` ×1 when present; contrast `n(max ΔL from skin to hair or eyes, 30, 20)` ×1 when hair or eyes are present |
+| Trait       | Inputs, each normalized, then averaged with weights                                                                                                           |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| temperature | skin `n(h, 55, 15)` ×2; hair `n(h, 60, 20)` ×1 when present                                                                                                   |
+| value       | skin `n(L, 62, 15)` ×2; hair `n(L, 40, 25)` ×1 when present; eyes `n(L, 40, 20)` ×0.5 when present                                                            |
+| clarity     | skin `n(C, 20, 8)` ×1; eyes `n(C, 20, 15)` ×1 when present; contrast `n(max of skin L − hair L and skin L − eyes L, 30, 20)` ×1 when hair or eyes are present |
 
 Absent regions drop out of the weighted mean. Each trait is rounded to three decimals.
+
+- A hue term's weight is scaled by `min(1, C / 10)`. The hue angle of black, grey or white hair is rounding noise, and at full weight it swung temperature by up to 0.67 between near-identical blacks.
+- Contrast is signed (features darker than the skin), so darker hair never lowers clarity, even when the hair is lighter than the skin.
+- A region with more than 20,000 pixels (hair on a full-resolution selfie) is sampled at an even stride before the Lab conversion.
 
 - Rounding is also the cross-engine guard. `Math.cbrt` and `Math.pow` may differ in the last bit between JavaScript engines, and rounding absorbs that except exactly at a rounding edge.
 - Alternative: a trained model over the region colors. Rejected: no labeled data yet, and the concept asks for a rule-based classifier that can be explained.
@@ -115,7 +119,7 @@ Each season has a reference point (temperature, value, clarity). The points are 
 | true-autumn   | 0.9 | −0.2 | −0.2 |     | true-winter   | −0.9 | −0.3 | 0.5  |
 | deep-autumn   | 0.4 | −0.8 | 0    |     | bright-winter | −0.4 | −0.1 | 0.9  |
 
-The result is the nearest point by Euclidean distance, with the second nearest as runner-up. A tie goes to the earlier season in `SEASON_SLUGS`. Confidence is `round2(s × (1 − d1 / d2))`, with `s` = 0.6 when there is no photo and 1 otherwise. It is scaled before rounding, so it always has two decimals. That gives 1 on a point, 0 at an equidistant midpoint, and a smooth rise in between.
+The result is the nearest point by Euclidean distance, with the second nearest as runner-up. A tie goes to the earlier season in `SEASON_SLUGS`. Confidence is `round2(s × (1 − d1 / d2))`, with `s` = 0.6 when there is no photo and 1 otherwise. It is scaled before rounding, so it always has two decimals. That gives 1 on a point, 0 at an equidistant midpoint, and a smooth rise in between. Off a point it is capped at 0.99, since rounding alone would show 1 within 0.5% of a point.
 
 - Alternative: a decision tree (temperature first, then the dominant trait). Rejected: hard thresholds give a confidence that jumps, and adding a season means rewriting branches. Nearest-point classification is still a rule a person can read off the table.
 

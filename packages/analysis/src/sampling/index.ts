@@ -31,6 +31,9 @@ export interface Sample {
 /** Fewer usable pixels than this and a region is absent, not estimated. */
 export const MIN_REGION_PIXELS = 50;
 
+/** Pixels per region converted to Lab; larger regions are sampled at an even stride. */
+const MAX_REGION_SAMPLES = 20_000;
+
 function check({ pixels, width, height, landmarks, hairMask }: PhotoInput): void {
   if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1)
     throw new RangeError(`width and height: ${width} × ${height}, expected positive integers`);
@@ -52,14 +55,19 @@ export function samplePhoto(input: PhotoInput): Sample {
   const { pixels, width, height, landmarks, hairMask } = input;
   const inside = (rings: Rings) => regionPixels(rings, landmarks, width, height);
   const notHair = (i: number) => !hairMask?.[i];
-  const color = (indices: number[]): Lab | null =>
-    indices.length < MIN_REGION_PIXELS
-      ? null
-      : robustCenter(
-          indices.map((i) =>
-            srgbToLab(pixels[i * 4] ?? 0, pixels[i * 4 + 1] ?? 0, pixels[i * 4 + 2] ?? 0),
-          ),
-        );
+  const color = (indices: number[]): Lab | null => {
+    if (indices.length < MIN_REGION_PIXELS) return null;
+    // Every step-th pixel: a full-resolution selfie can have millions of hair pixels.
+    const step = Math.ceil(indices.length / MAX_REGION_SAMPLES);
+    const kept = step > 1 ? indices.filter((_, k) => k % step === 0) : indices;
+    return robustCenter(
+      kept.map((i) =>
+        srgbToLab(pixels[i * 4] ?? 0, pixels[i * 4 + 1] ?? 0, pixels[i * 4 + 2] ?? 0),
+      ),
+    );
+  };
+  const hair: number[] = [];
+  if (hairMask) for (let i = 0; i < hairMask.length; i++) if (hairMask[i]) hair.push(i);
 
   const skin = [
     ...new Set([REGIONS.forehead, REGIONS.rightCheek, REGIONS.leftCheek].flatMap(inside)),
@@ -70,7 +78,7 @@ export function samplePhoto(input: PhotoInput): Sample {
     skin: color(skin),
     eyes: color([...inside(REGIONS.rightIris), ...inside(REGIONS.leftIris)]),
     lips: color(inside(REGIONS.lips).filter(notHair)),
-    hair: hairMask ? color([...hairMask.keys()].filter((i) => hairMask[i])) : null,
+    hair: hairMask ? color(hair) : null,
   };
   return { regions, traits: traitsOf(regions) };
 }
