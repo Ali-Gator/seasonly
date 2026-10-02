@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test";
 
-test("the placeholder landing renders", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Seasonly" })).toBeVisible();
+// Asserts only what survives the placeholder being replaced: the page answers and is branded.
+test("the landing renders", async ({ page }) => {
+  const response = await page.goto("/");
+  expect(response?.status()).toBe(200);
+  await expect(page).toHaveTitle(/Seasonly/);
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 });
