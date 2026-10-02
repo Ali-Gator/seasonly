@@ -151,7 +151,12 @@ describe("checkPhoto", () => {
 
     /** {@link openspec/specs/photo-check/spec.md#scenario-a-photo-with-two-problems} */
     it("reports only dark for a dark, tinted photo", () => {
-      expect(problem(darken(warm(face())))).toBe("dark");
+      // A cast strong enough to outlive the darkening: eye white L* 32, C*ab 32.
+      const check = checkPhoto(darken(edit(face(), ([r, g, b]) => [r, g, b * 0.3])));
+      expect(check.problem).toBe("dark");
+      const eyeWhite = check.measures.eyeWhite ?? { L: NaN, a: NaN, b: NaN };
+      expect(eyeWhite.L).toBeLessThan(40);
+      expect(chroma(eyeWhite)).toBeGreaterThan(25);
     });
   });
 
