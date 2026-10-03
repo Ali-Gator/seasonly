@@ -144,12 +144,14 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
 - [ ] 9.1 At archive, add the README rows, re-add each new spec's Public Interface, Behavior and Edge Cases, and update the plan's carried list:
   - `capture-flow`: `apps/web/src/app/(flow)/analyze/page.tsx`, `apps/web/src/app/(flow)/analyze/flow.tsx`, `apps/web/src/app/(flow)/analyze/flow-state.ts`, `apps/web/src/app/(flow)/analyze/_capture/**`, `apps/web/src/lib/capture/**`;
   - `quiz`: `apps/web/src/app/(flow)/analyze/_quiz/**`;
-  - `season-reveal`: `apps/web/src/app/(flow)/analyze/_reveal/**`, `apps/web/src/app/api/analyze/**`, `apps/web/src/lib/analysis/**`.
+  - `season-reveal`: `apps/web/src/app/(flow)/analyze/_reveal/**`, `apps/web/src/app/api/analyze/**`, `apps/web/src/lib/analysis/**`, and `supabase/migrations/*_reports.sql` if the daily-cap migration has a row of its own. Check whether `apps/web/src/lib/supabase.ts` needs an owner.
 
   The carried list gets three groups of items:
   - **`t5-report-delivery`:** "Get my full report" on the reveal; a reveal with no report id; reading `reports`; checking "30 colors".
   - **`t5-report-images`:** crop storage.
   - **`t8-photo-privacy`:** consent; deleting `is_test` rows on a schedule; the jsDelivr and Google model downloads.
+  - **`t6-eval-set`:** false rejects found screening 26 CC0 and public-domain portraits for the E2E fixture (2026-10-03). Glasses gave `tint`; smiles, squints, turned heads and graded photos gave `dark`; no daylight selfie passed. Measure both on the eval set before launch.
+  - **Later UI:** the quiz options' image slots (the canvas shows placeholders; none ship), and a screen of its own for a check that crashes (it now shows the no-face retake and reports to Sentry).
   - **`t7-paywall-off`:** the analyze response carries the season, and the reveal's tagline and line are unique per season. So the subtype can be worked out from the free teaser, and the paywall must withhold both when it is on.
 
   Also edit the Purpose of `abuse-controls` and the Edge Cases line on BotID. Done when `openspec validate --specs` passes and the README mapping test passes.

@@ -46,8 +46,8 @@ const jpeg = (canvas: HTMLCanvasElement) =>
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob failed"))), "image/jpeg", 0.85),
   );
 
-/** An uploaded file (EXIF orientation applied) or the camera's current frame. */
-export async function checkImage(source: Blob | HTMLVideoElement): Promise<CheckedPhoto> {
+/** An uploaded file (EXIF orientation applied) or a frame taken from the camera. */
+export async function checkImage(source: Blob | ImageBitmap): Promise<CheckedPhoto> {
   const [{ landmarker, segmenter }, bitmap] = await Promise.all([
     loadVision(),
     createImageBitmap(source),

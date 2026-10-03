@@ -61,10 +61,15 @@ export function Flow() {
 
   const onPhoto = useCallback(
     async (photo: Blob | HTMLVideoElement, source: "camera" | "upload") => {
+      // The frame is taken before "checking" unmounts the camera and stops its stream.
+      const image = await (photo instanceof HTMLVideoElement
+        ? createImageBitmap(photo).catch(() => null)
+        : photo);
       dispatch({ type: "checking" });
       checks.current += 1;
       try {
-        const checked = await checkImage(photo);
+        if (!image) throw new Error("no camera frame");
+        const checked = await checkImage(image);
         track("photo_checked", photoCheckedProps({ ...checked, attempt: checks.current, source }));
         dispatch({
           type: "checked",
