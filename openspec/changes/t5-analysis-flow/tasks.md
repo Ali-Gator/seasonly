@@ -41,7 +41,7 @@
   - `BOTID_PROTECT` (the analyze route, `POST`) in `apps/web/src/lib/abuse/botid.ts`;
   - `initBotId({ protect: BOTID_PROTECT })` in `instrumentation-client.ts`.
 
-  Then run `pnpm build && pnpm start` with `CI=1` and no env, and call `checkBotId()` from a throwaway route. Done when it answers not-a-bot and the throwaway route is deleted. If it answers bot, stop and ask the user. 2026-10-03: plain `checkBotId()` threw (no OIDC token under `next start`); the user chose `isDevelopment: process.env.VERCEL !== "1"`, which answered human under `next start`.
+  Then run `pnpm build && pnpm start` with `CI=1` and no env, and call `checkBotId()` from a throwaway route. Done when it answers not-a-bot and the throwaway route is deleted. If it answers bot, stop and ask the user. 2026-10-03: plain `checkBotId()` threw (no OIDC token under `next start`); the user chose `isDevelopment` from the platform's deployment variable, which answered human under `next start`. It reads `VERCEL_ENV`, already exempt in the env catalogue, instead of `VERCEL`, which is not.
 
 ## 4. Tests first
 
@@ -77,7 +77,7 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
 
   Done when it fails for the missing module.
 
-- [ ] 4.5 Write `apps/web/src/app/api/analyze/route.test.ts`, citing the season-reveal and abuse-controls scenarios. Mock `botid/server`, `@/lib/report-text`, `@/lib/analysis/store` and `@sentry/nextjs`. Cover:
+- [x] 4.5 Write `apps/web/src/app/api/analyze/route.test.ts`, citing the season-reveal and abuse-controls scenarios. Mock `botid/server`, `@/lib/report-text`, `@/lib/analysis/store` and `@sentry/nextjs`. Cover:
   - 400 for each malformed input, with no claim, no call and no save;
   - the server classifies Soft Autumn's reference traits;
   - one report-text call with exactly the crop for a photo, and none for quiz-only;
@@ -108,8 +108,8 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
 
 ## 7. Flow and route
 
-- [ ] 7.1 Add `supabase/migrations/<timestamp>_reports.sql` and `apps/web/src/lib/analysis/store.ts` (design.md decision 6). Done when `store.test.ts` passes.
-- [ ] 7.2 Add `apps/web/src/lib/analysis/request.ts` (zod form-data parsing) and `apps/web/src/app/api/analyze/route.ts` (design.md decision 5). Done when `route.test.ts` passes.
+- [x] 7.1 Add `supabase/migrations/<timestamp>_reports.sql` and `apps/web/src/lib/analysis/store.ts` (design.md decision 6). Done when `store.test.ts` passes.
+- [x] 7.2 Add `apps/web/src/lib/analysis/request.ts` (zod form-data parsing) and `apps/web/src/app/api/analyze/route.ts` (design.md decision 5). Done when `route.test.ts` passes.
 - [ ] 7.3 Add `apps/web/src/lib/capture/`:
   - `mediapipe.ts`: lazy singletons and CDN URLs from the installed version (design.md decision 3);
   - `photo.ts`: decode and downscale, landmarks, hair mask, `checkPhoto` and `samplePhoto`, then the crop;
