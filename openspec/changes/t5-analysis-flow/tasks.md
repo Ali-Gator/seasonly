@@ -96,7 +96,7 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
 
   Done when both fail for the missing modules and migration.
 
-- [ ] 4.6 Add `e2e/fixtures/face.jpg`: a CC0 or public-domain portrait of one adult in daylight, with no filter. Record its URL and license in `e2e/fixtures/README.md`. Change `playwright.config.ts` as design.md decision 11 says: starved `webServer.env`, port 3100, `reuseExistingServer: false`. Confirm that Next keeps an empty pre-set variable over `.env.local`. Then write `e2e/analysis-flow.spec.ts` (design.md decision 11), citing the season-reveal exit and spend-nothing scenarios and the capture-flow no-face scenario. Its tripwire asserts that the analyze response is not `personal` and has a null `reportId`. Done when it fails because the flow is missing. Once the flow exists (7.x), the fixture must pass the photo check. If it does not, pick another photo; never loosen a threshold.
+- [x] 4.6 Add `e2e/fixtures/face.jpg`: a CC0 or public-domain portrait of one adult in daylight, with no filter. Record its URL and license in `e2e/fixtures/README.md`. Change `playwright.config.ts` as design.md decision 11 says: starved `webServer.env`, port 3100, `reuseExistingServer: false`. Confirm that Next keeps an empty pre-set variable over `.env.local`. Then write `e2e/analysis-flow.spec.ts` (design.md decision 11), citing the season-reveal exit and spend-nothing scenarios and the capture-flow no-face scenario. Its tripwire asserts that the analyze response is not `personal` and has a null `reportId`. Done when it fails because the flow is missing. Once the flow exists (7.x), the fixture must pass the photo check. If it does not, pick another photo; never loosen a threshold. 2026-10-03: the user approved the edit to `site-structure.spec.ts` (the progress nav is allowed). No daylight CC0 selfie of 26 screened passed (glasses gave `tint`; smiles, turned heads and graded photos gave `dark`), so the fixture is a public-domain official portrait; `e2e/fixtures/README.md` records why. The exit check ran in 5.2 s against `next start`.
 
 ## 5. Core
 
@@ -110,7 +110,7 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
 
 - [x] 7.1 Add `supabase/migrations/<timestamp>_reports.sql` and `apps/web/src/lib/analysis/store.ts` (design.md decision 6). Done when `store.test.ts` passes.
 - [x] 7.2 Add `apps/web/src/lib/analysis/request.ts` (zod form-data parsing) and `apps/web/src/app/api/analyze/route.ts` (design.md decision 5). Done when `route.test.ts` passes.
-- [ ] 7.3 Add `apps/web/src/lib/capture/`:
+- [x] 7.3 Add `apps/web/src/lib/capture/`:
   - `mediapipe.ts`: lazy singletons and CDN URLs from the installed version (design.md decision 3);
   - `photo.ts`: decode and downscale, landmarks, hair mask, `checkPhoto` and `samplePhoto`, then the crop;
   - `faces.ts`;
@@ -118,7 +118,7 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
 
   Done when 4.3 passes.
 
-- [ ] 7.4 Add `flow-state.ts`, `flow.tsx` and `page.tsx` in `apps/web/src/app/(flow)/analyze/`, and the steps:
+- [x] 7.4 Add `flow-state.ts`, `flow.tsx` and `page.tsx` in `apps/web/src/app/(flow)/analyze/`, and the steps:
   - `_capture/`: guide, capture, retake, consent;
   - `_quiz/`: four questions;
   - `_reveal/`: analyzing, reveal, no-result, error.

@@ -211,7 +211,7 @@ The canvas note "gives you 30 colors" stays verbatim. `t5-report-delivery` check
 1. **The exit check:** `/`, then the CTA, then "Upload a photo", then `setInputFiles` with `e2e/fixtures/face.jpg`, then "Agree and upload", then four answers, then the reveal shows a family name. All of it must finish within 30 s.
 2. **No face:** a solid grey PNG, generated in the test, gets the "No face found" retake screen and makes no `/api/analyze` request.
 
-The fixture is a CC0 or public-domain portrait: one adult in daylight, with no filter. `e2e/fixtures/README.md` records its URL and license.
+The fixture is a CC0 or public-domain portrait: one adult, frontal and evenly lit, with no filter. `e2e/fixtures/README.md` records its URL and license, and why it is a studio portrait rather than a daylight selfie.
 
 E2E never spends anything, wherever it runs. Locally, `pnpm dev` would load `apps/web/.env.local`, which holds real Supabase, Gateway and Sentry values. So `playwright.config.ts` changes in three ways:
 
