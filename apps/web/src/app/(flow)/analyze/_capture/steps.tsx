@@ -2,7 +2,7 @@
 
 import { RETAKE_TIPS, type RetakeReason } from "@seasonly/analysis";
 import Link from "next/link";
-import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { Button, CameraFrame, Icon, Note, PhotoTipCard } from "@/components/ds";
 
@@ -14,6 +14,15 @@ import { Button, CameraFrame, Icon, Note, PhotoTipCard } from "@/components/ds";
  */
 type OnPhoto = (photo: Blob | HTMLVideoElement, source: "camera" | "upload") => void;
 
+const noop = () => () => {};
+/** False in the server HTML and during hydration: a pick made before React listens is lost. */
+const useHydrated = () =>
+  useSyncExternalStore(
+    noop,
+    () => true,
+    () => false,
+  );
+
 /** A file picker dressed as a button: the label is the control, the input stays focusable. */
 export function UploadButton({
   onPhoto,
@@ -24,6 +33,7 @@ export function UploadButton({
   variant: "secondary" | "ghost";
   children: string;
 }) {
+  const hydrated = useHydrated();
   const pick = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
@@ -31,7 +41,13 @@ export function UploadButton({
   };
   return (
     <label className={`sn-btn sn-btn--${variant} sn-btn--block`}>
-      <input type="file" accept="image/*" className="sn-visually-hidden" onChange={pick} />
+      <input
+        type="file"
+        accept="image/*"
+        className="sn-visually-hidden"
+        disabled={!hydrated}
+        onChange={pick}
+      />
       <Icon name="upload" size={18} />
       {children}
     </label>
@@ -39,6 +55,7 @@ export function UploadButton({
 }
 
 export function Guide({ onCamera, onPhoto }: { onCamera: () => void; onPhoto: OnPhoto }) {
+  const hydrated = useHydrated();
   return (
     <>
       <div className="flex flex-col gap-(--space-3)">
@@ -68,7 +85,7 @@ export function Guide({ onCamera, onPhoto }: { onCamera: () => void; onPhoto: On
         bad={{ caption: "Beauty filter on" }}
       />
       <div className="sn-stack">
-        <Button block onClick={onCamera}>
+        <Button block disabled={!hydrated} onClick={onCamera}>
           <Icon name="camera" size={18} />
           Take a selfie
         </Button>

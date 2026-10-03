@@ -51,14 +51,16 @@ test("goes from the landing to the reveal in under 30 s, spending nothing", asyn
   await expect(
     page.getByRole("heading", { name: "Three things before your selfie" }),
   ).toBeVisible();
-  await page.getByLabel("Upload a photo").setInputFiles(FACE);
+  const upload = page.getByLabel("Upload a photo");
+  await expect(upload).toBeEnabled();
+  await upload.setInputFiles(FACE);
   await page.getByRole("button", { name: "Agree and upload" }).click();
 
   const answers = ["Green or olive", "Gold", "Tans easily, rarely burns", "Medium or light brown"];
   for (const [i, label] of answers.entries()) {
     await expect(page.getByText(`Question ${i + 1} of 4`)).toBeVisible();
     await page.getByText(label, { exact: true }).click();
-    if (i < 3) await page.getByRole("button", { name: "Next" }).click();
+    if (i < 3) await page.getByRole("button", { name: "Next", exact: true }).click();
   }
   const analyzed = page.waitForResponse(
     (r) => r.url().endsWith("/api/analyze") && r.request().method() === "POST",
@@ -85,9 +87,9 @@ test("asks for a retake of a photo with no face, sending nothing", async ({ page
     if (r.url().includes("/api/analyze")) analyze.push(r.url());
   });
   await page.goto("/analyze");
-  await page
-    .getByLabel("Upload a photo")
-    .setInputFiles({ name: "grey.png", mimeType: "image/png", buffer: greyPng() });
+  const upload = page.getByLabel("Upload a photo");
+  await expect(upload).toBeEnabled();
+  await upload.setInputFiles({ name: "grey.png", mimeType: "image/png", buffer: greyPng() });
   await expect(page.getByRole("heading", { name: "Let's retake this one" })).toBeVisible({
     timeout: 30_000,
   });

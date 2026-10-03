@@ -10,7 +10,7 @@ import path from "node:path";
 
 import { PGlite } from "@electric-sql/pglite";
 import * as Sentry from "@sentry/nextjs";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { type ReportInsert, type ReportRecord, type ReportRow, saveReport } from "./store";
 
@@ -26,6 +26,12 @@ function migration(): string {
   if (!file) throw new Error("no *_reports.sql migration");
   return fs.readFileSync(path.join(MIGRATIONS, file), "utf8");
 }
+
+/** One database per file: each PGlite boots a WASM Postgres, slow when files run in parallel. */
+let db: PGlite;
+beforeAll(async () => {
+  db = await database();
+}, 30_000);
 
 async function database(): Promise<PGlite> {
   const db = new PGlite();
@@ -82,7 +88,8 @@ const PERSONAL: ReportRecord = {
   agreementNote: "Green veins and gold jewelry point warm.",
 };
 
-afterEach(() => {
+afterEach(async () => {
+  await db.exec("reset role");
   vi.useRealTimers();
   vi.unstubAllEnvs();
   vi.clearAllMocks();
@@ -91,7 +98,6 @@ afterEach(() => {
 describe("saveReport", () => {
   /** {@link openspec/specs/season-reveal/spec.md#scenario-a-personal-result} */
   it("stores a personal result under a 22-character URL-safe id", async () => {
-    const db = await database();
     const id = await saveReport(PERSONAL, { insert: pgliteInsert(db) });
     expect(id).toMatch(/^[A-Za-z0-9_-]{22}$/);
     const { rows } = await db.query<Record<string, unknown>>(
@@ -116,7 +122,6 @@ describe("saveReport", () => {
 
   /** {@link openspec/specs/season-reveal/spec.md#requirement-a-result-is-stored-under-an-unguessable-id} */
   it("gives every report its own id", async () => {
-    const db = await database();
     const ids = await Promise.all(
       Array.from({ length: 20 }, () => saveReport(PERSONAL, { insert: pgliteInsert(db) })),
     );
@@ -169,7 +174,6 @@ describe("saveReport", () => {
 describe("reports table", () => {
   /** {@link openspec/specs/season-reveal/spec.md#scenario-the-public-role-reads-reports} */
   it("refuses the anonymous role both select and insert", async () => {
-    const db = await database();
     expect(await saveReport(PERSONAL, { insert: pgliteInsert(db) })).not.toBeNull();
     for (const role of ["anon", "authenticated"]) {
       await db.exec(`set role ${role}`);
