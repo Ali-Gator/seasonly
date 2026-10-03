@@ -18,7 +18,7 @@ The approved canvas report (`project/Report.dc.html` on https://claude.ai/artifa
 
 The other section intros ("Wear these near your face…", "Keep them away from your face…") are the same for every season. They stay page copy for `t5-report-delivery`.
 
-`ai` is at 7.x and is not installed. Every SDK name below (`generateText`, `Output.object`, the mock model in `ai/test`) must be checked against `node_modules/ai/docs` after install.
+`ai` 7.0.127 is installed in `apps/web`, with `zod` added there too: the output schema lives in `apps/web`, `ai` has `zod` as a peer, and pnpm does not hoist the core's copy. The SDK names below were checked against `node_modules/ai/docs`: `generateText`, `Output.object`, `maxRetries`, `abortSignal`, `providerOptions.gateway.zeroDataRetention`, and `MockLanguageModelV4` from `ai/test` (its `doGenerateCalls` records each call; the image part reaches it as a `file` part with `mediaType`).
 
 Motivation: proposal.md. Requirements: `specs/report-text/spec.md` and `specs/abuse-controls/spec.md`.
 
@@ -141,11 +141,11 @@ The steps run in this order:
    - one user message: a text part and an image part holding `faceCrop`, `image/jpeg`.
 3. Map the outcome:
    - an abort gives `timeout`;
-   - a no-object or schema error gives `invalid`;
+   - a no-object or schema error gives `invalid`: `NoObjectGeneratedError` when `generateText` rejects on unparsable or schema-invalid output, and `NoOutputGeneratedError` when reading `result.output` finds none, so the `.output` read sits inside the same `try`;
    - any other throw gives `failed`;
    - the verdict `no-face` or `several-faces` gives `rejected`;
    - otherwise the result is `personal`.
-4. Every fallback except `capped` calls `Sentry.captureException(new Error("report-text fallback: <reason>"), { extra: { cause } })` and then `await Sentry.flush(2000)`. A fallback returns normally, so nothing else flushes before the Vercel function freezes; `with-error-capture.ts` flushes only on a thrown error. The flush runs on failure paths only, and 20 s plus 2 s stays inside the 30 s budget.
+4. Every fallback except `capped` calls `Sentry.captureException(new Error("report-text fallback: <reason>", { cause }))` and then `await Sentry.flush(2000)`. The cause rides on the error rather than in `extra`, so Sentry shows its stack as a linked error. A fallback returns normally, so nothing else flushes before the Vercel function freezes; `with-error-capture.ts` flushes only on a thrown error. The flush runs on failure paths only, and 20 s plus 2 s stays inside the 30 s budget.
 
 Output schema (zod, `.strict()`):
 
@@ -218,7 +218,7 @@ The 200-slot scenario runs at cap 200 in a loop. It takes milliseconds in PGlite
 
 ### 9. The smoke run
 
-`report-text.smoke.ts` is not matched by the unit or eval globs. It runs only through `pnpm test:smoke`, which uses `vitest.config.smoke.ts`. A key exported in a shell can therefore never turn `pnpm test:unit` into a paid run. It calls `generateReportText` three times on `evals/photos/smoke.jpg` (git-ignored; the user supplies it), with `claimSlot` stubbed to `granted`. Vitest does not read `apps/web/.env.local`, so the config loads it with Vite's `loadEnv`. For each call it prints the result kind, the verdict, both strings and the latency. A human reads the output against the "describes coloring only" rules.
+`report-text.smoke.ts` is not matched by the unit or eval globs. It runs only through `pnpm test:smoke`, which uses `vitest.config.smoke.ts`. A key exported in a shell can therefore never turn `pnpm test:unit` into a paid run. It calls `generateReportText` three times on `evals/photos/smoke.jpg` (git-ignored; the user supplies it), with `claimSlot` stubbed to `granted`. Vitest does not read `apps/web/.env.local`, so the config loads it with Node's `process.loadEnvFile`. Vite's `loadEnv` is not resolvable from the root under pnpm, and `vitest/config` does not re-export it. For each call it prints the result kind, the verdict, both strings and the latency. A human reads the output against the "describes coloring only" rules.
 
 ### 10. Env
 

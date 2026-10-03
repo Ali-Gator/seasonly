@@ -19,9 +19,11 @@
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "test:eval": "vitest run --config vitest.config.eval.ts",
+    "test:smoke": "vitest run --config vitest.config.smoke.ts",
     "verify:env": "node scripts/verify-env.ts"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@eslint/js": "^10.0.1",
     "@next/eslint-plugin-next": "^16.3.8",
     "@playwright/test": "^1.63.0",

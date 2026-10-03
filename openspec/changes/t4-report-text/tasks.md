@@ -1,6 +1,6 @@
 ## 1. Tracker
 
-- [ ] 1.1 Add a Tracker Log line naming `t4-report-text` and the branch, and say that BotID moved to `t5-analysis-flow` (proposal.md). T4 stays In progress until this change archives. Done when the Log shows the line.
+- [x] 1.1 Add a Tracker Log line naming `t4-report-text` and the branch, and say that BotID moved to `t5-analysis-flow` (proposal.md). T4 stays In progress until this change archives. Done when the Log shows the line.
 
 ## 2. Copy approval (user gate)
 
@@ -14,13 +14,13 @@
 
 ## 3. Setup
 
-- [ ] 3.1 Add the dependencies:
+- [x] 3.1 Add the dependencies:
   - `ai` and `@supabase/supabase-js` to `apps/web`;
   - `@electric-sql/pglite` as a root dev dependency.
 
   Check `generateText`, `Output.object`, the no-object error class, `maxRetries`, `abortSignal`, `providerOptions.gateway` and the mock language model in `ai/test` against `node_modules/ai/docs`, and fix design.md decisions 3 and 4 wherever a name differs. Done when `pnpm install` succeeds and design.md matches the installed API.
 
-- [ ] 3.2 Add `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `AI_GATEWAY_API_KEY` and `DAILY_ANALYSIS_CAP` (design.md decision 10) to:
+- [x] 3.2 Add `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `AI_GATEWAY_API_KEY` and `DAILY_ANALYSIS_CAP` (design.md decision 10) to:
   - `apps/web/.env.example`;
   - the catalogue table in `openspec/specs/env/spec.md`, edited directly because it sits in Purpose;
   - `PROBES` in `scripts/verify-env.ts`.
@@ -29,14 +29,14 @@
 
 ## 4. Tests first
 
-- [ ] 4.1 Write `packages/analysis/src/report-text/report-text.test.ts`, citing `openspec/specs/report-text/spec.md` scenarios:
+- [x] 4.1 Write `packages/analysis/src/report-text/report-text.test.ts`, citing `openspec/specs/report-text/spec.md` scenarios:
   - all 12 seasons have every field, non-empty and within limits;
   - the Soft Autumn strings equal the canvas;
   - all four agreement notes are within their limits, and the `agree` title is right.
 
   Done when the tests fail for the missing module.
 
-- [ ] 4.2 Write `apps/web/src/lib/report-text/report-text.test.ts`, citing the report-text scenarios. Use the `ai/test` mock model and `vi.mock("@sentry/nextjs")`. Cover:
+- [x] 4.2 Write `apps/web/src/lib/report-text/report-text.test.ts`, citing the report-text scenarios. Use the `ai/test` mock model and `vi.mock("@sentry/nextjs")`. Cover:
   - one call for a valid answer;
   - one call and `invalid` for an over-long summary and for an unknown verdict;
   - one call and `failed` on a throw;
@@ -48,7 +48,7 @@
 
   Done when the tests fail for the missing module.
 
-- [ ] 4.3 Write `apps/web/src/lib/abuse/daily-cap.test.ts`, citing `openspec/specs/abuse-controls/spec.md` scenarios. Use PGlite with the migration file, as in design.md decision 8. Cover:
+- [x] 4.3 Write `apps/web/src/lib/abuse/daily-cap.test.ts`, citing `openspec/specs/abuse-controls/spec.md` scenarios. Use PGlite with the migration file, as in design.md decision 8. Cover:
   - claim 200 is granted and claim 201 refused, at cap 200;
   - yesterday's full row does not block today's first claim;
   - `anon` is refused both the claim and a select on the table, after Supabase's default grants are replayed (design.md decision 8);
@@ -61,10 +61,10 @@
 ## 5. Code
 
 - [ ] 5.1 Add `packages/analysis/src/report-text/index.ts` and `copy.ts` with the approved copy from 2.1 (design.md decisions 1–2), and re-export from `packages/analysis/src/index.ts`. Done when 4.1 passes and the architecture-boundaries tests, including "loads in plain node", pass.
-- [ ] 5.2 Add `supabase/migrations/<timestamp>_daily_cap.sql` and `apps/web/src/lib/abuse/daily-cap.ts` (design.md decision 7). Done when 4.3 passes.
-- [ ] 5.3 Add `apps/web/src/lib/report-text/index.ts` with `generateReportText`, the prompt, the output schema and `REPORT_TEXT_MODEL` (design.md decisions 3–6). Re-check the model id against `https://ai-gateway.vercel.sh/v1/models` first. Done when 4.2 passes.
-- [ ] 5.4 Add `vitest.config.smoke.ts`, the root script `test:smoke` and `apps/web/src/lib/report-text/report-text.smoke.ts` (design.md decision 9). The config loads `apps/web/.env.local` with `loadEnv`. Do not run it. Done when `pnpm test:unit` does not pick up the smoke file.
-- [ ] 5.5 Run `pnpm fix` then `pnpm test`. Done when both are green.
+- [x] 5.2 Add `supabase/migrations/<timestamp>_daily_cap.sql` and `apps/web/src/lib/abuse/daily-cap.ts` (design.md decision 7). Done when 4.3 passes.
+- [x] 5.3 Add `apps/web/src/lib/report-text/index.ts` with `generateReportText`, the prompt, the output schema and `REPORT_TEXT_MODEL` (design.md decisions 3–6). Re-check the model id against `https://ai-gateway.vercel.sh/v1/models` first. Done when 4.2 passes.
+- [x] 5.4 Add `vitest.config.smoke.ts`, the root script `test:smoke` and `apps/web/src/lib/report-text/report-text.smoke.ts` (design.md decision 9). The config loads `apps/web/.env.local` with `process.loadEnvFile` (design.md decision 9). Do not run it. Done when `pnpm test:unit` does not pick up the smoke file.
+- [x] 5.5 Run `pnpm fix` then `pnpm test`. Done when both are green.
 
 ## 6. External (each needs the user's yes in chat)
 
