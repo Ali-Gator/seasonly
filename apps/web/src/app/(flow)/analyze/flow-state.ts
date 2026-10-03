@@ -135,14 +135,20 @@ export function reduce(s: FlowState, e: FlowEvent): FlowState {
           },
         );
       }
-      const next = { ...s, failures: 0, photo: e.photo, quizOnly: false };
-      return next.consented ? afterPhoto(next, replace) : replace(next, { name: "consent" });
+      const next = { ...s, failures: 0, photo: e.photo };
+      // Quiz-only ends only once the photo is kept, not when it might still be declined.
+      return next.consented
+        ? afterPhoto({ ...next, quizOnly: false }, replace)
+        : replace(next, { name: "consent" });
     }
     case "agree":
-      return step.name === "consent" ? afterPhoto({ ...s, consented: true }, push) : s;
+      return step.name === "consent"
+        ? afterPhoto({ ...s, consented: true, quizOnly: false }, push)
+        : s;
     case "decline":
-      // The person said no: the photo is dropped and the next pass asks again.
-      return push({ ...s, photo: null, consented: false }, { name: "capture" });
+      // The person said no: the photo is dropped and the next pass asks again. Replaced, so
+      // Back does not land on the consent it just left.
+      return replace({ ...s, photo: null, consented: false }, { name: "capture" });
     case "retake":
       return push(s, { name: "capture" });
     case "quiz-only":

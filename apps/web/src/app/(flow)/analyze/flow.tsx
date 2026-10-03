@@ -33,7 +33,8 @@ export function Flow() {
 
   // One browser entry per trail entry, numbered from the entry the flow mounted on: after a
   // reload or a return from /privacy, the browser keeps earlier entries and their depths.
-  // A popstate below our depth is Back, once per level; one at or above it (Forward) is ignored.
+  // A popstate below our depth is Back, once per level. Entries below the mount's base belong to
+  // an earlier visit, so Back onto one leaves the flow at once; Forward is undone.
   const base = useRef<number | null>(null);
   const depthOf = (e: { state: unknown }) => (e.state as { depth?: number } | null)?.depth ?? 0;
   useEffect(() => {
@@ -43,8 +44,12 @@ export function Flow() {
   }, [depth]);
   useEffect(() => {
     const onPop = (e: PopStateEvent) => {
-      const to = Math.max(0, depthOf(e) - (base.current ?? 0));
-      for (; shown.current > to; shown.current--) dispatch({ type: "back" });
+      // Another page's entry is the router's business.
+      if (location.pathname !== "/analyze") return;
+      const at = depthOf(e) - (base.current ?? 0);
+      if (at < 0) return history.go(-(depthOf(e) + 1));
+      if (at > shown.current) return history.go(shown.current - at);
+      for (; shown.current > at; shown.current--) dispatch({ type: "back" });
     };
     addEventListener("popstate", onPop);
     return () => removeEventListener("popstate", onPop);
@@ -79,7 +84,9 @@ export function Flow() {
       try {
         if (!image) throw new Error("no camera frame");
         const checked = await checkImage(image);
-        track("photo_checked", photoCheckedProps({ ...checked, attempt: id, source }));
+        // A check overtaken by a newer one is dropped, so it is not reported either.
+        if (id === checks.current)
+          track("photo_checked", photoCheckedProps({ ...checked, attempt: id, source }));
         dispatch({
           type: "checked",
           id,

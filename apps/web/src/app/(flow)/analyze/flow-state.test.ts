@@ -301,17 +301,49 @@ describe("review fixes", () => {
   });
 
   /** {@link openspec/specs/capture-flow/spec.md#requirement-nothing-leaves-the-device-before-consent} */
-  it("shows capture, not an empty consent, when Back reaches consent for a dropped photo", () => {
+  it("shows capture, not an empty consent, when Back reaches consent for a rejected photo", () => {
+    const rejected = reduce(run(toAnalyzing), {
+      type: "analyzed",
+      response: { kind: "rejected", problem: "no-face" },
+    });
+    const back = (n: number, s: FlowState) =>
+      run(
+        Array.from({ length: n }, (): FlowEvent => ({ type: "back" })),
+        s,
+      );
+    // The rejection replaced analyzing; four Backs pass the questions, the fifth reaches consent.
+    expect(back(4, rejected).step).toEqual({ name: "quiz", question: 0 });
+    expect(back(5, rejected).step).toEqual({ name: "capture" });
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-consent-declined} */
+  it("replaces consent with capture when declined, so Back does not return to it", () => {
     const state = run([
+      { type: "open-camera" },
       { type: "checking", id: 1 },
       passed,
       { type: "decline" },
-      { type: "checking", id: 1 },
-      failed(),
-      { type: "back" },
-      { type: "back" },
     ]);
     expect(state.step).toEqual({ name: "capture" });
+    expect(reduce(state, { type: "back" }).step).toEqual({ name: "capture" });
+    expect(run([{ type: "back" }, { type: "back" }], state).step).toEqual({ name: "guide" });
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-continuing-without-a-photo} */
+  it("keeps the quiz-only choice when a later photo is declined", () => {
+    const quizOnly = run([
+      { type: "checking", id: 1 },
+      failed(),
+      { type: "checking", id: 1 },
+      failed(),
+      { type: "quiz-only" },
+    ]);
+    const declined = run(
+      [{ type: "retake" }, { type: "checking", id: 2 }, { ...passed, id: 2 }, { type: "decline" }],
+      quizOnly,
+    );
+    expect(declined.quizOnly).toBe(true);
+    expect(run([{ type: "change-answers" }, ...answerAll], declined).step.name).toBe("analyzing");
   });
 
   /** {@link openspec/specs/capture-flow/spec.md#scenario-first-failure} */

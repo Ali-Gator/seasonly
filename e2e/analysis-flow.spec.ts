@@ -136,4 +136,7 @@ test("Back stays inside the flow, also after a reload", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Three things before your selfie" }),
   ).toBeVisible();
+  // The entries before the reload belong to the earlier visit: one more Back leaves the flow.
+  await page.goBack();
+  await expect(page).not.toHaveURL(/\/analyze/);
 });
