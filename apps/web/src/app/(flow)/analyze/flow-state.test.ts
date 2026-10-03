@@ -25,9 +25,16 @@ const PASS: PassedPhoto = {
   crop,
   cropUrl: "blob:crop",
 };
-const passed: FlowEvent = { type: "checked", problem: null, photo: PASS, previewUrl: "blob:p" };
+const passed: FlowEvent = {
+  type: "checked",
+  id: 1,
+  problem: null,
+  photo: PASS,
+  previewUrl: "blob:p",
+};
 const failed = (problem: "dark" | "no-face" = "dark"): FlowEvent => ({
   type: "checked",
+  id: 1,
   problem,
   photo: null,
   previewUrl: "blob:p",
@@ -43,12 +50,22 @@ const answerAll: FlowEvent[] = [
   { type: "next" },
 ];
 /** Guide → upload → pass → consent → quiz done → analyzing. */
-const toAnalyzing: FlowEvent[] = [{ type: "checking" }, passed, { type: "agree" }, ...answerAll];
+const toAnalyzing: FlowEvent[] = [
+  { type: "checking", id: 1 },
+  passed,
+  { type: "agree" },
+  ...answerAll,
+];
 
 describe("history", () => {
   /** {@link openspec/specs/capture-flow/spec.md#scenario-back-inside-the-quiz} */
   it("goes back from question 2 to question 1", () => {
-    const q2 = run([{ type: "checking" }, passed, { type: "agree" }, ...answerAll.slice(0, 2)]);
+    const q2 = run([
+      { type: "checking", id: 1 },
+      passed,
+      { type: "agree" },
+      ...answerAll.slice(0, 2),
+    ]);
     expect(q2.step).toEqual({ name: "quiz", question: 1 });
     expect(reduce(q2, { type: "back" }).step).toEqual({ name: "quiz", question: 0 });
   });
@@ -82,7 +99,7 @@ describe("history", () => {
 
   /** {@link openspec/specs/capture-flow/spec.md#requirement-the-flow-stays-on-one-url-and-back-returns-to-the-previous-step} */
   it("replaces the check with its outcome, so Back from consent skips it", () => {
-    const consent = run([{ type: "open-camera" }, { type: "checking" }, passed]);
+    const consent = run([{ type: "open-camera" }, { type: "checking", id: 1 }, passed]);
     expect(consent.step.name).toBe("consent");
     expect(reduce(consent, { type: "back" }).step).toEqual({ name: "capture" });
   });
@@ -96,14 +113,14 @@ describe("history", () => {
 describe("consent", () => {
   /** {@link openspec/specs/capture-flow/spec.md#scenario-consent-declined} */
   it("goes back to capture without a request when declined", () => {
-    const state = run([{ type: "checking" }, passed, { type: "decline" }]);
+    const state = run([{ type: "checking", id: 1 }, passed, { type: "decline" }]);
     expect(state.step).toEqual({ name: "capture" });
     expect(state.request).toBeNull();
   });
 
   /** {@link openspec/specs/capture-flow/spec.md#scenario-consent-given} */
   it("starts the quiz when given, and builds the request only when the quiz is done", () => {
-    const quiz = run([{ type: "checking" }, passed, { type: "agree" }]);
+    const quiz = run([{ type: "checking", id: 1 }, passed, { type: "agree" }]);
     expect(quiz.step).toEqual({ name: "quiz", question: 0 });
     expect(quiz.request).toBeNull();
     expect(run(answerAll, quiz).request?.photo).toBe(PASS);
@@ -112,11 +129,11 @@ describe("consent", () => {
   /** {@link openspec/specs/capture-flow/spec.md#requirement-nothing-leaves-the-device-before-consent} */
   it("is asked once per visit", () => {
     const again = run([
-      { type: "checking" },
+      { type: "checking", id: 1 },
       passed,
       { type: "agree" },
       { type: "retake" },
-      { type: "checking" },
+      { type: "checking", id: 1 },
       passed,
     ]);
     expect(again.step.name).not.toBe("consent");
@@ -126,7 +143,7 @@ describe("consent", () => {
 describe("retakes", () => {
   /** {@link openspec/specs/capture-flow/spec.md#scenario-first-failure} */
   it("offers only a retake and an upload after the first failure", () => {
-    expect(run([{ type: "checking" }, failed()]).step).toEqual({
+    expect(run([{ type: "checking", id: 1 }, failed()]).step).toEqual({
       name: "retake",
       problem: "dark",
       offerQuizOnly: false,
@@ -136,18 +153,26 @@ describe("retakes", () => {
 
   /** {@link openspec/specs/capture-flow/spec.md#scenario-second-failure-in-a-row} */
   it("offers to continue without a photo after the second failure in a row, until a pass", () => {
-    const twice = run([{ type: "checking" }, failed(), { type: "checking" }, failed("no-face")]);
+    const twice = run([
+      { type: "checking", id: 1 },
+      failed(),
+      { type: "checking", id: 1 },
+      failed("no-face"),
+    ]);
     expect(twice.step).toMatchObject({ name: "retake", problem: "no-face", offerQuizOnly: true });
-    const reset = run([{ type: "checking" }, passed, { type: "checking" }, failed()], twice);
+    const reset = run(
+      [{ type: "checking", id: 1 }, passed, { type: "checking", id: 1 }, failed()],
+      twice,
+    );
     expect(reset.step).toMatchObject({ name: "retake", offerQuizOnly: false });
   });
 
   /** {@link openspec/specs/capture-flow/spec.md#scenario-continuing-without-a-photo} */
   it("sends the answers only on the quiz-only path", () => {
     const state = run([
-      { type: "checking" },
+      { type: "checking", id: 1 },
       failed(),
-      { type: "checking" },
+      { type: "checking", id: 1 },
       failed(),
       { type: "quiz-only" },
       ...answerAll,
@@ -171,14 +196,24 @@ describe("retakes", () => {
 describe("quiz", () => {
   /** {@link openspec/specs/quiz/spec.md#scenario-a-fresh-question} */
   it("selects nothing on a fresh question and blocks Next until an answer", () => {
-    const q2 = run([{ type: "checking" }, passed, { type: "agree" }, ...answerAll.slice(0, 2)]);
+    const q2 = run([
+      { type: "checking", id: 1 },
+      passed,
+      { type: "agree" },
+      ...answerAll.slice(0, 2),
+    ]);
     expect(q2.answers.jewelry).toBeUndefined();
     expect(reduce(q2, { type: "next" })).toBe(q2);
   });
 
   /** {@link openspec/specs/quiz/spec.md#scenario-back-to-an-answered-question} */
   it("keeps an answer through Back", () => {
-    const q3 = run([{ type: "checking" }, passed, { type: "agree" }, ...answerAll.slice(0, 4)]);
+    const q3 = run([
+      { type: "checking", id: 1 },
+      passed,
+      { type: "agree" },
+      ...answerAll.slice(0, 4),
+    ]);
     const back = reduce(q3, { type: "back" });
     expect(back.step).toEqual({ name: "quiz", question: 1 });
     expect(back.answers.jewelry).toBe("gold");
@@ -191,7 +226,7 @@ describe("quiz", () => {
       response: { kind: "rejected", problem: "several-faces" },
     });
     expect(rejected.step).toMatchObject({ name: "retake", problem: "several-faces" });
-    const again = run([{ type: "retake" }, { type: "checking" }, passed], rejected);
+    const again = run([{ type: "retake" }, { type: "checking", id: 1 }, passed], rejected);
     expect(again.step.name).toBe("analyzing");
     expect(again.request?.answers).toEqual(run(toAnalyzing).request?.answers);
   });
@@ -247,5 +282,63 @@ describe("step progress", () => {
     expect(stepProgress({ name: "quiz", question: 2 })).toBe(1);
     expect(stepProgress({ name: "analyzing" })).toBe(2);
     expect(stepProgress({ name: "reveal", result: {} as never })).toBeNull();
+  });
+});
+
+describe("review fixes", () => {
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-consent-declined} */
+  it("asks for consent again after it was declined", () => {
+    const state = run([
+      { type: "checking", id: 1 },
+      passed,
+      { type: "agree" },
+      { type: "back" },
+      { type: "decline" },
+      { type: "checking", id: 1 },
+      passed,
+    ]);
+    expect(state.step.name).toBe("consent");
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#requirement-nothing-leaves-the-device-before-consent} */
+  it("shows capture, not an empty consent, when Back reaches consent for a dropped photo", () => {
+    const state = run([
+      { type: "checking", id: 1 },
+      passed,
+      { type: "decline" },
+      { type: "checking", id: 1 },
+      failed(),
+      { type: "back" },
+      { type: "back" },
+    ]);
+    expect(state.step).toEqual({ name: "capture" });
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-first-failure} */
+  it("asks for a new photo, not a quiz-only send, after Back from a rejection", () => {
+    const rejected = reduce(run(toAnalyzing), {
+      type: "analyzed",
+      response: { kind: "rejected", problem: "no-face" },
+    });
+    const state = run([{ type: "back" }, { type: "next" }], rejected);
+    expect(state.step).toEqual({ name: "capture" });
+    const again = run(
+      [
+        { type: "checking", id: 2 },
+        { ...passed, id: 2 },
+      ],
+      state,
+    );
+    expect(again.step.name).toBe("analyzing");
+    expect(again.request?.photo).toBe(PASS);
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#requirement-every-photo-is-checked-on-the-device-before-anything-is-uploaded} */
+  it("drops a result from an earlier check and a second tap while checking", () => {
+    const first = run([{ type: "checking", id: 1 }]);
+    expect(reduce(first, { type: "checking", id: 2 })).toBe(first);
+    const second = run([{ type: "back" }, { type: "checking", id: 2 }], first);
+    expect(reduce(second, passed)).toBe(second);
+    expect(reduce(second, { ...passed, id: 2 }).step.name).toBe("consent");
   });
 });

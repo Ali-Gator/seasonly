@@ -14,7 +14,8 @@ export type Result = Extract<AnalyzeResponse, { kind: "result" }>;
 export type Step =
   | { name: "guide" }
   | { name: "capture" }
-  | { name: "checking" }
+  /** `id` ties the check's result to the photo that started it. */
+  | { name: "checking"; id: number }
   | { name: "retake"; problem: RetakeReason; offerQuizOnly: boolean; previewUrl: string | null }
   | { name: "consent" }
   | { name: "quiz"; question: number }
@@ -43,6 +44,8 @@ export interface FlowState {
   answers: QuizAnswers;
   /** Answered every question once this visit. */
   quizDone: boolean;
+  /** Chose to continue without a photo; a passing photo ends it. */
+  quizOnly: boolean;
   /** Failed checks in a row. */
   failures: number;
   consented: boolean;
@@ -57,9 +60,10 @@ export type Question = (typeof QUESTIONS)[number];
 
 export type FlowEvent =
   | { type: "open-camera" }
-  | { type: "checking" }
+  | { type: "checking"; id: number }
   | {
       type: "checked";
+      id: number;
       problem: RetakeReason | null;
       photo: PassedPhoto | null;
       previewUrl: string | null;
@@ -83,6 +87,7 @@ export function initialState(): FlowState {
     photo: null,
     answers: {},
     quizDone: false,
+    quizOnly: false,
     failures: 0,
     consented: false,
     request: null,
@@ -114,9 +119,10 @@ export function reduce(s: FlowState, e: FlowEvent): FlowState {
     case "open-camera":
       return push(s, { name: "capture" });
     case "checking":
-      return push(s, { name: "checking" });
+      // A second tap while checking adds no entry; its result is dropped by id.
+      return step.name === "checking" ? s : push(s, { name: "checking", id: e.id });
     case "checked": {
-      if (step.name !== "checking") return s;
+      if (step.name !== "checking" || step.id !== e.id) return s;
       if (e.problem || !e.photo) {
         const failures = s.failures + 1;
         return replace(
@@ -129,22 +135,26 @@ export function reduce(s: FlowState, e: FlowEvent): FlowState {
           },
         );
       }
-      const next = { ...s, failures: 0, photo: e.photo };
+      const next = { ...s, failures: 0, photo: e.photo, quizOnly: false };
       return next.consented ? afterPhoto(next, replace) : replace(next, { name: "consent" });
     }
     case "agree":
       return step.name === "consent" ? afterPhoto({ ...s, consented: true }, push) : s;
     case "decline":
+      // The person said no: the photo is dropped and the next pass asks again.
+      return push({ ...s, photo: null, consented: false }, { name: "capture" });
     case "retake":
       return push(s, { name: "capture" });
     case "quiz-only":
-      return afterPhoto({ ...s, photo: null }, push);
+      return afterPhoto({ ...s, photo: null, quizOnly: true }, push);
     case "answer":
       return { ...s, answers: { ...s.answers, [e.question]: e.value } as QuizAnswers };
     case "next": {
       if (step.name !== "quiz" || !s.answers[QUESTIONS[step.question] as Question]) return s;
       if (step.question < QUESTIONS.length - 1)
         return push(s, { name: "quiz", question: step.question + 1 });
+      // A photo that was rejected since is not replaced by the quiz alone without the offer.
+      if (!s.photo && !s.quizOnly) return push({ ...s, quizDone: true }, { name: "capture" });
       return analyze({ ...s, quizDone: true }, push);
     }
     case "change-answers":
@@ -168,7 +178,10 @@ export function reduce(s: FlowState, e: FlowEvent): FlowState {
         : s;
     case "back": {
       const previous = s.trail.at(-1);
-      return previous ? { ...s, step: previous, trail: s.trail.slice(0, -1) } : s;
+      if (!previous) return s;
+      // Consent for a photo that was since dropped has nothing to show: take a new one.
+      const to: Step = previous.name === "consent" && !s.photo ? { name: "capture" } : previous;
+      return { ...s, step: to, trail: s.trail.slice(0, -1) };
     }
   }
 }

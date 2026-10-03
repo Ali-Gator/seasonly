@@ -97,3 +97,43 @@ test("asks for a retake of a photo with no face, sending nothing", async ({ page
   await expect(page.getByText("Hold the phone at eye level")).toBeVisible();
   expect(analyze).toEqual([]);
 });
+
+/**
+ * {@link openspec/specs/capture-flow/spec.md#scenario-back-inside-the-quiz}
+ * {@link openspec/specs/capture-flow/spec.md#scenario-reload}
+ */
+test("Back stays inside the flow, also after a reload", async ({ page }) => {
+  test.setTimeout(90_000);
+  const upload = async () => {
+    const input = page.getByLabel("Upload a photo");
+    await expect(input).toBeEnabled();
+    await input.setInputFiles(FACE);
+    await page.getByRole("button", { name: "Agree and upload" }).click();
+  };
+  await page.goto("/analyze");
+  await upload();
+  await page.getByText("Green or olive", { exact: true }).click();
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(page.getByText("Question 2 of 4")).toBeVisible();
+  await page.getByText("Gold", { exact: true }).click();
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+  await expect(page.getByText("Question 3 of 4")).toBeVisible();
+
+  await page.goBack();
+  await expect(page.getByText("Question 2 of 4")).toBeVisible();
+  await expect(page.getByLabel("Gold")).toBeChecked();
+  expect(new URL(page.url()).pathname).toBe("/analyze");
+
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Three things before your selfie" }),
+  ).toBeVisible();
+  await upload();
+  await expect(page.getByText("Question 1 of 4")).toBeVisible();
+  await page.goBack();
+  await expect(page.getByRole("heading", { name: "Before we upload" })).toBeVisible();
+  await page.goBack();
+  await expect(
+    page.getByRole("heading", { name: "Three things before your selfie" }),
+  ).toBeVisible();
+});

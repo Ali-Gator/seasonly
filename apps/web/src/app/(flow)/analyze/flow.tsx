@@ -29,20 +29,22 @@ export function Flow() {
   const depth = state.trail.length;
   const shown = useRef(0);
   const checks = useRef(0);
+  const urls = useRef<string[]>([]);
 
-  // One browser entry per trail entry. A popstate below our depth is Back; one at or above it
-  // (Forward) is ignored, and the next push drops it.
+  // One browser entry per trail entry, numbered from the entry the flow mounted on: after a
+  // reload or a return from /privacy, the browser keeps earlier entries and their depths.
+  // A popstate below our depth is Back, once per level; one at or above it (Forward) is ignored.
+  const base = useRef<number | null>(null);
+  const depthOf = (e: { state: unknown }) => (e.state as { depth?: number } | null)?.depth ?? 0;
   useEffect(() => {
-    if (depth > shown.current) history.pushState({ depth }, "");
+    base.current ??= depthOf(history);
+    if (depth > shown.current) history.pushState({ depth: base.current + depth }, "");
     shown.current = depth;
   }, [depth]);
   useEffect(() => {
     const onPop = (e: PopStateEvent) => {
-      const to = (e.state as { depth?: number } | null)?.depth ?? 0;
-      if (to < shown.current) {
-        shown.current = to;
-        dispatch({ type: "back" });
-      }
+      const to = Math.max(0, depthOf(e) - (base.current ?? 0));
+      for (; shown.current > to; shown.current--) dispatch({ type: "back" });
     };
     addEventListener("popstate", onPop);
     return () => removeEventListener("popstate", onPop);
@@ -54,10 +56,17 @@ export function Flow() {
     document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true });
   }, [step]);
 
-  // The models download while the guide is read.
+  // The models download while the guide is read. The photo's object URLs end with the page.
   useEffect(() => {
     loadVision().catch(() => {});
+    const created = urls.current;
+    return () => created.forEach((url) => URL.revokeObjectURL(url));
   }, []);
+  const objectUrl = (blob: Blob) => {
+    const url = URL.createObjectURL(blob);
+    urls.current.push(url);
+    return url;
+  };
 
   const onPhoto = useCallback(
     async (photo: Blob | HTMLVideoElement, source: "camera" | "upload") => {
@@ -65,30 +74,33 @@ export function Flow() {
       const image = await (photo instanceof HTMLVideoElement
         ? createImageBitmap(photo).catch(() => null)
         : photo);
-      dispatch({ type: "checking" });
-      checks.current += 1;
+      const id = ++checks.current;
+      dispatch({ type: "checking", id });
       try {
         if (!image) throw new Error("no camera frame");
         const checked = await checkImage(image);
-        track("photo_checked", photoCheckedProps({ ...checked, attempt: checks.current, source }));
+        track("photo_checked", photoCheckedProps({ ...checked, attempt: id, source }));
         dispatch({
           type: "checked",
+          id,
           problem: checked.problem,
           photo:
             checked.traits && checked.crop
               ? {
                   traits: checked.traits,
                   crop: checked.crop,
-                  cropUrl: URL.createObjectURL(checked.crop),
+                  cropUrl: objectUrl(checked.crop),
                 }
               : null,
-          previewUrl: URL.createObjectURL(checked.preview),
+          previewUrl: objectUrl(checked.preview),
         });
       } catch (error) {
         // A photo the browser cannot decode, or models that failed to load.
         // ponytail: shown as the no-face retake; a screen of its own if Sentry shows load failures.
         Sentry.captureException(error);
-        dispatch({ type: "checked", problem: "no-face", photo: null, previewUrl: null });
+        dispatch({ type: "checked", id, problem: "no-face", photo: null, previewUrl: null });
+      } finally {
+        if (image instanceof ImageBitmap) image.close();
       }
     },
     [],
@@ -99,12 +111,11 @@ export function Flow() {
   const { request, attempt } = state;
   useEffect(() => {
     if (!analyzing || !request) return;
+    // One controller for both Back and the timeout: AbortSignal.any is too new for iOS 16.
     const controller = new AbortController();
-    fetch("/api/analyze", {
-      method: "POST",
-      body: toFormData(request),
-      signal: AbortSignal.any([controller.signal, AbortSignal.timeout(TIMEOUT_MS)]),
-    })
+    let left = false;
+    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    fetch("/api/analyze", { method: "POST", body: toFormData(request), signal: controller.signal })
       .then(async (res) => {
         if (!res.ok) throw new Error(`analyze: ${res.status}`);
         const response = (await res.json()) as AnalyzeResponse;
@@ -127,9 +138,13 @@ export function Flow() {
         dispatch({ type: "analyzed", response });
       })
       .catch(() => {
-        if (!controller.signal.aborted) dispatch({ type: "failed" });
-      });
-    return () => controller.abort();
+        if (!left) dispatch({ type: "failed" });
+      })
+      .finally(() => clearTimeout(timer));
+    return () => {
+      left = true;
+      controller.abort();
+    };
   }, [analyzing, request, attempt]);
 
   const progress = stepProgress(step);
