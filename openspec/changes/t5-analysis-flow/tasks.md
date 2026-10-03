@@ -128,7 +128,7 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
 ## 8. Gate and external (each external step needs the user's yes in chat)
 
 - [x] 8.1 Run `pnpm fix` then `pnpm test`. Done when both are green.
-- [ ] 8.2 With the user's confirmation, apply the `reports` migration to the Supabase project `seasonly` (ref `qisseuermrrwvvnfyjet`) through the connector. As `anon`, `select` from `public.reports` and expect a permission error. Done when the connector lists the migration and `anon` was refused.
+- [x] 8.2 With the user's confirmation, apply the `reports` migration to the Supabase project `seasonly` (ref `qisseuermrrwvvnfyjet`) through the connector. As `anon`, `select` from `public.reports` and expect a permission error. Done when the connector lists the migration and `anon` was refused. Applied 2026-10-03 as version 20261003195509 (local file renamed to match); `anon` was refused select and insert; the only advisor note is the intended RLS-without-policies INFO.
 - [ ] 8.3 Push the branch. On the Vercel preview, on a real phone, check:
   - the camera's live view and the camera-blocked upload path;
   - a deliberately dark photo gets the dark retake;
