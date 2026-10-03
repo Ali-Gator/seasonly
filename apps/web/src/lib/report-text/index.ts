@@ -94,7 +94,7 @@ Rules:
 - Describe only the visible coloring of the skin, hair and eyes, and how it fits ${season}.
 - Never mention ethnicity, race, age, body, health or attractiveness.
 - summary: 2 to 4 sentences, under 600 characters, in the voice and length of the reference summary. Describe this person's coloring; do not copy the reference.
-- agreementNote: 1 or 2 sentences, under 240 characters. Say what the photo showed and what the quiz answers pointed to. If there are no quiz answers, say what the photo showed.
+- agreementNote: 1 or 2 sentences, under 240 characters. Name at least one quiz answer and what it pointed to, and at least one feature the photo showed and what it pointed to. For example: "Green veins and gold jewelry point warm. Your soft brown hair and hazel eyes point muted." If there are no quiz answers, say what the photo showed.
 - photo: your verdict on the image.
   - "no-face": no human face is visible.
   - "several-faces": more than one face is visible.

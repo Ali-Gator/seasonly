@@ -19,6 +19,7 @@ vi.mock("@sentry/nextjs", () => ({
 }));
 
 const PHOTO = path.resolve(import.meta.dirname, "../../../../../evals/photos/smoke.jpg");
+const OUTPUT = path.join(path.dirname(PHOTO), "smoke-output.json");
 const RESULT: SeasonResult = {
   season: "soft-autumn",
   runnerUp: "true-autumn",
@@ -29,7 +30,7 @@ const RESULT: SeasonResult = {
 
 it(`three calls to ${REPORT_TEXT_MODEL} give personal text`, async () => {
   const faceCrop = new Uint8Array(fs.readFileSync(PHOTO));
-  const kinds: string[] = [];
+  const runs: { ms: number; result: unknown }[] = [];
   for (let i = 1; i <= 3; i++) {
     const start = performance.now();
     const result = await generateReportText({
@@ -40,7 +41,13 @@ it(`three calls to ${REPORT_TEXT_MODEL} give personal text`, async () => {
     });
     const ms = Math.round(performance.now() - start);
     console.log(`\n--- call ${i}: ${ms} ms ---\n${JSON.stringify(result, null, 2)}`);
-    kinds.push(result.kind);
+    runs.push({ ms, result });
   }
-  expect(kinds).toEqual(["personal", "personal", "personal"]);
+  // Kept next to the photo (git-ignored), so the text survives whatever the reporter shows.
+  fs.writeFileSync(OUTPUT, JSON.stringify(runs, null, 2));
+  expect(runs.map((r) => (r.result as { kind: string }).kind)).toEqual([
+    "personal",
+    "personal",
+    "personal",
+  ]);
 });
