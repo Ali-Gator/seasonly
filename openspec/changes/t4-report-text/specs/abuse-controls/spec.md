@@ -8,6 +8,8 @@ Keeps the cost of free analyses bounded. Every analysis with a photo costs one p
 
 A slot claim SHALL be granted while fewer than the cap have been granted on the current UTC day, and refused once the cap is reached. A new UTC day SHALL start from zero. Counting and granting SHALL happen in one atomic database statement, so concurrent claims never grant more than the cap.
 
+**Unenforced:** concurrency itself is not exercised, because the in-process test database has one connection. The single-statement upsert, which locks the day's row, carries it; the scenarios below prove the counting.
+
 #### Scenario: The last slot and the next claim
 
 - **WHEN** the cap is 200 and 200 claims have been granted today

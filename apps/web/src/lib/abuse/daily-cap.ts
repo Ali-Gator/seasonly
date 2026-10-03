@@ -44,7 +44,8 @@ export async function claimAnalysisSlot({
 }: { cap?: number; rpc?: ClaimRpc } = {}): Promise<SlotClaim> {
   const controller = new AbortController();
   let timer: ReturnType<typeof setTimeout> | undefined;
-  // Raced as well as passed on, so a request that ignores the signal still gives way.
+  // Raced as well as passed on, so a request that ignores the signal still gives way. A claim
+  // that commits just after the timeout spends a slot with no call: it errs toward fewer calls.
   const timeout = new Promise<"unavailable">((resolve) => {
     timer = setTimeout(() => {
       controller.abort();

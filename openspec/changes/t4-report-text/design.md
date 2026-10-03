@@ -145,7 +145,7 @@ The steps run in this order:
    - any other throw gives `failed`;
    - the verdict `no-face` or `several-faces` gives `rejected`;
    - otherwise the result is `personal`.
-4. Every fallback except `capped` calls `Sentry.captureException(new Error("report-text fallback: <reason>", { cause }))` and then `await Sentry.flush(2000)`. The cause rides on the error rather than in `extra`, so Sentry shows its stack as a linked error. A fallback returns normally, so nothing else flushes before the Vercel function freezes; `with-error-capture.ts` flushes only on a thrown error. The flush runs on failure paths only, and 20 s plus 2 s stays inside the 30 s budget.
+4. Every fallback except `capped` calls `Sentry.captureException(new Error("report-text fallback: <reason>", { cause }))` and then `await Sentry.flush(2000)`. The cause rides on the error rather than in `extra`, so Sentry shows its stack as a linked error. A fallback returns normally, so nothing else flushes before the Vercel function freezes; `with-error-capture.ts` flushes only on a thrown error. The flush runs on failure paths only. The worst case inside `generateReportText` is 3 s (claim) + 20 s (model) + 2 s (flush) = 25 s, which leaves `t5` about 5 s of a 30 s budget for upload and classification; `t5` sets its route's `maxDuration` with that headroom.
 
 Output schema (zod, `.strict()`):
 
