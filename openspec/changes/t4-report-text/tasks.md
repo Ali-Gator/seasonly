@@ -68,12 +68,12 @@
 
 ## 6. External (each needs the user's yes in chat)
 
-- [ ] 6.1 Ask the user to:
+- [x] 6.1 Ask the user to:
   - put `SUPABASE_URL` and `SUPABASE_SECRET_KEY` in Vercel (all environments) and in `apps/web/.env.local`;
   - enable AI Gateway on the Vercel project;
   - create a local `AI_GATEWAY_API_KEY`, optionally with a budget.
 
   Done when `pnpm verify:env 1` shows them `ok` locally.
 
-- [ ] 6.2 With the user's confirmation, apply the migration to the Supabase project `seasonly` (ref `qisseuermrrwvvnfyjet`) through the Supabase connector. Then run `select public.claim_analysis_slot(200)` once, expect `true`, and delete the row. Also run `set role anon; select public.claim_analysis_slot(1)` and expect a permission error. Done when the connector lists the migration, the table is empty and `anon` was refused.
+- [x] 6.2 With the user's confirmation, apply the migration to the Supabase project `seasonly` (ref `qisseuermrrwvvnfyjet`) through the Supabase connector. Then run `select public.claim_analysis_slot(200)` once, expect `true`, and delete the row. Also run `set role anon; select public.claim_analysis_slot(1)` and expect a permission error. Done when the connector lists the migration, the table is empty and `anon` was refused.
 - [ ] 6.3 With the user's confirmation and `evals/photos/smoke.jpg` in place, run `pnpm test:smoke` (three paid calls). Report to the user the kinds, verdicts, both strings and latencies, and whether the excluded topics stay out. If the model has no ZDR provider, pick the next vision model (design.md decision 6) and re-run with approval. Done when the user has seen the output and a Tracker Log line records it.

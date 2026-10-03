@@ -13,7 +13,7 @@ Catalogues every environment variable the code reads and checks a deployment has
 | `SENTRY_AUTH_TOKEN`              | 0     | no       | no                 | Sentry → Settings → Auth Tokens (org token)        |
 | `NEXT_PUBLIC_POSTHOG_KEY`        | 0     | yes      | yes                | PostHog → Project settings → Project API key       |
 | `NEXT_PUBLIC_POSTHOG_HOST`       | 0     | no       | yes                | Defaults to `https://us.i.posthog.com`             |
-| `SUPABASE_URL`                   | 1     | yes      | no                 | Supabase → Project settings → Data API             |
+| `SUPABASE_URL`                   | 1     | yes      | no                 | `https://<ref>.supabase.co`, no path               |
 | `SUPABASE_SECRET_KEY`            | 1     | yes      | no                 | Supabase → Project settings → API Keys (secret)    |
 | `AI_GATEWAY_API_KEY`             | 1     | no       | no                 | Vercel → AI Gateway → API Keys; local only (OIDC)  |
 | `DAILY_ANALYSIS_CAP`             | 1     | no       | no                 | Vision calls per UTC day; defaults to 200          |

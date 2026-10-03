@@ -222,12 +222,12 @@ The 200-slot scenario runs at cap 200 in a loop. It takes milliseconds in PGlite
 
 ### 10. Env
 
-| Variable              | Phase | Required | Browser | Shape            |
-| --------------------- | ----- | -------- | ------- | ---------------- |
-| `SUPABASE_URL`        | 1     | yes      | no      | `^https://`      |
-| `SUPABASE_SECRET_KEY` | 1     | yes      | no      | checked at apply |
-| `AI_GATEWAY_API_KEY`  | 1     | no       | no      | none             |
-| `DAILY_ANALYSIS_CAP`  | 1     | no       | no      | `^[1-9]\d*$`     |
+| Variable              | Phase | Required | Browser | Shape                           |
+| --------------------- | ----- | -------- | ------- | ------------------------------- |
+| `SUPABASE_URL`        | 1     | yes      | no      | `^https://<ref>.supabase.co/?$` |
+| `SUPABASE_SECRET_KEY` | 1     | yes      | no      | checked at apply                |
+| `AI_GATEWAY_API_KEY`  | 1     | no       | no      | none                            |
+| `DAILY_ANALYSIS_CAP`  | 1     | no       | no      | `^[1-9]\d*$`                    |
 
 `AI_GATEWAY_API_KEY` is optional because Vercel deployments authenticate with OIDC (`VERCEL_OIDC_TOKEN`, injected by the platform). The SDK reads both itself, so no code reads them. They are still catalogued, because a local smoke run needs the key.
 

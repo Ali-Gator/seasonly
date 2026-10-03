@@ -65,8 +65,8 @@ export const PROBES: Probe[] = [
   {
     name: "SUPABASE_URL",
     phase: 1,
-    hint: "Supabase → Project settings → Data API (Project URL)",
-    shape: /^https:\/\//,
+    hint: "https://<ref>.supabase.co, with no path (Supabase → Project settings → General)",
+    shape: /^https:\/\/[a-z0-9]+\.supabase\.co\/?$/,
   },
   {
     name: "SUPABASE_SECRET_KEY",
