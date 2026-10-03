@@ -62,6 +62,31 @@ export const PROBES: Probe[] = [
     hint: "defaults to https://us.i.posthog.com",
     shape: /^https:\/\//,
   },
+  {
+    name: "SUPABASE_URL",
+    phase: 1,
+    hint: "https://<ref>.supabase.co, with no path (Supabase → Project settings → General)",
+    shape: /^https:\/\/[a-z0-9]+\.supabase\.co\/?$/,
+  },
+  {
+    name: "SUPABASE_SECRET_KEY",
+    phase: 1,
+    hint: "Supabase → Project settings → API Keys → Secret keys",
+    shape: /^sb_secret_/,
+  },
+  {
+    name: "AI_GATEWAY_API_KEY",
+    phase: 1,
+    optional: true,
+    hint: "local only; Vercel → AI Gateway → API Keys (deployments use OIDC)",
+  },
+  {
+    name: "DAILY_ANALYSIS_CAP",
+    phase: 1,
+    optional: true,
+    hint: "vision calls per UTC day; defaults to 200",
+    shape: /^[1-9]\d*$/,
+  },
 ];
 
 function loadEnvLocal(): Record<string, string> {
