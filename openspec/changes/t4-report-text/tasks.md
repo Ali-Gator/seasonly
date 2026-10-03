@@ -4,13 +4,13 @@
 
 ## 2. Copy approval (user gate)
 
-- [ ] 2.1 Draft `SEASON_COPY` for the 11 seasons other than Soft Autumn, and `AGREEMENT_COPY` for `agree`, `differ`, `photo-only` and `quiz-only`.
+- [x] 2.1 Draft `SEASON_COPY` for the 11 seasons other than Soft Autumn, and `AGREEMENT_COPY` for `agree`, `differ`, `photo-only` and `quiz-only`.
   - Soft Autumn is the canvas copy verbatim, from `project/Report.dc.html` on https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3. The `agree` title is "Photo and quiz agree".
   - Each field stays within design.md decision 2's limits.
   - Each season's `neutralsIntro` matches its own neutrals in `PALETTES`, so no Winter is told to swap black away.
   - The `drapingLine` names the season's own draping pair.
 
-  Publish it as a review page with each season's swatches beside its copy. Done when the user approves it in chat; record the date.
+  Publish it as a review page with each season's swatches beside its copy. Done when the user approves it in chat; record the date. Approved 2026-10-03 on https://claude.ai/artifact/TDo1Ca824cof8DpfkFMdLz.
 
 ## 3. Setup
 
@@ -60,7 +60,7 @@
 
 ## 5. Code
 
-- [ ] 5.1 Add `packages/analysis/src/report-text/index.ts` and `copy.ts` with the approved copy from 2.1 (design.md decisions 1–2), and re-export from `packages/analysis/src/index.ts`. Done when 4.1 passes and the architecture-boundaries tests, including "loads in plain node", pass.
+- [x] 5.1 Add `packages/analysis/src/report-text/index.ts` and `copy.ts` with the approved copy from 2.1 (design.md decisions 1–2), and re-export from `packages/analysis/src/index.ts`. Done when 4.1 passes and the architecture-boundaries tests, including "loads in plain node", pass.
 - [x] 5.2 Add `supabase/migrations/<timestamp>_daily_cap.sql` and `apps/web/src/lib/abuse/daily-cap.ts` (design.md decision 7). Done when 4.3 passes.
 - [x] 5.3 Add `apps/web/src/lib/report-text/index.ts` with `generateReportText`, the prompt, the output schema and `REPORT_TEXT_MODEL` (design.md decisions 3–6). Re-check the model id against `https://ai-gateway.vercel.sh/v1/models` first. Done when 4.2 passes.
 - [x] 5.4 Add `vitest.config.smoke.ts`, the root script `test:smoke` and `apps/web/src/lib/report-text/report-text.smoke.ts` (design.md decision 9). The config loads `apps/web/.env.local` with `process.loadEnvFile` (design.md decision 9). Do not run it. Done when `pnpm test:unit` does not pick up the smoke file.
