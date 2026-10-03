@@ -27,7 +27,7 @@
 
 ## 3. Setup
 
-- [ ] 3.1 Add `@mediapipe/tasks-vision` and `botid` to `apps/web`. Check these names against the installed packages and docs, and fix design.md decisions 3 and 7 wherever a name differs:
+- [x] 3.1 Add `@mediapipe/tasks-vision` and `botid` to `apps/web`. Check these names against the installed packages and docs, and fix design.md decisions 3 and 7 wherever a name differs:
   - `FilesetResolver.forVisionTasks`;
   - `FaceLandmarker` with `numFaces`, `runningMode: "IMAGE"` and `delegate: "CPU"`;
   - `ImageSegmenter`'s category mask, and the hair segmenter model's versioned path and class index;
@@ -36,12 +36,12 @@
   Done when `pnpm install` succeeds and design.md matches.
 
 - [x] 3.2 Move the lazy Supabase server client from `apps/web/src/lib/abuse/daily-cap.ts` to `apps/web/src/lib/supabase.ts` (design.md decision 6). Done when the unchanged `daily-cap.test.ts` passes.
-- [ ] 3.3 Wire BotID (design.md decision 7):
+- [x] 3.3 Wire BotID (design.md decision 7):
   - `withBotId` in `next.config.ts`;
   - `BOTID_PROTECT` (the analyze route, `POST`) in `apps/web/src/lib/abuse/botid.ts`;
   - `initBotId({ protect: BOTID_PROTECT })` in `instrumentation-client.ts`.
 
-  Then run `pnpm build && pnpm start` with `CI=1` and no env, and call `checkBotId()` from a throwaway route. Done when it answers not-a-bot and the throwaway route is deleted. If it answers bot, stop and ask the user.
+  Then run `pnpm build && pnpm start` with `CI=1` and no env, and call `checkBotId()` from a throwaway route. Done when it answers not-a-bot and the throwaway route is deleted. If it answers bot, stop and ask the user. 2026-10-03: plain `checkBotId()` threw (no OIDC token under `next start`); the user chose `isDevelopment: process.env.VERCEL !== "1"`, which answered human under `next start`.
 
 ## 4. Tests first
 

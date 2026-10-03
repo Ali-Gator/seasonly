@@ -376,7 +376,8 @@ describe("RETAKE_TIPS", () => {
 
   /**
    * Copied from the approved MVP canvas, https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3:
-   * the danger and retake-tip notes of project/BadNoFace.dc.html, BadDark, BadTint and BadFilter.
+   * the danger and retake-tip notes of project/BadNoFace.dc.html, BadDark, BadTint, BadFilter and
+   * BadSeveral.
    *
    * {@link openspec/specs/photo-check/spec.md#scenario-tips-match-the-canvas}
    */
@@ -407,6 +408,24 @@ describe("RETAKE_TIPS", () => {
         tip: "Try one straight from the camera. Turn off beauty mode and portrait effects first.",
         icon: "camera",
       },
+      "several-faces": {
+        title: "More than one face",
+        message: "We found more than one face in this photo.",
+        tip: "Take it on your own, with nobody else close to you in the frame.",
+        icon: "camera",
+      },
     });
+  });
+
+  /**
+   * Copied from project/BadSeveral.dc.html on the canvas, approved 2026-10-03.
+   *
+   * {@link openspec/specs/photo-check/spec.md#requirement-each-problem-has-its-own-retake-tip}
+   */
+  it("has a several-faces tip distinct from the other four", () => {
+    const { "several-faces": several, ...four } = RETAKE_TIPS;
+    expect(Object.keys(four).sort()).toEqual(["dark", "filter", "no-face", "tint"]);
+    for (const tip of Object.values(four)) expect(several).not.toEqual(tip);
+    expect(several.title).toBe("More than one face");
   });
 });

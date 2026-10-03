@@ -179,9 +179,9 @@ Three pieces wire it in:
 
 - `withBotId(nextConfig)` in `next.config.ts`, composed inside `withSentryConfig`;
 - `initBotId({ protect: [{ path: "/api/analyze", method: "POST" }] })` in `instrumentation-client.ts`;
-- `checkBotId()` first in the handler.
+- `checkBotId({ developmentOptions: { isDevelopment: process.env.VERCEL !== "1" } })` first in the handler.
 
-Off Vercel, `checkBotId` answers human by default, per its documented local behavior. Task 3.3 confirms this under `next start` before the E2E relies on it. If it does not hold, stop and ask: no test-only bypass env var is added on a guess.
+BotID decides it runs locally from `NODE_ENV`. Under `next start` that is `production`, so off Vercel `checkBotId()` throws for want of Vercel's OIDC token (task 3.3 found this). `VERCEL=1` is set by the platform on every deployment, preview and production, and never locally or in CI, so it marks the real check's scope. Off Vercel, development mode answers human. No test-only bypass variable is added. The cost is that a self-hosted copy has no bot check; Vercel is the only host.
 
 ### 8. Events from the browser
 
@@ -229,7 +229,7 @@ The test also trips on a leak: it waits for the `/api/analyze` response and asse
 - [A CC0 face might not pass the photo check's provisional thresholds] → Task 4.6 runs the fixture through the check first, and picks another photo if it fails. Thresholds are not loosened for a fixture.
 - [The client-sent traits could be forged] → It is the person's own result, and the server bounds every number. Text and season are never client-authored.
 - [A failed save leaves a reveal with no report id] → It is reported to Sentry. `t5-report-delivery` decides what "Get my full report" does without an id.
-- [BotID off Vercel may not default to human under `next start`] → Task 3.3 checks this before E2E depends on it.
+- [BotID throws off Vercel under `next start`] → The handler sets `isDevelopment` from `VERCEL` (decision 7).
 
 ## Migration Plan
 

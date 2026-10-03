@@ -14,7 +14,7 @@ import { robustCenter, srgbToLab, type Lab } from "../sampling/color.ts";
 import { MIN_REGION_PIXELS, samplePhoto, type PhotoInput } from "../sampling/index.ts";
 import { regionPixels, type Rings } from "../sampling/regions.ts";
 
-export { RETAKE_TIPS, type RetakeTip } from "./tips.ts";
+export { RETAKE_TIPS, type RetakeReason, type RetakeTip } from "./tips.ts";
 
 // Provisional limits: t6-eval-set tunes them against labeled photos across the skin-tone range.
 /** Narrower than this, in pixels, and the face is too small to measure. */
