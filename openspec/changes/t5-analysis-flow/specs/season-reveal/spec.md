@@ -170,7 +170,7 @@ The analyze route's time limit SHALL be 60 s. Its slowest path is a 3 s slot cla
 
 ### Requirement: Landing to reveal in under 30 seconds
 
-On a 390 × 844 viewport, a person SHALL be able to go from the landing page to the reveal in under 30 s, by uploading a good photo and answering the quiz.
+On a 390 × 844 viewport, a person SHALL be able to go from the landing page to the reveal in under 30 s, by uploading a good photo and answering the quiz. The E2E run that proves it SHALL NOT claim a daily slot, call the model or store a report, wherever it runs, locally or in CI.
 
 **Unenforced:** real phones and networks vary. CI proves the path with the static fallback, because CI has no model access. Task 8.3's manual check on a phone, against a preview deployment, times the real path.
 
@@ -178,3 +178,8 @@ On a 390 × 844 viewport, a person SHALL be able to go from the landing page to 
 
 - **WHEN** the E2E test opens the landing, starts the analysis, uploads the fixture face, agrees and answers four questions
 - **THEN** the reveal is shown within 30 s of opening the landing
+
+#### Scenario: The E2E run spends nothing
+
+- **WHEN** the E2E test's analyze request is answered
+- **THEN** its text source is not `personal` and its report id is null

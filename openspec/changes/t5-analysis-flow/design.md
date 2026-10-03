@@ -209,7 +209,13 @@ The canvas note "gives you 30 colors" stays verbatim. `t5-report-delivery` check
 
 The fixture is a CC0 or public-domain portrait: one adult in daylight, with no filter. `e2e/fixtures/README.md` records its URL and license.
 
-In CI the claim answers `unavailable` (no Supabase env), so the static copy is used and the save returns `null`. The reveal still shows. CI never has a Gateway key, so it never makes a paid call.
+E2E never spends anything, wherever it runs. Locally, `pnpm dev` would load `apps/web/.env.local`, which holds real Supabase, Gateway and Sentry values. So `playwright.config.ts` changes in three ways:
+
+- `webServer.env` sets `SUPABASE_URL=http://127.0.0.1:9` (unreachable), and blanks `SUPABASE_SECRET_KEY`, `AI_GATEWAY_API_KEY` and `NEXT_PUBLIC_SENTRY_DSN`. Next gives variables already in `process.env` precedence over `.env*` files; task 4.6 confirms this holds for empty strings.
+- The server runs on its own port, 3100, with `reuseExistingServer: false`, so E2E never attaches to a developer's live server.
+- The claim then answers `unavailable`, so no model call is made, the static copy is used and the save returns `null`. The reveal still shows.
+
+The test also trips on a leak: it waits for the `/api/analyze` response and asserts that `text` is not `personal` and `reportId` is `null`.
 
 ## Risks / Trade-offs
 

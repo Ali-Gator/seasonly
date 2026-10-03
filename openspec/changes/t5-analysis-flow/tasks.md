@@ -18,6 +18,13 @@
 
   Done when the user approves in chat; record the date here and in `mvp-design-canvas` memory.
 
+- [ ] 2.2 Ask the user to approve these edits to existing tests (CLAUDE.md gate), each of which the new data or components would otherwise break:
+  - `packages/analysis/src/photo-check/photo-check.test.ts`: the whole-map `toEqual` on `RETAKE_TIPS` gains the several-faces tip;
+  - `packages/analysis/src/report-text/report-text.test.ts`: `FIELDS` gains `revealLine`, and the Soft Autumn `toEqual` gains its canvas reveal line;
+  - `apps/web/src/components/ds/ds.test.tsx`: the class-coverage fragment renders the four new components in every variant.
+
+  Done when the user approves in chat; record the date here.
+
 ## 3. Setup
 
 - [ ] 3.1 Add `@mediapipe/tasks-vision` and `botid` to `apps/web`. Check these names against the installed packages and docs, and fix design.md decisions 3 and 7 wherever a name differs:
@@ -38,16 +45,16 @@
 
 ## 4. Tests first
 
-No existing test file is edited. New cases go in new files. If an existing test must change, ask the user first.
+Existing tests change only as approved in 2.2. Any other change to an existing test needs the user's approval first.
 
-- [ ] 4.1 Write `packages/analysis/src/photo-check/several-faces.test.ts` and `packages/analysis/src/report-text/reveal-line.test.ts`, citing the photo-check and report-text delta scenarios. Cover:
+- [ ] 4.1 Make the edits approved in 2.2 to `photo-check.test.ts` and `report-text.test.ts`, and write `packages/analysis/src/report-text/reveal-line.test.ts`, citing the photo-check and report-text delta scenarios. Cover:
   - the several-faces tip exists, differs from the other four and equals its approved copy;
   - every season has a reveal line within 160 characters that does not contain its season's name;
   - Soft Autumn's line equals the canvas.
 
   Done when they fail for the missing data.
 
-- [ ] 4.2 Write `apps/web/src/components/ds/flow-components.test.tsx`, citing the ui-components delta scenarios. Cover StepProgress, QuizOption, CameraFrame and PhotoTipCard, with `renderToStaticMarkup` as in `ds.test.tsx`. Done when it fails for the missing components.
+- [ ] 4.2 Write `apps/web/src/components/ds/flow-components.test.tsx`, citing the ui-components delta scenarios. Cover StepProgress, QuizOption, CameraFrame and PhotoTipCard, with `renderToStaticMarkup` as in `ds.test.tsx`. Add the four components to `ds.test.tsx`'s class-coverage fragment, as approved in 2.2. Done when both fail for the missing components.
 - [ ] 4.3 Write `apps/web/src/lib/capture/capture.test.ts`, citing the capture-flow scenarios. Cover:
   - the two-face rule: 200 px + 200 px gives `several-faces`; 400 px + 60 px checks only the 400 px face;
   - the crop box for a 3000 × 4000 photo with a 1200 px face: it contains the face box, stays in the image and scales to ≤ 512 px;
@@ -89,7 +96,7 @@ No existing test file is edited. New cases go in new files. If an existing test 
 
   Done when both fail for the missing modules and migration.
 
-- [ ] 4.6 Add `e2e/fixtures/face.jpg`: a CC0 or public-domain portrait of one adult in daylight, with no filter. Record its URL and license in `e2e/fixtures/README.md`. Then write `e2e/analysis-flow.spec.ts` (design.md decision 11), citing the season-reveal exit scenario and the capture-flow no-face scenario. Done when it fails because the flow is missing. Once the flow exists (7.x), the fixture must pass the photo check. If it does not, pick another photo; never loosen a threshold.
+- [ ] 4.6 Add `e2e/fixtures/face.jpg`: a CC0 or public-domain portrait of one adult in daylight, with no filter. Record its URL and license in `e2e/fixtures/README.md`. Change `playwright.config.ts` as design.md decision 11 says: starved `webServer.env`, port 3100, `reuseExistingServer: false`. Confirm that Next keeps an empty pre-set variable over `.env.local`. Then write `e2e/analysis-flow.spec.ts` (design.md decision 11), citing the season-reveal exit and spend-nothing scenarios and the capture-flow no-face scenario. Its tripwire asserts that the analyze response is not `personal` and has a null `reportId`. Done when it fails because the flow is missing. Once the flow exists (7.x), the fixture must pass the photo check. If it does not, pick another photo; never loosen a threshold.
 
 ## 5. Core
 
@@ -143,5 +150,6 @@ No existing test file is edited. New cases go in new files. If an existing test 
   - **`t5-report-delivery`:** "Get my full report" on the reveal; a reveal with no report id; reading `reports`; checking "30 colors".
   - **`t5-report-images`:** crop storage.
   - **`t8-photo-privacy`:** consent; deleting `is_test` rows on a schedule; the jsDelivr and Google model downloads.
+  - **`t7-paywall-off`:** the analyze response carries the season, and the reveal's tagline and line are unique per season. So the subtype can be worked out from the free teaser, and the paywall must withhold both when it is on.
 
   Also edit the Purpose of `abuse-controls` and the Edge Cases line on BotID. Done when `openspec validate --specs` passes and the README mapping test passes.
