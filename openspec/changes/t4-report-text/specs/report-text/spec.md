@@ -102,14 +102,16 @@ The model SHALL NOT be asked for a season, and nothing the model returns SHALL c
 - **WHEN** personal text is requested for a Soft Autumn result
 - **THEN** the request names Soft Autumn, and the output schema has no season field
 
-### Requirement: Only the face crop is sent, with zero data retention
+### Requirement: Only the face crop is sent
 
-A call SHALL carry exactly one image, the face crop it was given. It SHALL ask the AI Gateway to route only to providers with zero data retention.
+A call SHALL carry exactly one image, the face crop it was given, and no other photo or personal data.
 
-#### Scenario: The request's image and options
+Zero data retention is not requested: the AI Gateway offers it only on Vercel Pro and Enterprise plans, and the project is on Hobby. The provider's own retention policy applies, and the privacy page says so.
+
+#### Scenario: The request's image
 
 - **WHEN** personal text is requested
-- **THEN** the request carries one image, equal to the given face crop, and requests zero data retention
+- **THEN** the request carries one image, equal to the given face crop
 
 ### Requirement: The photo double-check
 

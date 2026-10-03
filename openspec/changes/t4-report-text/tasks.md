@@ -43,7 +43,7 @@
   - `timeout` after 20 s with fake timers;
   - no call for `capped` or `cap-unavailable`;
   - `rejected` for `several-faces`, and `personal` with `heavy-makeup`;
-  - the request names Soft Autumn, carries exactly the given face crop as its one image, and sets `zeroDataRetention: true`;
+  - the request names Soft Autumn, and carries exactly the given face crop as its one image;
   - one Sentry report naming the reason, followed by an awaited flush, for `invalid`; neither for `capped`.
 
   Done when the tests fail for the missing module.
@@ -76,4 +76,4 @@
   Done when `pnpm verify:env 1` shows them `ok` locally.
 
 - [x] 6.2 With the user's confirmation, apply the migration to the Supabase project `seasonly` (ref `qisseuermrrwvvnfyjet`) through the Supabase connector. Then run `select public.claim_analysis_slot(200)` once, expect `true`, and delete the row. Also run `set role anon; select public.claim_analysis_slot(1)` and expect a permission error. Done when the connector lists the migration, the table is empty and `anon` was refused.
-- [ ] 6.3 With the user's confirmation and `evals/photos/smoke.jpg` in place, run `pnpm test:smoke` (three paid calls). Report to the user the kinds, verdicts, both strings and latencies, and whether the excluded topics stay out. If the model has no ZDR provider, pick the next vision model (design.md decision 6) and re-run with approval. Done when the user has seen the output and a Tracker Log line records it.
+- [ ] 6.3 With the user's confirmation and `evals/photos/smoke.jpg` in place, run `pnpm test:smoke` (three paid calls). Report to the user the kinds, verdicts, both strings and latencies, and whether the excluded topics stay out. The first run (2026-10-03) was refused: the Gateway offers ZDR only on Vercel Pro. The user chose to drop the ZDR flag rather than upgrade; re-run after that change. Done when the user has seen the output and a Tracker Log line records it.

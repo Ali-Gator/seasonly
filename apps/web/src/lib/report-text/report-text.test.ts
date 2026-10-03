@@ -204,8 +204,8 @@ describe("the request", () => {
     expect(Object.keys(schema.properties).sort()).toEqual(["agreementNote", "photo", "summary"]);
   });
 
-  /** {@link openspec/specs/report-text/spec.md#scenario-the-requests-image-and-options} */
-  it("carries exactly the face crop and asks for zero data retention", async () => {
+  /** {@link openspec/specs/report-text/spec.md#scenario-the-requests-image} */
+  it("carries exactly the face crop", async () => {
     const model = modelReturning(VALID);
     await run(model);
     const call = onlyCall(model);
@@ -216,7 +216,6 @@ describe("the request", () => {
     expect(files[0]).toMatchObject({ mediaType: "image/jpeg", data: { type: "data" } });
     const data = (files[0]?.data as { data: Uint8Array }).data;
     expect(new Uint8Array(data)).toEqual(FACE_CROP);
-    expect(call.providerOptions).toMatchObject({ gateway: { zeroDataRetention: true } });
   });
 });
 

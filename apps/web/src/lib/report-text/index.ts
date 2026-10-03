@@ -161,7 +161,6 @@ export async function generateReportText({
       // The SDK's default retries would make a second paid call.
       maxRetries: 0,
       abortSignal: controller.signal,
-      providerOptions: { gateway: { zeroDataRetention: true } },
       system,
       messages: [
         {

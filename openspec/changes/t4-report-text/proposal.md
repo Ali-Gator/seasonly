@@ -10,7 +10,7 @@ The core already gives a season and its palette. The approved full report also h
   - a personal agreement-note body;
   - a verdict on the photo.
 
-  The output is validated against a zod schema. Retries are off, the call has a time limit, and it asks the Gateway for zero data retention. The model never picks or changes the season; the deterministic classifier owns it.
+  The output is validated against a zod schema. Retries are off and the call has a time limit. Zero data retention is not requested: the Gateway offers it only on Vercel Pro, and the project stays on Hobby (decided 2026-10-03, after the smoke run was refused). The model never picks or changes the season; the deterministic classifier owns it.
 
 - **The photo double-check.** The verdict is one of `ok`, `no-face`, `several-faces`, `filter` or `heavy-makeup`.
   - `no-face` and `several-faces` reject the analysis, so no report is shown and the flow asks for a retake.
@@ -53,7 +53,7 @@ None. The `env` catalogue table sits in its spec's Purpose, not in a requirement
 - **External**
   - The migration is applied to the Supabase project `seasonly`, after the user confirms.
   - One paid smoke run on a sample photo, also after the user confirms.
-- **Privacy, a T8 item:** the face crop is sent to a third-party model provider. Zero data retention is requested per call. The privacy page (`t8-photo-privacy`) must say so.
+- **Privacy, a T8 item:** the face crop is sent to a third-party model provider, Google via the Gateway, without zero data retention. The provider does not train on it, but may keep it for a limited time for abuse monitoring. The privacy page (`t8-photo-privacy`) must say so. Upgrading to Vercel Pro and setting `providerOptions.gateway.zeroDataRetention` restores it.
 - **Downstream**
   - **`t5-analysis-flow`**:
     - Calls `generateReportText` after the photo check passes.

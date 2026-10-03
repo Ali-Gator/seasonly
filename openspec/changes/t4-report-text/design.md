@@ -18,7 +18,7 @@ The approved canvas report (`project/Report.dc.html` on https://claude.ai/artifa
 
 The other section intros ("Wear these near your face…", "Keep them away from your face…") are the same for every season. They stay page copy for `t5-report-delivery`.
 
-`ai` 7.0.127 is installed in `apps/web`, with `zod` added there too: the output schema lives in `apps/web`, `ai` has `zod` as a peer, and pnpm does not hoist the core's copy. The SDK names below were checked against `node_modules/ai/docs`: `generateText`, `Output.object`, `maxRetries`, `abortSignal`, `providerOptions.gateway.zeroDataRetention`, and `MockLanguageModelV4` from `ai/test` (its `doGenerateCalls` records each call; the image part reaches it as a `file` part with `mediaType`).
+`ai` 7.0.127 is installed in `apps/web`, with `zod` added there too: the output schema lives in `apps/web`, `ai` has `zod` as a peer, and pnpm does not hoist the core's copy. The SDK names below were checked against `node_modules/ai/docs`: `generateText`, `Output.object`, `maxRetries`, `abortSignal`, and `MockLanguageModelV4` from `ai/test` (its `doGenerateCalls` records each call; the image part reaches it as a `file` part with `mediaType`).
 
 Motivation: proposal.md. Requirements: `specs/report-text/spec.md` and `specs/abuse-controls/spec.md`.
 
@@ -137,7 +137,7 @@ The steps run in this order:
    - a structured output, `Output.object({ schema })`;
    - `maxRetries: 0`. The SDK default retries would break "one vision call".
    - an `AbortController` aborted by `setTimeout(20_000)`. This rather than `AbortSignal.timeout`, so Vitest's fake timers can drive the test.
-   - `providerOptions: { gateway: { zeroDataRetention: true } }`, which the Vercel docs say routes only to ZDR-verified providers;
+   - no `providerOptions.gateway.zeroDataRetention`: the Gateway refuses it with a 403 on the Hobby plan (smoke run, 2026-10-03). Setting it after an upgrade to Pro is a one-line change plus a spec edit;
    - one user message: a text part and an image part holding `faceCrop`, `image/jpeg`.
 3. Map the outcome:
    - an abort gives `timeout`;
@@ -172,7 +172,7 @@ The rules come from the spec's "describes coloring only" requirement, which the 
 
 ### 6. Model
 
-`REPORT_TEXT_MODEL = "google/gemini-3.8-flash"`. It is a vision and structured-output model on the Gateway, priced at $0.75 per million input tokens and $3.75 per million output. That is about $0.003 a call, or $0.60 a day at the cap. The pick comes from the Gateway's model list on 2026-10-03; re-check the list at apply. The smoke run confirms that a ZDR provider serves it. If none does, the call fails, and the next vision model with a ZDR provider is picked.
+`REPORT_TEXT_MODEL = "google/gemini-3.8-flash"`. It is a vision and structured-output model on the Gateway, priced at $0.75 per million input tokens and $3.75 per million output. That is about $0.003 a call, or $0.60 a day at the cap. The pick comes from the Gateway's model list on 2026-10-03; re-check the list at apply. The smoke run confirms the Gateway serves it with structured output.
 
 - Alternative: an env var for the model id. Rejected. Changing a constant is a one-line change. An env var would add a catalogue entry for a value that changes once a quarter at most.
 
@@ -235,7 +235,7 @@ The 200-slot scenario runs at cap 200 in a loop. It takes milliseconds in PGlite
 
 ## Risks / Trade-offs
 
-- [The chosen model has no ZDR provider on the Gateway] → Every call fails into a reported `failed`. The smoke run catches it before `t5`, and decision 6 says to pick another.
+- [No zero data retention on Hobby] → The provider's retention policy applies to the face crop. The privacy page (t8) discloses it. Upgrading to Vercel Pro restores ZDR with one provider option.
 - [The model's verdict wrongly says `no-face` on a good photo] → That loses a user to a retake. The verdict is returned and `t5` records it, so `t6-eval-set` measures the false-reject rate. If it is high, demote `no-face` to recorded-only, which is a one-line change plus a spec edit.
 - [A schema-invalid rate high enough that most reports go static] → Sentry shows the reason count. The smoke run's three calls give a first read. The limits are loose, as decision 4 explains.
 - [A slot is spent on a call that then fails] → Accepted, because the cap guards cost, and a failed call can still cost tokens.
