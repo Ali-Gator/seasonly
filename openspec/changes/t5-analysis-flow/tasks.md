@@ -55,7 +55,7 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
   Done when they fail for the missing data.
 
 - [x] 4.2 Write `apps/web/src/components/ds/flow-components.test.tsx`, citing the ui-components delta scenarios. Cover StepProgress, QuizOption, CameraFrame and PhotoTipCard, with `renderToStaticMarkup` as in `ds.test.tsx`. Add the four components to `ds.test.tsx`'s class-coverage fragment, as approved in 2.2. Done when both fail for the missing components.
-- [ ] 4.3 Write `apps/web/src/lib/capture/capture.test.ts`, citing the capture-flow scenarios. Cover:
+- [x] 4.3 Write `apps/web/src/lib/capture/capture.test.ts`, citing the capture-flow scenarios. Cover:
   - the two-face rule: 200 px + 200 px gives `several-faces`; 400 px + 60 px checks only the 400 px face;
   - the crop box for a 3000 × 4000 photo with a 1200 px face: it contains the face box, stays in the image and scales to ≤ 512 px;
   - `track` sends nothing without PostHog;
@@ -63,7 +63,7 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
 
   Done when it fails for the missing module.
 
-- [ ] 4.4 Write `apps/web/src/app/(flow)/analyze/flow-state.test.ts`, citing the capture-flow, quiz and season-reveal scenarios. Cover:
+- [x] 4.4 Write `apps/web/src/app/(flow)/analyze/flow-state.test.ts`, citing the capture-flow, quiz and season-reveal scenarios. Cover:
   - Back from question 2 gives question 1;
   - an outcome replaces analyzing, so Back from the reveal gives question 4;
   - a reload state starts at the guide;
