@@ -92,7 +92,11 @@ Both use the CPU delegate. For one still image it takes well under a second on a
 The assets come from pinned URLs:
 
 - The wasm loads from `cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@<installed version>/wasm`. The version is read from the package's `package.json` at build time, so the code and the wasm never drift.
-- The models load from `storage.googleapis.com/mediapipe-models/...`, on versioned paths, never `latest`.
+- The models load from `storage.googleapis.com/mediapipe-models/...`, on versioned paths, never `latest`:
+  - `face_landmarker/face_landmarker/float16/1/face_landmarker.task`;
+  - `image_segmenter/hair_segmenter/float32/1/hair_segmenter.tflite`, whose category mask is 0 for background and 1 for hair.
+
+`FilesetResolver.forVisionTasks(wasmUrl)` loads the wasm. Both tasks are made with `createFromOptions(fileset, { baseOptions: { modelAssetPath, delegate: "CPU" }, runningMode: "IMAGE", … })`: the landmarker with `numFaces: 2`, the segmenter with `outputCategoryMask: true`. The mask is read with `categoryMask.getAsUint8Array()`. Checked against `@mediapipe/tasks-vision` 1.0.1, pinned exactly.
 
 Loading starts when the guide mounts, so it overlaps reading the guide.
 

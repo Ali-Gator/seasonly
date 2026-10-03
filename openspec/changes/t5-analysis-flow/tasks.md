@@ -9,21 +9,21 @@
 
 ## 2. Copy approval (user gate)
 
-- [ ] 2.1 Add to the MVP canvas (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3) the states in design.md decision 10:
+- [x] 2.1 Add to the MVP canvas (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3) the states in design.md decision 10:
   - the several-faces retake;
   - the retake screen with "Continue without a photo";
   - the quiz-only reveal;
   - the no-result and error screens;
   - the 11 reveal lines, shown with each season's tagline. Soft Autumn's line is the canvas line verbatim. Each line stays within 160 characters and never names its season.
 
-  Done when the user approves in chat; record the date here and in `mvp-design-canvas` memory.
+  Done when the user approves in chat; record the date here and in `mvp-design-canvas` memory. Approved 2026-10-03 (canvas v14: artboards 04e, 04f, 08b–08e).
 
-- [ ] 2.2 Ask the user to approve these edits to existing tests (CLAUDE.md gate), each of which the new data or components would otherwise break:
+- [x] 2.2 Ask the user to approve these edits to existing tests (CLAUDE.md gate), each of which the new data or components would otherwise break:
   - `packages/analysis/src/photo-check/photo-check.test.ts`: the whole-map `toEqual` on `RETAKE_TIPS` gains the several-faces tip;
   - `packages/analysis/src/report-text/report-text.test.ts`: `FIELDS` gains `revealLine`, and the Soft Autumn `toEqual` gains its canvas reveal line;
   - `apps/web/src/components/ds/ds.test.tsx`: the class-coverage fragment renders the four new components in every variant.
 
-  Done when the user approves in chat; record the date here.
+  Done when the user approves in chat; record the date here. Approved 2026-10-03.
 
 ## 3. Setup
 
@@ -35,7 +35,7 @@
 
   Done when `pnpm install` succeeds and design.md matches.
 
-- [ ] 3.2 Move the lazy Supabase server client from `apps/web/src/lib/abuse/daily-cap.ts` to `apps/web/src/lib/supabase.ts` (design.md decision 6). Done when the unchanged `daily-cap.test.ts` passes.
+- [x] 3.2 Move the lazy Supabase server client from `apps/web/src/lib/abuse/daily-cap.ts` to `apps/web/src/lib/supabase.ts` (design.md decision 6). Done when the unchanged `daily-cap.test.ts` passes.
 - [ ] 3.3 Wire BotID (design.md decision 7):
   - `withBotId` in `next.config.ts`;
   - `BOTID_PROTECT` (the analyze route, `POST`) in `apps/web/src/lib/abuse/botid.ts`;

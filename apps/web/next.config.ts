@@ -1,4 +1,5 @@
 import { withSentryConfig } from "@sentry/nextjs/config";
+import { withBotId } from "botid/next/config";
 import type { NextConfig } from "next";
 
 import { SEASON_ALIASES } from "./src/lib/site/routes";
@@ -18,7 +19,7 @@ const nextConfig: NextConfig = {
 };
 
 // Source maps upload only when SENTRY_AUTH_TOKEN is set; without it the build still passes.
-export default withSentryConfig(nextConfig, {
+export default withSentryConfig(withBotId(nextConfig), {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
