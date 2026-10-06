@@ -139,6 +139,8 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
 
   Then delete the test row. Done when the user has seen the timing and a Tracker Log line records the result.
 
+  2026-10-06, on the preview with the user, from Chrome on a MacBook, Safari on a MacBook, and Safari on an iPhone: every real photo came back `dark` at first. Calibrating the limits on real selfies (`34ad7b1`, `76bac03`) fixed it. After the fix, webcam and iPhone camera photos pass; clearly dark photos still get `dark` (eye-white L* 10–19), and a strong orange cast gets `tint`. 8 paid analyses ran, taking 8–21 s from the photo check to the result, taps included. All 8 `reports` rows had `is_test` true and source `personal`, and were then deleted. `photo_checked` and `analysis_result` arrived in PostHog 290879. BotID passed on every analyze call (it answers 403 without its header). Still to check: the camera-blocked upload path.
+
 ## 9. Archive prep
 
 - [ ] 9.1 At archive, add the README rows, re-add each new spec's Public Interface, Behavior and Edge Cases, and update the plan's carried list:
@@ -150,7 +152,7 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
   - **`t5-report-delivery`:** "Get my full report" on the reveal; a reveal with no report id; reading `reports`; checking "30 colors".
   - **`t5-report-images`:** crop storage.
   - **`t8-photo-privacy`:** consent; deleting `is_test` rows on a schedule; the jsDelivr and Google model downloads.
-  - **`t6-eval-set`:** false rejects found screening 26 CC0 and public-domain portraits for the E2E fixture (2026-10-03). Glasses gave `tint`; smiles, squints, turned heads and graded photos gave `dark`; no daylight selfie passed. Measure both on the eval set before launch. On 2026-10-06 the eye-white limits dropped from L* 50 / C*ab 15 to 25 / 25: real indoor selfies read L* 30–47 and C*ab 12–21, and the user's normal and dim webcam shots overlap near L* 30. The skin-hue floor dropped from 25° to 15°: dim webcam skin read 20–24° and got `filter`. Tune all three against labeled photos.
+  - **`t6-eval-set`:** false rejects found screening 26 CC0 and public-domain portraits for the E2E fixture (2026-10-03). Glasses gave `tint`; smiles, squints, turned heads and graded photos gave `dark`; no daylight selfie passed. Measure both on the eval set before launch. On 2026-10-06 the eye-white limits dropped from L* 50 / C*ab 15 to 25 / 25: real indoor selfies read L* 30–47 and C*ab 12–21, and the user's normal and dim webcam shots overlap near L* 30. The skin-hue floor dropped from 25° to 15°: dim webcam skin read 20–24° and got `filter`. Tune all three against labeled photos. Also, the same person in one evening got 5 different seasons in 8 runs (bright/true/deep winter, soft summer, bright spring), with agreement mostly `differ`: measure how stable a result is across photos of one person.
   - **Later UI:** the quiz options' image slots (the canvas shows placeholders; none ship), and a screen of its own for a check that crashes (it now shows the no-face retake and reports to Sentry).
   - **`t7-paywall-off`:** the analyze response carries the season, and the reveal's tagline and line are unique per season. So the subtype can be worked out from the free teaser, and the paywall must withhold both when it is on.
 
