@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
 
 /**
  * The daily cap on vision calls: a slot is claimed in Postgres before each call.
@@ -23,14 +23,8 @@ export function dailyCap(): number {
   return /^[1-9]\d*$/.test(value) ? Number(value) : DEFAULT_CAP;
 }
 
-let client: SupabaseClient | undefined;
-
-const supabaseRpc: ClaimRpc = (cap, signal) => {
-  client ??= createClient(process.env.SUPABASE_URL ?? "", process.env.SUPABASE_SECRET_KEY ?? "", {
-    auth: { persistSession: false },
-  });
-  return client.rpc("claim_analysis_slot", { cap }).abortSignal(signal);
-};
+const supabaseRpc: ClaimRpc = (cap, signal) =>
+  supabase().rpc("claim_analysis_slot", { cap }).abortSignal(signal);
 
 /**
  * Claims one of today's slots. Never throws: a missing env var, a network or RPC error, or no

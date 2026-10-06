@@ -6,7 +6,18 @@ import type { ReactElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { Button, Icon, Note, ReportSection, Swatch, SwatchGrid } from "./index";
+import {
+  Button,
+  CameraFrame,
+  Icon,
+  Note,
+  PhotoTipCard,
+  QuizOption,
+  ReportSection,
+  StepProgress,
+  Swatch,
+  SwatchGrid,
+} from "./index";
 
 const html = (el: ReactElement) => renderToStaticMarkup(el);
 
@@ -184,7 +195,12 @@ describe("Stylesheets", () => {
   const hasRule = (css: string, cls: string) => new RegExp(`\\.${cls}(?![\\w-])`).test(css);
 
   /** Classes the design system renders only as hooks, with no rule of their own. */
-  const HOOKS = ["sn-note--neutral", "sn-report__overline"];
+  const HOOKS = [
+    "sn-note--neutral",
+    "sn-report__overline",
+    "sn-steps__count",
+    "sn-steps__step--next",
+  ];
 
   /** Every component in every variant, with every optional part filled. */
   const rendered = html(
@@ -207,6 +223,19 @@ describe("Stylesheets", () => {
       <ReportSection title="Title" overline="Overline" intro="Intro">
         <p>Body</p>
       </ReportSection>
+      <StepProgress current={1} />
+      <QuizOption name="q" value="a" label="Label" description="Description" readOnly />
+      <QuizOption name="q" value="b" label="Label" readOnly />
+      <CameraFrame caption="Caption">
+        <video />
+      </CameraFrame>
+      <CameraFrame guide={false} label="Placeholder" />
+      <PhotoTipCard
+        title="Title"
+        body="Body"
+        good={{ caption: "Good", src: "/good.jpg", alt: "" }}
+        bad={{ caption: "Bad" }}
+      />
     </>,
   );
   const classes = new Set(

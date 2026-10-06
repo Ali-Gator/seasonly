@@ -17,6 +17,7 @@ const FIELDS = [
   "makeupIntro",
   "hairTip",
   "drapingLine",
+  "revealLine",
 ] as const satisfies readonly (keyof SeasonCopy)[];
 
 describe("season copy", () => {
@@ -45,6 +46,8 @@ describe("season copy", () => {
       hairTip:
         "Go one or two shades warmer than your natural color. Skip ash blonde and blue-black.",
       drapingLine: "Terracotta warms your skin; fuchsia competes with it.",
+      revealLine:
+        "Colors with a golden base and a little dust in them work with you. Bright, icy and very dark colors compete.",
     });
   });
 });

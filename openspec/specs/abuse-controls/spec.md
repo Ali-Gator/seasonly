@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Keeps the cost of free analyses bounded. Every analysis with a photo costs one paid vision call, so the number of calls per day is capped in Postgres, and a slot is claimed before each call. Bot protection on the analyze route joins this capability with that route.
+Keeps the cost of free analyses bounded. Every analysis with a photo costs one paid vision call, so the number of calls per day is capped in Postgres, and a slot is claimed before each call. Vercel BotID refuses bots on the analyze route before a slot is claimed.
 
 ## Public Interface
 
@@ -36,7 +36,7 @@ public.claim_analysis_slot(cap integer) returns boolean -- security definer; tru
 - `SUPABASE_URL` must be the bare project URL; a Data API URL ending in `/rest/v1/` makes every claim `unavailable` (PostgREST `PGRST125`). `verify:env` rejects a path.
 - A claim that commits just after the 3 s timeout spends a slot with no model call; it errs toward fewer calls.
 - Rows accumulate one per day and are never pruned; at one small row a day that needs no cleanup.
-- Vercel BotID on the analyze route joins this capability in `t5-analysis-flow`.
+- BotID's real check runs only where `VERCEL_ENV` is set (every Vercel deployment); locally and in CI it runs in development mode and answers human, so a self-hosted copy has no bot check.
 
 ## Requirements
 
@@ -87,3 +87,19 @@ When the counter cannot be reached or answers with an error, the claim SHALL ans
 
 - **WHEN** the claim's database request fails
 - **THEN** the claim answers `unavailable`
+
+### Requirement: Bots are refused on the analyze route
+
+The analyze route SHALL check each request with Vercel BotID before anything else. A request classified as a bot SHALL be answered 403 and SHALL NOT claim a slot, call the model or store anything. The browser SHALL attach BotID's challenge to `POST /api/analyze`.
+
+**Unenforced:** BotID classifies real traffic only on a Vercel deployment. Off Vercel (no `VERCEL_ENV`, which the platform sets on every deployment) the route runs BotID in its development mode, which answers "human", so local runs and CI's E2E pass through. BotID's own development check is `NODE_ENV`, which `next start` sets to `production`; there it throws for want of Vercel's OIDC token (checked in task 3.3). The unit test proves the refusal with a bot answer, and a preview deployment shows the challenge on the request.
+
+#### Scenario: A bot
+
+- **WHEN** BotID classifies an analyze request as a bot
+- **THEN** the route answers 403, and no slot is claimed, no model call is made and nothing is stored
+
+#### Scenario: The browser protects the request
+
+- **WHEN** the client instrumentation starts
+- **THEN** BotID protects `POST /api/analyze`

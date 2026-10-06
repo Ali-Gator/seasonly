@@ -2,6 +2,7 @@
  * Report copy. Soft Autumn is the approved canvas report (project/Report.dc.html on
  * https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3); the other 11 seasons and the four
  * agreement notes were approved on https://claude.ai/artifact/TDo1Ca824cof8DpfkFMdLz (2026-10-03).
+ * The reveal lines are board 08e of the MVP canvas, approved 2026-10-03; Soft Autumn's is Reveal 08.
  *
  * @see openspec/specs/report-text/spec.md
  */
@@ -23,6 +24,8 @@ export const SEASON_COPY: Record<SeasonSlug, SeasonCopy> = {
     hairTip:
       "Stay light and golden: honey or strawberry blonde. Skip ash tones and anything near black.",
     drapingLine: "Peach lights up your skin; burgundy weighs it down.",
+    revealLine:
+      "Clear colors with a sunny base and plenty of white in them brighten you. Dark, heavy and dusty colors weigh you down.",
   },
   "true-spring": {
     tagline: "Warm, clear and golden.",
@@ -36,6 +39,8 @@ export const SEASON_COPY: Record<SeasonSlug, SeasonCopy> = {
     makeupIntro: "Stay warm and fresh: coral, peach and tomato red.",
     hairTip: "Warm it up: golden, copper or chestnut. Skip ash shades and blue-black.",
     drapingLine: "Coral brings your skin to life; burgundy dulls it.",
+    revealLine:
+      "Clear, warm colors like coral, golden yellow and warm teal make you glow. Cool, dusty and icy colors drain you.",
   },
   "bright-spring": {
     tagline: "Warm, bright and vivid.",
@@ -51,6 +56,8 @@ export const SEASON_COPY: Record<SeasonSlug, SeasonCopy> = {
     hairTip:
       "Keep depth and shine: chestnut, copper or warm dark brown. Skip ashy and greyed shades.",
     drapingLine: "Bright coral matches your clarity; olive drab dulls it.",
+    revealLine:
+      "Saturated, clear colors with a warm lean match your intensity. Dusty, muted and greyed colors make you look tired.",
   },
   "light-summer": {
     tagline: "Cool, light and airy.",
@@ -66,6 +73,8 @@ export const SEASON_COPY: Record<SeasonSlug, SeasonCopy> = {
     hairTip:
       "Stay light and cool: ash blonde or light ash brown. Skip golden, copper and very dark shades.",
     drapingLine: "Powder blue softens your skin; mustard turns it sallow.",
+    revealLine:
+      "Soft pastels with a cool, rosy base flatter you. Dark, heavy and warm earthy colors overpower you.",
   },
   "true-summer": {
     tagline: "Cool, soft and serene.",
@@ -80,6 +89,8 @@ export const SEASON_COPY: Record<SeasonSlug, SeasonCopy> = {
     makeupIntro: "Stay cool and rosy: rose, raspberry and berry pink.",
     hairTip: "Stay cool: ash brown or ash blonde. Skip golden highlights and copper.",
     drapingLine: "Soft blue calms your skin; orange fights it.",
+    revealLine:
+      "Cool colors with a touch of grey, like rose, slate blue and raspberry, look effortless on you. Orange, gold and warm browns clash.",
   },
   "soft-summer": {
     tagline: "Cool, muted and smoky.",
@@ -94,6 +105,8 @@ export const SEASON_COPY: Record<SeasonSlug, SeasonCopy> = {
     makeupIntro: "Stay in the same cool, dusty family as your clothes.",
     hairTip: "Stay soft and cool: ash brown or cool mocha. Skip brassy gold and blue-black.",
     drapingLine: "Dusty rose blends with your skin; orange competes with it.",
+    revealLine:
+      "Greyed, dusty colors like dusty rose, slate and smoky plum blend with you. Bright, saturated and warm colors overpower you.",
   },
   "soft-autumn": {
     tagline: "Warm, soft and earthy.",
@@ -107,6 +120,8 @@ export const SEASON_COPY: Record<SeasonSlug, SeasonCopy> = {
     makeupIntro: "Stay in the same warm, muted family as your clothes.",
     hairTip: "Go one or two shades warmer than your natural color. Skip ash blonde and blue-black.",
     drapingLine: "Terracotta warms your skin; fuchsia competes with it.",
+    revealLine:
+      "Colors with a golden base and a little dust in them work with you. Bright, icy and very dark colors compete.",
   },
   "true-autumn": {
     tagline: "Warm, rich and golden.",
@@ -120,6 +135,8 @@ export const SEASON_COPY: Record<SeasonSlug, SeasonCopy> = {
     makeupIntro: "Stay warm and earthy: brick, terracotta and burnt coral.",
     hairTip: "Go warm and rich: auburn, copper or golden chestnut. Skip ash tones and blue-black.",
     drapingLine: "Pumpkin warms your skin; bubblegum pink fights it.",
+    revealLine:
+      "Rich, warm colors like pumpkin, olive and bronze glow on you. Cool, icy and pink-based colors drain you.",
   },
   "deep-autumn": {
     tagline: "Warm, deep and rich.",
@@ -135,6 +152,8 @@ export const SEASON_COPY: Record<SeasonSlug, SeasonCopy> = {
     hairTip:
       "Keep it deep and warm: dark chocolate, mahogany or deep auburn. Skip pale blonde and ash.",
     drapingLine: "Deep rust matches your depth; pastel pink washes you out.",
+    revealLine:
+      "Dark, warm colors like deep rust, forest olive and chocolate match your depth. Pastels and icy colors wash you out.",
   },
   "deep-winter": {
     tagline: "Cool, deep and striking.",
@@ -149,6 +168,8 @@ export const SEASON_COPY: Record<SeasonSlug, SeasonCopy> = {
     makeupIntro: "Go deep and cool: true red, deep berry and wine.",
     hairTip: "Stay dark and cool: espresso or soft black. Skip golden highlights and copper.",
     drapingLine: "True red matches your contrast; mustard turns your skin sallow.",
+    revealLine:
+      "Dark, saturated colors and true black match your depth. Warm, golden and earthy colors make you look tired.",
   },
   "true-winter": {
     tagline: "Cool, crisp and bold.",
@@ -164,6 +185,8 @@ export const SEASON_COPY: Record<SeasonSlug, SeasonCopy> = {
     hairTip:
       "Stay cool and dark: cool brown, soft black or blue-black. Skip golden, copper and caramel.",
     drapingLine: "Blue red sharpens your features; camel drains your skin.",
+    revealLine:
+      "Clear, bold colors like blue red, fuchsia and navy look striking on you. Warm, golden and earthy colors clash.",
   },
   "bright-winter": {
     tagline: "Cool, bright and electric.",
@@ -178,6 +201,8 @@ export const SEASON_COPY: Record<SeasonSlug, SeasonCopy> = {
     hairTip:
       "Keep it dark and cool: soft black or cool espresso. Skip ashy, faded and golden shades.",
     drapingLine: "Hot pink matches your brightness; mushroom dulls it.",
+    revealLine:
+      "Vivid, saturated colors like hot pink, clear red and bright navy match your intensity. Dusty, muted and earthy colors dull you.",
   },
 };
 

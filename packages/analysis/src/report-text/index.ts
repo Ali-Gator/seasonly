@@ -18,6 +18,8 @@ export interface SeasonCopy {
   hairTip: string;
   /** Names the season's own draping pair. */
   drapingLine: string;
+  /** Shown on the reveal: what suits the family's colors, never naming the season. */
+  revealLine: string;
 }
 
 export interface AgreementCopy {
@@ -38,6 +40,7 @@ export const COPY_LIMITS: { [K in keyof SeasonCopy | "noteTitle" | "noteBody"]: 
   makeupIntro: 160,
   hairTip: 160,
   drapingLine: 120,
+  revealLine: 160,
   noteTitle: 40,
   noteBody: 240,
 };

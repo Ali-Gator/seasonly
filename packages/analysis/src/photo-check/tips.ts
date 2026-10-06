@@ -3,6 +3,8 @@
  * (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3): the danger note's title and message, and
  * the retake-tip note's text and icon, on BadNoFace, BadDark, BadTint and BadFilter.
  * The shared heading and the Retake and Upload buttons belong to the screen, not to a problem.
+ * `several-faces` never comes out of `checkPhoto`: the web flow finds it from the face count and
+ * the vision call can report it. Its copy is BadSeveral on the canvas, approved 2026-10-03.
  *
  * @see openspec/specs/photo-check/spec.md
  */
@@ -17,7 +19,10 @@ export interface RetakeTip {
   icon: "info" | "sun" | "camera";
 }
 
-export const RETAKE_TIPS: Record<PhotoProblem, RetakeTip> = {
+/** Every reason a photo is sent back for a retake. */
+export type RetakeReason = PhotoProblem | "several-faces";
+
+export const RETAKE_TIPS: Record<RetakeReason, RetakeTip> = {
   "no-face": {
     title: "No face found",
     message: "We couldn't find a face in this photo.",
@@ -41,6 +46,12 @@ export const RETAKE_TIPS: Record<PhotoProblem, RetakeTip> = {
     title: "Filter detected",
     message: "Your photo looks filtered. Filters shift skin tone, so your result would be off.",
     tip: "Try one straight from the camera. Turn off beauty mode and portrait effects first.",
+    icon: "camera",
+  },
+  "several-faces": {
+    title: "More than one face",
+    message: "We found more than one face in this photo.",
+    tip: "Take it on your own, with nobody else close to you in the frame.",
     icon: "camera",
   },
 };

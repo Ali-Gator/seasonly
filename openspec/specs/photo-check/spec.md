@@ -40,8 +40,8 @@ The check runs before sampling, on the same input. In order:
 1. No landmarks: the refusals that need none (width, height, buffer and hair-mask length, with sampling's messages), then `no-face` with every measurement null.
 2. `samplePhoto` validates the input and gives the skin color.
 3. `no-face` when a landmark is outside the image or not a number, the landmark bounding box is narrower than `MIN_FACE_WIDTH`, or sampling gives no traits.
-4. The eye white: the pixels inside both eye openings (MediaPipe's `FACEMESH_RIGHT_EYE` and `FACEMESH_LEFT_EYE`, cited in `photo-check/index.ts`), the brightest 40% by L*, then sampling's robust center. Fewer than `MIN_REGION_PIXELS` pixels leaves it null and skips the next two checks. `dark` when its L* is below 50, then `tint` when its C*ab is above 15.
-5. `filter` when skin C*ab is below 2 or above 45, or, from C*ab 6 up, its hue is outside 25° to 100°.
+4. The eye white: the pixels inside both eye openings (MediaPipe's `FACEMESH_RIGHT_EYE` and `FACEMESH_LEFT_EYE`, cited in `photo-check/index.ts`), the brightest 40% by L*, then sampling's robust center. Fewer than `MIN_REGION_PIXELS` pixels leaves it null and skips the next two checks. `dark` when its L* is below 25, then `tint` when its C*ab is above 25.
+5. `filter` when skin C*ab is below 2 or above 45, or, from C*ab 6 up, its hue is outside 15° to 100°.
 
 The first problem found is returned with the measurements gathered so far. Every limit is provisional until `t6-eval-set` tunes it; the skin limits are set against the Monk Skin Tone scale (C*ab 3.8 to 27.9, hue 49° to 89°). `RETAKE_TIPS` holds the copy of the approved canvas screens `BadNoFace`, `BadDark`, `BadTint` and `BadFilter`; the shared heading and buttons belong to the web flow.
 
@@ -104,12 +104,17 @@ The check SHALL report `dark` when the eye whites are darker than the minimum li
 
 #### Scenario: A light-skinned face, underexposed
 
-- **WHEN** a photo of a light-skinned face that passes is darkened to a third of its brightness
+- **WHEN** a photo of a light-skinned face that passes is darkened to a fifth of its brightness
 - **THEN** `dark` is reported
 
 #### Scenario: A deep-skinned face in good light
 
 - **WHEN** a face with the deepest Monk Skin Tone and bright neutral eye whites is checked
+- **THEN** no problem is reported
+
+#### Scenario: A dim indoor selfie
+
+- **WHEN** a photo of a light-skinned face that passes is darkened to a third of its brightness, so its eye whites read L* 33 as in real indoor selfies
 - **THEN** no problem is reported
 
 ### Requirement: A color cast is judged from the eye whites
@@ -125,6 +130,11 @@ The check SHALL report `tint` when the eye whites are more colorful than the max
 
 - **WHEN** a photo that passes has its red channel scaled down so the eye whites turn blue-green
 - **THEN** `tint` is reported
+
+#### Scenario: Warm indoor light
+
+- **WHEN** a photo that passes is warmed slightly, so its eye whites read C*ab 19 as in real indoor selfies
+- **THEN** no problem is reported
 
 ### Requirement: Eye whites that cannot be measured do not reject a photo
 
@@ -159,9 +169,14 @@ The check SHALL report `filter` when the skin color is near-gray, more saturated
 - **WHEN** a face is painted in each of the 10 Monk Skin Tone colors, with neutral eye whites
 - **THEN** no problem is reported for any of them
 
+#### Scenario: Skin reddened by dim warm light
+
+- **WHEN** a face's skin reads hue 20°, as a webcam reads skin in dim warm light
+- **THEN** no problem is reported
+
 ### Requirement: Each problem has its own retake tip
 
-Each of the four problems SHALL have its own retake tip. A tip has a title, a message saying what is wrong, a tip saying how to retake, and an icon name. All four SHALL be distinct. Each SHALL equal the copy of its screen on the approved MVP canvas (`BadNoFace`, `BadDark`, `BadTint`, `BadFilter`).
+Each of the four problems SHALL have its own retake tip, and so SHALL `several-faces`. The check never reports `several-faces`: the web flow detects it from the face count, and the vision call can report it too. A tip has a title, a message saying what is wrong, a tip saying how to retake, and an icon name. All five SHALL be distinct. Each of the four SHALL equal the copy of its screen on the approved MVP canvas (`BadNoFace`, `BadDark`, `BadTint`, `BadFilter`). The several-faces tip SHALL equal the copy approved for it on the canvas.
 
 #### Scenario: Four bad photos, four tips
 
@@ -172,6 +187,11 @@ Each of the four problems SHALL have its own retake tip. A tip has a title, a me
 
 - **WHEN** the retake tips are read
 - **THEN** each title, message, tip and icon equals the copy on its canvas screen
+
+#### Scenario: Several faces has its own tip
+
+- **WHEN** the several-faces tip is read
+- **THEN** it differs from the other four and equals its approved canvas copy
 
 ### Requirement: Malformed input is refused
 

@@ -87,8 +87,8 @@ function edit(photo: PhotoInput, f: (rgb: RGB) => RGB): PhotoInput {
     pixels.set(f([pixels[i] ?? 0, pixels[i + 1] ?? 0, pixels[i + 2] ?? 0]), i);
   return { ...photo, pixels };
 }
-/** Eye white L* 33. */
-const darken = (p: PhotoInput) => edit(p, ([r, g, b]) => [r * 0.33, g * 0.33, b * 0.33]);
+/** Eye white L* 20. */
+const darken = (p: PhotoInput) => edit(p, ([r, g, b]) => [r * 0.2, g * 0.2, b * 0.2]);
 /** Eye white C*ab 29, yellow. */
 const warm = (p: PhotoInput) => edit(p, ([r, g, b]) => [r, g * 0.9, b * 0.7]);
 /** Eye white C*ab 30, blue-green. */
@@ -161,11 +161,11 @@ describe("checkPhoto", () => {
 
     /** {@link openspec/specs/photo-check/spec.md#scenario-a-photo-with-two-problems} */
     it("reports only dark for a dark, tinted photo", () => {
-      // A cast strong enough to outlive the darkening: eye white L* 32, C*ab 32.
-      const check = checkPhoto(darken(edit(face(), ([r, g, b]) => [r, g, b * 0.3])));
+      // A cast strong enough to outlive the darkening: eye white L* 19, C*ab 27.
+      const check = checkPhoto(darken(edit(face(), ([r, g]) => [r, g, 0])));
       expect(check.problem).toBe("dark");
       const eyeWhite = check.measures.eyeWhite ?? { L: NaN, a: NaN, b: NaN };
-      expect(eyeWhite.L).toBeLessThan(40);
+      expect(eyeWhite.L).toBeLessThan(25);
       expect(chroma(eyeWhite)).toBeGreaterThan(25);
     });
   });
@@ -218,7 +218,7 @@ describe("checkPhoto", () => {
   /** {@link openspec/specs/photo-check/spec.md#requirement-darkness-is-judged-from-the-eye-whites-not-the-skin} */
   describe("dark", () => {
     /** {@link openspec/specs/photo-check/spec.md#scenario-a-light-skinned-face-underexposed} */
-    it("reports dark for a light-skinned face at a third of its brightness", () => {
+    it("reports dark for a light-skinned face at a fifth of its brightness", () => {
       expect(problem(face())).toBeNull();
       expect(problem(darken(face()))).toBe("dark");
     });
@@ -226,6 +226,11 @@ describe("checkPhoto", () => {
     /** {@link openspec/specs/photo-check/spec.md#scenario-a-deep-skinned-face-in-good-light} */
     it("passes the deepest Monk Skin Tone in good light", () => {
       expect(problem(face({ skin: DEEPEST }))).toBeNull();
+    });
+
+    /** {@link openspec/specs/photo-check/spec.md#scenario-a-dim-indoor-selfie} */
+    it("passes a face at a third of its brightness, eye white L* 33 as indoors", () => {
+      expect(problem(edit(face(), ([r, g, b]) => [r * 0.33, g * 0.33, b * 0.33]))).toBeNull();
     });
   });
 
@@ -239,6 +244,11 @@ describe("checkPhoto", () => {
     /** {@link openspec/specs/photo-check/spec.md#scenario-cool-light} */
     it("reports tint for a cool cast", () => {
       expect(problem(cool(face()))).toBe("tint");
+    });
+
+    /** {@link openspec/specs/photo-check/spec.md#scenario-warm-indoor-light} */
+    it("passes a mild warm cast, eye white C*ab 19 as indoors", () => {
+      expect(problem(edit(face(), ([r, g, b]) => [r, g * 0.85, b * 0.78]))).toBeNull();
     });
   });
 
@@ -271,6 +281,11 @@ describe("checkPhoto", () => {
 
     it("reports filter for green skin under neutral eye whites", () => {
       expect(problem(face({ skin: [160, 180, 130] }))).toBe("filter"); // C*ab 28, hue 124°
+    });
+
+    /** {@link openspec/specs/photo-check/spec.md#scenario-skin-reddened-by-dim-warm-light} */
+    it("passes skin of hue 20°, as a webcam reads it in dim warm light", () => {
+      expect(problem(face({ skin: [150, 95, 97] }))).toBeNull(); // C*ab 24, hue 20°
     });
 
     it("ignores the hue of near-gray skin", () => {
@@ -376,7 +391,8 @@ describe("RETAKE_TIPS", () => {
 
   /**
    * Copied from the approved MVP canvas, https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3:
-   * the danger and retake-tip notes of project/BadNoFace.dc.html, BadDark, BadTint and BadFilter.
+   * the danger and retake-tip notes of project/BadNoFace.dc.html, BadDark, BadTint, BadFilter and
+   * BadSeveral.
    *
    * {@link openspec/specs/photo-check/spec.md#scenario-tips-match-the-canvas}
    */
@@ -407,6 +423,24 @@ describe("RETAKE_TIPS", () => {
         tip: "Try one straight from the camera. Turn off beauty mode and portrait effects first.",
         icon: "camera",
       },
+      "several-faces": {
+        title: "More than one face",
+        message: "We found more than one face in this photo.",
+        tip: "Take it on your own, with nobody else close to you in the frame.",
+        icon: "camera",
+      },
     });
+  });
+
+  /**
+   * Copied from project/BadSeveral.dc.html on the canvas, approved 2026-10-03.
+   *
+   * {@link openspec/specs/photo-check/spec.md#requirement-each-problem-has-its-own-retake-tip}
+   */
+  it("has a several-faces tip distinct from the other four", () => {
+    const { "several-faces": several, ...four } = RETAKE_TIPS;
+    expect(Object.keys(four).sort()).toEqual(["dark", "filter", "no-face", "tint"]);
+    for (const tip of Object.values(four)) expect(several).not.toEqual(tip);
+    expect(several.title).toBe("More than one face");
   });
 });

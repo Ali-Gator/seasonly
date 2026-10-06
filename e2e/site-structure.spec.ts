@@ -54,7 +54,8 @@ test.describe("public routes", () => {
     await page.goto("/analyze");
     await expect(page.locator("header a")).toHaveCount(1);
     await expect(page.locator('header a[href="/"]')).toHaveCount(1);
-    await expect(page.locator("nav, footer")).toHaveCount(0);
+    // The step progress is a nav landmark of its own; no site nav or footer.
+    await expect(page.locator('nav:not([aria-label="Progress"]), footer')).toHaveCount(0);
   });
 
   /** {@link openspec/specs/site-structure/spec.md#scenario-a-stub-page} */

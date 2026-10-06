@@ -10,6 +10,8 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    // PGlite boots a WASM Postgres per test; two files booting at once can pass 5 s on a laptop.
+    testTimeout: 15_000,
     include: [
       "scripts/**/*.test.ts",
       "packages/*/src/**/*.test.ts",

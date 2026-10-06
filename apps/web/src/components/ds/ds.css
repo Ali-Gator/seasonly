@@ -185,4 +185,210 @@
   .sn-note--success .sn-note__title {
     color: var(--success);
   }
+
+  /* Step progress: Photo, Quiz, Result. */
+  .sn-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .sn-steps ol {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sn-steps__step {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .sn-steps__bar {
+    height: 3px;
+    border-radius: 2px;
+    background: var(--line);
+  }
+  .sn-steps__step--done .sn-steps__bar,
+  .sn-steps__step--current .sn-steps__bar {
+    background: var(--ink);
+  }
+  .sn-steps__label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--ink-muted);
+  }
+  .sn-steps__step--current .sn-steps__label {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* Photo tip card: a good and a bad example. */
+  .sn-tip {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .sn-tip__body {
+    color: var(--ink-muted);
+  }
+  .sn-tip__pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+  .sn-tip__example {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+  }
+  .sn-tip__slot {
+    aspect-ratio: 3 / 4;
+  }
+  .sn-tip__example figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sn-tip__verdict {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 600;
+  }
+  .sn-tip__verdict--good {
+    color: var(--success);
+  }
+  .sn-tip__verdict--bad {
+    color: var(--danger);
+  }
+  .sn-tip__caption {
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--ink-muted);
+  }
+
+  /* Quiz option: a native radio inside its label. */
+  .sn-quiz {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: var(--size-tap);
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+  /* A file picker dressed as a button: the label carries the input's focus ring. */
+  .sn-btn:has(input:focus-visible),
+  .sn-quiz:has(:focus-visible) {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .sn-quiz__input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+  }
+  .sn-quiz__text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+  }
+  .sn-quiz__label {
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 20px;
+    color: var(--ink);
+  }
+  .sn-quiz__desc {
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--ink-muted);
+  }
+  .sn-quiz__mark {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid var(--line-strong);
+  }
+  .sn-quiz:has(:checked) {
+    border: 2px solid var(--ink);
+    padding: calc(var(--space-3) - 1px) calc(var(--space-4) - 1px);
+    box-shadow: var(--shadow-sm);
+  }
+  .sn-quiz:has(:checked) .sn-quiz__mark {
+    border: 6px solid var(--ink);
+  }
+  .sn-quiz:has(:disabled) {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  .sn-quiz-group {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .sn-quiz-group legend {
+    padding: 0;
+    margin-bottom: var(--space-3);
+  }
+
+  /* Camera frame: the view, a face guide oval and a caption. */
+  .sn-camera {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: 0;
+  }
+  .sn-camera__view {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--sunken);
+  }
+  .sn-camera__slot,
+  .sn-camera__view > video,
+  .sn-camera__view > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0;
+  }
+  .sn-camera__oval {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    width: 58%;
+    aspect-ratio: 3 / 4;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    box-shadow: 0 0 0 100vmax var(--scrim);
+  }
+  .sn-camera__caption {
+    text-align: center;
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--ink-muted);
+  }
 }
