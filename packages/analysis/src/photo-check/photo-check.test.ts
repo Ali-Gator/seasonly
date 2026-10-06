@@ -228,7 +228,7 @@ describe("checkPhoto", () => {
       expect(problem(face({ skin: DEEPEST }))).toBeNull();
     });
 
-    /** {@link openspec/specs/photo-check/spec.md#requirement-darkness-is-judged-from-the-eye-whites-not-the-skin} */
+    /** {@link openspec/specs/photo-check/spec.md#scenario-a-dim-indoor-selfie} */
     it("passes a face at a third of its brightness, eye white L* 33 as indoors", () => {
       expect(problem(edit(face(), ([r, g, b]) => [r * 0.33, g * 0.33, b * 0.33]))).toBeNull();
     });
@@ -246,7 +246,7 @@ describe("checkPhoto", () => {
       expect(problem(cool(face()))).toBe("tint");
     });
 
-    /** {@link openspec/specs/photo-check/spec.md#requirement-a-color-cast-is-judged-from-the-eye-whites} */
+    /** {@link openspec/specs/photo-check/spec.md#scenario-warm-indoor-light} */
     it("passes a mild warm cast, eye white C*ab 19 as indoors", () => {
       expect(problem(edit(face(), ([r, g, b]) => [r, g * 0.85, b * 0.78]))).toBeNull();
     });
@@ -283,7 +283,7 @@ describe("checkPhoto", () => {
       expect(problem(face({ skin: [160, 180, 130] }))).toBe("filter"); // C*ab 28, hue 124°
     });
 
-    /** {@link openspec/specs/photo-check/spec.md#requirement-a-filter-is-judged-from-skin-color-no-natural-skin-has} */
+    /** {@link openspec/specs/photo-check/spec.md#scenario-skin-reddened-by-dim-warm-light} */
     it("passes skin of hue 20°, as a webcam reads it in dim warm light", () => {
       expect(problem(face({ skin: [150, 95, 97] }))).toBeNull(); // C*ab 24, hue 20°
     });

@@ -47,7 +47,7 @@
 
 Existing tests change only as approved in 2.2. Any other change to an existing test needs the user's approval first.
 
-- [ ] 4.1 Make the edits approved in 2.2 to `photo-check.test.ts` and `report-text.test.ts`, and write `packages/analysis/src/report-text/reveal-line.test.ts`, citing the photo-check and report-text delta scenarios. Cover:
+- [x] 4.1 Make the edits approved in 2.2 to `photo-check.test.ts` and `report-text.test.ts`, and write `packages/analysis/src/report-text/reveal-line.test.ts`, citing the photo-check and report-text delta scenarios. Cover:
   - the several-faces tip exists, differs from the other four and equals its approved copy;
   - every season has a reveal line within 160 characters that does not contain its season's name;
   - Soft Autumn's line equals the canvas.
@@ -100,7 +100,7 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
 
 ## 5. Core
 
-- [ ] 5.1 Add the approved several-faces tip to `RETAKE_TIPS` as `Record<PhotoProblem | "several-faces", RetakeTip>` (export `RetakeReason`). Add `revealLine` (limit 160) to `SeasonCopy`, `COPY_LIMITS` and the 12 seasons. Done when 4.1 and the existing core tests pass.
+- [x] 5.1 Add the approved several-faces tip to `RETAKE_TIPS` as `Record<PhotoProblem | "several-faces", RetakeTip>` (export `RetakeReason`). Add `revealLine` (limit 160) to `SeasonCopy`, `COPY_LIMITS` and the 12 seasons. Done when 4.1 and the existing core tests pass.
 
 ## 6. Components
 
@@ -143,7 +143,7 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
 
 ## 9. Archive prep
 
-- [ ] 9.1 At archive, add the README rows, re-add each new spec's Public Interface, Behavior and Edge Cases, and update the plan's carried list:
+- [x] 9.1 At archive, add the README rows, re-add each new spec's Public Interface, Behavior and Edge Cases, and update the plan's carried list:
   - `capture-flow`: `apps/web/src/app/(flow)/analyze/page.tsx`, `apps/web/src/app/(flow)/analyze/flow.tsx`, `apps/web/src/app/(flow)/analyze/flow-state.ts`, `apps/web/src/app/(flow)/analyze/_capture/**`, `apps/web/src/lib/capture/**`;
   - `quiz`: `apps/web/src/app/(flow)/analyze/_quiz/**`;
   - `season-reveal`: `apps/web/src/app/(flow)/analyze/_reveal/**`, `apps/web/src/app/api/analyze/**`, `apps/web/src/lib/analysis/**`, and `supabase/migrations/*_reports.sql` if the daily-cap migration has a row of its own. Check whether `apps/web/src/lib/supabase.ts` needs an owner.

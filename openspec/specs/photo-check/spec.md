@@ -104,12 +104,17 @@ The check SHALL report `dark` when the eye whites are darker than the minimum li
 
 #### Scenario: A light-skinned face, underexposed
 
-- **WHEN** a photo of a light-skinned face that passes is darkened to a third of its brightness
+- **WHEN** a photo of a light-skinned face that passes is darkened to a fifth of its brightness
 - **THEN** `dark` is reported
 
 #### Scenario: A deep-skinned face in good light
 
 - **WHEN** a face with the deepest Monk Skin Tone and bright neutral eye whites is checked
+- **THEN** no problem is reported
+
+#### Scenario: A dim indoor selfie
+
+- **WHEN** a photo of a light-skinned face that passes is darkened to a third of its brightness, so its eye whites read L* 33 as in real indoor selfies
 - **THEN** no problem is reported
 
 ### Requirement: A color cast is judged from the eye whites
@@ -125,6 +130,11 @@ The check SHALL report `tint` when the eye whites are more colorful than the max
 
 - **WHEN** a photo that passes has its red channel scaled down so the eye whites turn blue-green
 - **THEN** `tint` is reported
+
+#### Scenario: Warm indoor light
+
+- **WHEN** a photo that passes is warmed slightly, so its eye whites read C*ab 19 as in real indoor selfies
+- **THEN** no problem is reported
 
 ### Requirement: Eye whites that cannot be measured do not reject a photo
 
@@ -159,9 +169,14 @@ The check SHALL report `filter` when the skin color is near-gray, more saturated
 - **WHEN** a face is painted in each of the 10 Monk Skin Tone colors, with neutral eye whites
 - **THEN** no problem is reported for any of them
 
+#### Scenario: Skin reddened by dim warm light
+
+- **WHEN** a face's skin reads hue 20°, as a webcam reads skin in dim warm light
+- **THEN** no problem is reported
+
 ### Requirement: Each problem has its own retake tip
 
-Each of the four problems SHALL have its own retake tip. A tip has a title, a message saying what is wrong, a tip saying how to retake, and an icon name. All four SHALL be distinct. Each SHALL equal the copy of its screen on the approved MVP canvas (`BadNoFace`, `BadDark`, `BadTint`, `BadFilter`).
+Each of the four problems SHALL have its own retake tip, and so SHALL `several-faces`. The check never reports `several-faces`: the web flow detects it from the face count, and the vision call can report it too. A tip has a title, a message saying what is wrong, a tip saying how to retake, and an icon name. All five SHALL be distinct. Each of the four SHALL equal the copy of its screen on the approved MVP canvas (`BadNoFace`, `BadDark`, `BadTint`, `BadFilter`). The several-faces tip SHALL equal the copy approved for it on the canvas.
 
 #### Scenario: Four bad photos, four tips
 
@@ -172,6 +187,11 @@ Each of the four problems SHALL have its own retake tip. A tip has a title, a me
 
 - **WHEN** the retake tips are read
 - **THEN** each title, message, tip and icon equals the copy on its canvas screen
+
+#### Scenario: Several faces has its own tip
+
+- **WHEN** the several-faces tip is read
+- **THEN** it differs from the other four and equals its approved canvas copy
 
 ### Requirement: Malformed input is refused
 
