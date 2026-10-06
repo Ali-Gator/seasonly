@@ -116,7 +116,7 @@ After the second failed check in a row, the retake screen SHALL also offer to co
 
 ### Requirement: Each photo check is reported without photo data
 
-Each completed check SHALL send one `photo_checked` event. The event SHALL carry:
+Each check whose outcome is shown SHALL send one `photo_checked` event. A check overtaken by a newer photo, or by a second tap while checking, is not shown and SHALL NOT be reported. The event SHALL carry:
 
 - the problem, or none;
 - the number of faces found;

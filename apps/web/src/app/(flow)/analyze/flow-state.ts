@@ -105,7 +105,8 @@ const replace = (s: FlowState, step: Step): FlowState => ({ ...s, step });
 /** Sends the request, as a new entry from the last question or in place of a spinner. */
 const analyze = (s: FlowState, to: typeof push): FlowState => ({
   ...to(s, { name: "analyzing" }),
-  request: { answers: s.answers, photo: s.photo },
+  // Never a photo the person has not agreed to send.
+  request: { answers: s.answers, photo: s.consented ? s.photo : null },
   attempt: s.attempt + 1,
 });
 
@@ -185,9 +186,11 @@ export function reduce(s: FlowState, e: FlowEvent): FlowState {
     case "back": {
       const previous = s.trail.at(-1);
       if (!previous) return s;
+      // Leaving consent unanswered keeps no photo, as declining would.
+      const photo = step.name === "consent" && !s.consented ? null : s.photo;
       // Consent for a photo that was since dropped has nothing to show: take a new one.
-      const to: Step = previous.name === "consent" && !s.photo ? { name: "capture" } : previous;
-      return { ...s, step: to, trail: s.trail.slice(0, -1) };
+      const to: Step = previous.name === "consent" && !photo ? { name: "capture" } : previous;
+      return { ...s, photo, step: to, trail: s.trail.slice(0, -1) };
     }
   }
 }

@@ -32,3 +32,51 @@ The check SHALL report `dark` when the eye whites are darker than the minimum li
 
 - **WHEN** a face with the deepest Monk Skin Tone and bright neutral eye whites is checked
 - **THEN** no problem is reported
+
+#### Scenario: A dim indoor selfie
+
+- **WHEN** a photo of a light-skinned face that passes is darkened to a third of its brightness, so its eye whites read L* 33 as in real indoor selfies
+- **THEN** no problem is reported
+
+### Requirement: A color cast is judged from the eye whites
+
+The check SHALL report `tint` when the eye whites are more colorful than the maximum eye-white chroma, in any direction.
+
+#### Scenario: Warm lamp light
+
+- **WHEN** a photo that passes has its blue channel scaled down so the eye whites turn yellow
+- **THEN** `tint` is reported
+
+#### Scenario: Cool light
+
+- **WHEN** a photo that passes has its red channel scaled down so the eye whites turn blue-green
+- **THEN** `tint` is reported
+
+#### Scenario: Warm indoor light
+
+- **WHEN** a photo that passes is warmed slightly, so its eye whites read C*ab 19 as in real indoor selfies
+- **THEN** no problem is reported
+
+### Requirement: A filter is judged from skin color no natural skin has
+
+The check SHALL report `filter` when the skin color is near-gray, more saturated than the maximum skin chroma, or of a hue outside the natural skin range. Every tone of the Monk Skin Tone scale, under neutral light, SHALL pass.
+
+#### Scenario: A black-and-white photo
+
+- **WHEN** a photo that passes is converted to grayscale
+- **THEN** `filter` is reported
+
+#### Scenario: A pink filter on the skin
+
+- **WHEN** a photo's skin is turned magenta while its eye whites stay neutral
+- **THEN** `filter` is reported
+
+#### Scenario: Every skin tone passes
+
+- **WHEN** a face is painted in each of the 10 Monk Skin Tone colors, with neutral eye whites
+- **THEN** no problem is reported for any of them
+
+#### Scenario: Skin reddened by dim warm light
+
+- **WHEN** a face's skin reads hue 20°, as a webcam reads skin in dim warm light
+- **THEN** no problem is reported

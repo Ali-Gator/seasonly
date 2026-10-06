@@ -29,6 +29,11 @@ export function Flow() {
   const depth = state.trail.length;
   const shown = useRef(0);
   const checks = useRef(0);
+  // The step as last rendered, so a check's result can tell whether the reducer will keep it.
+  const shownStep = useRef(step);
+  useEffect(() => {
+    shownStep.current = step;
+  }, [step]);
   const urls = useRef<string[]>([]);
 
   // One browser entry per trail entry, numbered from the entry the flow mounted on: after a
@@ -47,7 +52,13 @@ export function Flow() {
       // Another page's entry is the router's business.
       if (location.pathname !== "/analyze") return;
       const at = depthOf(e) - (base.current ?? 0);
-      if (at < 0) return history.go(-(depthOf(e) + 1));
+      if (at < 0) {
+        // With no page before the flow's first entry the browser stays put: the guide owns this
+        // entry from now on.
+        base.current = depthOf(e);
+        for (; shown.current > 0; shown.current--) dispatch({ type: "back" });
+        return history.go(-(depthOf(e) + 1));
+      }
       if (at > shown.current) return history.go(shown.current - at);
       for (; shown.current > at; shown.current--) dispatch({ type: "back" });
     };
@@ -84,8 +95,10 @@ export function Flow() {
       try {
         if (!image) throw new Error("no camera frame");
         const checked = await checkImage(image);
-        // A check overtaken by a newer one is dropped, so it is not reported either.
-        if (id === checks.current)
+        // Reported only when the reducer keeps it: the check on screen, not one overtaken by Back
+        // and a newer photo, nor a second tap while checking.
+        const now = shownStep.current;
+        if (now.name === "checking" && now.id === id)
           track("photo_checked", photoCheckedProps({ ...checked, attempt: id, source }));
         dispatch({
           type: "checked",

@@ -346,6 +346,43 @@ describe("review fixes", () => {
     expect(run([{ type: "change-answers" }, ...answerAll], declined).step.name).toBe("analyzing");
   });
 
+  /** {@link openspec/specs/capture-flow/spec.md#requirement-nothing-leaves-the-device-before-consent} */
+  it("sends no photo left unanswered on consent by Back", () => {
+    const reveal = reduce(
+      run([
+        { type: "checking", id: 1 },
+        failed(),
+        { type: "checking", id: 1 },
+        failed(),
+        { type: "quiz-only" },
+        ...answerAll,
+      ]),
+      {
+        type: "analyzed",
+        response: {
+          kind: "result",
+          reportId: null,
+          season: "soft-autumn",
+          agreement: "quiz-only",
+          confidence: 0.5,
+          photo: null,
+          text: "cap-unavailable",
+        },
+      },
+    );
+    const consent = run(
+      [{ type: "retake" }, { type: "checking", id: 2 }, { ...passed, id: 2 }],
+      reveal,
+    );
+    expect(consent.step.name).toBe("consent");
+    const quiz = run([{ type: "back" }, { type: "back" }, { type: "back" }], consent);
+    expect(quiz.step).toEqual({ name: "quiz", question: 3 });
+    expect(quiz.photo).toBeNull();
+    const sent = reduce(quiz, { type: "next" });
+    expect(sent.step.name).toBe("analyzing");
+    expect(sent.request?.photo).toBeNull();
+  });
+
   /** {@link openspec/specs/capture-flow/spec.md#scenario-first-failure} */
   it("asks for a new photo, not a quiz-only send, after Back from a rejection", () => {
     const rejected = reduce(run(toAnalyzing), {
