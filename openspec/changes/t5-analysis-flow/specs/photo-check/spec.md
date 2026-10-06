@@ -18,3 +18,17 @@ Each of the four problems SHALL have its own retake tip, and so SHALL `several-f
 
 - **WHEN** the several-faces tip is read
 - **THEN** it differs from the other four and equals its approved canvas copy
+
+### Requirement: Darkness is judged from the eye whites, not the skin
+
+The check SHALL report `dark` when the eye whites are darker than the minimum lightness. It SHALL NOT judge darkness from skin lightness, so deep skin in good light passes.
+
+#### Scenario: A light-skinned face, underexposed
+
+- **WHEN** a photo of a light-skinned face that passes is darkened to a fifth of its brightness
+- **THEN** `dark` is reported
+
+#### Scenario: A deep-skinned face in good light
+
+- **WHEN** a face with the deepest Monk Skin Tone and bright neutral eye whites is checked
+- **THEN** no problem is reported

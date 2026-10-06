@@ -17,12 +17,14 @@ import { regionPixels, type Rings } from "../sampling/regions.ts";
 export { RETAKE_TIPS, type RetakeReason, type RetakeTip } from "./tips.ts";
 
 // Provisional limits: t6-eval-set tunes them against labeled photos across the skin-tone range.
+// The eye-white ones come from real webcam and phone selfies (2026-10-06): in normal indoor light
+// the sclera reads L* 30-47 and C*ab 12-21, shadowed by the lids and pink by nature.
 /** Narrower than this, in pixels, and the face is too small to measure. */
 export const MIN_FACE_WIDTH = 120;
 /** Eye-white L* below this is too dark. */
-const MIN_EYE_WHITE_L = 50;
+const MIN_EYE_WHITE_L = 25;
 /** Eye-white C*ab above this is a color cast. */
-const MAX_EYE_WHITE_CHROMA = 15;
+const MAX_EYE_WHITE_CHROMA = 25;
 /** Skin C*ab outside this range is a filter: grayscale below, oversaturated above. */
 const MIN_SKIN_CHROMA = 2;
 const MAX_SKIN_CHROMA = 45;

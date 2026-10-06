@@ -87,8 +87,8 @@ function edit(photo: PhotoInput, f: (rgb: RGB) => RGB): PhotoInput {
     pixels.set(f([pixels[i] ?? 0, pixels[i + 1] ?? 0, pixels[i + 2] ?? 0]), i);
   return { ...photo, pixels };
 }
-/** Eye white L* 33. */
-const darken = (p: PhotoInput) => edit(p, ([r, g, b]) => [r * 0.33, g * 0.33, b * 0.33]);
+/** Eye white L* 20. */
+const darken = (p: PhotoInput) => edit(p, ([r, g, b]) => [r * 0.2, g * 0.2, b * 0.2]);
 /** Eye white C*ab 29, yellow. */
 const warm = (p: PhotoInput) => edit(p, ([r, g, b]) => [r, g * 0.9, b * 0.7]);
 /** Eye white C*ab 30, blue-green. */
@@ -161,11 +161,11 @@ describe("checkPhoto", () => {
 
     /** {@link openspec/specs/photo-check/spec.md#scenario-a-photo-with-two-problems} */
     it("reports only dark for a dark, tinted photo", () => {
-      // A cast strong enough to outlive the darkening: eye white L* 32, C*ab 32.
-      const check = checkPhoto(darken(edit(face(), ([r, g, b]) => [r, g, b * 0.3])));
+      // A cast strong enough to outlive the darkening: eye white L* 19, C*ab 27.
+      const check = checkPhoto(darken(edit(face(), ([r, g]) => [r, g, 0])));
       expect(check.problem).toBe("dark");
       const eyeWhite = check.measures.eyeWhite ?? { L: NaN, a: NaN, b: NaN };
-      expect(eyeWhite.L).toBeLessThan(40);
+      expect(eyeWhite.L).toBeLessThan(25);
       expect(chroma(eyeWhite)).toBeGreaterThan(25);
     });
   });
@@ -218,7 +218,7 @@ describe("checkPhoto", () => {
   /** {@link openspec/specs/photo-check/spec.md#requirement-darkness-is-judged-from-the-eye-whites-not-the-skin} */
   describe("dark", () => {
     /** {@link openspec/specs/photo-check/spec.md#scenario-a-light-skinned-face-underexposed} */
-    it("reports dark for a light-skinned face at a third of its brightness", () => {
+    it("reports dark for a light-skinned face at a fifth of its brightness", () => {
       expect(problem(face())).toBeNull();
       expect(problem(darken(face()))).toBe("dark");
     });
