@@ -80,12 +80,3 @@ fold items in.
   _Refs:_ `apps/web/src/components/ds/icon.tsx`, design system
   (https://claude.ai/artifact/E11hciU9VsyCxTFnJJNbHD) · _Status:_ gated — your choice of icon set
   and photos (open since T3, 2026-10-01)
-
-## Repo & tooling
-
-- **[BL-07] Protect `main`** — branch protection was skipped in Phase 0 because the private repo
-  on the free plan refused it. The repo is public since 2026-10-06, so the free plan now allows
-  it. Require the `ci.yml`, `openspec.yml` and `e2e.yml` checks before merge; this also enables
-  GitHub auto-merge.
-  _Refs:_ GitHub `Ali-Gator/seasonly` settings · _Status:_ open — your call, since it changes how
-  you merge
