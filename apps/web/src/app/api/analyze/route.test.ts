@@ -1,5 +1,6 @@
 /**
- * The analyze route with its three seams mocked: BotID, the report-text call and the store.
+ * The analyze route with its seams mocked: BotID, the report-text call, the store and the crop
+ * store. `after` runs its callback at once, so a scheduled crop upload is seen as a call.
  *
  * @see openspec/specs/season-reveal/spec.md
  */
@@ -8,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { BOTID_PROTECT } from "@/lib/abuse/botid";
 import { saveReport } from "@/lib/analysis/store";
+import { storeCrop } from "@/lib/draping/crops";
 import { generateReportText } from "@/lib/report-text";
 
 import { maxDuration, POST } from "./route";
@@ -21,6 +23,12 @@ vi.mock("@sentry/nextjs", () => ({
 vi.mock("botid/server", () => ({ checkBotId: vi.fn() }));
 vi.mock("@/lib/report-text", () => ({ generateReportText: vi.fn() }));
 vi.mock("@/lib/analysis/store", () => ({ saveReport: vi.fn() }));
+vi.mock("@/lib/draping/crops", () => ({ storeCrop: vi.fn() }));
+// Outside a request scope the real `after` throws; run its callback at once instead.
+vi.mock("next/server", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("next/server")>()),
+  after: vi.fn((task: () => unknown) => void task()),
+}));
 
 const human = { isHuman: true, isBot: false, isVerifiedBot: false, bypassed: false };
 const REPORT_ID = "AAAAAAAAAAAAAAAAAAAAAA";
@@ -211,6 +219,33 @@ describe("POST /api/analyze", () => {
   /** {@link openspec/specs/season-reveal/spec.md#scenario-the-declared-limit} */
   it("declares a 60 s limit", () => {
     expect(maxDuration).toBe(60);
+  });
+});
+
+describe("crop storage", () => {
+  /** {@link openspec/specs/draping-preview/spec.md#scenario-a-photo-result} */
+  it("schedules the crop under the report id for a personal photo result", async () => {
+    await POST(photo());
+    expect(storeCrop).toHaveBeenCalledTimes(1);
+    expect(storeCrop).toHaveBeenCalledWith(REPORT_ID, JPEG);
+  });
+
+  /** {@link openspec/specs/draping-preview/spec.md#scenario-a-fallback-result-with-a-photo} */
+  it("schedules the crop for a fallback photo result too", async () => {
+    vi.mocked(generateReportText).mockResolvedValue({ kind: "static", reason: "capped" });
+    await POST(photo());
+    expect(storeCrop).toHaveBeenCalledWith(REPORT_ID, JPEG);
+  });
+
+  /** {@link openspec/specs/draping-preview/spec.md#scenario-nothing-to-store-under} */
+  it("stores nothing for quiz-only, rejected, no-result or an unsaved result", async () => {
+    await POST(request({ answers: { veins: "green", jewelry: "gold" } }));
+    await POST(request({ answers: { veins: "green", jewelry: "silver" } }));
+    vi.mocked(saveReport).mockResolvedValueOnce(null);
+    await POST(photo());
+    vi.mocked(generateReportText).mockResolvedValue({ kind: "rejected", problem: "several-faces" });
+    await POST(photo());
+    expect(storeCrop).not.toHaveBeenCalled();
   });
 });
 

@@ -28,6 +28,12 @@ export interface Palette {
   hair: readonly Swatch[];
   /** A best color and a color to avoid, shown side by side on the face. */
   draping: { best: Swatch; worst: Swatch };
+  /**
+   * 6, from `best` and `neutrals`, in the order surfaces show them; a surface showing fewer shows
+   * the first. Soft Autumn's are the canvas share card's; the other 11 were approved as swatches on
+   * https://claude.ai/artifact/K24H42V67Uc7MkRs8p95y9 (2026-10-07).
+   */
+  highlights: readonly Swatch[];
 }
 
 export const PALETTES: Record<SeasonSlug, Palette> = {
@@ -108,6 +114,14 @@ export const PALETTES: Record<SeasonSlug, Palette> = {
       best: { name: "Peach", hex: "#F5B88F" },
       worst: { name: "Burgundy", hex: "#6E1E30" },
     },
+    highlights: [
+      { name: "Peach", hex: "#F5B88F" },
+      { name: "Light Turquoise", hex: "#5CC4C9" },
+      { name: "Buttercup", hex: "#F6D46B" },
+      { name: "Warm Pink", hex: "#EE8FA0" },
+      { name: "Spring Green", hex: "#9CCB72" },
+      { name: "Light Taupe", hex: "#BFAA90" },
+    ],
   },
   "true-spring": {
     best: [
@@ -186,6 +200,14 @@ export const PALETTES: Record<SeasonSlug, Palette> = {
       best: { name: "Coral", hex: "#F26B4F" },
       worst: { name: "Burgundy", hex: "#6E1E30" },
     },
+    highlights: [
+      { name: "Coral", hex: "#F26B4F" },
+      { name: "Turquoise", hex: "#18B0B0" },
+      { name: "Marigold", hex: "#F2B134" },
+      { name: "Warm Pink", hex: "#F27A8A" },
+      { name: "Kelly Green", hex: "#3C9A4D" },
+      { name: "Caramel", hex: "#A8763E" },
+    ],
   },
   "bright-spring": {
     best: [
@@ -264,6 +286,14 @@ export const PALETTES: Record<SeasonSlug, Palette> = {
       best: { name: "Bright Coral", hex: "#FF6F5E" },
       worst: { name: "Olive Drab", hex: "#6B6A3A" },
     },
+    highlights: [
+      { name: "Bright Coral", hex: "#FF6F5E" },
+      { name: "Bright Turquoise", hex: "#00B5C0" },
+      { name: "Sunflower", hex: "#FFC20E" },
+      { name: "Hot Pink", hex: "#E8407F" },
+      { name: "Emerald", hex: "#009B77" },
+      { name: "Ink Navy", hex: "#1D2A4D" },
+    ],
   },
   "light-summer": {
     best: [
@@ -342,6 +372,14 @@ export const PALETTES: Record<SeasonSlug, Palette> = {
       best: { name: "Powder Blue", hex: "#A9C6E8" },
       worst: { name: "Mustard", hex: "#BF9A4A" },
     },
+    highlights: [
+      { name: "Powder Blue", hex: "#A9C6E8" },
+      { name: "Soft Teal", hex: "#6AAEAE" },
+      { name: "Light Lemon", hex: "#F3E8A0" },
+      { name: "Rose Pink", hex: "#E8A3B7" },
+      { name: "Lavender", hex: "#B9A9DB" },
+      { name: "Rose Taupe", hex: "#A39A96" },
+    ],
   },
   "true-summer": {
     best: [
@@ -420,6 +458,14 @@ export const PALETTES: Record<SeasonSlug, Palette> = {
       best: { name: "Soft Blue", hex: "#6F95C8" },
       worst: { name: "Orange", hex: "#F57B20" },
     },
+    highlights: [
+      { name: "Soft Blue", hex: "#6F95C8" },
+      { name: "Sea Green", hex: "#5FA89A" },
+      { name: "Rose Pink", hex: "#D9849C" },
+      { name: "Lavender", hex: "#A99BD0" },
+      { name: "Plum", hex: "#7D4A72" },
+      { name: "Cool Taupe", hex: "#8F8582" },
+    ],
   },
   "soft-summer": {
     best: [
@@ -498,6 +544,14 @@ export const PALETTES: Record<SeasonSlug, Palette> = {
       best: { name: "Dusty Rose", hex: "#C4979E" },
       worst: { name: "Orange", hex: "#F57B20" },
     },
+    highlights: [
+      { name: "Dusty Rose", hex: "#C4979E" },
+      { name: "Smoky Teal", hex: "#5C8686" },
+      { name: "Dusty Blue", hex: "#7D93AE" },
+      { name: "Grey Violet", hex: "#8A80A6" },
+      { name: "Grey Green", hex: "#8A9C8E" },
+      { name: "Rose Taupe", hex: "#9C8B87" },
+    ],
   },
   "soft-autumn": {
     best: [
@@ -576,6 +630,14 @@ export const PALETTES: Record<SeasonSlug, Palette> = {
       best: { name: "Terracotta", hex: "#B4694F" },
       worst: { name: "Fuchsia", hex: "#CC2A7E" },
     },
+    highlights: [
+      { name: "Terracotta", hex: "#B4694F" },
+      { name: "Deep Teal", hex: "#4C7774" },
+      { name: "Camel", hex: "#C39D6F" },
+      { name: "Dusty Rose", hex: "#C4918A" },
+      { name: "Olive", hex: "#7B7848" },
+      { name: "Mushroom", hex: "#A08F7E" },
+    ],
   },
   "true-autumn": {
     best: [
@@ -654,6 +716,14 @@ export const PALETTES: Record<SeasonSlug, Palette> = {
       best: { name: "Pumpkin", hex: "#D2691E" },
       worst: { name: "Bubblegum Pink", hex: "#F4A3C8" },
     },
+    highlights: [
+      { name: "Pumpkin", hex: "#D2691E" },
+      { name: "Peacock Teal", hex: "#1F6E6E" },
+      { name: "Mustard", hex: "#CC9B2B" },
+      { name: "Salmon", hex: "#E07B5A" },
+      { name: "Olive", hex: "#7A7A2E" },
+      { name: "Camel Tan", hex: "#B88F5F" },
+    ],
   },
   "deep-autumn": {
     best: [
@@ -732,6 +802,14 @@ export const PALETTES: Record<SeasonSlug, Palette> = {
       best: { name: "Deep Rust", hex: "#8F3B1F" },
       worst: { name: "Pastel Pink", hex: "#F4C2D7" },
     },
+    highlights: [
+      { name: "Deep Rust", hex: "#8F3B1F" },
+      { name: "Deep Teal", hex: "#1E5A5A" },
+      { name: "Saffron", hex: "#D19A2A" },
+      { name: "Deep Plum", hex: "#5A2A40" },
+      { name: "Hunter Green", hex: "#355E3B" },
+      { name: "Taupe Brown", hex: "#7A6250" },
+    ],
   },
   "deep-winter": {
     best: [
@@ -810,6 +888,14 @@ export const PALETTES: Record<SeasonSlug, Palette> = {
       best: { name: "True Red", hex: "#C8102E" },
       worst: { name: "Mustard", hex: "#BF9A4A" },
     },
+    highlights: [
+      { name: "True Red", hex: "#C8102E" },
+      { name: "Emerald", hex: "#00704A" },
+      { name: "Cobalt", hex: "#0047AB" },
+      { name: "Fuchsia", hex: "#CC2A7E" },
+      { name: "Royal Purple", hex: "#5A2D91" },
+      { name: "Charcoal", hex: "#333438" },
+    ],
   },
   "true-winter": {
     best: [
@@ -888,6 +974,14 @@ export const PALETTES: Record<SeasonSlug, Palette> = {
       best: { name: "Blue Red", hex: "#C21E3A" },
       worst: { name: "Camel", hex: "#C39D6F" },
     },
+    highlights: [
+      { name: "Blue Red", hex: "#C21E3A" },
+      { name: "Cobalt", hex: "#0047AB" },
+      { name: "Lemon Yellow", hex: "#F2E14C" },
+      { name: "Hot Pink", hex: "#E01E7E" },
+      { name: "Emerald", hex: "#00845A" },
+      { name: "Charcoal", hex: "#333438" },
+    ],
   },
   "bright-winter": {
     best: [
@@ -966,5 +1060,13 @@ export const PALETTES: Record<SeasonSlug, Palette> = {
       best: { name: "Hot Pink", hex: "#F0287E" },
       worst: { name: "Mushroom", hex: "#A08F7E" },
     },
+    highlights: [
+      { name: "Hot Pink", hex: "#F0287E" },
+      { name: "Bright Turquoise", hex: "#00C1C1" },
+      { name: "Lemon Yellow", hex: "#F7E52E" },
+      { name: "Bright Violet", hex: "#8A2BE2" },
+      { name: "Emerald", hex: "#009B6A" },
+      { name: "Charcoal", hex: "#333438" },
+    ],
   },
 };

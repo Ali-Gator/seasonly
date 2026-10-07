@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 import {
   Button,
   CameraFrame,
+  DrapingPair,
   Icon,
   Note,
   PhotoTipCard,
@@ -230,6 +231,16 @@ describe("Stylesheets", () => {
         <video />
       </CameraFrame>
       <CameraFrame guide={false} label="Placeholder" />
+      <DrapingPair
+        best={{ name: "Terracotta", hex: "#b4694f" }}
+        worst={{ name: "Fuchsia", hex: "#CC2A7E" }}
+        faceSrc="/api/face/x"
+        faceAlt="Your face"
+      />
+      <DrapingPair
+        best={{ name: "Terracotta", hex: "#b4694f" }}
+        worst={{ name: "Fuchsia", hex: "#CC2A7E" }}
+      />
       <PhotoTipCard
         title="Title"
         body="Body"

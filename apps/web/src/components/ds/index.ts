@@ -4,6 +4,7 @@ export { Note, type NoteProps } from "./note";
 export { ReportSection, type ReportSectionProps } from "./report-section";
 export { Swatch, SwatchGrid, type SwatchGridProps, type SwatchProps } from "./swatch";
 export { CameraFrame, type CameraFrameProps } from "./camera-frame";
+export { DrapingPair, type DrapingPairProps } from "./draping-pair";
 export { PhotoTipCard, type PhotoTipCardProps } from "./photo-tip-card";
 export { QuizOption, type QuizOptionProps } from "./quiz-option";
 export { StepProgress, type StepProgressProps } from "./step-progress";
