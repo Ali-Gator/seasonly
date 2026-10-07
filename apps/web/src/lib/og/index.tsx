@@ -10,19 +10,24 @@ import tokens from "@/styles/tokens.json";
  * @see openspec/specs/share-card/spec.md
  * @see openspec/specs/palette-image/spec.md
  */
-const font = (file: string) => readFileSync(new URL(`./fonts/${file}`, import.meta.url));
+// Literal URLs: the bundler copies a font only when it can read its path statically.
 
 export const OG_FONTS = [
-  { name: "Bodoni Moda", data: font("BodoniModa-Medium.ttf"), weight: 500, style: "normal" },
+  {
+    name: "Bodoni Moda",
+    data: readFileSync(new URL("./fonts/BodoniModa-Medium.ttf", import.meta.url)),
+    weight: 500,
+    style: "normal",
+  },
   {
     name: "Instrument Sans",
-    data: font("InstrumentSans-Regular.ttf"),
+    data: readFileSync(new URL("./fonts/InstrumentSans-Regular.ttf", import.meta.url)),
     weight: 400,
     style: "normal",
   },
   {
     name: "Instrument Sans",
-    data: font("InstrumentSans-SemiBold.ttf"),
+    data: readFileSync(new URL("./fonts/InstrumentSans-SemiBold.ttf", import.meta.url)),
     weight: 600,
     style: "normal",
   },
