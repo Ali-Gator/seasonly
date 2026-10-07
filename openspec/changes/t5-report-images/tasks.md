@@ -125,8 +125,8 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
 
 ## 6. Checks with the user
 
-- [ ] 6.1 Ask the user to confirm applying the crops-bucket migration to the Supabase project `seasonly` (ref `qisseuermrrwvvnfyjet`) through the connector, before 6.3, as `reports` was on 2026-10-03. Rename the local file to the applied version. Done when the user confirms, the connector lists the migration, and `storage.buckets` shows `crops` with `public` false.
-- [ ] 6.2 Show the user all 24 share cards and the 12 palette images, at full size and at 120 px wide, in a scratch Artifact built from the built PNGs. Done when the user confirms that the season name, the colors and `seasonly.me` read at thumbnail size, and that the palette images match the artboard. Record the date here.
+- [x] 6.1 Ask the user to confirm applying the crops-bucket migration to the Supabase project `seasonly` (ref `qisseuermrrwvvnfyjet`) through the connector, before 6.3, as `reports` was on 2026-10-03. Rename the local file to the applied version. Done when the user confirms, the connector lists the migration, and `storage.buckets` shows `crops` with `public` false. Applied 2026-10-07 as `20261007171413_crops_bucket`; `crops` is private, 524288 bytes, `image/jpeg` only, and `storage` has no policies.
+- [x] 6.2 Show the user all 24 share cards and the 12 palette images, at full size and at 120 px wide, in a scratch Artifact built from the built PNGs. Done when the user confirms that the season name, the colors and `seasonly.me` read at thumbnail size, and that the palette images match the artboard. Record the date here. Approved 2026-10-07 (https://claude.ai/artifact/TuXp87Dwy3C922KiUnkE9b).
 - [ ] 6.3 On the preview deployment, with the user's yes for one paid analysis:
   1. run one photo analysis from the user's phone;
   2. after the migration is applied (6.1), open `/api/face/<report id>` from the response;

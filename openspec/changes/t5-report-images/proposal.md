@@ -46,7 +46,7 @@ The report needs three images that nothing renders yet: the share card, the main
   - `apps/web/src/app/api/face/[id]/route.ts` and `apps/web/src/lib/draping/`: the crop store.
   - `apps/web/src/app/api/analyze/route.ts`: one `after()` call.
   - `apps/web/src/components/ds/draping-pair.tsx` and its `ds.css` rules.
-- **Database:** the migration `supabase/migrations/<ts>_crops_bucket.sql` creates the private bucket `crops`: JPEG only, at most 512 KB, and no policies, so only the server's key reads or writes it. It is applied to the Supabase project `seasonly` after the user confirms, from main only.
+- **Database:** the migration `supabase/migrations/<ts>_crops_bucket.sql` creates the private bucket `crops`: JPEG only, at most 512 KB, and no policies, so only the server's key reads or writes it. It is applied to the Supabase project `seasonly` after the user confirms, before the preview check (task 6.1).
 - **Fonts:** static TTF instances of Bodoni Moda (500) and Instrument Sans (400, 600) are committed with their OFL licenses, because `next/og` cannot read variable fonts or WOFF2.
 - **Dependencies:** none. `next/og` ships with Next.
 - **Env:** none. The crop store uses `SUPABASE_URL` and `SUPABASE_SECRET_KEY`.
