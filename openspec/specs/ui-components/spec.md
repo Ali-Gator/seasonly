@@ -59,12 +59,19 @@ export interface ReportSectionProps {
   className?: string;
 }
 
+export type DrapingPairProps = {
+  best: Color;
+  worst: Color;
+  className?: string;
+} & ({ faceSrc: string; faceAlt: string } | { faceSrc?: undefined; faceAlt?: undefined });
+
 export function Button(props: ButtonProps): JSX.Element;
 export function Icon(props: IconProps): JSX.Element;
 export function Swatch(props: SwatchProps): JSX.Element;
 export function SwatchGrid(props: SwatchGridProps): JSX.Element;
 export function Note(props: NoteProps): JSX.Element;
 export function ReportSection(props: ReportSectionProps): JSX.Element;
+export function DrapingPair(props: DrapingPairProps): JSX.Element; // the face is /api/face/<report id> (draping-preview)
 ```
 
 Styles: `apps/web/src/components/ds/ds.css`, imported once from `globals.css` right after Tailwind.
@@ -237,3 +244,23 @@ A photo tip card SHALL show its title as a heading, its body, and two examples, 
 
 - **WHEN** a tip card renders with the title "Face a window", the good caption "Facing a window" and the bad caption "Under a ceiling lamp"
 - **THEN** it shows the heading "Face a window", "Good" with "Facing a window", and "Avoid" with "Under a ceiling lamp"
+
+### Requirement: A draping pair tells best from worst in words
+
+DrapingPair SHALL render two frames side by side, the best color first. Each frame SHALL be filled with its color and hold the same face image, with the same source and alt text on both sides. Under each frame SHALL be:
+
+- a verdict in words with an icon: "Best" with the check icon in the success color, or "Worst" with the cross icon in the danger color;
+- the color's name;
+- its uppercase hex code.
+
+Without a face source, each frame SHALL show a slot labeled "Face" in place of the image.
+
+#### Scenario: A pair with a face
+
+- **WHEN** DrapingPair renders Terracotta `#b4694f` as best, Fuchsia `#CC2A7E` as worst, and a face source with alt text
+- **THEN** the first frame is filled with `#b4694f` and reads "Best", "Terracotta" and "#B4694F"; the second is filled with `#CC2A7E` and reads "Worst", "Fuchsia" and "#CC2A7E"; and both hold an image with that source and alt text
+
+#### Scenario: A pair without a face
+
+- **WHEN** DrapingPair renders with no face source
+- **THEN** each frame shows a slot labeled "Face" and no image

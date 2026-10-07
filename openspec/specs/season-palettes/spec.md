@@ -21,13 +21,14 @@ export interface Palette {
   metalsAvoid: readonly Swatch[];
   lips: readonly Swatch[]; blush: readonly Swatch[]; eyes: readonly Swatch[]; hair: readonly Swatch[]; // 3 each
   draping: { best: Swatch; worst: Swatch };
+  highlights: readonly Swatch[]; // 6, from best and neutrals, in display order
 }
 export const PALETTES: Record<SeasonSlug, Palette>;
 ```
 
 ## Behavior
 
-`apps/web/src/lib/site/routes.ts` takes `SEASON_SLUGS` and `SeasonSlug` from `@seasonly/analysis` and keeps its season summaries as page copy; `site-chrome.tsx` groups seasons with `seasonFamily`. `evals/manifest.ts` imports the slugs by relative path. `palettes/data.ts` is a typed literal, so a missing season fails to compile. Soft Autumn is the approved canvas report; the other 11 were approved as swatches on 2026-10-02 (https://claude.ai/artifact/5t696uuN9gV4kVNi24XKPX).
+`apps/web/src/lib/site/routes.ts` takes `SEASON_SLUGS` and `SeasonSlug` from `@seasonly/analysis` and keeps its season summaries as page copy; `site-chrome.tsx` groups seasons with `seasonFamily`. `evals/manifest.ts` imports the slugs by relative path. `palettes/data.ts` is a typed literal, so a missing season fails to compile. Soft Autumn is the approved canvas report; the other 11 were approved as swatches on 2026-10-02 (https://claude.ai/artifact/5t696uuN9gV4kVNi24XKPX). Highlights: Soft Autumn's are the canvas share card's colors; the other 11 sets (the draping best color, 4 best colors from other hue groups, then a neutral) were approved on 2026-10-07 (https://claude.ai/artifact/K24H42V67Uc7MkRs8p95y9). The 9:16 share card shows the first 5, the 1:1 card all 6, and the report email and paywall teaser the first 4.
 
 ## Edge Cases
 
@@ -97,3 +98,17 @@ The palettes of the 11 seasons other than Soft Autumn SHALL be reviewed and appr
 
 - **WHEN** a season's palette is drafted
 - **THEN** it is shown to the user as swatches with names and hex, and is committed only after approval
+
+### Requirement: Every palette names six highlight colors
+
+Each of the 12 palettes SHALL name exactly 6 highlight colors, in order. Each highlight SHALL equal, by name and hex, one of that palette's best colors or neutrals, and no highlight SHALL appear twice. The order is the order surfaces show them in: a surface that shows fewer than 6 SHALL show the first ones. Soft Autumn's highlights SHALL be the canvas share card's colors: Terracotta `#B4694F`, Deep Teal `#4C7774`, Camel `#C39D6F`, Dusty Rose `#C4918A`, Olive `#7B7848` and Mushroom `#A08F7E`. The highlights of the other 11 seasons are palette data, so "Palettes are approved before they ship" applies to them.
+
+#### Scenario: Every palette's highlights
+
+- **WHEN** any season's highlights are read
+- **THEN** there are 6, each is one of that palette's best colors or neutrals, and no two are the same
+
+#### Scenario: Soft Autumn's highlights
+
+- **WHEN** the Soft Autumn highlights are read
+- **THEN** they are Terracotta, Deep Teal, Camel, Dusty Rose, Olive and Mushroom, in that order, with the canvas hex codes

@@ -18,11 +18,14 @@ The second column is parsed, not read: comma-separated globs and nothing else. N
 | `capture-flow`      | `apps/web/src/app/(flow)/analyze/page.tsx`, `apps/web/src/app/(flow)/analyze/flow.tsx`, `apps/web/src/app/(flow)/analyze/flow-state.ts`, `apps/web/src/app/(flow)/analyze/_capture/**`, `apps/web/src/lib/capture/**` |
 | `quiz`              | `apps/web/src/app/(flow)/analyze/_quiz/**`                                                                                                                                                                            |
 | `season-reveal`     | `apps/web/src/app/(flow)/analyze/_reveal/**`, `apps/web/src/app/api/analyze/**`, `apps/web/src/lib/analysis/**`, `supabase/migrations/*_reports.sql`                                                                  |
+| `share-card`        | `apps/web/src/app/images/share/**`, `apps/web/src/lib/share-card/**`                                                                                                                                                  |
+| `palette-image`     | `apps/web/src/app/images/palette/**`, `apps/web/src/lib/palette-image/**`                                                                                                                                             |
+| `draping-preview`   | `apps/web/src/app/api/face/**`, `apps/web/src/lib/draping/**`, `supabase/migrations/*_crops_bucket.sql`                                                                                                               |
 
 Rows never overlap and every row matches a file: {@link openspec/specs/spec-workflow/spec.md#requirement-mapping-rows-never-overlap}. Each capability owns its own folder, so row order never matters.
 
 Config files (`*.config.*`, such as `apps/web/sentry.server.config.ts`) are spec-exempt, so no row lists them even when a capability owns them. A capability whose sources are all spec-exempt (scripts, config, workflow YAML, docs) has no row: `constitution`, `spec-workflow`, `architecture-boundaries` and `env` are enforced by tests under `scripts/__tests__/`, and `design-tokens` (CSS and JSON only) by `apps/web/src/styles/tokens.test.ts`.
 
-`apps/web/src/lib/supabase.ts`, the server client shared by `abuse-controls` and `season-reveal`, has no row: neither capability owns it alone.
+`apps/web/src/lib/supabase.ts`, the server client shared by `abuse-controls`, `season-reveal` and `draping-preview`, has no row: no capability owns it alone. `apps/web/src/lib/og/**`, the fonts, token colors and shared pieces of the share card and the palette image, has no row for the same reason: `share-card` and `palette-image` share it.
 
 Add a capability's row when its change is archived: until its permanent spec exists, a row would block every edit to its paths.

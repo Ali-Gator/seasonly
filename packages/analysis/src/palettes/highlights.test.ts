@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { PALETTES, SEASON_SLUGS } from "./index.ts";
 
 describe("highlights", () => {
-  /** {@link openspec/specs/season-palettes/spec.md#scenario-all-12-palettes} */
+  /** {@link openspec/specs/season-palettes/spec.md#scenario-every-palettes-highlights} */
   it.each(SEASON_SLUGS)("%s has 6 distinct highlights from its best colors or neutrals", (slug) => {
     const { highlights, best, neutrals } = PALETTES[slug];
     expect(highlights).toHaveLength(6);

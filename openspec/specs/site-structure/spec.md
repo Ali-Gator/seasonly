@@ -64,7 +64,7 @@ The site SHALL serve exactly these public page routes, each with the rendering a
 | `/analyze`                        | The analysis flow, every step on one route | Static shell                             | Never          |
 | `/r/<id>`                         | A personal report                          | On request; 404 for an id with no report | Never          |
 
-Every other page path SHALL answer 404 and SHALL NOT be indexed; the season-name redirects, `/sitemap.xml`, `/robots.txt`, icons and `/api/` are not page paths. Each flow step (guide, capture, photo check, consent, quiz, analyzing, reveal, email) SHALL render inside `/analyze` without changing the URL.
+Every other page path SHALL answer 404 and SHALL NOT be indexed; the season-name redirects, `/sitemap.xml`, `/robots.txt`, icons, the generated images under `/images/` and `/api/` are not page paths. Each flow step (guide, capture, photo check, consent, quiz, analyzing, reveal, email) SHALL render inside `/analyze` without changing the URL.
 
 #### Scenario: Each public route answers
 

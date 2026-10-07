@@ -137,7 +137,7 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
 
 ## 7. Archive prep
 
-- [ ] 7.1 At archive, add the README rows and re-add each new spec's Public Interface, Behavior and Edge Cases:
+- [x] 7.1 At archive, add the README rows and re-add each new spec's Public Interface, Behavior and Edge Cases:
   - `share-card`: `apps/web/src/app/images/share/**`, `apps/web/src/lib/share-card/**`;
   - `palette-image`: `apps/web/src/app/images/palette/**`, `apps/web/src/lib/palette-image/**`;
   - `draping-preview`: `apps/web/src/app/api/face/**`, `apps/web/src/lib/draping/**`, `supabase/migrations/*_crops_bucket.sql`.
@@ -149,4 +149,4 @@ Existing tests change only as approved in 2.2. Any other change to an existing t
   - **`t8-photo-privacy`:** delete crops older than 24 h and crops of `is_test` reports; disclose on the privacy page that the crop is kept up to 24 h for draping and is reachable by report link.
   - **`t7-paywall-off`:** the teaser's 4 colors are the first 4 highlights.
 
-  Done when `openspec validate --specs` passes and the README mapping test passes.
+  Done when `openspec validate --specs` passes and the README mapping test passes. Done 2026-10-07. The season-palettes scenario "All 12 palettes" in this change's delta collided with an existing one, so it is "Every palette's highlights" in the main spec. Leftovers no change owns went to the new `docs/backlog.md` (BL-01 to BL-07).
