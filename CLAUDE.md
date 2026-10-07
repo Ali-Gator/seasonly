@@ -27,9 +27,17 @@ Tests (`__tests__`, `*.test.*`, `*.spec.*`), docs and markdown, config files (`*
 ## Review and gates
 
 - Each phase runs on its own branch. Commit freely; review once per phase with the `phase-review` skill (`/code-review high` in a fresh subagent).
-- After `/opsx:apply` finishes, without being asked: phase review in a fresh `general-purpose` subagent (never inline), fix its findings, `/opsx:archive`, push, open a PR to `main`.
+- After `/opsx:apply` finishes, without being asked: phase review in a fresh `general-purpose` subagent (never inline), fix its findings, log what stays unfixed in `docs/backlog.md`, `/opsx:archive`, push, open a PR to `main`.
 - You (the user) approve: a design canvas before its UI proposal, any edit to an existing test, and every paid smoke run. Agents never start a paid run on their own.
 - `pnpm fix` then `pnpm test` is the manual phase gate. CI runs `ci.yml` (format, lint, typecheck, unit + citation gate), `openspec.yml` and `e2e.yml` on every push.
+
+## Backlog (`docs/backlog.md`)
+
+Do these without being asked, in every phase:
+
+- **Add.** Before archive, log every review finding you did not fix, and every defect or gap found along the way that is worth fixing later, as a `BL-nn` item (shape, ids and status rules are at the top of the file). Say in the PR which ids you added.
+- **Route.** Work a named later change already owns goes in the plan's "Carried in from finished changes" list instead. The backlog holds what no change owns.
+- **Fold in.** When proposing a change, read the backlog and take the items in its area into its tasks. Delete an item when its fix ships, in the same PR.
 
 ## Hooks (`.claude/settings.json`)
 
