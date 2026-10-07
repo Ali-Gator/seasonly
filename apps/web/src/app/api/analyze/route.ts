@@ -1,14 +1,18 @@
 import { classify } from "@seasonly/analysis";
 import { checkBotId } from "botid/server";
+import { after } from "next/server";
 
 import { type AnalyzeResponse, parseAnalyzeRequest } from "@/lib/analysis/request";
 import { saveReport, type TextSource } from "@/lib/analysis/store";
+import { storeCrop } from "@/lib/draping/crops";
 import { withErrorCapture } from "@/lib/observability/with-error-capture";
 import { generateReportText, type PhotoVerdict } from "@/lib/report-text";
 
 /**
- * Bot check, validation, classification, one report-text call with a photo, then the save.
- * Worst case: a 3 s slot claim, a 20 s model call and a 3 s save.
+ * Bot check, validation, classification, one report-text call with a photo, then the save, and the
+ * face crop's upload after the response. Worst case: a 3 s slot claim, a 20 s model call and a 3 s
+ * save, then a 3 s upload, plus a 2 s Sentry flush after a failed save and after a failed upload:
+ * 33 s.
  *
  * {@link openspec/specs/season-reveal/spec.md#requirement-the-route-outlasts-its-slowest-path}
  */
@@ -61,6 +65,11 @@ export const POST = withErrorCapture(async (request: Request) => {
     summary,
     agreementNote,
   });
+  // Saved first, so a failed insert leaves no orphan crop.
+  if (reportId && input.photo) {
+    const { crop } = input.photo;
+    after(() => storeCrop(reportId, crop));
+  }
   return Response.json({
     kind: "result",
     reportId,
