@@ -125,5 +125,12 @@ describe("/images/share/[season]/[ratio]", () => {
     const params = await generateStaticParams();
     expect(new Set(params.map((p) => p.ratio))).toEqual(new Set(["story", "post"]));
     expect(params).not.toContainEqual(expect.objectContaining({ season: "autumn" }));
+    for (const p of [
+      { season: "autumn", ratio: "story" },
+      { season: "soft-autumn", ratio: "reel" },
+    ]) {
+      const res = await GET(new Request("http://localhost/"), { params: Promise.resolve(p) });
+      expect(res.status).toBe(404);
+    }
   });
 });

@@ -88,6 +88,7 @@ describe("readCrop", () => {
   /** {@link openspec/specs/draping-preview/spec.md#requirement-the-face-route-serves-a-stored-crop-and-nothing-else} */
   it("throws for any other error", async () => {
     for (const error of [
+      new StorageApiError("Bucket not found", 400, "404"),
       new StorageApiError("Unauthorized", 400, "403"),
       new StorageApiError("Internal", 500, "500"),
       new Error("network"),

@@ -52,8 +52,9 @@ export async function storeCrop(
 
 /**
  * A stored crop's bytes, or null when there is none. Storage can answer a missing object with
- * HTTP 400 and `statusCode: "404"` in the body, so both shapes count as not found; any other
- * error is thrown.
+ * HTTP 400 and `statusCode: "404"` in the body, so both shapes count as not found. A missing
+ * bucket answers the same way and is thrown with every other error, so a misconfigured project
+ * reaches Sentry instead of looking like a deleted crop.
  *
  * {@link openspec/specs/draping-preview/spec.md#requirement-the-face-route-serves-a-stored-crop-and-nothing-else}
  */
@@ -62,8 +63,11 @@ export async function readCrop(
   { download = supabaseDownload }: { download?: CropDownload } = {},
 ): Promise<Uint8Array<ArrayBuffer> | null> {
   const { data, error } = await download(`${id}.jpg`);
-  if (error instanceof StorageApiError && (error.status === 404 || error.statusCode === "404"))
-    return null;
+  const notFound =
+    error instanceof StorageApiError &&
+    (error.status === 404 || error.statusCode === "404") &&
+    !/bucket/i.test(error.message);
+  if (notFound) return null;
   if (error || !data) throw error ?? new Error("crop download gave no data");
   return new Uint8Array(await data.arrayBuffer());
 }

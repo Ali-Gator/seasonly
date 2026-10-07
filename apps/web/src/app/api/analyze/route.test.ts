@@ -238,13 +238,28 @@ describe("crop storage", () => {
   });
 
   /** {@link openspec/specs/draping-preview/spec.md#scenario-nothing-to-store-under} */
-  it("stores nothing for quiz-only, rejected, no-result or an unsaved result", async () => {
-    await POST(request({ answers: { veins: "green", jewelry: "gold" } }));
-    await POST(request({ answers: { veins: "green", jewelry: "silver" } }));
-    vi.mocked(saveReport).mockResolvedValueOnce(null);
-    await POST(photo());
-    vi.mocked(generateReportText).mockResolvedValue({ kind: "rejected", problem: "several-faces" });
-    await POST(photo());
+  it.each<[string, () => Promise<unknown>]>([
+    ["a quiz-only result", () => POST(request({ answers: { veins: "green", jewelry: "gold" } }))],
+    ["a no-result", () => POST(request({ answers: { veins: "green", jewelry: "silver" } }))],
+    [
+      "a rejected photo",
+      () => {
+        vi.mocked(generateReportText).mockResolvedValue({
+          kind: "rejected",
+          problem: "several-faces",
+        });
+        return POST(photo());
+      },
+    ],
+    [
+      "a photo result whose save failed",
+      () => {
+        vi.mocked(saveReport).mockResolvedValue(null);
+        return POST(photo());
+      },
+    ],
+  ])("stores no crop for %s", async (_name, run) => {
+    await run();
     expect(storeCrop).not.toHaveBeenCalled();
   });
 });

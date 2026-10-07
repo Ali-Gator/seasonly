@@ -11,7 +11,8 @@ import { generateReportText, type PhotoVerdict } from "@/lib/report-text";
 /**
  * Bot check, validation, classification, one report-text call with a photo, then the save, and the
  * face crop's upload after the response. Worst case: a 3 s slot claim, a 20 s model call and a 3 s
- * save, then a 3 s upload: 29 s.
+ * save, then a 3 s upload, plus a 2 s Sentry flush after a failed save and after a failed upload:
+ * 33 s.
  *
  * {@link openspec/specs/season-reveal/spec.md#requirement-the-route-outlasts-its-slowest-path}
  */
