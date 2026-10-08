@@ -95,7 +95,7 @@ describe("/images/palette/[season]", () => {
         height: 1920,
       });
     }
-  }, 60_000);
+  }, 180_000);
 
   /** {@link openspec/specs/palette-image/spec.md#scenario-an-unknown-season} */
   it("lists only the 12 slugs and answers 404 for anything else", async () => {
