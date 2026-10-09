@@ -39,15 +39,6 @@ fold items in.
 
 ## Testing
 
-- **[BL-03] Nothing catches a font missing from the production build** — the first
-  `t5-report-images` build left Instrument Sans out of the bundle (a template-literal
-  `new URL()`), and every card fell back to Bodoni. All unit tests passed because Vitest reads the
-  fonts from disk. Only the human look at the built PNGs caught it. Add a check against the build
-  output: an e2e request for one card compared with a Vitest render, or a test that the fonts
-  appear in the route's file trace.
-  _Refs:_ `apps/web/src/lib/og/index.tsx` (`OG_FONTS`), `openspec/specs/share-card/spec.md` (Edge
-  Cases) · _Status:_ open — found 2026-10-07
-
 ## Design / UX
 
 - **[BL-04] The design system's ShareCard overflows on long names** — the approved

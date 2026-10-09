@@ -115,11 +115,13 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
   Done when they fail for the missing component and the Button fix.
 
 - [x] 3.8 Abuse controls, in a new `apps/web/src/lib/abuse/botid.test.ts`: `BOTID_PROTECT` holds `POST /api/analyze` and the email route's path. The route's bot case is in 3.3. Done when it fails.
-- [ ] 3.9 BL-03 and E2E:
+- [x] 3.9 BL-03 and E2E:
   - a Vitest case in a new `apps/web/src/lib/share-card/share-card-golden.test.ts` compares Soft Autumn's rendered story card with `e2e/fixtures/share-soft-autumn-story.png`;
   - a new `e2e/report-delivery.spec.ts` covers design.md decision 10's two cases, plus a fetch of `/images/share/soft-autumn/story` compared with the same golden.
 
   First render the card twice in Vitest and once under `next start` to confirm the bytes are stable (design.md decision 9), and note the result here. Done when the E2E fails only for the missing UI.
+
+  Result 2026-10-09: the bytes are stable. Two Vitest renders of the Soft Autumn story card were identical, and `next start` on the production build served the same bytes (`af4866f1…`, 100,236 B, macOS). The golden was generated on macOS, not Linux. resvg renders with the bundled fonts only, so the bytes should not depend on the platform; the first CI run on Linux confirms it.
 
 ## 4. Env
 
@@ -135,7 +137,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
 - [x] 5.4 Write `apps/web/src/lib/email/` (`address.ts`, `render.ts`, `send.ts`, `store.ts`), the email route with `withErrorCapture`, BotID and `after()`, and add the path to `BOTID_PROTECT`. Done when 3.3 and 3.8 pass.
 - [x] 5.5 Add EmailInput to `apps/web/src/components/ds/` with its `.sn-field*` rules in `ds.css` (from `bundle.css`, with token variables), export it, and make a disabled Button with `href` render without one. Done when 3.7 passes and the class-coverage test passes. Delete BL-05 from `docs/backlog.md`.
-- [ ] 5.6 Flow: the `email` step and `open-email` in `flow-state.ts`; "Get my full report" and the null-id Note with "Try again" in `_reveal/steps.tsx`; `_email/step.tsx` wired in `flow.tsx`. Done when 3.6 passes and the existing E2E still passes.
+- [x] 5.6 Flow: the `email` step and `open-email` in `flow-state.ts`; "Get my full report" and the null-id Note with "Try again" in `_reveal/steps.tsx`; `_email/step.tsx` wired in `flow.tsx`. Done when 3.6 passes and the existing E2E still passes.
 - [x] 5.7 Report:
   - move `apps/web/src/app/(flow)/r/[id]/page.tsx` to `apps/web/src/app/(report)/r/[id]/`, with `(report)/layout.tsx`, `not-found.tsx` and `error.tsx` from board 10c;
   - write `lib/report/` (`read.ts`, `view.tsx` and the client islands, design.md decisions 3, 7 and 8).
@@ -143,7 +145,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
   Done when 3.4 and the approved `seo.test.ts` pass, and the site-structure route-map test still passes.
 
 - [x] 5.8 Interest: `lib/interest/` and the interest route with `withErrorCapture`, and `PremiumCard` placed in the report view. Done when 3.5 passes.
-- [ ] 5.9 Commit the golden PNG and make 3.9 pass. Delete BL-03 from `docs/backlog.md`, or, if decision 9's fallback failed, rewrite BL-03 with what was found.
+- [x] 5.9 Commit the golden PNG and make 3.9 pass. Delete BL-03 from `docs/backlog.md`, or, if decision 9's fallback failed, rewrite BL-03 with what was found.
 - [ ] 5.10 Run `pnpm fix`, `pnpm test` and `pnpm --filter web build`. Done when all pass, and the build output lists `/r/[id]` as dynamic and both `/api/reports/[id]/…` routes.
 
 ## 6. Checks with the user

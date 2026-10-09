@@ -28,6 +28,7 @@ export default defineConfig({
       SUPABASE_URL: "http://127.0.0.1:9",
       SUPABASE_SECRET_KEY: "",
       AI_GATEWAY_API_KEY: "",
+      RESEND_API_KEY: "",
       NEXT_PUBLIC_SENTRY_DSN: "",
       NEXT_PUBLIC_POSTHOG_KEY: "",
     },
