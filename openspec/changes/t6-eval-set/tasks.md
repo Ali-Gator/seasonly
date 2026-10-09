@@ -130,7 +130,7 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only
 
 ## 6. Paid vision run (user approval)
 
-- [ ] 6.1 `apps/web/src/lib/report-text/eval-vision.smoke.ts`:
+- [x] 6.1 `apps/web/src/lib/report-text/eval-vision.smoke.ts`:
   - for each photo with a crop, call `generateReportText` with the crop, its classify result, `answers: {}` and a stubbed `claimSlot`;
   - tally `kind`, `problem` and `photo` for usable photos and for those with `expect: several-faces`;
   - write `evals/vision-results.json` with counts and per-file verdicts, and no model text.
