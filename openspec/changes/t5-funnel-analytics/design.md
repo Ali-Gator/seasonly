@@ -103,7 +103,7 @@ Alternative: a separate jsdom Vitest project. Rejected: one directive per file n
 
 ### 6. The funnel in PostHog, through the connector
 
-Once production has the events, with the user's yes at that moment:
+Created through the connector as part of apply, without a stop for approval (user, 2026-10-09). It needs no production events to exist; its steps fill once the change ships:
 
 - an action "Shared or saved" (three steps);
 - a funnel insight "Landing to share" with the steps the spec lists (Consent optional), a 7-day conversion window, ordered, filtered to `$host = seasonly.me`, with test accounts filtered out;

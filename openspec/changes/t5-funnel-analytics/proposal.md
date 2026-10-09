@@ -31,7 +31,7 @@ It also closes a leak found while planning. Autocaptured page views and clicks o
 
   Every `/r/<id>` in any property (URLs, referrers, element text) becomes `/r/:id` before an event leaves the browser. No `identify` call, and no person properties.
 
-- **The funnel itself.** A saved "Landing to share" funnel insight on the Seasonly dashboard, filtered to `seasonly.me` so preview traffic stays out, made through the PostHog connector after the user's yes.
+- **The funnel itself.** A saved "Landing to share" funnel insight on the Seasonly dashboard, filtered to `seasonly.me` so preview traffic stays out, made through the PostHog connector (no stop for approval: user, 2026-10-09).
 - **Tests that see the events.**
   - The E2E build gets a test PostHog key whose host the tests intercept, so the flow's funnel is checked end to end.
   - The report page's buttons get component tests in jsdom (new dev dependency), since CI has no database to render `/r/<id>`.
@@ -65,7 +65,7 @@ None. The new events fire from code owned by `capture-flow`, `season-reveal`, `e
   - `playwright.config.ts` and `.github/workflows/e2e.yml` build and serve with test keys (BL-11).
 - **Dependencies:** `jsdom` (dev only).
 - **Env:** no new variable. The E2E build sets `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST` and `NEXT_PUBLIC_SENTRY_DSN` itself.
-- **PostHog (with the user's yes):** one action "Shared or saved", one funnel insight and its dashboard tile. No project setting changes.
+- **PostHog (through the connector, no approval stop):** one action "Shared or saved", one funnel insight and its dashboard tile. No project setting changes.
 - **Downstream**
   - `t8-photo-privacy`: decide on cookie consent for PostHog (a banner, or cookieless mode), and name PostHog and what it receives on the privacy page.
   - `t7-paywall-off`: the paywall's unlock becomes a funnel step after `report_requested`; its flag reads PostHog as today.
