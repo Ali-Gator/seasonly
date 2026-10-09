@@ -19,28 +19,34 @@ alter table public.report_emails enable row level security;
 revoke all on public.report_emails from public, anon, authenticated;
 grant select, insert on public.report_emails to service_role;
 
--- 'stored' with the new row's id, 'limit' once the report has 3 addresses, 'unknown' for no
--- report. Locking the report row makes the count and the insert one step, so two calls at once
--- cannot both pass 3. Security definer, as claim_analysis_slot, so the lock does not depend on
--- the caller's grants on reports.
+-- ('stored', row id, season, agreement) | ('limit', null, season, agreement) | ('unknown', nulls).
+-- The row id is the email's idempotency key; the season and agreement let the route render the
+-- email without a second read. Locking the report row makes the count and the insert one step,
+-- so two calls at once cannot both pass 3. Security definer, as claim_analysis_slot, so the lock
+-- does not depend on the caller's grants on reports.
 -- openspec/specs/abuse-controls/spec.md
 create function public.store_report_email(p_report_id text, p_email text, p_is_test boolean)
-  returns table (outcome text, email_id bigint)
+  returns table (outcome text, email_id bigint, season text, agreement text)
   language plpgsql security definer set search_path = '' as $$
+declare
+  r record;
 begin
-  perform 1 from public.reports where id = p_report_id for update;
+  select rp.season, rp.agreement into r from public.reports rp where rp.id = p_report_id for update;
   if not found then
-    return query select 'unknown'::text, null::bigint;
+    return query select 'unknown'::text, null::bigint, null::text, null::text;
     return;
   end if;
   if (select count(*) from public.report_emails e where e.report_id = p_report_id) >= 3 then
-    return query select 'limit'::text, null::bigint;
+    return query select 'limit'::text, null::bigint, r.season, r.agreement;
     return;
   end if;
   return query
-    insert into public.report_emails (report_id, email, is_test)
-    values (p_report_id, p_email, p_is_test)
-    returning 'stored'::text, id;
+    with stored as (
+      insert into public.report_emails (report_id, email, is_test)
+      values (p_report_id, p_email, p_is_test)
+      returning id
+    )
+    select 'stored'::text, stored.id, r.season, r.agreement from stored;
 end
 $$;
 

@@ -17,6 +17,7 @@ Catalogues every environment variable the code reads and checks a deployment has
 | `SUPABASE_SECRET_KEY`            | 1     | yes      | no                 | Supabase → Project settings → API Keys (secret)    |
 | `AI_GATEWAY_API_KEY`             | 1     | no       | no                 | Vercel → AI Gateway → API Keys; local only (OIDC)  |
 | `DAILY_ANALYSIS_CAP`             | 1     | no       | no                 | Vision calls per UTC day; defaults to 200          |
+| `RESEND_API_KEY`                 | 1     | yes      | no                 | Resend → API Keys, sending access                  |
 
 ## Requirements
 

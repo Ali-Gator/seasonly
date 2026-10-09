@@ -63,11 +63,12 @@ create table public.report_emails (
   is_test boolean not null
 );
 create index on public.report_emails (report_id, created_at desc);
--- ('stored', <row id>) | ('limit', null) | ('unknown', null); locks the report row so two calls
--- cannot both pass 3. The row id is the email's idempotency key.
+-- ('stored', row id, season, agreement) | ('limit', null, season, agreement) | ('unknown', nulls);
+-- locks the report row so two calls cannot both pass 3. The row id is the email's idempotency key.
 create function public.store_report_email(p_report_id text, p_email text, p_is_test boolean)
-  returns table (outcome text, email_id bigint) language plpgsql security definer set search_path = ''
-  as $$ … select … from public.reports where id = p_report_id for update; … $$;
+  returns table (outcome text, email_id bigint, season text, agreement text)
+  language plpgsql security definer set search_path = ''
+  as $$ … select … from public.reports rp where rp.id = p_report_id for update; … $$;
 ```
 
 `<ts>_interest_clicks.sql`:
@@ -114,7 +115,7 @@ The address reaches the page only for the Premium note (the user chose to show i
 
 ### 5. The email: React to static HTML, `fetch` to Resend
 
-`renderReportEmail({ id, season, quizOnly })` gives `{ subject, html, text }`. The HTML is a small React tree rendered with `react-dom/server`'s `renderToStaticMarkup`:
+`renderReportEmail({ id, season, quizOnly })` gives `{ subject, html, text }`. The HTML is built from template strings with every inserted string escaped. `react-dom/server` was the plan, but route handlers resolve React's `react-server` build, and there `react-dom/server` throws (found in task 5.4):
 
 - table layout and inline styles, because mail clients ignore classes and most CSS;
 - colors from `tokens.json`, as `lib/og` does;
@@ -131,11 +132,12 @@ The plain-text part is built from the same strings.
 - a non-2xx answer becomes an error carrying the status and Resend's error `name` only, never its `message`, which can echo the address;
 - with no key, it returns at once, reporting to Sentry only when `VERCEL_ENV` is set.
 
-The route calls it inside `after()`, once the row is stored, and answers `{ ok: true }` first. `maxDuration` is 30 s: 1 s BotID, a 3 s store and 2 s flush before the answer, then a 5 s send and 2 s flush after it.
+The route calls it inside `after()`, once the row is stored, and answers `{ ok: true }` first. `store_report_email` gives the report's season and agreement with the row id, so the route renders the email without a second read. `maxDuration` is 30 s: 1 s BotID, a 3 s store and 2 s flush before the answer, then a 5 s send and 2 s flush after it.
 
 Alternatives considered:
 
 - The `resend` SDK or React Email. Each adds a dependency for one `fetch` and one template. React Email's components would also replace a table layout we can test as plain markup.
+- `react-dom/server` in a route handler. It throws under the `react-server` export condition that route handlers resolve.
 - Sending before answering. That makes the report wait up to 5 s on the provider.
 
 ### 6. The email step in the flow

@@ -74,7 +74,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Done when it fails for the missing migrations.
 
-- [ ] 3.3 `email-capture`, new files under `apps/web/src/lib/email/` and `apps/web/src/app/api/reports/[id]/email/`:
+- [x] 3.3 `email-capture`, new files under `apps/web/src/lib/email/` and `apps/web/src/app/api/reports/[id]/email/`:
   - the address schema: trims and lowercases; refuses empty, `maya.reyes@gmail`, and 255 characters;
   - `renderReportEmail` for Soft Autumn (photo): the subject, preview text, "You're a Soft Autumn: warm, soft and earthy.", the badge, the 4 highlights in order with hex codes, both links to `https://seasonly.me/r/<id>`, the photo footer line, and the plain-text part with the link; for quiz-only: "your quiz answers" and no photo line;
   - `sendReportEmail`: the request to Resend (from, to, subject, html, text, `Idempotency-Key`); a 500 and a 5 s hang each reach Sentry without the address; no key off Vercel sends nothing and reports nothing; no key with `VERCEL_ENV` set reports to Sentry;
@@ -114,7 +114,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Done when they fail for the missing component and the Button fix.
 
-- [ ] 3.8 Abuse controls, in a new `apps/web/src/lib/abuse/botid.test.ts`: `BOTID_PROTECT` holds `POST /api/analyze` and the email route's path. The route's bot case is in 3.3. Done when it fails.
+- [x] 3.8 Abuse controls, in a new `apps/web/src/lib/abuse/botid.test.ts`: `BOTID_PROTECT` holds `POST /api/analyze` and the email route's path. The route's bot case is in 3.3. Done when it fails.
 - [ ] 3.9 BL-03 and E2E:
   - a Vitest case in a new `apps/web/src/lib/share-card/share-card-golden.test.ts` compares Soft Autumn's rendered story card with `e2e/fixtures/share-soft-autumn-story.png`;
   - a new `e2e/report-delivery.spec.ts` covers design.md decision 10's two cases, plus a fetch of `/images/share/soft-autumn/story` compared with the same golden.
@@ -123,7 +123,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
 ## 4. Env
 
-- [ ] 4.1 Add `RESEND_API_KEY` (phase 1, required, server only, "Resend → API Keys, sending access") to the code that reads it, `apps/web/.env.example`, the catalogue in `openspec/specs/env/spec.md` and `scripts/verify-env.ts` (shape `re_…`). Done when the env unit tests pass and `pnpm verify:env 1` reports it `ok` with the key from 2.3 in `.env.local`.
+- [x] 4.1 Add `RESEND_API_KEY` (phase 1, required, server only, "Resend → API Keys, sending access") to the code that reads it, `apps/web/.env.example`, the catalogue in `openspec/specs/env/spec.md` and `scripts/verify-env.ts` (shape `re_…`). Done when the env unit tests pass and `pnpm verify:env 1` reports it `ok` with the key from 2.3 in `.env.local`.
 
 ## 5. Implementation
 
@@ -133,7 +133,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Result 2026-10-09: it matches. `botid` 1.5.11's client turns a protected path into an anchored regex with `*` as `.*` (`dist/client/core/index.mjs`). Run on that very function, `/api/reports/*/email` matches `/api/reports/<22-char id>/email` and does not match `/api/reports/<id>/interest`, `/api/analyze` or `/api/reports/email`. The matcher was checked by itself, not under `next dev`, because BotID attaches no challenge off Vercel. 6.3 step 6 checks the header on the preview. Decision 6's path stands.
 
-- [ ] 5.4 Write `apps/web/src/lib/email/` (`address.ts`, `render.tsx`, `send.ts`, `store.ts`), the email route with `withErrorCapture`, BotID and `after()`, and add the path to `BOTID_PROTECT`. Done when 3.3 and 3.8 pass.
+- [x] 5.4 Write `apps/web/src/lib/email/` (`address.ts`, `render.ts`, `send.ts`, `store.ts`), the email route with `withErrorCapture`, BotID and `after()`, and add the path to `BOTID_PROTECT`. Done when 3.3 and 3.8 pass.
 - [x] 5.5 Add EmailInput to `apps/web/src/components/ds/` with its `.sn-field*` rules in `ds.css` (from `bundle.css`, with token variables), export it, and make a disabled Button with `href` render without one. Done when 3.7 passes and the class-coverage test passes. Delete BL-05 from `docs/backlog.md`.
 - [ ] 5.6 Flow: the `email` step and `open-email` in `flow-state.ts`; "Get my full report" and the null-id Note with "Try again" in `_reveal/steps.tsx`; `_email/step.tsx` wired in `flow.tsx`. Done when 3.6 passes and the existing E2E still passes.
 - [ ] 5.7 Report:

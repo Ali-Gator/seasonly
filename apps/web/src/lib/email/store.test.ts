@@ -8,7 +8,15 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { PGlite } from "@electric-sql/pglite";
-import { afterEach, beforeAll, describe, expect, it } from "vitest";
+import * as Sentry from "@sentry/nextjs";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+
+import { type StoreEmailRpc, storeReportEmail } from "./store";
+
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+  flush: vi.fn(async () => true),
+}));
 
 const MIGRATIONS = path.resolve(import.meta.dirname, "../../../../../supabase/migrations");
 
@@ -26,7 +34,7 @@ beforeAll(async () => {
     grant usage on schema public to anon, authenticated, service_role;
     alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
     alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
-    create table public.reports (id text primary key, is_test boolean not null default true);
+    create table public.reports (id text primary key, season text not null default 'soft-autumn', agreement text not null default 'agree', is_test boolean not null default true);
     revoke all on public.reports from public, anon, authenticated;
     grant select, insert on public.reports to service_role;
   `);
@@ -35,6 +43,9 @@ beforeAll(async () => {
 
 afterEach(async () => {
   await db.exec("reset role");
+  vi.useRealTimers();
+  vi.unstubAllEnvs();
+  vi.clearAllMocks();
 });
 
 let n = 0;
@@ -48,10 +59,12 @@ const report = async () => {
 const store = async (reportId: string, email = "maya.reyes@gmail.com") => {
   await db.exec("set role service_role");
   try {
-    const { rows } = await db.query<{ outcome: string; email_id: number | null }>(
-      "select * from public.store_report_email($1, $2, true)",
-      [reportId, email],
-    );
+    const { rows } = await db.query<{
+      outcome: string;
+      email_id: number | null;
+      season: string | null;
+      agreement: string | null;
+    }>("select * from public.store_report_email($1, $2, true)", [reportId, email]);
     return rows[0];
   } finally {
     await db.exec("reset role");
@@ -67,6 +80,9 @@ describe("store_report_email", () => {
     expect(outcomes.map((o) => o?.outcome)).toEqual(["stored", "stored", "stored", "limit"]);
     expect(outcomes.slice(0, 3).every((o) => typeof o?.email_id === "number")).toBe(true);
     expect(outcomes[3]?.email_id).toBeNull();
+    expect(outcomes.every((o) => o?.season === "soft-autumn" && o.agreement === "agree")).toBe(
+      true,
+    );
     const { rows } = await db.query("select email from public.report_emails where report_id = $1", [
       id,
     ]);
@@ -75,7 +91,12 @@ describe("store_report_email", () => {
 
   /** {@link openspec/specs/email-capture/spec.md#scenario-an-unknown-id} */
   it("answers unknown for a missing report and stores nothing", async () => {
-    expect(await store("no-such-report")).toEqual({ outcome: "unknown", email_id: null });
+    expect(await store("no-such-report")).toEqual({
+      outcome: "unknown",
+      email_id: null,
+      season: null,
+      agreement: null,
+    });
     const { rows } = await db.query(
       "select 1 from public.report_emails where report_id = 'no-such-report'",
     );
@@ -90,7 +111,7 @@ describe("store_report_email", () => {
    */
   it("locks the report row before counting", () => {
     expect(migration("_report_emails.sql")).toMatch(
-      /from public\.reports where id = p_report_id for update/,
+      /from public\.reports rp where rp\.id = p_report_id for update/,
     );
   });
 
@@ -127,5 +148,95 @@ describe("store_report_email", () => {
       id,
     ]);
     expect(rows).toHaveLength(0);
+  });
+});
+
+/** The production RPC's shape, answered by PGlite as the server's role. */
+const pgliteRpc: StoreEmailRpc = async (args) => {
+  await db.exec("set role service_role");
+  try {
+    const { rows } = await db.query("select * from public.store_report_email($1, $2, $3)", [
+      args.p_report_id,
+      args.p_email,
+      args.p_is_test,
+    ]);
+    return { data: rows, error: null };
+  } catch (error) {
+    return { data: null, error: error as { code?: string } };
+  } finally {
+    await db.exec("reset role");
+  }
+};
+
+const TO = "maya.reyes@gmail.com";
+
+describe("storeReportEmail", () => {
+  /** {@link openspec/specs/email-capture/spec.md#scenario-a-valid-address} */
+  it("stores the address under its report with the season to render", async () => {
+    const id = await report();
+    const outcome = await storeReportEmail(id, TO, { rpc: pgliteRpc });
+    expect(outcome).toEqual({
+      kind: "stored",
+      emailId: expect.any(Number),
+      season: "soft-autumn",
+      quizOnly: false,
+    });
+    const { rows } = await db.query("select email from public.report_emails where report_id = $1", [
+      id,
+    ]);
+    expect(rows).toEqual([{ email: TO }]);
+  });
+
+  /** {@link openspec/specs/email-capture/spec.md#scenario-a-preview-deployment} */
+  it("marks an address as test data outside production", async () => {
+    const flags: boolean[] = [];
+    const rpc: StoreEmailRpc = async (args) => {
+      flags.push(args.p_is_test);
+      return { data: [{ outcome: "unknown" }], error: null };
+    };
+    vi.stubEnv("VERCEL_ENV", "preview");
+    await storeReportEmail("x", TO, { rpc });
+    vi.stubEnv("VERCEL_ENV", "production");
+    await storeReportEmail("x", TO, { rpc });
+    expect(flags).toEqual([true, false]);
+  });
+
+  it("answers limit and unknown as the function does", async () => {
+    const id = await report();
+    for (let i = 0; i < 3; i++) await storeReportEmail(id, TO, { rpc: pgliteRpc });
+    expect(await storeReportEmail(id, TO, { rpc: pgliteRpc })).toEqual({ kind: "limit" });
+    expect(await storeReportEmail("no-such-report", TO, { rpc: pgliteRpc })).toEqual({
+      kind: "unknown",
+    });
+  });
+
+  /** {@link openspec/specs/email-capture/spec.md#scenario-the-database-is-down} */
+  it("gives failed and reports to Sentry without the address", async () => {
+    const rpc: StoreEmailRpc = async () => ({
+      data: null,
+      error: {
+        code: "XX000",
+        message: `boom for ${TO}`,
+        details: `Failing row contains (${TO})`,
+      } as {
+        code?: string;
+      },
+    });
+    expect(await storeReportEmail("k7m2qx", TO, { rpc })).toEqual({ kind: "failed" });
+    expect(Sentry.captureException).toHaveBeenCalledTimes(1);
+    const calls = JSON.stringify(vi.mocked(Sentry.captureException).mock.calls, (_, v) =>
+      v instanceof Error ? { message: v.message, cause: v.cause } : v,
+    );
+    expect(calls).toContain("k7m2qx");
+    expect(calls).toContain("XX000");
+    expect(calls).not.toContain(TO);
+  });
+
+  /** {@link openspec/specs/email-capture/spec.md#requirement-a-failed-store-keeps-the-person-on-the-step} */
+  it("gives failed after 3 s when the database never answers", async () => {
+    vi.useFakeTimers();
+    const pending = storeReportEmail("k7m2qx", TO, { rpc: () => new Promise(() => {}) });
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(await pending).toEqual({ kind: "failed" });
   });
 });
