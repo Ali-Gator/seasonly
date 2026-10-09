@@ -77,12 +77,14 @@ Cite scenarios at `openspec/specs/analytics/spec.md#…`. Add new files or new c
 
   Delete the test report, its address and its interest row. Done when a Tracker Log line records the results.
 
-- [ ] 5.2 Through the PostHog connector, without stopping for approval (user, 2026-10-09):
+- [x] 5.2 Through the PostHog connector, without stopping for approval (user, 2026-10-09):
   - create the action "Shared or saved";
   - create the funnel insight "Landing to share" (design decision 6);
   - add it to the Seasonly dashboard (id 989985).
 
   Done when the insight's link is recorded here and in the Tracker Log, and its query runs. Its steps fill once this change reaches production.
+
+  Result 2026-10-09: action "Shared or saved" (id 166067: `share_tapped` with `outcome` `shared`, `share_card_downloaded`, `palette_saved`); funnel insight [Landing to share](https://eu.posthog.com/project/290879/insights/u9u1pu2U) (`u9u1pu2U`, tile 7289338 on dashboard 989985), Landing as a `$pageview` whose `$pathname` does not match `^/(analyze$|r/)`. Its query runs: 32 landings and 1 flow start on `seasonly.me` in the last 30 days, later steps 0 until this change ships. Tracker Log line added at archive.
 
 ## 6. Backlog and archive prep
 
