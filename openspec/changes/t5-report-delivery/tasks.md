@@ -39,13 +39,13 @@
 
 ## 2. Plan, accounts and test-edit approval
 
-- [ ] 2.1 Update the plan for `t5-report-delivery` on branch `claude/t5-report-delivery-proposal-ojaeru`:
+- [x] 2.1 Update the plan for `t5-report-delivery` on branch `claude/t5-report-delivery-proposal-ojaeru`:
   - add a "t5-report-delivery planned" Log line to the Tracker (newest first), naming the user's choices of 2026-10-08 (email required; only Premium tappers get one later email; the address shown in the Premium note; Try again on a null report id);
   - remove both `t5-report-delivery` items from "Carried in from finished changes" (Architecture and phases tab).
 
   T5 stays In progress until `t5-report-delivery` and `t5-funnel-analytics` archive. Done when the Log shows the line and the carried list holds no `t5-report-delivery` item.
 
-- [ ] 2.2 Ask the user to approve these edits to existing tests (CLAUDE.md gate), each of which the change would otherwise break or needs:
+- [x] 2.2 Ask the user to approve these edits to existing tests (CLAUDE.md gate), each of which the change would otherwise break or needs:
   - `apps/web/src/lib/site/seo.test.ts`: the import `@/app/(flow)/r/[id]/page` becomes `@/app/(report)/r/[id]/page` (design.md decision 1);
   - `apps/web/src/app/(flow)/analyze/flow-state.test.ts`: new cases for the email step (entered from the reveal, Back returns to the reveal) and for "Try again" on a reveal with a null report id;
   - `apps/web/src/components/ds/ds.test.tsx`: EmailInput in the class-coverage fragment (with hint and with error), and the ui-components scenario "A disabled button with a destination";
@@ -54,7 +54,11 @@
 
   Done when the user approves in chat; record the date here.
 
-- [ ] 2.3 The user, in Resend: adds and verifies the domain `seasonly.me` (SPF and DKIM records at the domain's DNS), and creates an API key with sending access only. The key goes into Vercel (Production and Preview) and `apps/web/.env.local` as `RESEND_API_KEY`. Done when Resend shows the domain as verified; record the date here.
+  Approved 2026-10-09 (all three). No test asserts `BOTID_PROTECT`'s exact value (`api/analyze/route.test.ts` uses `toContainEqual`).
+
+- [x] 2.3 The user, in Resend: adds and verifies the domain `seasonly.me` (SPF and DKIM records at the domain's DNS), and creates an API key with sending access only. The key goes into Vercel (Production and Preview) and `apps/web/.env.local` as `RESEND_API_KEY`. Done when Resend shows the domain as verified; record the date here.
+
+  Verified 2026-10-09 (user).
 
 ## 3. Tests first
 
