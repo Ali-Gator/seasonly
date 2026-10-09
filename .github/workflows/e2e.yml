@@ -2,8 +2,9 @@ name: E2E
 
 # Playwright on every push, against a prebuilt server. Not in the pre-commit hook:
 # a dev server per commit saturates the machine. `pnpm test` stays the manual
-# phase-completion gate. The build needs no secrets: observability stays off
-# without keys ({@link openspec/specs/observability/spec.md#requirement-observability-is-off-until-its-keys-are-set}).
+# phase-completion gate. No build step here: with CI set, playwright.config.ts
+# builds and serves the app itself, with its own E2E keys (BL-11), so the build
+# needs no secrets ({@link openspec/specs/observability/spec.md#requirement-observability-is-off-until-its-keys-are-set}).
 
 on:
   push:
@@ -27,7 +28,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm build
       - run: pnpm test:e2e
       - uses: actions/upload-artifact@v5
         if: ${{ !cancelled() }}

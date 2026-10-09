@@ -1,12 +1,12 @@
 ## 1. Setup
 
-- [ ] 1.1 Add `jsdom` as a root dev dependency (`pnpm add -Dw jsdom`). Done when a throwaway `// @vitest-environment jsdom` test sees `document` and `pnpm test:unit` still runs every other file in Node. Delete the throwaway test.
+- [x] 1.1 Add `jsdom` as a root dev dependency (`pnpm add -Dw jsdom`). Done when a throwaway `// @vitest-environment jsdom` test sees `document` and `pnpm test:unit` still runs every other file in Node. Delete the throwaway test.
 
 ## 2. Tests first
 
 Cite scenarios at `openspec/specs/analytics/spec.md#…`. Add new files or new cases; edit no existing assertion without the user's approval.
 
-- [ ] 2.1 `apps/web/src/lib/analytics/analytics.test.ts` (Node):
+- [x] 2.1 `apps/web/src/lib/analytics/analytics.test.ts` (Node):
   - `maskReportIds` rewrites `/r/<22 id chars>` to `/r/:id`:
     - in `$current_url`, `$pathname`, `$referrer`, a nested `$elements[].$el_text`, `$elements_chain` and `$set_once.$initial_current_url`;
     - in every occurrence within one string.
@@ -17,7 +17,7 @@ Cite scenarios at `openspec/specs/analytics/spec.md#…`. Add new files or new c
 
   Done when the file fails against the current code, because `lib/analytics` does not exist.
 
-- [ ] 2.2 `apps/web/src/lib/report/actions.dom.test.tsx` (jsdom), with `posthog-js` mocked as loaded:
+- [x] 2.2 `apps/web/src/lib/report/actions.dom.test.tsx` (jsdom), with `posthog-js` mocked as loaded:
   - "Share my season" with a share sheet that resolves sends one `share_tapped` `{ place: "actions", outcome: "shared" }`;
   - the header "Share" with one that rejects with `AbortError` sends `{ place: "header", outcome: "cancelled" }`;
   - with no `canShare`, the tap sends `outcome: "panel"`, and the panel's post Download sends `share_card_downloaded` `{ ratio: "post" }`;
@@ -25,9 +25,9 @@ Cite scenarios at `openspec/specs/analytics/spec.md#…`. Add new files or new c
 
   No property holds the report id. Done when it fails for the missing events.
 
-- [ ] 2.3 `apps/web/src/lib/interest/premium-card.dom.test.tsx` (jsdom). A tap whose route answers 200 sends one `premium_tapped`, and a 500 sends none. Done when it fails for the missing event.
-- [ ] 2.4 BL-09: `apps/web/src/lib/report/draping.dom.test.tsx` (jsdom). Firing `error` on the face image of `ReportDraping` shows the deleted-photo fallback. Cite `openspec/specs/report-page/spec.md`'s draping-fallback scenario. Done when it passes against the current code, since the behavior already ships.
-- [ ] 2.5 `e2e/funnel.spec.ts` on a phone viewport, with `http://127.0.0.1:9/**` routed and each capture body decoded (JSON, or gzip on `compression=gzip-js`):
+- [x] 2.3 `apps/web/src/lib/interest/premium-card.dom.test.tsx` (jsdom). A tap whose route answers 200 sends one `premium_tapped`, and a 500 sends none. Done when it fails for the missing event.
+- [x] 2.4 BL-09: `apps/web/src/lib/report/draping.dom.test.tsx` (jsdom). Firing `error` on the face image of `ReportDraping` shows the deleted-photo fallback. Cite `openspec/specs/report-page/spec.md`'s draping-fallback scenario. Done when it passes against the current code, since the behavior already ships.
+- [x] 2.5 `e2e/funnel.spec.ts` on a phone viewport, with `http://127.0.0.1:9/**` routed and each capture body decoded (JSON, or gzip on `compression=gzip-js`):
   1. `/` → header "Find my colors" → upload the fixture face → "Agree and upload" → 4 answers → "See my result" (analyze route answered with a result and a well-formed 22-character `reportId`) → "Get my full report" → a valid address (email route answered 200);
   2. poll until the received events, in order, are `$pageview` `/`, `$pageview` `/analyze`, `photo_checked`, `consent_answered` (`agreed: true`), `quiz_completed`, `analysis_result`, `report_requested`, `email_submitted` and `$pageview` `/r/:id`, each once among the named events. No property of any captured request holds the id, every event shares one `distinct_id`, and no `$identify` was sent;
   3. a second case declines consent once and sees `consent_answered` `{ agreed: false }`;
@@ -36,19 +36,23 @@ Cite scenarios at `openspec/specs/analytics/spec.md#…`. Add new files or new c
 
   Flags and remote-config requests get an empty 200; polls wait up to 20 s. Done when the spec fails against the current code.
 
+  Result 2026-10-09: the report id is the 22-character `e2eFunnelReport0000000`, so `/r/<id>` is a real report path (design decision 4's `/r/e2e-report` is 10 characters and would never meet the mask). `posthog-js` drops every event from a likely bot, so the spec sets a phone user agent and clears `navigator.webdriver` and `userAgentData`; that also keeps every other spec's PostHog requests from being sent at all. Capture bodies are gzip without a `compression` parameter, so the decoder detects gzip by its magic bytes. Case 5 holds the analyze route open and anchors on the landing's later `$pageview` instead of a second send; with the `left` guard removed it fails. Case 2 also covers "Back to a step already seen" (`report_requested` twice, `analysis_result` once).
+
 ## 3. Code
 
-- [ ] 3.1 Create `apps/web/src/lib/analytics/index.ts` with `track` (moved) and `maskReportIds` (design decision 2, with a `ponytail:` note on encoded ids). Re-export `track` from `lib/capture/events.ts`. Pass `before_send: maskReportIds` in `initPostHog`. Done when 2.1 passes and `capture.test.ts` and `observability.test.ts` pass unedited.
-- [ ] 3.2 `flow.tsx`: `consent_answered`, `quiz_completed`, `analysis_failed` (only when `!left`) and `report_requested`, as in design decision 3. Done when the flow steps of 2.5 pass locally (`pnpm test:e2e e2e/funnel.spec.ts`).
-- [ ] 3.3 `_email/step.tsx`: `email_submitted` on `open`, before `router.push`. Done when 2.5's `email_submitted` step passes.
-- [ ] 3.4 `lib/report/actions.tsx`: `share_tapped` with a `place` prop (`header` for the header button), `share_card_downloaded` on each Download, and `palette_saved` with its method from the `download` closure. `share.ts` stays unchanged. Done when 2.2 and `share.test.ts` pass.
-- [ ] 3.5 `lib/interest/premium-card.tsx`: `premium_tapped` on `clicked`. Done when 2.3 and `premium-card.test.tsx` pass.
-- [ ] 3.6 BL-11 and the E2E keys (design decision 4):
+- [x] 3.1 Create `apps/web/src/lib/analytics/index.ts` with `track` (moved) and `maskReportIds` (design decision 2, with a `ponytail:` note on encoded ids). Re-export `track` from `lib/capture/events.ts`. Pass `before_send: maskReportIds` in `initPostHog`. Done when 2.1 passes and `capture.test.ts` and `observability.test.ts` pass unedited.
+- [x] 3.2 `flow.tsx`: `consent_answered`, `quiz_completed`, `analysis_failed` (only when `!left`) and `report_requested`, as in design decision 3. Done when the flow steps of 2.5 pass locally (`pnpm test:e2e e2e/funnel.spec.ts`).
+- [x] 3.3 `_email/step.tsx`: `email_submitted` on `open`, before `router.push`. Done when 2.5's `email_submitted` step passes.
+- [x] 3.4 `lib/report/actions.tsx`: `share_tapped` with a `place` prop (`header` for the header button), `share_card_downloaded` on each Download, and `palette_saved` with its method from the `download` closure. `share.ts` stays unchanged. Done when 2.2 and `share.test.ts` pass.
+- [x] 3.5 `lib/interest/premium-card.tsx`: `premium_tapped` on `clicked`. Done when 2.3 and `premium-card.test.tsx` pass.
+- [x] 3.6 BL-11 and the E2E keys (design decision 4):
   - `playwright.config.ts` gets one `E2E_ENV` (the current values, plus `NEXT_PUBLIC_POSTHOG_KEY: "phc_e2e"` and `NEXT_PUBLIC_POSTHOG_HOST: "http://127.0.0.1:9"`);
   - the prebuilt command becomes `pnpm build && pnpm start`, with a web-server timeout that covers the build;
   - `.github/workflows/e2e.yml` drops `pnpm build`, and its header comment says why.
 
   Done when a local `pnpm build` followed by `CI=1 pnpm test:e2e` passes, and `.next` is then rebuilt with the test key: `grep -r phc_e2e apps/web/.next/static` finds it, and the production DSN is not in the bundle.
+
+  Result 2026-10-09: before, the local build's bundle held the production DSN host (1 file); after `CI=1 pnpm test:e2e` it holds `phc_e2e` (1 file) and no DSN. 51 of 52 pass; the one failure is the known macOS-only `/seasons/Soft-Autumn` 200 (case-insensitive disk, see `t5-report-delivery` 4.1), which passes on Linux CI.
 
 ## 4. Gate
 

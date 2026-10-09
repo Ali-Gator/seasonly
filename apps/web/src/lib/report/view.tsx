@@ -76,6 +76,7 @@ export function ReportView({ id, report }: { id: string; report: StoredReport })
           variant="ghost"
           block={false}
           className="lg:hidden"
+          place="header"
         />
         <p className="caption hidden text-(--ink-muted) lg:block">seasonly.me/r/{id}</p>
       </header>

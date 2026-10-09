@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, type Ref, useRef, useState } from "react";
 
 import { Button, EmailInput, Icon, Note } from "@/components/ds";
+import { track } from "@/lib/analytics";
 import { EMAIL_ERROR, parseEmail } from "@/lib/email/address";
 import { postWithin } from "@/lib/http/post-within";
 
@@ -148,8 +149,13 @@ export function EmailStep({
     setError(null);
     setSending(true);
     const result = await submitEmail(reportId, value);
-    // Stays disabled while the report opens.
-    if (result.kind === "open") return router.push(result.href);
+    if (result.kind === "open") {
+      // Never the address, nor any part of it.
+      // {@link openspec/specs/analytics/spec.md#requirement-the-email-event-never-carries-the-address}
+      track("email_submitted", {});
+      // Stays disabled while the report opens.
+      return router.push(result.href);
+    }
     setSending(false);
     if (result.kind === "invalid") {
       setError(EMAIL_ERROR);

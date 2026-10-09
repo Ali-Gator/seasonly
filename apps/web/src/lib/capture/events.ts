@@ -1,18 +1,13 @@
 import type { PhotoMeasures } from "@seasonly/analysis";
-import posthog from "posthog-js";
+
+export { track } from "@/lib/analytics";
 
 /**
- * Analysis events, from the browser where every outcome is known. Never pixels, landmarks or the
- * crop: only problems, counts and colors as Lab numbers.
+ * The photo check's event. Never pixels, landmarks or the crop: only problems, counts and colors
+ * as Lab numbers.
  *
  * {@link openspec/specs/capture-flow/spec.md#requirement-each-photo-check-is-reported-without-photo-data}
  */
-export function track(name: string, props: Record<string, unknown>): void {
-  // Off without a key (initPostHog never ran): the flow works the same.
-  if (!posthog.__loaded) return;
-  posthog.capture(name, props);
-}
-
 export function photoCheckedProps({
   problem,
   faceCount,
