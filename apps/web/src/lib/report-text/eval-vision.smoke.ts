@@ -13,7 +13,7 @@ import path from "node:path";
 import { expect, it, vi } from "vitest";
 
 import { PHOTOS_DIR, readManifest } from "../../../../../evals/fetch.ts";
-import { mediapipeVersion } from "../../../../../evals/gate.ts";
+import { EXTRACTOR_VERSION } from "../../../../../evals/extract.ts";
 import { cropPath, runPhotos } from "../../../../../evals/pipeline.ts";
 import { formatJson } from "../../../../../evals/results.ts";
 import { generateReportText, REPORT_TEXT_MODEL } from "./index";
@@ -36,7 +36,7 @@ it(
     const { report } = await runPhotos(manifest.photos, {
       photosDir: PHOTOS_DIR,
       cacheDir: CACHE_DIR,
-      version: mediapipeVersion(ROOT),
+      version: EXTRACTOR_VERSION,
       extract: async (file) => {
         throw new Error(`${file}: not extracted yet; run pnpm eval:run first`);
       },
@@ -44,6 +44,10 @@ it(
     const sent = report.flatMap((r) =>
       r.problem === null && r.result ? [{ ...r, result: r.result }] : [],
     );
+
+    // Every crop before the first paid call, so a missing one cannot waste the calls before it.
+    const missing = sent.filter((r) => !fs.existsSync(cropPath(CACHE_DIR, r.cacheKey)));
+    expect(missing.map((r) => r.file)).toEqual([]);
 
     const photos: { file: string; expect: string; verdict: string }[] = [];
     for (const r of sent) {

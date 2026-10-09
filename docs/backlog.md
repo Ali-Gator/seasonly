@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-17**
+_Next id:_ **BL-18**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -67,6 +67,15 @@ fold items in.
   _Status:_ open — found in `t6-eval-set`, 2026-10-09
 
 ## Testing
+
+- **[BL-17] Two analysis-eval scenarios are proven one level down** — "A photo cannot be had"
+  is tested on the results writer, not on `eval:run` failing after a failed fetch, and "A usable
+  photo the model rejects" has no test because its tally sits inline in the paid file. Move the
+  tally into `evals/` with a unit test, and test the run's fetch-then-fail order with a stubbed
+  fetch.
+  _Refs:_ `evals/eval.run.ts`, `apps/web/src/lib/report-text/eval-vision.smoke.ts`,
+  `openspec/specs/analysis-eval/spec.md` · _Status:_ open — phase review of `t6-eval-set`,
+  2026-10-09
 
 - **[BL-08] Two concurrent email stores are never raced in a test** — the abuse-controls
   scenario "Two requests at once" rests on `store_report_email` locking the report row (`for

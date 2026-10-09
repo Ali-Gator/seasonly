@@ -4,6 +4,7 @@
  *
  * {@link openspec/specs/analysis-eval/spec.md#requirement-ci-fails-a-stale-or-worse-result}
  */
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -27,18 +28,25 @@ const CORE_DIRS = ["sampling", "photo-check", "classifier", "palettes"].map(
   (d) => `packages/analysis/src/${d}`,
 );
 const APP_FILES = ["faces", "photo", "mediapipe"].map((f) => `apps/web/src/lib/capture/${f}.ts`);
+/** The core's entry point, which the eval imports through. */
+const CORE_INDEX = "packages/analysis/src/index.ts";
 
 const isTest = (file: string) => /\.(test|eval)\.ts$/.test(file) || file.includes("__tests__/");
 
-/** The hashed files, as sorted POSIX paths relative to `root`. */
+/**
+ * The hashed files, as sorted POSIX paths relative to `root`. Only files git tracks (committed or
+ * staged), so a local scratch script never makes CI's hash differ from the one recorded.
+ */
 export function inputFiles(root: string): string[] {
-  const core = CORE_DIRS.flatMap((dir) =>
-    fs
-      .readdirSync(path.join(root, dir), { recursive: true, encoding: "utf8" })
-      .map((f) => `${dir}/${f.split(path.sep).join("/")}`),
-  );
-  const evals = fs.readdirSync(path.join(root, "evals")).map((f) => `evals/${f}`);
-  return [...core, ...APP_FILES, ...evals]
+  const tracked = execFileSync(
+    "git",
+    ["ls-files", "--", ...CORE_DIRS, CORE_INDEX, ...APP_FILES, "evals"],
+    { cwd: root, encoding: "utf8" },
+  )
+    .split("\n")
+    .filter(Boolean);
+  return tracked
+    .filter((f) => !/^evals\/.+\//.test(f))
     .filter((f) => (f.endsWith(".ts") && !isTest(f)) || f === "evals/manifest.json")
     .sort();
 }
@@ -79,6 +87,10 @@ export function gateProblems(
   for (const [key, better] of Object.entries(RATCHETED) as [keyof RatchetedMetrics, string][]) {
     const value = results.metrics[key];
     const floor = baseline.metrics[key];
+    if (floor === undefined) {
+      problems.push(`${key}: missing from baseline.json`);
+      continue;
+    }
     if (floor === null) continue;
     const worse = value === null || (better === "higher" ? value < floor : value > floor);
     if (worse) problems.push(`${key}: ${value}, worse than the baseline's ${floor}`);

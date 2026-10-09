@@ -13,8 +13,14 @@ import path from "node:path";
 import { type Browser, chromium, type Page } from "@playwright/test";
 
 import { cropBox, type Landmarks, landmarkBox } from "../apps/web/src/lib/capture/faces.ts";
-import { FACE_MODEL, HAIR_MODEL, WASM } from "../apps/web/src/lib/capture/mediapipe.ts";
+import {
+  FACE_MODEL,
+  HAIR_MODEL,
+  MEDIAPIPE_VERSION,
+  WASM,
+} from "../apps/web/src/lib/capture/mediapipe.ts";
 import { MAX_SIDE } from "../apps/web/src/lib/capture/photo.ts";
+import { sha256 } from "./fetch.ts";
 import type { Extraction, Extractor } from "./pipeline.ts";
 
 /** A made-up origin, served by `page.route`, so the page can import an ES module. */
@@ -86,6 +92,17 @@ window.crop = async (box) => {
 };
 window.ready = true;
 </script>`;
+
+/**
+ * Names this extractor in the cache key: the MediaPipe version, then a hash of this file and the
+ * app's scaling and model constants, so a change to any of them re-extracts every photo.
+ */
+export const EXTRACTOR_VERSION = `${MEDIAPIPE_VERSION}-${sha256(
+  new TextEncoder().encode(
+    fs.readFileSync(import.meta.filename, "utf8") +
+      JSON.stringify({ WASM, FACE_MODEL, HAIR_MODEL, MAX_SIDE }),
+  ),
+).slice(0, 12)}`;
 
 interface PageExtraction {
   width: number;

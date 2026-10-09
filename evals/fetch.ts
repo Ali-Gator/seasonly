@@ -17,6 +17,9 @@ export const MANIFEST_PATH = path.join(import.meta.dirname, "manifest.json");
 // Wikimedia refuses generic scripted clients: https://meta.wikimedia.org/wiki/User-Agent_policy
 const USER_AGENT = "SeasonlyEval/1.0 (https://seasonly.me; labeled photo set fetch) node-fetch";
 
+/** A Commons original is a few MB; a stalled download fails instead of hanging the run. */
+const FETCH_TIMEOUT_MS = 120_000;
+
 export const sha256 = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("hex");
 
 /**
@@ -38,7 +41,10 @@ export async function fetchMissing(
       continue;
     }
     try {
-      const response = await fetchImpl(photo.source, { headers: { "User-Agent": USER_AGENT } });
+      const response = await fetchImpl(photo.source, {
+        headers: { "User-Agent": USER_AGENT },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const bytes = new Uint8Array(await response.arrayBuffer());
       const hash = sha256(bytes);

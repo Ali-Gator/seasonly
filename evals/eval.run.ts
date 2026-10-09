@@ -10,7 +10,7 @@ import path from "node:path";
 
 import { expect, it } from "vitest";
 
-import { createExtractor } from "./extract.ts";
+import { createExtractor, EXTRACTOR_VERSION } from "./extract.ts";
 import { fetchMissing, MANIFEST_PATH, PHOTOS_DIR, readManifest } from "./fetch.ts";
 import { currentInputsHash, mediapipeVersion } from "./gate.ts";
 import { runPhotos } from "./pipeline.ts";
@@ -20,6 +20,9 @@ const ROOT = path.resolve(import.meta.dirname, "..");
 const CACHE_DIR = path.join(PHOTOS_DIR, ".cache");
 
 it("measures the labeled photo set", async () => {
+  // A subset's numbers must never land in the committed results.json under the full set's hash.
+  if (process.env.EVAL_MANIFEST && !process.env.EVAL_RESULTS)
+    throw new Error("EVAL_MANIFEST needs EVAL_RESULTS, so the committed results.json is kept");
   const manifest = readManifest(process.env.EVAL_MANIFEST ?? MANIFEST_PATH);
   await fetchMissing(manifest, PHOTOS_DIR);
   const version = mediapipeVersion(ROOT);
@@ -27,7 +30,7 @@ it("measures the labeled photo set", async () => {
   const run = await runPhotos(manifest.photos, {
     photosDir: PHOTOS_DIR,
     cacheDir: CACHE_DIR,
-    version,
+    version: EXTRACTOR_VERSION,
     extract: extractor.extract,
   }).finally(extractor.close);
 

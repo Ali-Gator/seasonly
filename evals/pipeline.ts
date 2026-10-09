@@ -56,7 +56,7 @@ export interface PhotoReport {
 export interface RunOptions {
   photosDir: string;
   cacheDir: string;
-  /** The MediaPipe version, part of the cache key. */
+  /** Names the extractor in the cache key: `EXTRACTOR_VERSION` from extract.ts. */
   version: string;
   extract: Extractor;
   check?: typeof checkPhoto;
@@ -142,7 +142,12 @@ export async function runPhotos(
   const report: PhotoReport[] = [];
   for (const photo of photos) {
     const file = path.join(photosDir, photo.file);
-    const cacheKey = `${sha256(fs.readFileSync(file))}-${version}`;
+    const hash = sha256(fs.readFileSync(file));
+    if (photo.sha256 && hash !== photo.sha256)
+      throw new Error(
+        `${photo.file}: sha256 ${hash}, expected ${photo.sha256}; delete it and re-fetch`,
+      );
+    const cacheKey = `${hash}-${version}`;
     const cacheFile = path.join(cacheDir, `${cacheKey}.json.gz`);
     let extraction = readCache(cacheFile);
     if (!extraction) {

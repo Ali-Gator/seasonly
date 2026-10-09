@@ -132,6 +132,14 @@ describe("the Node stage", () => {
     expect(fs.readdirSync(cacheDir).filter((f) => f.endsWith(".crop.jpg"))).toHaveLength(2);
   });
 
+  it("fails on a local photo whose bytes differ from the manifest's hash", async () => {
+    const [one, two] = PHOTOS as [EvalPhoto, EvalPhoto];
+    const photos = [{ ...one, sha256: "0".repeat(64) }, two];
+    await expect(
+      runPhotos(photos, { photosDir, cacheDir, version: "1.0.1", extract: stubExtractor() }),
+    ).rejects.toThrow(/p01\/one\.jpg: sha256 [0-9a-f]{64}, expected 0{64}/);
+  });
+
   /** {@link openspec/specs/analysis-eval/spec.md#requirement-each-photo-goes-through-the-web-apps-own-steps} */
   it("fails on a missing photo, naming it", async () => {
     fs.rmSync(path.join(photosDir, "p01/two.jpg"));

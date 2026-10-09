@@ -66,6 +66,13 @@ describe("the gate", () => {
     expect(gateProblems(results(NULLS), baseline(NULLS), HASH)).toEqual([]);
   });
 
+  it("fails a metric missing from the baseline, so it is never left unratcheted", () => {
+    const { catchRate: _, ...rest } = METRICS;
+    expect(gateProblems(results(METRICS), { metrics: rest } as Baseline, HASH)).toEqual([
+      "catchRate: missing from baseline.json",
+    ]);
+  });
+
   /** {@link openspec/specs/analysis-eval/spec.md#requirement-ci-fails-a-stale-or-worse-result} */
   it("fails a metric that went null, and passes any value over a null baseline", () => {
     expect(gateProblems(results({ ...METRICS, catchRate: null }), baseline(METRICS), HASH)).toEqual(
