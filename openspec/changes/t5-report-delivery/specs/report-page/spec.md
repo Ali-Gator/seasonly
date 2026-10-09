@@ -62,7 +62,7 @@ A report with no photo SHALL leave out the draping section and number the others
 
 ### Requirement: Share my season hands over the share cards
 
-"Share my season" SHALL hand the season's 9:16 card (`/images/share/<slug>/story`) to the phone's share sheet, with the text "My color season: <Season>. Find yours at seasonly.me", where the browser can share files. Elsewhere it SHALL show both cards (story and post) with their alt text, each with a download. Cancelling the share sheet SHALL change nothing.
+"Share my season" SHALL hand the season's 9:16 card (`/images/share/<slug>/story`) to the phone's share sheet, with the text "My color season: <Season>. Find yours at seasonly.me", where the browser can share files. Elsewhere it SHALL open a closable panel titled "Share my season", saying "Download a card, then post it from your photos.", that shows both cards (story and post) with their alt text, each with a "Download" button. Cancelling the share sheet SHALL change nothing.
 
 #### Scenario: A phone that shares files
 

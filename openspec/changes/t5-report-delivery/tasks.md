@@ -1,6 +1,6 @@
 ## 1. Design (user gate)
 
-- [ ] 1.1 The user pastes this prompt into Claude Design, on the MVP canvas (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3):
+- [x] 1.1 The user pastes this prompt into Claude Design, on the MVP canvas (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3):
 
   ```text
   Using the "Seasonly" design system, add these states to the MVP canvas. Reuse the existing
@@ -34,6 +34,8 @@
   ```
 
   Done when the user approves the new and changed artboards in chat. Record the date here and in `mvp-design-canvas` memory, and give the new boards' names in design.md decision 8 (share panel). Any copy the user changes on the canvas is updated in the delta specs before 3.x cites it.
+
+  Approved 2026-10-09 (canvas version 30, edited in place rather than through Claude Design). The share panel's added line "Download a card, then post it from your photos." went into the report-page delta. On board 09b the failed Note splits its copy: title "We couldn't send your report", body "Nothing is lost, so you can try again." 08f puts its Note above the season, since its copy says "Your season is below". The deleted-photo face slot keeps the DS "Face" placeholder label.
 
 ## 2. Plan, accounts and test-edit approval
 

@@ -5,7 +5,7 @@
 - **Images.** `t5-report-images` built `/images/share/<slug>/story|post` (with `shareCardAlt`), `/images/palette/<slug>`, `/api/face/<id>` (404 when there is no crop) and DrapingPair.
 - **Flow.** `apps/web/src/app/(flow)/analyze/flow.tsx` is one client component driven by the pure reducer in `flow-state.ts`. Each new step pushes a history entry, and the outcome of analyzing replaces it. The reveal is `_reveal/steps.tsx`. `(flow)/layout.tsx` wraps every flow page in the phone column with a wordmark-only header, and `/r/[id]` lives there today as a stub that always calls `notFound()`.
 - **Guards.** BotID protects `/api/analyze` (`BOTID_PROTECT` in `apps/web/src/lib/abuse/botid.ts`, used by `instrumentation-client.ts`). Every route handler must use `withErrorCapture`. `saveReport` and `storeCrop` each copy the same 3 s timeout, Sentry capture and flush (BL-01).
-- **Design inputs.** MVP canvas https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3: boards 08 Reveal, 09 Email step, "10 Full report · 375", "10 Full report · 1280", "10 Premium button", 11 Share cards, 11b Palette image and 12 Report email; the design-system bundle (`project/ds/seasonly/components/bundle.js|css`) holds EmailInput and SeasonBadge.
+- **Design inputs.** MVP canvas https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3: boards 08 Reveal, 09 Email step, "10 Full report · 375", "10 Full report · 1280", "10 Premium button", 11 Share cards, 11b Palette image and 12 Report email, plus the states added and approved on 2026-10-09 (task 1.1): 08f Season reveal · report not saved, 09b Email step · invalid, sending, failed, quiz only, 10b Full report · quiz only (375 and 1280), 10c Report could not load, 10d Draping preview · photo deleted, 10e Share panel (375 and 1280), and the Premium board's failed tap; the design-system bundle (`project/ds/seasonly/components/bundle.js|css`) holds EmailInput and SeasonBadge.
 
 Motivation: proposal.md. Requirements: the delta specs under `specs/`.
 
@@ -172,7 +172,7 @@ A quiz-only record (`agreement === "quiz-only"`) gets no `ReportDraping`, and it
 
 iOS Safari refuses `navigator.share` once the tap's activation has been spent awaiting a fetch. So the report page fetches the story card and the palette image as `File`s when it mounts. They are static and cached, about 100 KB each. The tap then calls `share` at once.
 
-- **Share:** `navigator.canShare({ files: [story] })` true: share the story with the spec's text. Otherwise, open an inline panel (a native `<dialog>`) showing both PNGs as `<img>` with `shareCardAlt` as alt text, each with an `<a download>` link.
+- **Share:** `navigator.canShare({ files: [story] })` true: share the story with the spec's text. Otherwise, open an inline panel (a native `<dialog>`) showing both PNGs as `<img>` with `shareCardAlt` as alt text, each with an `<a download>` link. The panel follows boards "10e Share panel · no file sharing · 375" (a bottom sheet) and "10e Share panel · no file sharing · 1280" (a centred dialog): the title "Share my season", a close button, the line "Download a card, then post it from your photos.", then the story and post cards side by side, each captioned and with its "Download" button.
 - **Save:** share the palette image the same way. Otherwise, click a hidden `<a download="seasonly-<slug>-palette.png">` holding an object URL.
 - An `AbortError` (the person closed the sheet) changes nothing. Any other error falls back to the download path.
 
