@@ -37,7 +37,7 @@ function cropBox(
   height: number,
 ): Box & { outWidth: number; outHeight: number };
 function loadVision(): Promise<{ landmarker: FaceLandmarker; segmenter: ImageSegmenter }>; // once per visit, CPU delegate
-function track(name: string, props: Record<string, unknown>): void; // no-op without PostHog
+export { track } from "@/lib/analytics"; // re-exported; owned by analytics, no-op without PostHog
 function photoCheckedProps(o: {
   problem;
   faceCount;

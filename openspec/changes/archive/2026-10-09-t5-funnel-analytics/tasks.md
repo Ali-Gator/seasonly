@@ -56,11 +56,13 @@ Cite scenarios at `openspec/specs/analytics/spec.md#…`. Add new files or new c
 
 ## 4. Gate
 
-- [ ] 4.1 `pnpm fix`, then `pnpm test` (unit and E2E). Done when both pass and CI (`ci.yml`, `openspec.yml`, `e2e.yml`) is green on the pushed branch; record the counts here.
+- [x] 4.1 `pnpm fix`, then `pnpm test` (unit and E2E). Done when both pass and CI (`ci.yml`, `openspec.yml`, `e2e.yml`) is green on the pushed branch; record the counts here.
+
+  Result 2026-10-09: `pnpm fix` clean; 589 unit tests pass; E2E on the built server (`CI=1`) 53 of 54, the one failure the known macOS-only `/seasons/Soft-Autumn` case; under `pnpm dev` the one failure is BL-12. CI green on `01ba304` (CI, E2E, OpenSpec); the PR's checks gate the merge.
 
 ## 5. Checks with the user
 
-- [ ] 5.1 On the preview deployment, with the user's yes (no model call, but it writes `is_test` rows to the production Supabase and sends one email through Resend), from the user's phone:
+- [x] 5.1 On the preview deployment, with the user's yes (no model call, but it writes `is_test` rows to the production Supabase and sends one email through Resend), from the user's phone:
   1. run a quiz-only analysis: two failed photos, then "Continue without a photo";
   2. "Get my full report", the user's address, then on the report: Share, Save and Premium.
 
@@ -76,6 +78,8 @@ Cite scenarios at `openspec/specs/analytics/spec.md#…`. Add new files or new c
   - check that no `$identify` was sent.
 
   Delete the test report, its address and its interest row. Done when a Tracker Log line records the results.
+
+  Result 2026-10-09, preview `seasonly-6ez2nfzu6` (commit `96c31f2`), from the user's phone: `$pageview /analyze`; `photo_checked` ×2 (`no-face`), no `consent_answered`; `quiz_completed` and `report_requested` with `quiz_only: true`; `analysis_result` (`result`), `email_submitted`, `$pageview /r/:id`; `share_tapped` `{ place: actions, outcome: shared }`; the first "Save my palette" closed the sheet and sent nothing, the second sent `palette_saved` `{ method: share-sheet }`; `premium_tapped`. All 41 events share one `distinct_id`; none holds a report-id path, the report's id or the address; no `$identify`, `$set` or alias in the project. Scan since 2026-10-09: two ids were stored unmasked (`V-kYLkoM…` on preview and production, `3VWeBndh…` from localhost), and neither resolves to a report any more, so nothing to do. Test report `GTs_p3qI…` deleted, its address and interest row with it (cascade). Tracker Log line added at archive.
 
 - [x] 5.2 Through the PostHog connector, without stopping for approval (user, 2026-10-09):
   - create the action "Shared or saved";
@@ -98,7 +102,7 @@ Cite scenarios at `openspec/specs/analytics/spec.md#…`. Add new files or new c
 
   Result 2026-10-09: phase review (fresh subagent, `/code-review high`) found 8 issues, all fixed: the flags request leaked the first page's `/r/<id>` (flags off, E2E case for a report as first page, carried to `t7-paywall-off`); the mask now covers `/api/face/` and `/api/reports/`; `SENTRY_AUTH_TOKEN` blanked in `E2E_ENV`; a real 45 s timeout case (Playwright clock); refused and failed addresses send no `email_submitted`; the first case waits for a later landing view before its exact list and checks `$prev_pageview_pathname`; the build log is piped in CI; the referrer scenario now names the previous page path. Report ids in Sentry are carried to `t8-photo-privacy` as one decision, not logged. Backlog: added BL-12 (dev-mode cache-control E2E failure); deleted BL-09 (`draping.dom.test.tsx`) and BL-11 (`E2E_ENV` at build).
 
-- [ ] 6.2 At archive:
+- [x] 6.2 At archive:
   - add the README row `analytics`: `apps/web/src/lib/analytics/**`;
   - re-add the analytics spec's Public Interface (`track`, `maskReportIds`), Behavior (the event table's call sites, the mask's reach, the E2E host) and Edge Cases;
   - in capture-flow's Public Interface, note that `track` lives in `lib/analytics` and is re-exported;
