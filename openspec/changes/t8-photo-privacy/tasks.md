@@ -6,7 +6,7 @@
   Using the "Seasonly" design system, add or change these boards. Reuse the existing boards'
   layout and components; anything missing goes into the design system first.
 
-  1. "15 Legal page" in row 4 (Site pages), 375 and 1280: the site header and footer, the
+  1. "<next free number> Legal page" in row 4 (Site pages; check first whether T14 already has a privacy or terms board, and change that one instead), 375 and 1280: the site header and footer, the
      overline "Legal", the h1, a "Last updated <date>" caption, then long-form sections: an h2
      per section, body paragraphs, a bullet list and a two-column "service / what it gets"
      list. Fill it with the privacy policy's section headings: What we store and for how long;
@@ -34,11 +34,13 @@
   - the user's choices of 2026-10-09 (daily deletion with the 24 h wording, the PostHog cookie with no banner, Sentry keeps report ids, data kept until a request);
   - the facts from 1.2.
 
-  The processor list comes from a recorded network capture. In the built-in browser, on the latest preview, run a quiz-only flow, the email step and a report page, list every request host, and compare them with the `legal-pages` list. A photo analysis needs the user's yes, because it is a paid call; without one, the vision host comes from the code. Record the hosts here.
+  The processor list comes from a recorded network capture. Previews sit behind Vercel SSO, so run it in the user's signed-in Chrome (Claude in Chrome), on the latest preview, never on production, where a quiz-only run would write a real row counted by the demand gate. Run a quiz-only flow, the email step and a report page, list every request host, and compare them with the `legal-pages` list. A photo analysis needs the user's yes, because it is a paid call; without one, the vision host comes from the code. Delete the test report afterwards. Record the hosts here.
+
+  Each service's own retention (Vercel request logs, AI Gateway logging and Google's abuse-monitoring window, Resend's sent-email logs, PostHog's event retention, Sentry's event retention) is looked up in that service's current docs or account settings, never from memory, and recorded here with its source. Also check in Resend whether click or open tracking is on for `seasonly.me`. If click tracking is on, every report link passes through Resend's link domain. Turn it off with the user's yes, or name it on the page.
 
   Done when the user approves the text in chat; record the date here.
 
-- [ ] 1.4 Legal check: the user has the approved text reviewed by someone qualified, or waives a review for the beta in writing in chat. Record which, who and the date here. The text the agent drafts is not legal advice. This gate must close before the PR merges; it does not block the code tasks.
+- [ ] 1.4 Legal check: the user has the approved text reviewed by someone qualified, or waives a review for the beta in writing in chat. Record which, who and the date here. The text the agent drafts is not legal advice. It does not block the code tasks, but archive, the PR and auto-merge all wait for it (8.2).
 
 ## 2. Plan and test-edit approval
 
@@ -105,13 +107,13 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
   - the catalogue in `openspec/specs/env/spec.md`;
   - `scripts/verify-env.ts`.
 
-  The user puts a generated value in `apps/web/.env.local` and in Vercel Production. Done when `pnpm verify:env 1` reports it `ok` locally.
+  The user puts one generated value in `apps/web/.env.local` and in Vercel Production and Preview (Preview is used by 6.4). `verify:env` runs in no CI job and no build, so a missing value cannot break a deploy; the route refuses every request instead. Done when `pnpm verify:env 1` reports it `ok` locally.
 
 ## 5. Implementation
 
 - [ ] 5.1 Write `supabase/migrations/<ts>_retention.sql` (design.md decision 5). Do not apply it. Done when 3.2 passes.
 - [ ] 5.2 Write `apps/web/src/lib/retention/` (decisions 4 and 5) and `apps/web/src/app/api/cron/retention/route.ts` (decision 3), wrapped in `withErrorCapture`, with the job's results as JSON. Add `apps/web/vercel.json` with the daily `0 4 * * *` cron. Done when 3.1 and 3.3 pass and `BOTID_PROTECT` is unchanged.
-- [ ] 5.3 Write `/privacy` and `/terms` from the text approved in 1.3 and the layout of board 15 (decision 7), and set both routes `ready: true` in `lib/site/routes.ts`. Done when 3.4 passes and the site-structure tests pass.
+- [ ] 5.3 Write `/privacy` and `/terms` from the text approved in 1.3 and the layout of the legal-page board from 1.1 (decision 7), and set both routes `ready: true` in `lib/site/routes.ts`. Done when 3.4 passes and the site-structure tests pass.
 - [ ] 5.4 Consent copy in `_capture/steps.tsx`, and the BL-10 line in `lib/report/draping.tsx` (decision 8), both from the approved boards. Done when 3.5 passes. Delete BL-10 from `docs/backlog.md`.
 - [ ] 5.5 Write `docs/privacy-requests.md` (decision 6). Rewrite the Edge Case notes that point at `t8-photo-privacy` in the permanent specs:
   - `draping-preview`: "Nothing deletes crops yet";
@@ -134,28 +136,31 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Done when both results are recorded here.
 
-## 7. Production checks (after merge)
-
-- [ ] 7.1 Confirm `CRON_SECRET` is set in Vercel Production, and that the production deployment lists the cron `/api/cron/retention` at `0 4 * * *` (Vercel dashboard → Cron Jobs, or `vercel crons ls`). Record it here.
-- [ ] 7.2 Run the job once from the Vercel dashboard's "Run" button. Check that:
+- [ ] 6.4 Prove the job on the preview deployment before merge. The user runs `curl -H "Authorization: Bearer $CRON_SECRET" https://<preview>/api/cron/retention` with the Vercel bypass for SSO, or approves the agent running it. Check that:
   - it answers 200 with its counts;
   - no crop older than 24 h remains (list the `crops` bucket through the connector);
-  - `select count(*) from reports where is_test and created_at < now() - interval '24 hours'` is 0.
+  - `select count(*) from reports where is_test and created_at < now() - interval '24 hours'` is 0;
+  - the same request without the header answers 401.
 
-  The next morning, check that the scheduled run's log shows 200. Done when both are recorded in a Tracker Log line.
+  Previews share the production Supabase project, so this run is the real first cleanup. Done when the results are recorded here.
 
-- [ ] 7.3 Check that `https://seasonly.me/privacy` and `/terms` carry no `noindex` and appear in `https://seasonly.me/sitemap.xml`. Record it here.
+## 7. Backlog and archive prep
 
-## 8. Backlog and archive prep
-
-- [ ] 8.1 Before archive, log in `docs/backlog.md`, under the next free `BL-nn` ids, and name them in the PR:
+- [ ] 7.1 Before archive, log in `docs/backlog.md`, under the next free `BL-nn` ids, and name them in the PR:
   - every phase-review finding not fixed, and every defect found on the way that is worth fixing later;
   - deferred, "until Vercel Pro or before paid promotion (T15)": deletion runs daily, so a crop can stay about 49 h while the pages say 24 h. The fix is an hourly scheduler calling the same route;
   - deferred, "before paid promotion or a complaint": the PostHog cookie is set without consent. The fix is `cookieless_mode` or a banner with `on_reject`.
 
   Check that BL-10 was deleted in 5.4.
 
-- [ ] 8.2 At archive:
+- [ ] 7.2 Archive, push, PR and auto-merge wait until 1.4 is recorded. At archive:
   - add the `data-retention` and `legal-pages` rows to `openspec/specs/README.md` (design.md decision 1);
   - re-add Public Interface, Behavior and Edge Cases to both new permanent specs;
-  - set T8 Done in the Tracker with a Log line, once 1.4 and 7.x are recorded.
+  - add a Tracker Log line, and leave T8 In progress until the production checks below.
+
+  After merge (the follow-up recorded in the Tracker, not a task here):
+  - production lists the cron `/api/cron/retention` at `0 4 * * *` (Vercel → Cron Jobs);
+  - the first scheduled run's log shows 200;
+  - `https://seasonly.me/privacy` and `/terms` carry no `noindex` and are in the sitemap.
+
+  T8 is set Done once these three are recorded in a Log line.

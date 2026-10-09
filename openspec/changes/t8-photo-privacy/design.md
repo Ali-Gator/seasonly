@@ -83,7 +83,7 @@ If a `remove` reports fewer deletions than it was asked for, the loop throws ins
 
 `<ts>_retention.sql` is a single line: `grant delete on public.reports to service_role;`. The job runs `delete from reports where is_test and created_at < cutoff` through supabase-js and counts the rows.
 
-Postgres runs the `on delete cascade` actions on `report_emails` and `interest_clicks` as the owner of those tables, so neither child table needs a delete grant. The PGlite test proves the cascade, as `store.test.ts` does for the other tables. PGlite runs as a superuser, so it cannot prove the grant. The first run against Supabase does (task 7.2).
+Postgres runs the `on delete cascade` actions on `report_emails` and `interest_clicks` as the owner of those tables, so neither child table needs a delete grant. The PGlite test proves the cascade, as `store.test.ts` does for the other tables. PGlite runs as a superuser, so it cannot prove the grant. The first run against Supabase does (task 6.4).
 
 A security-definer function, like `claim_analysis_slot`, would also work. It is not needed, because there is no check to make atomic.
 
@@ -98,7 +98,7 @@ Test reports are deleted after crops. A storage error stops the run before the d
 - run `delete from public.reports where id = '<id>'` in the SQL editor (the cascade removes the addresses and the interest record), or `delete from public.report_emails where email = '<address>'`;
 - reply within 30 days.
 
-It is a runbook, not code, because requests will be rare in the beta. The SQL editor runs as the owner, so no grant is needed. It is tried once on a test report (task 7.x).
+It is a runbook, not code, because requests will be rare in the beta. The SQL editor runs as the owner, so no grant is needed. It is tried once on a test report (task 6.3).
 
 ### 7. The legal pages are static JSX drafted from a fact inventory
 
@@ -126,16 +126,16 @@ So one line covers both cases: "We couldn't load your photo, so this shows the t
 - [The PostHog cookie is set without consent, an ePrivacy risk for EU visitors] → It is disclosed on `/privacy`. It goes in the backlog, with the trigger "before paid promotion or a complaint". The fix is `cookieless_mode`, or a banner with `on_reject`.
 - [Google may keep the crop for abuse monitoring, without ZDR] → Disclosed. Restored by Vercel Pro and `providerOptions.gateway.zeroDataRetention`.
 - [A cron run fails silently] → `withErrorCapture` sends the failure to Sentry. Selecting by age means the next run catches up.
-- [`CRON_SECRET` missing in Production] → Every run answers 401, and Vercel's cron log shows it. `verify:env` catches a missing variable locally. The first scheduled run is checked in task 7.x.
+- [`CRON_SECRET` missing in Production] → Every run answers 401, and Vercel's cron log shows it. `verify:env` catches a missing variable locally. The first scheduled run is checked after merge (task 7.2).
 - [The agent's text is mistaken for a legal review] → The legal check is a separate user gate with a recorded outcome (review, or a written waiver).
 - [The network capture misses a host] → The capture covers all three surfaces (flow, email step, report page) on a deployment, and the page treats a missing service as a defect.
 
 ## Migration Plan
 
-1. The user approves the canvas and copy, and gives the operator details (tasks 1.x).
+1. The user approves the canvas and copy, and gives the operator details (tasks 1.x). The legal check (1.4) gates archive, the PR and auto-merge.
 2. Apply `<ts>_retention.sql` to Supabase `seasonly` after the user confirms.
-3. Set `CRON_SECRET` in Vercel Production (the user, or the agent with permission).
+3. Set `CRON_SECRET` in Vercel Production and Preview (the user, or the agent with permission).
 4. Merge. The production deployment registers the cron.
-5. Run the job once from the Vercel dashboard's Cron Jobs tab. Check that the response counts are right and that old test rows are gone.
+5. Before merge, the job is run once on the preview with the secret (task 6.4). Previews share the production database, so that run is the first real cleanup. After merge, production lists the cron, and the first scheduled run's log is checked.
 
 Rollback: remove the `crons` entry and redeploy. The grant is harmless to keep.

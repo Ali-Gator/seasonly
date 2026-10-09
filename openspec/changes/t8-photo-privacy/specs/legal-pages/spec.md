@@ -39,6 +39,8 @@ It SHALL say that the full photo never leaves the device. It SHALL say that face
 - Sentry, Germany: error reports, which can include a report id;
 - jsDelivr and Google Cloud Storage: the browser downloads the face-detection code and model from them, so they see the visitor's IP address.
 
+For each service, the page SHALL also say how long that service keeps what it receives, as the service's own documentation or account settings state it. A deletion request reaches Seasonly's own records, not these copies, and the page SHALL say so.
+
 A service that receives data and is missing from the list is a defect in the page.
 
 **Unenforced:** completeness is checked by recording the network requests of a full photo analysis, the email step and the report page on a deployment, and comparing their hosts with the list. The check is recorded in the change's tasks.
@@ -51,7 +53,7 @@ A service that receives data and is missing from the list is a defect in the pag
 #### Scenario: Every service
 
 - **WHEN** a person reads `/privacy`
-- **THEN** it names Vercel, Supabase, Google, Resend, PostHog, Sentry and jsDelivr, each with what it receives
+- **THEN** it names Vercel, Supabase, Google, Resend, PostHog, Sentry and jsDelivr, each with what it receives and how long it keeps it
 
 ### Requirement: The privacy policy says who runs Seasonly and how to use one's rights
 
