@@ -1,19 +1,19 @@
 ## 1. Harness setup
 
-- [ ] 1.1 Wire the commands (design decision 2):
+- [x] 1.1 Wire the commands (design decision 2):
   - `vitest.config.ts` also includes `evals/**/*.test.ts`;
   - a new `vitest.config.eval-run.ts` includes `evals/**/*.run.ts`, with the `@/` alias and a long timeout;
   - in `package.json`, `eval:fetch` is `node evals/fetch.ts`, `eval:run` uses the new config, `eval:vision` is `vitest run --config vitest.config.smoke.ts eval-vision`, and `test:smoke` is narrowed to `report-text.smoke`.
 
   Done when `pnpm test:unit` and `pnpm test:eval` still pass, and `pnpm eval:run --passWithNoTests` starts and finds no file until 3.4 lands.
 
-- [ ] 1.2 Export `MAX_SIDE` from `apps/web/src/lib/capture/photo.ts`, and `WASM`, `FACE_MODEL` and `HAIR_MODEL` from `mediapipe.ts`. There is no behavior change. Done when `pnpm typecheck`, `pnpm test:unit` and `e2e/analysis-flow.spec.ts` pass.
+- [x] 1.2 Export `MAX_SIDE` from `apps/web/src/lib/capture/photo.ts`, and `WASM`, `FACE_MODEL` and `HAIR_MODEL` from `mediapipe.ts`. There is no behavior change. Done when `pnpm typecheck`, `pnpm test:unit` and `e2e/analysis-flow.spec.ts` pass.
 
 ## 2. Tests first
 
 Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only. `evals/manifest.eval.ts` stays as it is, unless the user approves an edit.
 
-- [ ] 2.1 `evals/manifest.test.ts` covers the new manifest fields:
+- [x] 2.1 `evals/manifest.test.ts` covers the new manifest fields:
   - a Commons entry (`source`, `sha256`, `license`, `author`, no `expect`) is valid and read as `pass`;
   - a `source` without `sha256`, or without `license`, is reported;
   - `expect: "blurry"` is reported;
@@ -21,14 +21,14 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only
 
   Done when it fails against today's `manifestProblems`.
 
-- [ ] 2.2 `evals/fetch.test.ts`, with `fetch` stubbed and a temp directory:
+- [x] 2.2 `evals/fetch.test.ts`, with `fetch` stubbed and a temp directory:
   - a missing file is written when its bytes hash right;
   - a hash mismatch or an HTTP error fails, naming the entry, and leaves no file;
   - a present file is not downloaded.
 
   Done when it fails because `evals/fetch.ts` does not exist.
 
-- [ ] 2.3 `evals/metrics.test.ts` runs on hand-built outcomes, with no photos. It covers:
+- [x] 2.3 `evals/metrics.test.ts` runs on hand-built outcomes, with no photos. It covers:
   - every scenario of agreement, the tie and the person who is not measured;
   - accuracy, right family but wrong season;
   - the false-reject breakdown and the expected-problem rate;
@@ -37,7 +37,7 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only
 
   Done when it fails because `evals/metrics.ts` does not exist.
 
-- [ ] 2.4 `evals/gate.test.ts` covers the gate logic with fixture results and baselines:
+- [x] 2.4 `evals/gate.test.ts` covers the gate logic with fixture results and baselines:
   - a stale hash fails with "run pnpm eval:run";
   - agreement 0.70 against a baseline of 0.72 fails, naming both values;
   - a lower false-reject rate passes;
@@ -45,7 +45,7 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only
 
   The hash is stable under CRLF and path order, and changes when one hashed file changes. Done when it fails for the missing module.
 
-- [ ] 2.5 `evals/variants.test.ts` covers the synthetic variants (design decision 4) on a small RGBA buffer:
+- [x] 2.5 `evals/variants.test.ts` covers the synthetic variants (design decision 4) on a small RGBA buffer:
   - darkened is channel × 0.35;
   - the warm cast is R × 1.15 and B × 0.7, clamped;
   - grayscale is Rec. 709 luma;
@@ -53,9 +53,9 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only
 
   Done when it fails for the missing module.
 
-- [ ] 2.6 Show that no vision call runs in a test suite. Add a case to `evals/gate.test.ts`: `eval-vision.smoke.ts` matches no `include` glob of `vitest.config.ts`, `vitest.config.eval.ts`, `vitest.config.eval-run.ts` or `playwright.config.ts`. Done when it passes after 1.1.
+- [x] 2.6 Show that no vision call runs in a test suite. Add a case to `evals/gate.test.ts`: `eval-vision.smoke.ts` matches no `include` glob of `vitest.config.ts`, `vitest.config.eval.ts`, `vitest.config.eval-run.ts` or `playwright.config.ts`. Done when it passes after 1.1.
 
-- [ ] 2.7 `evals/pipeline.test.ts` covers the Node stage on fake cache entries, built from `packages/analysis/src/__tests__/synthetic-face.ts` (no photos, no browser):
+- [x] 2.7 `evals/pipeline.test.ts` covers the Node stage on fake cache entries, built from `packages/analysis/src/__tests__/synthetic-face.ts` (no photos, no browser):
   - a single painted face's outcome is no problem, and the season equals `classify({ photo: samplePhoto(…).traits, answers: {} })`;
   - two faces, each at least `MIN_FACE_WIDTH` wide, give `several-faces`, as `pickFace` does;
   - a second run with a cache hit never calls the stubbed extractor;
@@ -63,7 +63,7 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only
 
   Done when it fails because `evals/pipeline.ts` does not exist. Only `*.test.ts` counts for the citation gate, so `eval.run.ts` and `gate.eval.ts` cite nothing.
 
-- [ ] 2.8 `evals/results.test.ts` covers the results writer:
+- [x] 2.8 `evals/results.test.ts` covers the results writer:
   - the serialized results for two fake photos hold the metrics, the per-person table, the counts and `inputsHash`;
   - no key or value is a pixel array, a landmark, a mask or an `L`/`a`/`b` color;
   - a missing photo throws, naming it, and leaves an existing `results.json` byte for byte unchanged.
@@ -72,15 +72,15 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only
 
 ## 3. Harness code
 
-- [ ] 3.1 `evals/manifest.ts`: add the optional fields `source`, `sha256`, `license`, `author` and `expect`, and their checks. Done when 2.1 passes and `evals/manifest.eval.ts` still passes unedited.
-- [ ] 3.2 `evals/fetch.ts`: download each missing manifest file, check its SHA-256, write it atomically, and report what was fetched. Runnable as `pnpm eval:fetch`. Send a descriptive `User-Agent` (Wikimedia refuses generic scripted clients), and check it first with one `curl` against a real Commons original. Done when 2.2 passes.
-- [ ] 3.3 `evals/metrics.ts`, `evals/variants.ts` and `evals/gate.ts`:
+- [x] 3.1 `evals/manifest.ts`: add the optional fields `source`, `sha256`, `license`, `author` and `expect`, and their checks. Done when 2.1 passes and `evals/manifest.eval.ts` still passes unedited.
+- [x] 3.2 `evals/fetch.ts`: download each missing manifest file, check its SHA-256, write it atomically, and report what was fetched. Runnable as `pnpm eval:fetch`. Send a descriptive `User-Agent` (Wikimedia refuses generic scripted clients), and check it first with one `curl` against a real Commons original. Done when 2.2 passes.
+- [x] 3.3 `evals/metrics.ts`, `evals/variants.ts` and `evals/gate.ts`:
   - pure functions for the metrics, the variants, the input hash (design decision 3's file list) and the comparison with the baseline;
   - `results.json` and `baseline.json` as committed files, with null metrics for the empty set.
 
   Done when 2.3–2.5 pass.
 
-- [ ] 3.4 `evals/extract.ts` (browser stage), `evals/pipeline.ts` (Node stage), `evals/results.ts` (writer) and `evals/eval.run.ts`, which ties them together. Done also when 2.7 and 2.8 pass. The run:
+- [x] 3.4 `evals/extract.ts` (browser stage), `evals/pipeline.ts` (Node stage), `evals/results.ts` (writer) and `evals/eval.run.ts`, which ties them together. Done also when 2.7 and 2.8 pass. The run:
   1. fetches;
   2. for each photo, uses the cache or runs the Chromium extractor (design decision 1), which serves the installed `vision_bundle.mjs` and reuses the app's exported constants;
   3. runs `pickFace`, then `checkPhoto`, then `samplePhoto` and `classify` (`answers: {}`), plus the variants on each passing usable photo;
@@ -91,7 +91,7 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only
   - a run on the empty manifest writes null metrics and a hash that `test:eval` accepts;
   - a one-off run on `e2e/fixtures/face.jpg`, listed in a temporary manifest that is not committed, reproduces the pass the E2E sees.
 
-- [ ] 3.5 `evals/gate.eval.ts` reads the committed `results.json` and `baseline.json`, recomputes the hash and fails as specified. Done when `pnpm test:eval` passes on the empty set, and fails after a throwaway edit to `packages/analysis/src/sampling/traits.ts` (then reverted).
+- [x] 3.5 `evals/gate.eval.ts` reads the committed `results.json` and `baseline.json`, recomputes the hash and fails as specified. Done when `pnpm test:eval` passes on the empty set, and fails after a throwaway edit to `packages/analysis/src/sampling/traits.ts` (then reverted).
 
 ## 4. The photo set (user approval)
 

@@ -1,0 +1,17 @@
+{
+  "inputsHash": "ada33d510c861815143ae564643c4dd0c9c1b7582d9c67997fd585c2f7221206",
+  "mediapipe": "1.0.1",
+  "counts": { "photos": 0, "people": 0, "variants": 0 },
+  "metrics": {
+    "agreement": null,
+    "familyAgreement": null,
+    "accuracy": null,
+    "familyAccuracy": null,
+    "falseRejectRate": null,
+    "falseRejects": { "no-face": 0, "dark": 0, "tint": 0, "filter": 0, "several-faces": 0 },
+    "expectedProblemRate": null,
+    "catchRate": null,
+    "passRate": null
+  },
+  "people": []
+}

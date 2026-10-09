@@ -28,7 +28,7 @@ export interface CheckedPhoto {
 }
 
 /** Longer side, in pixels, the photo is checked at. */
-const MAX_SIDE = 1280;
+export const MAX_SIDE = 1280;
 
 const NO_MEASURES: PhotoMeasures = { faceWidth: null, eyeWhite: null, skin: null };
 

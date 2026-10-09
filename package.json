@@ -19,7 +19,10 @@
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "test:eval": "vitest run --config vitest.config.eval.ts",
-    "test:smoke": "vitest run --config vitest.config.smoke.ts",
+    "test:smoke": "vitest run --config vitest.config.smoke.ts report-text.smoke",
+    "eval:fetch": "node evals/fetch.ts",
+    "eval:run": "vitest run --config vitest.config.eval-run.ts",
+    "eval:vision": "vitest run --config vitest.config.smoke.ts eval-vision",
     "verify:env": "node scripts/verify-env.ts"
   },
   "devDependencies": {
