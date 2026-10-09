@@ -118,7 +118,7 @@ The spec defines each metric. These are the design reasons:
   - all four families, ideally 8 or more of the 12 seasons;
   - at least 4 photos with a second person visible (`expect: several-faces`, or `pass` when the second face is small and blurred);
   - at least 3 genuinely dim or color-cast photos.
-- **The review page.** Each candidate shows its Commons thumbnail, source, license, author, the proposed season with a one-line reason, and the proposed `expect`. The user approves or edits the list, the labels and the expected outcomes. Only then are the photos downloaded and their hashes written into the manifest.
+- **The review page.** Each candidate links its Commons file page (an artifact cannot hotlink Commons images) with its source, license, author, the proposed season with a one-line reason, and the proposed `expect`. The user approves or edits the list, the labels and the expected outcomes. Only then are the photos downloaded and their hashes written into the manifest.
 - **Labels.** These are the user's call, informed by Claude's proposal, and are subjective for any public figure. That is why agreement, which needs no label, is the primary metric, and accuracy is the guard against collapse.
 - **Person ids.** Short slugs (`p01`…), so file paths stay neutral. The `source` URL identifies the photo anyway.
 
@@ -127,7 +127,7 @@ The spec defines each metric. These are the design reasons:
 Each step runs only where the eval shows a gain. Each ends with the spec delta (`/opsx:update`) and the new numbers.
 
 1. **First run, untuned.** Record the v0 metrics in tasks.md and the Tracker. This is the honest "before".
-2. **Photo-check limits and the several-faces width.** Search a small grid over eye-white L*, eye-white C*ab, the skin-hue floor and `MIN_FACE_WIDTH` in `pickFace`, minimizing the false-reject rate with the catch rate held at least at v0. `MIN_FACE_WIDTH` also gates sampling (`no-face`), so a separate several-faces width is introduced only if the two needs diverge.
+2. **Photo-check limits and the several-faces width.** Search a small grid over eye-white L*, eye-white C*ab, the skin-hue floor and `MIN_FACE_WIDTH` in `pickFace`, minimizing the false-reject rate while all four ratcheted metrics stay at v0 or better; a trade goes to the user. `MIN_FACE_WIDTH` also gates sampling (`no-face`), so a separate several-faces width is introduced only if the two needs diverge.
 3. **Sampling and classifier constants.** Use the per-photo traits in `report.json` to see why one person's photos scatter, for example how much light moves `value` and `clarity` while `temperature` holds. Adjust the fewest constants that explain it. A change is kept only if agreement and accuracy both rise, and every unit test still passes: the Monk scale, the synthetic face and the determinism tests.
 4. **Paid vision run, once, with approval.**
    - If the model says `several-faces` for more than 1 in 10 usable photos, bring the user the numbers and the two options: relax the prompt rule, or record the verdict without rejecting. The chosen one becomes a `report-text` delta.

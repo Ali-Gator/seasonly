@@ -55,17 +55,32 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only
 
 - [ ] 2.6 Show that no vision call runs in a test suite. Add a case to `evals/gate.test.ts`: `eval-vision.smoke.ts` matches no `include` glob of `vitest.config.ts`, `vitest.config.eval.ts`, `vitest.config.eval-run.ts` or `playwright.config.ts`. Done when it passes after 1.1.
 
+- [ ] 2.7 `evals/pipeline.test.ts` covers the Node stage on fake cache entries, built from `packages/analysis/src/__tests__/synthetic-face.ts` (no photos, no browser):
+  - a single painted face's outcome is no problem, and the season equals `classify({ photo: samplePhoto(…).traits, answers: {} })`;
+  - two faces, each at least `MIN_FACE_WIDTH` wide, give `several-faces`, as `pickFace` does;
+  - a second run with a cache hit never calls the stubbed extractor;
+  - a run after a stubbed limit change gives the new outcome.
+
+  Done when it fails because `evals/pipeline.ts` does not exist. Only `*.test.ts` counts for the citation gate, so `eval.run.ts` and `gate.eval.ts` cite nothing.
+
+- [ ] 2.8 `evals/results.test.ts` covers the results writer:
+  - the serialized results for two fake photos hold the metrics, the per-person table, the counts and `inputsHash`;
+  - no key or value is a pixel array, a landmark, a mask or an `L`/`a`/`b` color;
+  - a missing photo throws, naming it, and leaves an existing `results.json` byte for byte unchanged.
+
+  Done when it fails for the missing module.
+
 ## 3. Harness code
 
 - [ ] 3.1 `evals/manifest.ts`: add the optional fields `source`, `sha256`, `license`, `author` and `expect`, and their checks. Done when 2.1 passes and `evals/manifest.eval.ts` still passes unedited.
-- [ ] 3.2 `evals/fetch.ts`: download each missing manifest file, check its SHA-256, write it atomically, and report what was fetched. Runnable as `pnpm eval:fetch`. Done when 2.2 passes.
+- [ ] 3.2 `evals/fetch.ts`: download each missing manifest file, check its SHA-256, write it atomically, and report what was fetched. Runnable as `pnpm eval:fetch`. Send a descriptive `User-Agent` (Wikimedia refuses generic scripted clients), and check it first with one `curl` against a real Commons original. Done when 2.2 passes.
 - [ ] 3.3 `evals/metrics.ts`, `evals/variants.ts` and `evals/gate.ts`:
   - pure functions for the metrics, the variants, the input hash (design decision 3's file list) and the comparison with the baseline;
   - `results.json` and `baseline.json` as committed files, with null metrics for the empty set.
 
   Done when 2.3–2.5 pass.
 
-- [ ] 3.4 `evals/extract.ts` and `evals/eval.run.ts`. The run:
+- [ ] 3.4 `evals/extract.ts` (browser stage), `evals/pipeline.ts` (Node stage), `evals/results.ts` (writer) and `evals/eval.run.ts`, which ties them together. Done also when 2.7 and 2.8 pass. The run:
   1. fetches;
   2. for each photo, uses the cache or runs the Chromium extractor (design decision 1), which serves the installed `vision_bundle.mjs` and reuses the app's exported constants;
   3. runs `pickFace`, then `checkPhoto`, then `samplePhoto` and `classify` (`answers: {}`), plus the variants on each passing usable photo;
@@ -88,13 +103,13 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only
 
   Note each photo's file page, original URL, license and author, a proposed season with a one-line reason, and a proposed `expect`. Done when the list is drafted.
 
-- [ ] 4.2 Publish the candidate list as a private review page: Commons thumbnails, source, license, author, the proposed season and `expect`. **The user approves or edits** the people, photos, labels and expected outcomes. Done when the user says yes.
+- [ ] 4.2 Publish the candidate list as a private review page: source, license, author, the proposed season and `expect` for each photo. An artifact page cannot hotlink Commons images, so link each Commons file page rather than downloading before approval. **The user approves or edits** the people, photos, labels and expected outcomes. Done when the user says yes.
 - [ ] 4.3 Download the approved photos, compute their SHA-256, and write the manifest entries (`p01`… person ids). Done when `pnpm eval:fetch` reports nothing missing, and `pnpm test:eval`'s manifest test passes.
 
 ## 5. Measure, then tune
 
 - [ ] 5.1 First run, untuned. Commit its `results.json` and copy its metrics to `baseline.json` as v0. Also record v0 here, in the Tracker log and in the PR. If a variant factor is not plainly bad to the eye on the first run, adjust it once before recording v0. Done when `pnpm test:eval` passes with v0.
-- [ ] 5.2 Tune the photo check (design decision 6, step 2): a small grid over eye-white L*, eye-white C*ab, the skin-hue floor and the several-faces width, using cached runs. Keep the setting with the fewest false rejects whose catch rate is at least v0's. Done when the chosen values are in the code. Any existing test that pins a moved limit (for example `photo-check.test.ts` L* 25 and C*ab 25) is listed for the user, and **edited only with the user's approval**.
+- [ ] 5.2 Tune the photo check (design decision 6, step 2): a small grid over eye-white L*, eye-white C*ab, the skin-hue floor and the several-faces width, using cached runs. Keep the setting with the fewest false rejects that holds all four ratcheted metrics at v0 or better. A looser check admits harder photos, which can lower agreement or accuracy. If the best setting trades one metric for another, bring the numbers to the user, and lower the baseline only with the user's approval. Done when the chosen values are in the code. Any existing test that pins a moved limit (for example `photo-check.test.ts` L* 25 and C*ab 25) is listed for the user, and **edited only with the user's approval**.
 - [ ] 5.3 Update `photo-check` with the new limits and the measured rates through `/opsx:update`, replacing "provisional", and do the same for `capture-flow` if the several-faces width moved. If `face.jpg` now fails, swap the fixture per its README. Done when `openspec validate t6-eval-set` passes, along with `pnpm test:unit`, `pnpm test:eval` (fresh results) and `e2e/analysis-flow.spec.ts`.
 - [ ] 5.4 Tune sampling and the classifier (design decision 6, step 3). From `report.json`, find what light moves in each person's traits, and adjust the fewest `traits.ts` and `reference.ts` constants that explain it. Keep a change only if agreement and label accuracy both rise. Existing tests that pin a moved constant wait for the user's approval. Done when a fresh `results.json` beats the 5.3 numbers on both. If no change earns its place, record that, and leave the constants and their specs as they are.
 - [ ] 5.5 Update `color-sampling` and `season-classifier` with the moved constants, and drop "provisional" where a constant is now measured, through `/opsx:update`. Done when `openspec validate t6-eval-set` passes, along with `pnpm test:unit` and `pnpm test:eval`.
