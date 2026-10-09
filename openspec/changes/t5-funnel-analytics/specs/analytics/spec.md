@@ -145,6 +145,8 @@ The PostHog project SHALL hold a funnel insight "Landing to share" on the Season
 
 It SHALL be filtered to the host `seasonly.me`, with test accounts filtered out. Premium interest and failed analyses are read beside it, not as steps.
 
+**Unenforced:** the insight is a setting in the PostHog project, not app behavior; it is made and checked by hand through the PostHog connector, and its link is recorded in the change's tasks.
+
 #### Scenario: Reading the funnel
 
 - **WHEN** the dashboard is opened

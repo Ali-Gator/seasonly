@@ -78,9 +78,9 @@ Alternative for `palette_saved`: return `shared | downloaded | idle` from `saveP
 
 The E2E server gets a test key and `NEXT_PUBLIC_POSTHOG_HOST=http://127.0.0.1:9`, the dead address the Supabase URL already uses.
 
-- A new `e2e/funnel.spec.ts` routes `http://127.0.0.1:9/**`. It decodes each capture body: JSON, or gzip when the URL says `compression=gzip-js`. It then polls until the expected events are in, in order: landing → header "Find my colors" → upload → agree → quiz → reveal (analyze route answered) → "Get my full report" → address (email route answered) → `/r/e2e-report`.
-- That report shows its 404 page, but its `$pageview` still proves the mask.
-- In other specs the requests fail quietly, and `posthog-js` drops them.
+- A new `e2e/funnel.spec.ts` routes `http://127.0.0.1:9/**`. It answers the flags and remote-config requests with an empty 200, records the capture requests, and decodes each body: JSON, or gzip when the URL says `compression=gzip-js`. `posthog-js` batches on a flush interval, so the poll waits up to 20 s.
+- The analyze route answers a well-formed 22-character `reportId`. The report's push then lands on the read-failure page, since there is no database, and that page's `$pageview` proves the mask on the real path. It then polls until the expected events are in, in order: landing → header "Find my colors" → upload → agree → quiz → reveal (analyze route answered) → "Get my full report" → address (email route answered) → `/r/e2e-report`.
+- - In other specs the requests fail quietly, and `posthog-js` drops them.
 
 For BL-11, `playwright.config.ts` holds one `E2E_ENV`: the dead Supabase URL, empty secrets, the empty Sentry DSN, and the PostHog test key and host.
 
@@ -95,7 +95,7 @@ Alternative: keep PostHog off in E2E and test only the prop builders. Rejected: 
 
 `jsdom` becomes a root dev dependency. Component tests opt in with `// @vitest-environment jsdom` at the top of the file, and the rest of the suite stays in Node. They render with `react-dom/client` inside `act`, click real elements, and use `vi.mock("posthog-js")` as `capture.test.ts` does, with `__loaded: true`.
 
-`navigator.share` and `canShare` are stubbed per case. `fetch` is stubbed for the prefetched PNG and for the interest route.
+`navigator.share` and `canShare` are stubbed per case. `fetch` is stubbed for the prefetched PNG and for the interest route. jsdom has neither `HTMLDialogElement.prototype.showModal` nor `URL.createObjectURL` / `revokeObjectURL`, so both are stubbed too. Without them the panel path throws, and the download path fails inside `savePalette`, which swallows the error and returns `idle`: the test would report a missing `palette_saved` for the wrong reason.
 
 New files: `actions.dom.test.tsx` for share, download and save, and `premium-card.dom.test.tsx`. The email step's event goes in the E2E, which already walks it. BL-09's draping fallback test joins as `draping.dom.test.tsx`.
 
@@ -116,6 +116,7 @@ No project setting changes.
 - [Ad blockers drop PostHog requests] → Counts are a floor, not a census. The demand gate's 300 analyses are counted from `reports`, not from PostHog. A reverse proxy can come later.
 - [Cookies without consent for EU visitors] → The user's choice, and carried to `t8-photo-privacy` with the banner or cookieless option.
 - [An id in another shape escapes the mask (URL-encoded, as in a `?ref=%2Fr%2F…`)] → Nothing on the site writes one. The ceiling is noted in the code.
+- [PostHog is now on in every E2E spec, not only the funnel's] → Other specs' requests to `127.0.0.1:9` are refused and dropped. The existing `page.on("request")` listeners filter by URL, and `next.config.ts` sets no CSP. If `site-structure.spec.ts`'s `networkidle` waits flake on PostHog's retries, those specs route the host to an empty 200. That is an edit to an existing test, so it needs the user's yes first.
 - [Dev StrictMode doubles effects] → No event fires from an effect except `analysis_failed`, which the `left` guard drops on the aborted first run.
 - [The E2E build now takes place inside Playwright's web-server start] → Its timeout is raised; CI's total time is unchanged, since the separate build step goes.
 - [`posthog-js` changes its body format] → The E2E helper handles JSON and gzip. A third format fails the test loudly, not silently.

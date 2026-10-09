@@ -28,13 +28,13 @@ Cite scenarios at `openspec/specs/analytics/spec.md#…`. Add new files or new c
 - [ ] 2.3 `apps/web/src/lib/interest/premium-card.dom.test.tsx` (jsdom). A tap whose route answers 200 sends one `premium_tapped`, and a 500 sends none. Done when it fails for the missing event.
 - [ ] 2.4 BL-09: `apps/web/src/lib/report/draping.dom.test.tsx` (jsdom). Firing `error` on the face image of `ReportDraping` shows the deleted-photo fallback. Cite `openspec/specs/report-page/spec.md`'s draping-fallback scenario. Done when it passes against the current code, since the behavior already ships.
 - [ ] 2.5 `e2e/funnel.spec.ts` on a phone viewport, with `http://127.0.0.1:9/**` routed and each capture body decoded (JSON, or gzip on `compression=gzip-js`):
-  1. `/` → header "Find my colors" → upload the fixture face → "Agree and upload" → 4 answers → "See my result" (analyze route answered with a result and `reportId: "e2e-report"`) → "Get my full report" → a valid address (email route answered 200);
-  2. poll until the received events, in order, are `$pageview` `/`, `$pageview` `/analyze`, `photo_checked`, `consent_answered` (`agreed: true`), `quiz_completed`, `analysis_result`, `report_requested`, `email_submitted` and `$pageview` `/r/e2e-report`, each once among the named events;
+  1. `/` → header "Find my colors" → upload the fixture face → "Agree and upload" → 4 answers → "See my result" (analyze route answered with a result and a well-formed 22-character `reportId`) → "Get my full report" → a valid address (email route answered 200);
+  2. poll until the received events, in order, are `$pageview` `/`, `$pageview` `/analyze`, `photo_checked`, `consent_answered` (`agreed: true`), `quiz_completed`, `analysis_result`, `report_requested`, `email_submitted` and `$pageview` `/r/:id`, each once among the named events. No property of any captured request holds the id, every event shares one `distinct_id`, and no `$identify` was sent;
   3. a second case declines consent once and sees `consent_answered` `{ agreed: false }`;
   4. a third answers analyze with 500 and sees one `analysis_failed`;
   5. a fourth goes Back during analyzing (route held open) and sees none.
 
-  `e2e-report` is not a 22-character id, so the mask needs its own case. Open `/r/AAAAAAAAAAAAAAAAAAAAAA`: the read fails without a database, so the error page is shown. Check that its `$pageview` URL ends in `/r/:id`. Done when the spec fails against the current code.
+  Flags and remote-config requests get an empty 200; polls wait up to 20 s. Done when the spec fails against the current code.
 
 ## 3. Code
 
@@ -61,8 +61,14 @@ Cite scenarios at `openspec/specs/analytics/spec.md#…`. Add new files or new c
   2. "Get my full report", the user's address, then on the report: Share, Save and Premium.
 
   Then, through the PostHog connector, filtered to the preview's `$host`:
-  - check that each event of the spec's table arrived once, with the expected properties;
+  - check the expected events and counts:
+    - `$pageview` `/analyze`;
+    - `photo_checked` twice, and no `consent_answered`;
+    - `quiz_completed` and `report_requested`, each with `quiz_only: true`;
+    - `analysis_result`, `email_submitted` and `$pageview` `/r/:id`;
+    - `share_tapped`, `palette_saved` and `premium_tapped`, each with its expected properties;
   - check with SQL that no property of any event since the run holds `/r/` followed by 22 id characters, or the address;
+  - scan the events since 2026-10-09 the same way: `/r/` pages were live and unmasked on preview and production from then. Show the user any hit whose id still resolves to a report, and ask what to do;
   - check that no `$identify` was sent.
 
   Delete the test report, its address and its interest row. Done when a Tracker Log line records the results.
