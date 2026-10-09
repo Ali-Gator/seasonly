@@ -27,7 +27,8 @@ export function Button({
 }: ButtonProps) {
   const classes = cx("sn-btn", `sn-btn--${variant}`, block && "sn-btn--block", className);
   // A disabled destination is a link that goes nowhere: no href, so no tap or keyboard navigates.
-  const { disabled, ...anchor } = rest;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- dropped: a disabled link does nothing
+  const { disabled, onClick, ...anchor } = rest;
   if (href && (disabled || String(rest["aria-disabled"]) === "true"))
     return (
       <a

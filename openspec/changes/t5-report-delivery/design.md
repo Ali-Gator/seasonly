@@ -85,7 +85,7 @@ Both tables, and the function, follow the `reports` migration: RLS on with no po
 
 Interest is an `upsert` with `ignoreDuplicates`, so a repeat tap is a success that writes nothing. An unknown id is a foreign-key violation (`23503`), mapped to 404. The id is checked against `REPORT_ID` before either route touches the database.
 
-The demand-gate count is `select count(*) from interest_clicks where not is_test` against `select count(*) from reports where not is_test`.
+The demand-gate count is `select count(*) from interest_clicks i join reports r on r.id = i.report_id where not i.is_test and not r.is_test` against `select count(*) from reports where not is_test`. The join matters: a report made on a preview can be opened, and its Premium button tapped, on production, since the email always links there (phase review).
 
 Alternatives considered:
 

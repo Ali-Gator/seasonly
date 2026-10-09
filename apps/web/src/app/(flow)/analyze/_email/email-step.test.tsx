@@ -72,9 +72,15 @@ describe("EmailForm", () => {
     expect(text).toContain("Error: Enter an email like you@example.com");
   });
 
-  it("disables Send my report while sending", () => {
-    expect(form({ sending: true })).toMatch(/<button type="submit"[^>]* disabled=""/);
-    expect(form()).not.toMatch(/<button type="submit"[^>]* disabled=""/);
+  it("disables Send my report while sending, keeping focus on it", () => {
+    expect(form({ sending: true })).toMatch(/<button type="submit"[^>]* aria-disabled="true"/);
+    expect(form()).not.toMatch(/aria-disabled/);
+  });
+
+  it("announces a failed send", () => {
+    expect(form({ failed: true })).toMatch(
+      /<div role="alert"><div class="sn-note sn-note--danger"/,
+    );
   });
 
   /** {@link openspec/specs/email-capture/spec.md#scenario-the-database-is-down} */

@@ -4,7 +4,11 @@
  *
  * @see openspec/specs/site-structure/spec.md
  */
-import { SEASON_SLUGS as CORE_SEASON_SLUGS, type SeasonSlug } from "@seasonly/analysis";
+import {
+  SEASON_SLUGS as CORE_SEASON_SLUGS,
+  type SeasonSlug,
+  seasonFamily,
+} from "@seasonly/analysis";
 import type { Metadata } from "next";
 
 /** The canonical host. A constant: it never changes per environment. */
@@ -45,6 +49,12 @@ export const SEASON_ALIASES: Readonly<Record<string, SeasonSlug>> = {
   "cool-winter": "true-winter",
   "clear-winter": "bright-winter",
 };
+
+/** "soft-autumn" → "Autumn". */
+export function familyName(slug: SeasonSlug): string {
+  const family = seasonFamily(slug);
+  return family.charAt(0).toUpperCase() + family.slice(1);
+}
 
 /** "soft-autumn" → "Soft Autumn". */
 export function seasonName(slug: SeasonSlug): string {

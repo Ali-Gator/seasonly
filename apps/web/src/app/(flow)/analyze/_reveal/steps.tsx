@@ -1,9 +1,10 @@
 "use client";
 
-import { AGREEMENT_COPY, SEASON_COPY, seasonFamily } from "@seasonly/analysis";
+import { AGREEMENT_COPY, SEASON_COPY } from "@seasonly/analysis";
 import { useEffect, useState } from "react";
 
 import { Button, Icon, Note } from "@/components/ds";
+import { familyName } from "@/lib/site/routes";
 
 import type { Result } from "../flow-state";
 
@@ -84,8 +85,6 @@ export function Analyzing({ cropUrl }: { cropUrl: string | null }) {
   );
 }
 
-const capitalize = (s: string) => s[0]?.toUpperCase() + s.slice(1);
-
 /**
  * {@link openspec/specs/season-reveal/spec.md#requirement-the-reveal-shows-the-season-family}
  * {@link openspec/specs/season-reveal/spec.md#requirement-a-reveal-without-a-report-id-offers-to-try-again}
@@ -101,7 +100,7 @@ export function Reveal({
   onReport: () => void;
   onTryAgain: () => void;
 }) {
-  const family = capitalize(seasonFamily(result.season));
+  const family = familyName(result.season);
   const copy = SEASON_COPY[result.season];
   const quizOnly = result.agreement === "quiz-only";
   const saved = result.reportId !== null;

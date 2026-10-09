@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, type Ref, useRef, useState } from "react";
 
 import { Button, EmailInput, Icon, Note } from "@/components/ds";
 import { EMAIL_ERROR, parseEmail } from "@/lib/email/address";
+import { postWithin } from "@/lib/http/post-within";
 
 /**
  * The email step of canvas artboards 09 and 09b, inside /analyze: the address is the only way to
@@ -12,8 +13,6 @@ import { EMAIL_ERROR, parseEmail } from "@/lib/email/address";
  *
  * @see openspec/specs/email-capture/spec.md
  */
-const TIMEOUT_MS = 10_000;
-
 export type Submitted = { kind: "invalid" } | { kind: "open"; href: string } | { kind: "failed" };
 
 /**
@@ -29,23 +28,14 @@ export async function submitEmail(
 ): Promise<Submitted> {
   const email = parseEmail(raw);
   if (!email) return { kind: "invalid" };
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-  try {
-    const res = await fetch(`/api/reports/${reportId}/email`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-      signal: controller.signal,
-    });
-    return res.ok || res.status === 429
-      ? { kind: "open", href: `/r/${reportId}` }
-      : { kind: "failed" };
-  } catch {
-    return { kind: "failed" };
-  } finally {
-    clearTimeout(timer);
-  }
+  const res = await postWithin(
+    `/api/reports/${reportId}/email`,
+    { headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) },
+    { fetch },
+  );
+  return res && (res.ok || res.status === 429)
+    ? { kind: "open", href: `/r/${reportId}` }
+    : { kind: "failed" };
 }
 
 const INSIDE = [
@@ -67,6 +57,7 @@ export function EmailForm({
   failed,
   onChange,
   onSubmit,
+  inputRef,
 }: {
   family: string;
   quizOnly: boolean;
@@ -76,6 +67,7 @@ export function EmailForm({
   failed: boolean;
   onChange: (value: string) => void;
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
+  inputRef?: Ref<HTMLInputElement>;
 }) {
   return (
     <>
@@ -104,13 +96,18 @@ export function EmailForm({
           error={error ?? undefined}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          ref={inputRef}
         />
-        {failed && (
-          <Note tone="danger" title="We couldn't send your report">
-            Nothing is lost, so you can try again.
-          </Note>
-        )}
-        <Button type="submit" block disabled={sending}>
+        {/* Announced: focus stays on the button, so a screen reader hears nothing else. */}
+        <div role="alert">
+          {failed && (
+            <Note tone="danger" title="We couldn't send your report">
+              Nothing is lost, so you can try again.
+            </Note>
+          )}
+        </div>
+        {/* aria-disabled, not disabled: a disabled button drops focus to the page. */}
+        <Button type="submit" block aria-disabled={sending ? "true" : undefined}>
           <Icon name="mail" size={18} />
           Send my report
         </Button>
@@ -136,21 +133,28 @@ export function EmailStep({
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [failed, setFailed] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // A second tap while sending sends nothing more.
     if (sending) return;
     setFailed(false);
-    if (!parseEmail(value)) return setError(EMAIL_ERROR);
+    if (!parseEmail(value)) {
+      setError(EMAIL_ERROR);
+      // The error is read with the field once focus is on it.
+      return input.current?.focus();
+    }
     setError(null);
     setSending(true);
     const result = await submitEmail(reportId, value);
     // Stays disabled while the report opens.
     if (result.kind === "open") return router.push(result.href);
     setSending(false);
-    if (result.kind === "invalid") setError(EMAIL_ERROR);
-    else setFailed(true);
+    if (result.kind === "invalid") {
+      setError(EMAIL_ERROR);
+      input.current?.focus();
+    } else setFailed(true);
   };
 
   return (
@@ -163,6 +167,7 @@ export function EmailStep({
       failed={failed}
       onChange={setValue}
       onSubmit={onSubmit}
+      inputRef={input}
     />
   );
 }

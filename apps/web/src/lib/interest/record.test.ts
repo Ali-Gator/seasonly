@@ -25,7 +25,7 @@ beforeAll(async () => {
     create role anon; create role authenticated; create role service_role bypassrls;
     grant usage on schema public to anon, authenticated, service_role;
     alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
-    create table public.reports (id text primary key, is_test boolean not null default true);
+    create table public.reports (id text primary key, is_test boolean not null default false);
     revoke all on public.reports from public, anon, authenticated;
     grant select, insert on public.reports to service_role;
   `);
@@ -56,6 +56,11 @@ const tap = async (reportId: string, isTest = false) => {
   }
 };
 
+/** The demand-gate count (design.md decision 2). */
+const DEMAND_GATE = `select count(*) from public.interest_clicks i
+  join public.reports r on r.id = i.report_id
+  where not i.is_test and not r.is_test`;
+
 const count = async (sql: string) =>
   Number((await db.query<{ count: number }>(sql)).rows[0]?.count);
 
@@ -70,16 +75,23 @@ describe("interest_clicks", () => {
     ).toBe(1);
   });
 
-  /** {@link openspec/specs/interest-button/spec.md#scenario-counting} */
-  it("counts production reports with interest once each, leaving out test rows", async () => {
+  /**
+   * The gate reads the report's own flag: a test report opened on production (the email always
+   * links there) records an interest row that is not marked as a test.
+   *
+   * {@link openspec/specs/interest-button/spec.md#scenario-counting}
+   */
+  it("counts production reports with interest once each, leaving out test data", async () => {
     await db.exec("delete from public.interest_clicks");
-    const [a, b, t] = [await report(), await report(), await report()];
+    const [a, b, t, p] = [await report(), await report(), await report(), await report()];
+    await db.query("update public.reports set is_test = true where id in ($1, $2)", [t, p]);
     await tap(a);
     await tap(a);
     await tap(a);
     await tap(b);
     await tap(t, true);
-    expect(await count("select count(*) from public.interest_clicks where not is_test")).toBe(2);
+    await tap(p, false);
+    expect(await count(DEMAND_GATE)).toBe(2);
   });
 
   /** {@link openspec/specs/interest-button/spec.md#scenario-an-unknown-id} */

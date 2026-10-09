@@ -35,6 +35,7 @@ describe("PremiumCardView", () => {
   it("names the address in the clicked state", () => {
     const out = card({ phase: "clicked", email: "maya.reyes@gmail.com" });
     expect(out).toMatch(/aria-disabled="true"[^>]*>[\s\S]*We&#x27;ll let you know<\/button>/);
+    expect(out).toContain("ph-no-capture");
     expect(words(out)).toContain(
       "Thanks for asking Premium reports aren't out yet. We'll email maya.reyes@gmail.com once, when they are. Nothing to pay now.",
     );
@@ -55,7 +56,7 @@ describe("PremiumCardView", () => {
   });
 
   it("disables the button while the tap is sent", () => {
-    expect(card({ phase: "sending" })).toMatch(/<button type="button" disabled=""/);
+    expect(card({ phase: "sending" })).toMatch(/<button type="button" aria-disabled="true"/);
   });
 });
 

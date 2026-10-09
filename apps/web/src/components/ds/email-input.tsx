@@ -1,4 +1,4 @@
-import { type InputHTMLAttributes, useId } from "react";
+import { type InputHTMLAttributes, type Ref, useId } from "react";
 
 import { cx, Icon } from "./icon";
 
@@ -7,6 +7,8 @@ export interface EmailInputProps extends Omit<InputHTMLAttributes<HTMLInputEleme
   hint?: string;
   /** Shown after a failed submit, in place of the hint. */
   error?: string;
+  /** The field itself, so a failed submit can move focus to it. */
+  ref?: Ref<HTMLInputElement>;
 }
 
 /**

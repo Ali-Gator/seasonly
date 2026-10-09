@@ -19,7 +19,12 @@ export function fileFor(url: string, name: string): Promise<File | null> {
       .then(async (res) =>
         res.ok ? new File([await res.blob()], name, { type: "image/png" }) : null,
       )
-      .catch(() => null);
+      .catch(() => null)
+      .then((f) => {
+        // A failed fetch is tried again at the next tap, not cached for the page's life.
+        if (!f) files.delete(url);
+        return f;
+      });
     files.set(url, file);
   }
   return file;

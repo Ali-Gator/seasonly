@@ -188,7 +188,19 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
 ## 7. Backlog and archive prep
 
-- [ ] 7.1 Before archive, log in `docs/backlog.md` every phase-review finding not fixed and every defect found on the way that is worth fixing later, under the next free `BL-nn` ids, and name them in the PR. Check that BL-01, BL-03 and BL-05 are gone or rewritten as 5.1, 5.5 and 5.9 say, and that BL-04 still stands (no DOM ShareCard preview ships). Done when the file's `_Next id:_` line is correct.
+- [x] 7.1 Before archive, log in `docs/backlog.md` every phase-review finding not fixed and every defect found on the way that is worth fixing later, under the next free `BL-nn` ids, and name them in the PR. Check that BL-01, BL-03 and BL-05 are gone or rewritten as 5.1, 5.5 and 5.9 say, and that BL-04 still stands (no DOM ShareCard preview ships). Done when the file's `_Next id:_` line is correct.
+
+  Done 2026-10-09. The phase review (fresh subagent, `/code-review high`) found no high findings; 2 medium and 8 low. Fixed:
+  - test reports counted as production interest: the demand-gate count now joins `reports.is_test`;
+  - the email step's failure Note is a live alert, focus moves to the field on a bad address, and `aria-disabled` replaces `disabled` while sending, on the Premium button too;
+  - the address note is `ph-no-capture`;
+  - a disabled link-button drops its click handler;
+  - a failed image prefetch is no longer cached;
+  - one `familyName` helper;
+  - one `postWithin` client helper.
+
+  Logged: BL-08 (race untested), BL-09 (draping DOM switch untested) and BL-10 (deleted copy on any face error), plus BL-11 (a local production build reports to Sentry as production), found in 6.3. BL-01, BL-03 and BL-05 are deleted. BL-04 stands, deferred: no DOM ShareCard preview ships. `_Next id:_` is BL-12.
+
 - [ ] 7.2 At archive:
   - add the README rows:
     - `email-capture`: `apps/web/src/app/(flow)/analyze/_email/**`, `apps/web/src/app/api/reports/[id]/email/**`, `apps/web/src/lib/email/**`, `supabase/migrations/*_report_emails.sql`;

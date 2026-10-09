@@ -1,6 +1,6 @@
-import { PALETTES, SEASON_COPY, type SeasonSlug, seasonFamily } from "@seasonly/analysis";
+import { PALETTES, SEASON_COPY, type SeasonSlug } from "@seasonly/analysis";
 
-import { ORIGIN, seasonName } from "@/lib/site/routes";
+import { familyName as family, ORIGIN, seasonName } from "@/lib/site/routes";
 import tokens from "@/styles/tokens.json";
 
 /**
@@ -50,8 +50,7 @@ export function renderReportEmail({
   quizOnly: boolean;
 }): EmailContent {
   const name = seasonName(season);
-  const family = seasonFamily(season);
-  const familyName = family[0]?.toUpperCase() + family.slice(1);
+  const familyName = family(season);
   const tagline = SEASON_COPY[season].tagline;
   const link = `${ORIGIN}/r/${id}`;
   const shortLink = link.replace(/^https:\/\//, "");

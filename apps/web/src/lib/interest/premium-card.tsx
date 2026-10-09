@@ -3,14 +3,13 @@
 import { useState } from "react";
 
 import { Button, Icon, Note } from "@/components/ds";
+import { postWithin } from "@/lib/http/post-within";
 
 /**
  * The Premium card of canvas artboard "10 Premium button", with its clicked and failed states.
  *
  * @see openspec/specs/interest-button/spec.md
  */
-const TIMEOUT_MS = 10_000;
-
 export type Tapped = { kind: "clicked"; email: string | null } | { kind: "failed" };
 
 /** {@link openspec/specs/interest-button/spec.md#requirement-a-tap-records-one-interest-per-report} */
@@ -18,21 +17,10 @@ export async function tapPremium(
   reportId: string,
   { fetch = globalThis.fetch }: { fetch?: typeof globalThis.fetch } = {},
 ): Promise<Tapped> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-  try {
-    const res = await fetch(`/api/reports/${reportId}/interest`, {
-      method: "POST",
-      signal: controller.signal,
-    });
-    if (!res.ok) return { kind: "failed" };
-    const body = (await res.json()) as { email?: unknown };
-    return { kind: "clicked", email: typeof body.email === "string" ? body.email : null };
-  } catch {
-    return { kind: "failed" };
-  } finally {
-    clearTimeout(timer);
-  }
+  const res = await postWithin(`/api/reports/${reportId}/interest`, {}, { fetch });
+  if (!res?.ok) return { kind: "failed" };
+  const body = (await res.json().catch(() => ({}))) as { email?: unknown };
+  return { kind: "clicked", email: typeof body.email === "string" ? body.email : null };
 }
 
 export type Phase = "idle" | "sending" | "clicked" | "failed";
@@ -63,13 +51,19 @@ export function PremiumCardView({
             <Icon name="check" size={18} />
             We&apos;ll let you know
           </Button>
-          <Note icon="mail" title="Thanks for asking">
+          {/* ph-no-capture: the address stays out of analytics and session replays. */}
+          <Note icon="mail" title="Thanks for asking" className="ph-no-capture">
             Premium reports aren&apos;t out yet. We&apos;ll email {email ?? "you"} once, when they
             are. Nothing to pay now.
           </Note>
         </>
       ) : (
-        <Button variant="secondary" block disabled={phase === "sending"} onClick={onTap}>
+        <Button
+          variant="secondary"
+          block
+          aria-disabled={phase === "sending" ? "true" : undefined}
+          onClick={onTap}
+        >
           Premium report – coming soon
         </Button>
       )}

@@ -1,6 +1,5 @@
 "use client";
 
-import { seasonFamily } from "@seasonly/analysis";
 import * as Sentry from "@sentry/nextjs";
 import { useCallback, useEffect, useReducer, useRef } from "react";
 
@@ -9,14 +8,13 @@ import type { AnalyzeResponse } from "@/lib/analysis/request";
 import { photoCheckedProps, track } from "@/lib/capture/events";
 import { loadVision } from "@/lib/capture/mediapipe";
 import { checkImage } from "@/lib/capture/photo";
+import { familyName } from "@/lib/site/routes";
 
 import { Capture, Checking, Consent, Guide, Retake } from "./_capture/steps";
 import { EmailStep } from "./_email/step";
 import { QuizStep } from "./_quiz/quiz";
 import { AnalysisError, Analyzing, NoResult, Reveal } from "./_reveal/steps";
 import { initialState, reduce, stepProgress, toFormData } from "./flow-state";
-
-const capitalize = (s: string) => s[0]?.toUpperCase() + s.slice(1);
 
 /** The client gives up after this; the route's worst case is 26 s. */
 const TIMEOUT_MS = 45_000;
@@ -221,7 +219,7 @@ export function Flow() {
       {step.name === "email" && step.result.reportId && (
         <EmailStep
           reportId={step.result.reportId}
-          family={capitalize(seasonFamily(step.result.season))}
+          family={familyName(step.result.season)}
           quizOnly={step.result.agreement === "quiz-only"}
         />
       )}
