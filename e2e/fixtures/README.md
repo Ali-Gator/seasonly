@@ -8,4 +8,4 @@
 
 One adult, facing the camera in even studio light, with no filter. `e2e/analysis-flow.spec.ts` uploads it and expects it to pass the on-device photo check. If a change to the check's thresholds makes it fail, pick another public-domain or CC0 photo; never loosen a threshold for the fixture.
 
-Why not a daylight selfie: of 26 CC0 and public-domain portraits screened on 2026-10-03, the daylight selfies failed the check. Glasses gave `tint`, and smiles, turned heads and graded photos gave `dark`. Three frontal official portraits passed. `t6-eval-set` measures those false rejects.
+Why not a daylight selfie: of 26 CC0 and public-domain portraits screened on 2026-10-03, the daylight selfies failed the check. Glasses gave `tint`, and smiles, turned heads and graded photos gave `dark`. Three frontal official portraits passed. The labeled eval set in `evals/` now measures false rejects on 72 usable photos; see `evals/README.md`.

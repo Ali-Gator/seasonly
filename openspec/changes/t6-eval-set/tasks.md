@@ -137,17 +137,25 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only
 
   Done when it typechecks, and 2.6 still passes.
 
-- [ ] 6.2 Ask the user to approve the spend, stating the photo count, the model and the estimated cost. **Run `pnpm eval:vision` only after the user says yes.** Commit `vision-results.json`. Done when the counts are in the PR.
-- [ ] 6.3 Act on the run (design decision 6, step 4):
+- [x] 6.2 Ask the user to approve the spend, stating the photo count, the model and the estimated cost. **Run `pnpm eval:vision` only after the user says yes.** Commit `vision-results.json`. Done when the counts are in the PR.
+
+  **Run, 2026-10-09 (approved by the user):** `google/gemini-3.8-flash`, 62 calls, one per photo that passes the device check (59 usable, 2 `tint`, 1 `several-faces`). Usable photos: 53 `ok`, 5 `heavy-makeup`, 1 fallback on timeout, 0 `several-faces`, 0 `no-face`. The one second-face photo that passed the device was `ok` to the model as well. The other timeout was on a tinted stage photo.
+
+- [x] 6.3 Act on the run (design decision 6, step 4):
   - If more than 1 in 10 usable photos got `several-faces`, bring the user the numbers and the two options, then write the chosen one as a `report-text` delta and code it, tests first.
   - Otherwise, record the measured rate in the `report-text` spec's Edge Cases through `/opsx:update`.
 
   Done when the decision is in the spec.
 
+  **Decision:** 0 of 59 usable photos got `several-faces`, within 1 in 10, so the rule stays and no `report-text` delta is needed. Edge Cases is not a requirement section, so after archive add to the permanent `report-text` spec's Edge Cases: "Measured on the eval set (`t6-eval-set`, 2026-10-09): 0 of 59 usable photos rejected as `several-faces` or `no-face`; 5 got `heavy-makeup`; 1 call of 62 fell back on the 20 s timeout."
+
 ## 7. Baseline and wrap-up
 
-- [ ] 7.1 Final run. Raise `baseline.json` to the final `results.json`, and record v0 → final for every metric here and in the PR. Done when `pnpm fix`, `pnpm test:unit` and `pnpm test:eval` pass, and CI is green on the branch.
-- [ ] 7.2 Update the docs:
+- [x] 7.1 Final run. Raise `baseline.json` to the final `results.json`, and record v0 → final for every metric here and in the PR. Done when `pnpm fix`, `pnpm test:unit` and `pnpm test:eval` pass, and CI is green on the branch.
+
+  **v0 → final, 2026-10-09:** agreement 0.4911 → 0.6021, label accuracy 0.1389 → 0.1806, false-reject rate 0.2361 → 0.1806, catch rate 0.8606 → 0.8870. Not ratcheted: family agreement 0.6667 → 0.7177, family accuracy 0.2639 → 0.2778, expected-problem rate 0.5238 → 0.5238, pass rate 0.6237 → 0.6667. `baseline.json` holds the final numbers. CI on the branch is checked after push.
+
+- [x] 7.2 Update the docs:
   - `evals/README.md` (new): how to fetch, run, read the results, and refresh the baseline;
   - the comments that say "provisional until t6-eval-set" in the core, `vitest.config.eval.ts` and `evals/manifest.ts`, updated to the measured state.
 

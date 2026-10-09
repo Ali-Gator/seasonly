@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-13**
+_Next id:_ **BL-17**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -26,6 +26,29 @@ holds what no change owns yet: phase-review findings left unfixed, and defects o
 along the way that are worth fixing later. CLAUDE.md ("Backlog") says when to add and when to
 fold items in.
 
+## Analysis
+
+- **[BL-13] Temperature reads cool and moves with the light** — on the eval set, warm-labeled
+  people average cool (skin hue 47° against a midpoint of 55°), and one person's temperature
+  spreads 0.3–0.6 across photos, so label accuracy is 0.18. Constants cannot fix it (`t6-eval-set`
+  tried); white-balance skin and hair against the measured eye white before computing traits,
+  then re-tune on the set.
+  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/specs/color-sampling/spec.md`,
+  `evals/README.md` · _Status:_ open — found in `t6-eval-set`, 2026-10-09
+
+- **[BL-14] The eval set leans light-skinned and has no holdout** — 10 of 16 people are light,
+  3 medium, 3 deep, and the same 72 usable photos tuned the limits they now score. Add medium
+  and deep people (and the user's own selfies, which need no `source`), and keep a holdout once
+  the set passes about 30 people.
+  _Refs:_ `evals/manifest.json`, `openspec/specs/analysis-eval/spec.md` · _Status:_ open — found
+  in `t6-eval-set`, 2026-10-09
+
+- **[BL-15] CI checks a committed eval result, not the photos** — only a machine with the
+  photos can refresh `results.json`. Run `eval:fetch` and `eval:run` in CI (Playwright's
+  Chromium is already there) once a Commons fetch from CI proves stable.
+  _Refs:_ `.github/workflows/ci.yml`, `evals/gate.ts` · _Status:_ deferred — until fetching about
+  100 Commons originals per CI run is judged stable
+
 ## Code quality
 
 - **[BL-02] A hung crop upload is abandoned, not cancelled** — `upload()` in
@@ -36,6 +59,12 @@ fold items in.
   _Refs:_ `apps/web/src/lib/draping/crops.ts`, `openspec/specs/draping-preview/spec.md` ·
   _Status:_ deferred — until Sentry shows `crop upload timed out` events, or storage-js adds a
   signal to `upload()`
+
+- **[BL-16] The vision call uses a deprecated AI SDK image part** — every call logs "The
+  "image" content part type is deprecated. Use a "file" part with mediaType". Switch the face
+  crop to a `file` part with `mediaType: "image/jpeg"` before the SDK drops it.
+  _Refs:_ `apps/web/src/lib/report-text/index.ts`, `openspec/specs/report-text/spec.md` ·
+  _Status:_ open — found in `t6-eval-set`, 2026-10-09
 
 ## Testing
 
