@@ -144,7 +144,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Done when 3.4 and the approved `seo.test.ts` pass, and the site-structure route-map test still passes.
 
-- [x] 5.8 Interest: `lib/interest/` and the interest route with `withErrorCapture`, and `PremiumCard` placed in the report view. Done when 3.5 passes.
+- [x] 5.8 Interest: `lib/interest/` and the interest route with `withErrorCapture`, and `PremiumCard` placed in the report view. Done when 3.5 passes. The route answers `{ ok: true, email }` with the latest address, so the first tap's note can name it while an untapped report holds no address (design.md decision 3).
 - [x] 5.9 Commit the golden PNG and make 3.9 pass. Delete BL-03 from `docs/backlog.md`, or, if decision 9's fallback failed, rewrite BL-03 with what was found.
 - [x] 5.10 Run `pnpm fix`, `pnpm test` and `pnpm --filter web build`. Done when all pass, and the build output lists `/r/[id]` as dynamic and both `/api/reports/[id]/…` routes.
 

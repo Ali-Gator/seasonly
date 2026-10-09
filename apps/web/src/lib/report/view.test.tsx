@@ -181,6 +181,23 @@ describe("ReportView", () => {
   });
 });
 
+describe("ReportView and interest", () => {
+  /** {@link openspec/specs/interest-button/spec.md#scenario-opened-again} */
+  it("shows the clicked state with the address once interest exists", () => {
+    const out = words(html({ ...PHOTO, interested: true, email: "maya.reyes@gmail.com" }));
+    expect(out).toContain("We'll let you know");
+    expect(out).toContain("We'll email maya.reyes@gmail.com once, when they are.");
+    expect(out).not.toContain("Premium report – coming soon");
+  });
+
+  /** {@link openspec/specs/interest-button/spec.md#scenario-a-report-nobody-has-asked-about} */
+  it("holds no address in the page before the tap", () => {
+    const out = html({ ...PHOTO, interested: false, email: "maya.reyes@gmail.com" });
+    expect(out).not.toContain("maya.reyes");
+    expect(words(out)).toContain("Premium report – coming soon");
+  });
+});
+
 describe("DrapingView", () => {
   const pair = PALETTES["soft-autumn"].draping;
 

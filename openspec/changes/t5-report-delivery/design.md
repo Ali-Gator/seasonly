@@ -100,7 +100,7 @@ The page itself captures. That is how the observability gap closes: the `observa
 
 The page is dynamic (`export const dynamic = "force-dynamic"`). Next sends `private, no-cache, no-store` for dynamic pages, and a test asserts it on the built server.
 
-The address reaches the page only for the Premium note (the user chose to show it, 2026-10-08). It is passed to the Premium card only once interest exists, so a report nobody has tapped holds no address in its HTML.
+The address reaches the page only for the Premium note (the user chose to show it, 2026-10-08). It is passed to the Premium card only once interest exists, so a report nobody has tapped holds no address in its HTML. The first tap gets the address from the interest route instead: it answers `{ ok: true, email }` with the latest address, read after the insert (found in task 5.8). This shows nothing beyond what the clicked note shows.
 
 ### 4. One timeout-and-report helper (BL-01)
 

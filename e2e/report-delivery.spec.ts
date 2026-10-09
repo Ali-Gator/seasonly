@@ -102,10 +102,15 @@ test("offers Try again on a result that was not saved", async ({ page }) => {
   expect(calls.analyze).toBe(2);
 });
 
-/** {@link openspec/specs/report-page/spec.md#scenario-the-database-is-down} */
+/**
+ * {@link openspec/specs/report-page/spec.md#scenario-the-database-is-down}
+ * {@link openspec/specs/report-page/spec.md#requirement-a-report-is-never-kept-by-a-shared-cache}
+ */
 test("answers a report it cannot read with 500 and the reload page", async ({ page }) => {
   const res = await page.goto("/r/AAAAAAAAAAAAAAAAAAAAAA");
   expect(res?.status()).toBe(500);
+  // A dynamic page: no shared cache may keep it.
+  expect(res?.headers()["cache-control"]).toMatch(/private.*no-store|no-store.*private/);
   await expect(page.getByRole("heading", { name: "We couldn't open your report" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Reload" })).toBeVisible();
 });
