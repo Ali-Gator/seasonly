@@ -1,4 +1,5 @@
 export { Button, type ButtonProps } from "./button";
+export { EmailInput, type EmailInputProps } from "./email-input";
 export { Icon, type IconName, type IconProps } from "./icon";
 export { Note, type NoteProps } from "./note";
 export { ReportSection, type ReportSectionProps } from "./report-section";

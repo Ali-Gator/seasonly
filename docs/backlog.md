@@ -61,12 +61,6 @@ fold items in.
   `t5-report-delivery` renders a card preview; check whether the 2026-10-07 redesign session
   already updated the canvas
 
-- **[BL-05] A disabled Button with `href` is still a live link** — `aria-disabled` is passed
-  through, but the rendered `next/link` still navigates, as in the design system's bundle. Drop
-  the `href` (or prevent the click) while disabled.
-  _Refs:_ `apps/web/src/components/ds/button.tsx`, `openspec/specs/ui-components/spec.md` ·
-  _Status:_ open — noted at `t3-design-tokens` archive, 2026-10-02
-
 - **[BL-06] Placeholder icons and empty photo slots** — the icons are the bundle's placeholder
   glyphs, and the photo-tip and draping example slots show labels, not photos. Choose an icon set
   and real example photos.

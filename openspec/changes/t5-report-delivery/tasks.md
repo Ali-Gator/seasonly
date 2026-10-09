@@ -108,7 +108,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Done when the new cases fail.
 
-- [ ] 3.7 UI components:
+- [x] 3.7 UI components:
   - make the edits approved in 2.2 to `ds.test.tsx`;
   - add `apps/web/src/components/ds/email-input.test.tsx` for the ui-components delta scenarios (label, hint, error with `aria-invalid` and "Error:").
 
@@ -132,8 +132,9 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 - [x] 5.3 Check that `botid` matches `/api/reports/*/email` with a throwaway: `initBotId` with that pattern, then a request to a concrete path under `next dev`, looking for the challenge header. Record the result here. If it does not match, switch to the fixed path of design.md decision 6, and update decision 1's table and the email-capture and abuse-controls deltas before going on. Done when the result is recorded.
 
   Result 2026-10-09: it matches. `botid` 1.5.11's client turns a protected path into an anchored regex with `*` as `.*` (`dist/client/core/index.mjs`). Run on that very function, `/api/reports/*/email` matches `/api/reports/<22-char id>/email` and does not match `/api/reports/<id>/interest`, `/api/analyze` or `/api/reports/email`. The matcher was checked by itself, not under `next dev`, because BotID attaches no challenge off Vercel. 6.3 step 6 checks the header on the preview. Decision 6's path stands.
+
 - [ ] 5.4 Write `apps/web/src/lib/email/` (`address.ts`, `render.tsx`, `send.ts`, `store.ts`), the email route with `withErrorCapture`, BotID and `after()`, and add the path to `BOTID_PROTECT`. Done when 3.3 and 3.8 pass.
-- [ ] 5.5 Add EmailInput to `apps/web/src/components/ds/` with its `.sn-field*` rules in `ds.css` (from `bundle.css`, with token variables), export it, and make a disabled Button with `href` render without one. Done when 3.7 passes and the class-coverage test passes. Delete BL-05 from `docs/backlog.md`.
+- [x] 5.5 Add EmailInput to `apps/web/src/components/ds/` with its `.sn-field*` rules in `ds.css` (from `bundle.css`, with token variables), export it, and make a disabled Button with `href` render without one. Done when 3.7 passes and the class-coverage test passes. Delete BL-05 from `docs/backlog.md`.
 - [ ] 5.6 Flow: the `email` step and `open-email` in `flow-state.ts`; "Get my full report" and the null-id Note with "Try again" in `_reveal/steps.tsx`; `_email/step.tsx` wired in `flow.tsx`. Done when 3.6 passes and the existing E2E still passes.
 - [ ] 5.7 Report:
   - move `apps/web/src/app/(flow)/r/[id]/page.tsx` to `apps/web/src/app/(report)/r/[id]/`, with `(report)/layout.tsx`, `not-found.tsx` and `error.tsx` from board 10c;
