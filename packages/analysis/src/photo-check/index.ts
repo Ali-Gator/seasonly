@@ -16,21 +16,23 @@ import { regionPixels, type Rings } from "../sampling/regions.ts";
 
 export { RETAKE_TIPS, type RetakeReason, type RetakeTip } from "./tips.ts";
 
-// Provisional limits: t6-eval-set tunes them against labeled photos across the skin-tone range.
-// The eye-white ones come from real webcam and phone selfies (2026-10-06): in normal indoor light
-// the sclera reads L* 30-47 and C*ab 12-21, shadowed by the lids and pink by nature; webcam skin
-// in dim warm light reads as red as hue 20°.
+// Eye-white L*, eye-white C*ab and the skin-hue floor are measured (t6-eval-set, 2026-10-09): on
+// the 72 usable photos of evals/manifest.json and their dark, warm and grayscale variants, they
+// give the fewest false rejects (0.18, from 0.24) that keep agreement, label accuracy and the
+// variant catch rate at the untuned run's level or better. Three usable daylight and flash photos
+// read skin hue −5° to 9°, so the floor sits below 0°. Real selfies (2026-10-06) read sclera C*ab 12-21
+// indoors, close under the cast limit. MIN_FACE_WIDTH and the skin chroma range are unchanged.
 /** Narrower than this, in pixels, and the face is too small to measure. */
 export const MIN_FACE_WIDTH = 120;
 /** Eye-white L* below this is too dark. */
-const MIN_EYE_WHITE_L = 25;
+const MIN_EYE_WHITE_L = 22;
 /** Eye-white C*ab above this is a color cast. */
-const MAX_EYE_WHITE_CHROMA = 25;
+const MAX_EYE_WHITE_CHROMA = 22;
 /** Skin C*ab outside this range is a filter: grayscale below, oversaturated above. */
 const MIN_SKIN_CHROMA = 2;
 const MAX_SKIN_CHROMA = 45;
 /** Skin hue outside this range, in degrees, is a filter, judged only from `minChroma` up. */
-const SKIN_HUE = { from: 15, to: 100, minChroma: 6 };
+const SKIN_HUE = { from: -10, to: 100, minChroma: 6 };
 
 /** Share of an eye opening, brightest first, taken as the sclera: above the iris, pupil and lashes. */
 const SCLERA_SHARE = 0.4;

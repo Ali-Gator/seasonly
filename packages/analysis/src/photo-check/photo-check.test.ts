@@ -267,7 +267,7 @@ describe("checkPhoto", () => {
     });
   });
 
-  /** {@link openspec/specs/photo-check/spec.md#requirement-a-filter-is-judged-from-skin-color-no-natural-skin-has} */
+  /** {@link openspec/specs/photo-check/spec.md#scenario-skin-just-below-hue-0} */
   describe("filter", () => {
     /** {@link openspec/specs/photo-check/spec.md#scenario-a-black-and-white-photo} */
     it("reports filter for grayscale, whose neutral sclera is no tint", () => {
@@ -286,6 +286,14 @@ describe("checkPhoto", () => {
     /** {@link openspec/specs/photo-check/spec.md#scenario-skin-reddened-by-dim-warm-light} */
     it("passes skin of hue 20°, as a webcam reads it in dim warm light", () => {
       expect(problem(face({ skin: [150, 95, 97] }))).toBeNull(); // C*ab 24, hue 20°
+    });
+
+    /** {@link openspec/specs/photo-check/spec.md#scenario-skin-just-below-hue-0} */
+    it("passes skin just below hue 0°, as daylight and flash render some light skin", () => {
+      const check = checkPhoto(face({ skin: [182, 160, 167] })); // C*ab 9, hue −5°
+      expect(check.problem).toBeNull();
+      const skin = check.measures.skin ?? { a: 0, b: 1 };
+      expect(Math.atan2(skin.b, skin.a)).toBeLessThan(0);
     });
 
     it("ignores the hue of near-gray skin", () => {

@@ -1,7 +1,10 @@
 /**
  * The classifier's tunable numbers: each season's reference point and what each quiz answer adds.
  *
- * Every constant here is provisional: t6-eval-set tunes them against labeled photos.
+ * The reference points were checked against the eval set (t6-eval-set, 2026-10-09): no move
+ * tried (softer soft seasons, less light light seasons, less deep deep seasons, less extreme
+ * true and bright seasons) raised both agreement and label accuracy, so they stay as first set.
+ * The quiz weights are not measured: the eval photos carry no quiz answers.
  *
  * @see openspec/specs/season-classifier/spec.md
  */

@@ -1,10 +1,16 @@
 /**
  * The labeled photo set. Photos live in `evals/photos/` (git-ignored); this manifest
- * is committed. Phase 1 (t6-eval-set) fills it and adds the consistency runner.
+ * is committed, with where each photo comes from, so `pnpm eval:fetch` can rebuild the set.
+ *
+ * @see openspec/specs/analysis-eval/spec.md
  */
 import { SEASON_SLUGS, type SeasonSlug } from "../packages/analysis/src/index.ts";
 
 export type Season = SeasonSlug;
+
+/** The check outcome a photo should get. */
+export const EXPECTS = ["pass", "no-face", "dark", "tint", "filter", "several-faces"] as const;
+export type Expect = (typeof EXPECTS)[number];
 
 export type EvalPhoto = {
   /** Path under evals/photos/, e.g. `p01/daylight-1.jpg`. */
@@ -15,7 +21,17 @@ export type EvalPhoto = {
   season: Season;
   /** Free-text light condition, e.g. `daylight`, `indoor-warm`. */
   light: string;
+  /** An https URL the photo is downloaded from; needs `sha256` and `license`. */
+  source?: string;
+  /** Of the downloaded bytes. */
+  sha256?: string;
+  license?: string;
+  author?: string;
+  /** Absent: `pass`. */
+  expect?: Expect;
 };
+
+export const expectOf = (photo: EvalPhoto): Expect => photo.expect ?? "pass";
 
 export type Manifest = { version: 1; photos: EvalPhoto[] };
 
@@ -40,6 +56,19 @@ export function manifestProblems(value: unknown): string[] {
     if (!SEASON_SLUGS.includes(p?.season as Season))
       problems.push(`${at}.season: not one of the 12 seasons`);
     if (typeof p?.light !== "string" || !p.light) problems.push(`${at}.light: required`);
+    if (p?.source !== undefined && !/^https:\/\/\S+$/.test(String(p.source)))
+      problems.push(`${at}.source: expected an https URL`);
+    if (p?.sha256 !== undefined && !/^[0-9a-f]{64}$/.test(String(p.sha256)))
+      problems.push(`${at}.sha256: expected 64 lowercase hex digits`);
+    for (const key of ["license", "author"] as const)
+      if (p?.[key] !== undefined && (typeof p[key] !== "string" || !p[key]))
+        problems.push(`${at}.${key}: expected a non-empty string`);
+    if (p?.source !== undefined) {
+      if (p.sha256 === undefined) problems.push(`${at}.sha256: required with a source`);
+      if (p.license === undefined) problems.push(`${at}.license: required with a source`);
+    }
+    if (p?.expect !== undefined && !EXPECTS.includes(p.expect))
+      problems.push(`${at}.expect: not one of ${EXPECTS.join(", ")}`);
     const prior = seasonOf.get(p?.person);
     if (prior && prior !== p.season)
       problems.push(`${at}: ${p.person} labeled both ${prior} and ${p.season}`);

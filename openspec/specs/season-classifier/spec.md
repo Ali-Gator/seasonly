@@ -35,7 +35,7 @@ export function classify(input: {
 
 The quiz adds its answers' weights per axis, clamped to ±1; `unsure` and the neutral answers add nothing. With a photo, each axis an answer touched becomes 0.8 × photo + 0.2 × quiz; untouched axes keep the photo value. Without a photo the quiz traits are classified as is, at 0.6 × the confidence.
 
-The season is the nearest reference point by Euclidean distance; ties go to the earlier slug. Confidence is `1 − d1 / d2`, scaled and rounded to two decimals, and held at 0.99 unless the traits sit exactly on a point. The constants in `classifier/reference.ts` are provisional until `t6-eval-set` tunes them.
+The season is the nearest reference point by Euclidean distance; ties go to the earlier slug. Confidence is `1 − d1 / d2`, scaled and rounded to two decimals, and held at 0.99 unless the traits sit exactly on a point. The reference points in `classifier/reference.ts` were checked against the labeled eval set (`analysis-eval`, 2026-10-09) and kept: no move raised both agreement and label accuracy. The quiz weights are not measured, since the eval photos carry no quiz answers.
 
 A server route or the plugin parses client answers with `QuizAnswersSchema` before calling `classify`.
 

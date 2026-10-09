@@ -11,10 +11,10 @@ import webPackage from "../../../package.json";
  */
 export const MEDIAPIPE_VERSION = webPackage.dependencies["@mediapipe/tasks-vision"];
 
-const WASM = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MEDIAPIPE_VERSION}/wasm`;
+export const WASM = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MEDIAPIPE_VERSION}/wasm`;
 const MODELS = "https://storage.googleapis.com/mediapipe-models";
-const FACE_MODEL = `${MODELS}/face_landmarker/face_landmarker/float16/1/face_landmarker.task`;
-const HAIR_MODEL = `${MODELS}/image_segmenter/hair_segmenter/float32/1/hair_segmenter.tflite`;
+export const FACE_MODEL = `${MODELS}/face_landmarker/face_landmarker/float16/1/face_landmarker.task`;
+export const HAIR_MODEL = `${MODELS}/image_segmenter/hair_segmenter/float32/1/hair_segmenter.tflite`;
 
 export interface Vision {
   landmarker: FaceLandmarker;
