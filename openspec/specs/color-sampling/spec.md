@@ -49,7 +49,7 @@ Each region is a set of landmark index rings. Lips and irises come from MediaPip
 
 A region's color is its pixels sorted by L* (ties by position), the top and bottom tenth dropped, then the per-channel median. Regions over 20,000 pixels are sampled at an even stride first.
 
-Traits are weighted means of normalized terms (`sampling/traits.ts`, every constant provisional until `t6-eval-set` tunes them): temperature from skin and hair hue, each hue's weight scaled down below chroma 10; value from skin, hair and eye lightness; clarity from skin and eye chroma and how much darker the hair or eyes are than the skin. Absent regions drop out of each mean.
+Traits are weighted means of normalized terms (`sampling/traits.ts`; the skin chroma midpoint, 26, is the labeled eval set's mean, and the other constants were checked against the set and kept): temperature from skin and hair hue, each hue's weight scaled down below chroma 10; value from skin, hair and eye lightness; clarity from skin and eye chroma and how much darker the hair or eyes are than the skin. Absent regions drop out of each mean.
 
 ## Edge Cases
 

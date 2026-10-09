@@ -63,7 +63,7 @@ function generateReportText(input: {
 ## Edge Cases
 
 - Zero data retention is not requested: the Gateway refuses it on the Vercel Hobby plan with a 403. Upgrading to Pro and setting `providerOptions.gateway.zeroDataRetention: true` restores it.
-- A second person anywhere in the frame, even blurred in the background, gives `several-faces` and a retake. `t6-eval-set` measures how often that rejects a usable selfie.
+- A second person anywhere in the frame, even blurred in the background, gives `several-faces` and a retake. Measured on the labeled eval set (`analysis-eval`, 2026-10-09): of 59 usable photos that passed the device check, the model rejected none as `several-faces` or `no-face`, 5 got `heavy-makeup`, and 1 of 62 calls fell back on the 20 s timeout.
 - A model that runs a little over the fixed copy's 600/240 characters is still used; the schema allows 700/300.
 - A provider refusal with no text reads as `invalid`, the same as output that fails the schema; the Sentry cause tells them apart.
 - A slot spent on a call that then fails is not refunded: the cap guards cost, and a failed call can still cost tokens.

@@ -40,10 +40,10 @@ The check runs before sampling, on the same input. In order:
 1. No landmarks: the refusals that need none (width, height, buffer and hair-mask length, with sampling's messages), then `no-face` with every measurement null.
 2. `samplePhoto` validates the input and gives the skin color.
 3. `no-face` when a landmark is outside the image or not a number, the landmark bounding box is narrower than `MIN_FACE_WIDTH`, or sampling gives no traits.
-4. The eye white: the pixels inside both eye openings (MediaPipe's `FACEMESH_RIGHT_EYE` and `FACEMESH_LEFT_EYE`, cited in `photo-check/index.ts`), the brightest 40% by L*, then sampling's robust center. Fewer than `MIN_REGION_PIXELS` pixels leaves it null and skips the next two checks. `dark` when its L* is below 25, then `tint` when its C*ab is above 25.
-5. `filter` when skin C*ab is below 2 or above 45, or, from C*ab 6 up, its hue is outside 15° to 100°.
+4. The eye white: the pixels inside both eye openings (MediaPipe's `FACEMESH_RIGHT_EYE` and `FACEMESH_LEFT_EYE`, cited in `photo-check/index.ts`), the brightest 40% by L*, then sampling's robust center. Fewer than `MIN_REGION_PIXELS` pixels leaves it null and skips the next two checks. `dark` when its L* is below 22, then `tint` when its C*ab is above 22.
+5. `filter` when skin C*ab is below 2 or above 45, or, from C*ab 6 up, its hue is outside −10° to 100°.
 
-The first problem found is returned with the measurements gathered so far. Every limit is provisional until `t6-eval-set` tunes it; the skin limits are set against the Monk Skin Tone scale (C*ab 3.8 to 27.9, hue 49° to 89°). `RETAKE_TIPS` holds the copy of the approved canvas screens `BadNoFace`, `BadDark`, `BadTint` and `BadFilter`; the shared heading and buttons belong to the web flow.
+The first problem found is returned with the measurements gathered so far. The eye-white L* and C*ab limits and the hue floor are measured on the labeled eval set (`analysis-eval`, 2026-10-09): the fewest false rejects that keep agreement, label accuracy and the variant catch rate at the untuned level or better, a false-reject rate of 0.18 on 72 usable photos, down from 0.24. The skin chroma range is set against the Monk Skin Tone scale (C*ab 3.8 to 27.9, hue 49° to 89°) and was left as it was. `RETAKE_TIPS` holds the copy of the approved canvas screens `BadNoFace`, `BadDark`, `BadTint` and `BadFilter`; the shared heading and buttons belong to the web flow.
 
 ## Edge Cases
 
@@ -152,7 +152,7 @@ When the eye openings hold too few pixels to measure the eye whites (eyes closed
 
 ### Requirement: A filter is judged from skin color no natural skin has
 
-The check SHALL report `filter` when the skin color is near-gray, more saturated than the maximum skin chroma, or of a hue outside the natural skin range. Every tone of the Monk Skin Tone scale, under neutral light, SHALL pass.
+The check SHALL report `filter` when the skin color is near-gray, more saturated than the maximum skin chroma, or of a hue outside the natural skin range. Every tone of the Monk Skin Tone scale, under neutral light, SHALL pass. Skin that daylight or flash renders slightly pink-red, just below hue 0°, SHALL pass.
 
 #### Scenario: A black-and-white photo
 
@@ -172,6 +172,11 @@ The check SHALL report `filter` when the skin color is near-gray, more saturated
 #### Scenario: Skin reddened by dim warm light
 
 - **WHEN** a face's skin reads hue 20°, as a webcam reads skin in dim warm light
+- **THEN** no problem is reported
+
+#### Scenario: Skin just below hue 0°
+
+- **WHEN** a face's skin reads hue −5° at C*ab 9, as one usable daylight photo in the eval set reads
 - **THEN** no problem is reported
 
 ### Requirement: Each problem has its own retake tip

@@ -122,7 +122,7 @@ A taken or uploaded photo SHALL be checked in the browser: face landmarks, the f
 
 When the photo holds two faces that are each at least the core's minimum face width, the check SHALL report `several-faces` and show its retake tip. When the second face is narrower, the photo SHALL be checked as the larger face alone. At most two faces SHALL be looked for.
 
-The threshold is provisional until `t6-eval-set` measures how often a blurred background person causes a false reject.
+The threshold is measured on the labeled eval set (`analysis-eval`, 2026-10-09): 1 of 72 usable photos is rejected as `several-faces`, and 10 of 16 photos with a second face of about the subject's size get `several-faces` (1 passes; the rest get another problem first). A narrower width would only reject more, so it stays.
 
 #### Scenario: Two people
 

@@ -25,6 +25,7 @@ The second column is parsed, not read: comma-separated globs and nothing else. N
 | `report-page`       | `apps/web/src/app/(report)/**`, `apps/web/src/lib/report/**`                                                                                                                                                          |
 | `interest-button`   | `apps/web/src/app/api/reports/[id]/interest/**`, `apps/web/src/lib/interest/**`, `supabase/migrations/*_interest_clicks.sql`                                                                                          |
 | `analytics`         | `apps/web/src/lib/analytics/**`                                                                                                                                                                                       |
+| `analysis-eval`     | `evals/*.ts`                                                                                                                                                                                                          |
 
 Rows never overlap and every row matches a file: {@link openspec/specs/spec-workflow/spec.md#requirement-mapping-rows-never-overlap}. Each capability owns its own folder, so row order never matters.
 
