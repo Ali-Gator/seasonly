@@ -63,9 +63,11 @@ create table public.report_emails (
   is_test boolean not null
 );
 create index on public.report_emails (report_id, created_at desc);
--- 'stored' | 'limit' | 'unknown'; locks the report row so two calls cannot both pass 3.
+-- ('stored', <row id>) | ('limit', null) | ('unknown', null); locks the report row so two calls
+-- cannot both pass 3. The row id is the email's idempotency key.
 create function public.store_report_email(p_report_id text, p_email text, p_is_test boolean)
-  returns text language plpgsql as $$ … select … from reports where id = p_report_id for update; … $$;
+  returns table (outcome text, email_id bigint) language plpgsql security definer set search_path = ''
+  as $$ … select … from public.reports where id = p_report_id for update; … $$;
 ```
 
 `<ts>_interest_clicks.sql`:

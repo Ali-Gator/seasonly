@@ -65,7 +65,7 @@
 Existing tests change only as approved in 2.2. New tests go in new files and cite their scenario at its permanent path.
 
 - [x] 3.1 `apps/web/src/lib/observability/with-timeout.test.ts`: success gives `{ ok: true, value }`; a rejection and a 3 s hang (fake timers, the signal aborted) each capture one Sentry error carrying `extra` and its cause, flush, and give `{ ok: false }`. Done when it fails for the missing module.
-- [ ] 3.2 Migrations in PGlite, on a stub `reports` table, in `apps/web/src/lib/email/store.test.ts` and `apps/web/src/lib/interest/record.test.ts`:
+- [x] 3.2 Migrations in PGlite, on a stub `reports` table, in `apps/web/src/lib/email/store.test.ts` and `apps/web/src/lib/interest/record.test.ts`:
   - `store_report_email` answers `stored` three times, then `limit`, and `unknown` for a missing report;
   - its body locks the report row (`for update`), since PGlite has one connection and cannot race two calls;
   - the anonymous role is refused select and insert on both tables, and execute on the function;
@@ -128,7 +128,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 ## 5. Implementation
 
 - [x] 5.1 Write `withTimeout` (design.md decision 4) and move `saveReport` and `storeCrop` onto it. Done when 3.1 passes and `store.test.ts` and `crops.test.ts` pass unchanged; if either needs an edit, stop and ask the user. Delete BL-01 from `docs/backlog.md`.
-- [ ] 5.2 Write `supabase/migrations/<ts>_report_emails.sql` and `<ts>_interest_clicks.sql` (design.md decision 2). Do not apply them. Done when 3.2 passes.
+- [x] 5.2 Write `supabase/migrations/<ts>_report_emails.sql` and `<ts>_interest_clicks.sql` (design.md decision 2). Do not apply them. Done when 3.2 passes.
 - [ ] 5.3 Check that `botid` matches `/api/reports/*/email` with a throwaway: `initBotId` with that pattern, then a request to a concrete path under `next dev`, looking for the challenge header. Record the result here. If it does not match, switch to the fixed path of design.md decision 6, and update decision 1's table and the email-capture and abuse-controls deltas before going on. Done when the result is recorded.
 - [ ] 5.4 Write `apps/web/src/lib/email/` (`address.ts`, `render.tsx`, `send.ts`, `store.ts`), the email route with `withErrorCapture`, BotID and `after()`, and add the path to `BOTID_PROTECT`. Done when 3.3 and 3.8 pass.
 - [ ] 5.5 Add EmailInput to `apps/web/src/components/ds/` with its `.sn-field*` rules in `ds.css` (from `bundle.css`, with token variables), export it, and make a disabled Button with `href` render without one. Done when 3.7 passes and the class-coverage test passes. Delete BL-05 from `docs/backlog.md`.
