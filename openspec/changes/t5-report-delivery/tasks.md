@@ -156,12 +156,14 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Applied 2026-10-09 with the user's yes, as `20261009075315_report_emails` and `20261009075318_interest_clicks`; the local files carry those versions. As `anon`, a select on each table and a call to `store_report_email` are refused (insufficient privilege). `anon` and `authenticated` hold no select, insert or execute; `service_role` holds execute; RLS is on for both tables.
 
-- [ ] 6.2 Run the app locally against the project with `.env.local`. Create one quiz-only report through the flow: free, no model call, and an `is_test` row. Show the user, in a scratch Artifact:
+- [x] 6.2 Run the app locally against the project with `.env.local`. Create one quiz-only report through the flow: free, no model call, and an `is_test` row. Show the user, in a scratch Artifact:
   - screenshots of that report at 375 and 1280;
   - the same report with a photo record's draping, with the crop present and missing (pointing at the Soft Autumn crop from 6.3, once it exists, or at a placeholder JPEG);
   - the rendered report email.
 
   Done when the user confirms they match the boards approved in 1.1; record the date here.
+
+  Confirmed 2026-10-09 (https://claude.ai/artifact/Cu43qoSa4uq31nWeQJnq7g). The quiz-only report `3VWeBndhiaMTL0eIbSjDew` (True Autumn) went through the flow locally, and its email reached the Inbox at oleg.aztours@gmail.com. A test photo record `tZmsqxf6-mO_T_7Dp9bIPQ`, with the E2E fixture face uploaded as its crop, showed the draping preview with the face and, once the crop was deleted, the deleted-photo state.
 
 - [ ] 6.3 On the preview deployment, with the user's yes for one paid analysis, from the user's iPhone:
   1. run a photo analysis, choose "Get my full report" and send the user's own address;
