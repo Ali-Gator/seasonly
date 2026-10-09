@@ -48,13 +48,15 @@ Alternative: leave `track` in `capture`. Rejected: the report page would import 
 
 ### 2. Mask in `before_send`, over every string
 
-`initPostHog` passes `before_send: maskReportIds`. It walks the event's `properties`, `$set` and `$set_once` and rewrites, in every string, `/r/` followed by exactly 22 id characters (`REPORT_ID`'s class `[A-Za-z0-9_-]`, not followed by another) to `/r/:id`. Nested arrays and objects are walked too, so `$elements`, `$elements_chain`, `$current_url`, `$pathname`, `$referrer`, `$prev_pageview_pathname` and `$initial_*` are all covered without a list to keep up to date. The pattern is written out in `lib/analytics` rather than imported from `lib/draping/crops.ts`, which imports the server Supabase client. A test pins the two patterns together.
+`initPostHog` passes `before_send: maskReportIds`. The face image's `src` (`/api/face/<id>`, seen in a rage click's `attr__src`) and the report's API routes carry the id too, so the pattern also covers `/api/face/` and `/api/reports/`. It walks the event's `properties`, `$set` and `$set_once` and rewrites, in every string, `/r/` followed by exactly 22 id characters (`REPORT_ID`'s class `[A-Za-z0-9_-]`, not followed by another) to `/r/:id`. Nested arrays and objects are walked too, so `$elements`, `$elements_chain`, `$current_url`, `$pathname`, `$referrer`, `$prev_pageview_pathname` and `$initial_*` are all covered without a list to keep up to date. The pattern is written out in `lib/analytics` rather than imported from `lib/draping/crops.ts`, which imports the server Supabase client. A test pins the two patterns together.
 
 Alternatives:
 
 - `sanitize_properties` is deprecated in favor of `before_send`.
 - PostHog's path-cleaning rules (a project setting) clean only at query time, so the raw id would still be stored.
 - Masking only the URL properties misses element text and attributes.
+
+The flags request is not an event, so `before_send` never sees it, and its `person_properties` hold `$initial_current_url` and `$initial_pathname`: the report id of a visitor whose first page is the emailed `/r/<id>` (found in the phase review, checked in E2E). Nothing reads a flag yet, so `initPostHog` sets `advanced_disable_flags: true`. `t7-paywall-off` turns flags on only once that URL is masked (a rewrite of the stored initial person info, or a proxy).
 
 ### 3. Where each event fires
 

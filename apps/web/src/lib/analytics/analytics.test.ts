@@ -45,7 +45,11 @@ describe("maskReportIds", () => {
           $current_url: `https://seasonly.me/r/${ID}`,
           $pathname: `/r/${ID}`,
           $referrer: `https://seasonly.me/r/${ID}?from=mail`,
-          $elements: [{ tag_name: "p", $el_text: `seasonly.me/r/${ID}`, attr__href: `/r/${ID}` }],
+          $prev_pageview_pathname: `/r/${ID}`,
+          $elements: [
+            { tag_name: "p", $el_text: `seasonly.me/r/${ID}`, attr__href: `/r/${ID}` },
+            { tag_name: "img", attr__src: `/api/face/${ID}` },
+          ],
           $elements_chain: `p:text="seasonly.me/r/${ID}"nth-child="1";a:href="/r/${ID}"`,
           $heatmap_data: { [`https://seasonly.me/r/${ID}`]: [{ x: 1 }] },
           count: 3,
@@ -60,7 +64,11 @@ describe("maskReportIds", () => {
           $current_url: "https://seasonly.me/r/:id",
           $pathname: "/r/:id",
           $referrer: "https://seasonly.me/r/:id?from=mail",
-          $elements: [{ tag_name: "p", $el_text: "seasonly.me/r/:id", attr__href: "/r/:id" }],
+          $prev_pageview_pathname: "/r/:id",
+          $elements: [
+            { tag_name: "p", $el_text: "seasonly.me/r/:id", attr__href: "/r/:id" },
+            { tag_name: "img", attr__src: "/api/face/:id" },
+          ],
           $elements_chain: 'p:text="seasonly.me/r/:id"nth-child="1";a:href="/r/:id"',
           $heatmap_data: { "https://seasonly.me/r/:id": [{ x: 1 }] },
           count: 3,
@@ -99,12 +107,12 @@ describe("maskReportIds", () => {
 
 describe("initPostHog", () => {
   /** {@link openspec/specs/analytics/spec.md#requirement-no-report-id-reaches-posthog} */
-  it("installs the mask on every event", () => {
+  it("installs the mask on every event and sends no flags request", () => {
     vi.stubEnv("NEXT_PUBLIC_POSTHOG_KEY", "phc_test");
     expect(initPostHog()).toBe(true);
     expect(posthog.init).toHaveBeenCalledWith(
       "phc_test",
-      expect.objectContaining({ before_send: maskReportIds }),
+      expect.objectContaining({ before_send: maskReportIds, advanced_disable_flags: true }),
     );
   });
 });

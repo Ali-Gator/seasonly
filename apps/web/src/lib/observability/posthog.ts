@@ -16,6 +16,10 @@ export function initPostHog(): boolean {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
     defaults: "2025-05-24",
     before_send: maskReportIds,
+    // The flags request sends the first page's URL as a person property, outside before_send:
+    // the report id of a visitor who arrives by the email link. Nothing reads a flag yet.
+    // ponytail: off until t7-paywall-off needs a flag and masks that URL first.
+    advanced_disable_flags: true,
   });
   return true;
 }

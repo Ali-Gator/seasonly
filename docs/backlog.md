@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-12**
+_Next id:_ **BL-13**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -37,16 +37,6 @@ fold items in.
   _Status:_ deferred — until Sentry shows `crop upload timed out` events, or storage-js adds a
   signal to `upload()`
 
-- **[BL-11] A local production build reports to Sentry as production** — `pnpm build` reads
-  `apps/web/.env.local`, and Next inlines `NEXT_PUBLIC_SENTRY_DSN` at build time, so
-  Playwright's empty DSN at `pnpm start` has no effect. A local `CI=1` E2E run against that build
-  sent its forced read failures to Sentry under `production` (SEASONLY-5 and SEASONLY-6,
-  2026-10-09). CI is not affected, since its build has no keys. Build the E2E server with the
-  DSN emptied (an env override on the build step, or a `test:e2e:local` script), or tag local
-  runs with their own environment.
-  _Refs:_ `playwright.config.ts`, `apps/web/src/lib/observability/sentry.ts` · _Status:_ open —
-  found in `t5-report-delivery`, 2026-10-09
-
 ## Testing
 
 - **[BL-08] Two concurrent email stores are never raced in a test** — the abuse-controls
@@ -57,13 +47,13 @@ update`). PGlite has one connection, so the test only checks that the lock is in
   _Refs:_ `apps/web/src/lib/email/store.test.ts`, `openspec/specs/abuse-controls/spec.md` ·
   _Status:_ gated — a local Postgres in tests (the local Supabase stack needs Docker)
 
-- **[BL-09] The draping fallback's DOM switch is untested** — the unit test renders
-  `DrapingView` with `deleted` set. Nothing runs `ReportDraping`'s check of the images
-  (`complete && naturalWidth === 0` before hydration, the `error` listener after). The preview
-  check on 2026-10-09 saw it work. Add a jsdom test that fires `error` on the image, or an E2E
-  test with `/api/face/*` routed to 404 on a stored report.
-  _Refs:_ `apps/web/src/lib/report/draping.tsx`, `openspec/specs/report-page/spec.md` ·
-  _Status:_ gated — a jsdom test project, or a stored report in CI
+- **[BL-12] One report-delivery E2E case fails under `pnpm dev`** — "answers a report it cannot
+  read with 500" expects `private, no-store`, but the dev server sends `no-cache,
+must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure. The built
+  server and CI pass. Skip the header assertion outside the prebuilt mode, or run local E2E
+  against a build.
+  _Refs:_ `e2e/report-delivery.spec.ts`, `playwright.config.ts` · _Status:_ open — found in
+  `t5-funnel-analytics`, 2026-10-09
 
 ## Design / UX
 

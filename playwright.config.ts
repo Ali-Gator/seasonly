@@ -17,6 +17,8 @@ const E2E_ENV = {
   AI_GATEWAY_API_KEY: "",
   RESEND_API_KEY: "",
   NEXT_PUBLIC_SENTRY_DSN: "",
+  // No source-map upload or release from a local E2E build.
+  SENTRY_AUTH_TOKEN: "",
   NEXT_PUBLIC_POSTHOG_KEY: "phc_e2e",
   NEXT_PUBLIC_POSTHOG_HOST: "http://127.0.0.1:9",
 };
@@ -37,6 +39,8 @@ export default defineConfig({
     reuseExistingServer: false,
     // The prebuilt command builds first.
     timeout: PREBUILT ? 300_000 : 60_000,
+    // The build's log, which CI used to show as its own step.
+    stdout: PREBUILT ? "pipe" : "ignore",
     env: E2E_ENV,
   },
 });

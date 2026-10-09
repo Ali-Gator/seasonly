@@ -108,7 +108,7 @@ None of them SHALL carry the report id or the address.
 
 ### Requirement: No report id reaches PostHog
 
-Before any event leaves the browser, every `/r/<report id>` in any of its properties, nested ones included (the page URL, path, referrer, initial URL and referrer, and the clicked element's text and attributes), SHALL be replaced by `/r/:id`. This SHALL hold for every event, automatic ones included.
+Before any event leaves the browser, every `/r/<report id>` in any of its properties, nested ones included (the page URL, path, referrer, previous page, initial URL and referrer, and the clicked element's text and attributes), SHALL be replaced by `/r/:id`, and `/api/face/<report id>` and `/api/reports/<report id>` likewise by `/api/face/:id` and `/api/reports/:id`. This SHALL hold for every event, automatic ones included. No other request to PostHog SHALL carry a report id: while the flags request would send the first page's URL outside this mask, the app SHALL NOT send it.
 
 #### Scenario: A page view of a report
 
@@ -123,7 +123,7 @@ Before any event leaves the browser, every `/r/<report id>` in any of its proper
 #### Scenario: Leaving the report for the landing page
 
 - **WHEN** a person goes from a report to the landing page
-- **THEN** the landing page's `$pageview` has the referrer path `/r/:id`
+- **THEN** the landing page's `$pageview` has the previous page path `/r/:id`
 
 ### Requirement: No person is identified
 

@@ -88,7 +88,7 @@ Cite scenarios at `openspec/specs/analytics/spec.md#…`. Add new files or new c
 
 ## 6. Backlog and archive prep
 
-- [ ] 6.1 Before archive:
+- [x] 6.1 Before archive:
   - log in `docs/backlog.md` every phase-review finding left unfixed, and every defect found on the way, under the next `BL-nn` ids;
   - add report ids in Sentry's request URLs (design Non-Goals) if the review agrees it is worth fixing;
   - delete BL-09 and BL-11;
@@ -96,11 +96,15 @@ Cite scenarios at `openspec/specs/analytics/spec.md#…`. Add new files or new c
 
   Done when `_Next id:_` is correct.
 
+  Result 2026-10-09: phase review (fresh subagent, `/code-review high`) found 8 issues, all fixed: the flags request leaked the first page's `/r/<id>` (flags off, E2E case for a report as first page, carried to `t7-paywall-off`); the mask now covers `/api/face/` and `/api/reports/`; `SENTRY_AUTH_TOKEN` blanked in `E2E_ENV`; a real 45 s timeout case (Playwright clock); refused and failed addresses send no `email_submitted`; the first case waits for a later landing view before its exact list and checks `$prev_pageview_pathname`; the build log is piped in CI; the referrer scenario now names the previous page path. Report ids in Sentry are carried to `t8-photo-privacy` as one decision, not logged. Backlog: added BL-12 (dev-mode cache-control E2E failure); deleted BL-09 (`draping.dom.test.tsx`) and BL-11 (`E2E_ENV` at build).
+
 - [ ] 6.2 At archive:
   - add the README row `analytics`: `apps/web/src/lib/analytics/**`;
   - re-add the analytics spec's Public Interface (`track`, `maskReportIds`), Behavior (the event table's call sites, the mask's reach, the E2E host) and Edge Cases;
   - in capture-flow's Public Interface, note that `track` lives in `lib/analytics` and is re-exported;
   - in the plan's carried list, for `t8-photo-privacy`: decide on cookie consent for PostHog (a banner, or cookieless mode with "Cookieless server hash mode" turned on), and name PostHog and what it receives on the privacy page;
+  - in the plan's carried list, for `t8-photo-privacy`: decide whether Sentry receives report ids (they are sent on purpose as `extra.reportId` in `report/read.ts`, `email/send.ts`, `email/store.ts`, `interest/record.ts`, and in request URLs); if yes, say so on the privacy page, if no, mask `/r/`, `/api/face/` and `/api/reports/` in Sentry's `beforeSend` and `beforeBreadcrumb` and drop those extras (phase review);
+  - in the plan's carried list, for `t7-paywall-off`: PostHog flags are off (`advanced_disable_flags`) because the flags request sends the first page's URL, a report id for a visitor from the email link, outside `before_send`. Turn them on only with that URL masked (rewrite the stored initial person info, or a proxy), and keep `funnel.spec.ts`'s "report is the first page" case green;
   - in the Tracker, mark T5 Done.
 
   Done when `openspec validate --specs` and the README mapping test pass.

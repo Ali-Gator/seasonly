@@ -139,6 +139,7 @@ const POLL = { timeout: 20_000 };
 /**
  * {@link openspec/specs/analytics/spec.md#scenario-from-landing-to-the-report}
  * {@link openspec/specs/analytics/spec.md#scenario-a-page-view-of-a-report}
+ * {@link openspec/specs/analytics/spec.md#scenario-leaving-the-report-for-the-landing-page}
  * {@link openspec/specs/analytics/spec.md#scenario-a-valid-address}
  * {@link openspec/specs/analytics/spec.md#scenario-after-the-email-step}
  */
@@ -159,6 +160,8 @@ test("sends one event per funnel step, from the landing to the report", async ({
   await page.waitForURL(`**/r/${ID}`);
   await expect(page.getByRole("heading", { name: "We couldn't open your report" })).toBeVisible();
 
+  // Back to the landing: its page view is queued after every earlier event, so the list is final.
+  await page.getByRole("link", { name: "Seasonly" }).click();
   await expect
     .poll(posthog.named, POLL)
     .toEqual([
@@ -171,14 +174,15 @@ test("sends one event per funnel step, from the landing to the report", async ({
       "report_requested",
       "email_submitted",
       "$pageview /r/:id",
+      "$pageview /",
     ]);
   expect(posthog.errors).toEqual([]);
   expect(posthog.find("consent_answered")[0]?.properties).toMatchObject({ agreed: true });
   expect(posthog.find("quiz_completed")[0]?.properties).toMatchObject({ quiz_only: false });
   expect(posthog.find("report_requested")[0]?.properties).toMatchObject({ quiz_only: false });
-  expect(posthog.find("$pageview").at(-1)?.properties.$current_url).toBe(
-    "http://localhost:3100/r/:id",
-  );
+  const [, , report, landing] = posthog.find("$pageview").map((e) => e.properties);
+  expect(report?.$current_url).toBe("http://localhost:3100/r/:id");
+  expect(landing?.$prev_pageview_pathname).toBe("/r/:id");
   // Nothing PostHog received, flags and config requests included, holds the id or the address.
   const sent = posthog.bodies.join("\n");
   expect(sent).not.toContain(ID);
@@ -191,11 +195,15 @@ test("sends one event per funnel step, from the landing to the report", async ({
 /**
  * {@link openspec/specs/analytics/spec.md#scenario-declining-consent}
  * {@link openspec/specs/analytics/spec.md#scenario-back-to-a-step-already-seen}
+ * {@link openspec/specs/analytics/spec.md#scenario-a-typo}
  */
-test("sends a declined consent, and a second report_requested after Back", async ({ page }) => {
+test("sends a declined consent, a second report_requested after Back, and no refused address", async ({
+  page,
+}) => {
   test.setTimeout(90_000);
   const posthog = await recordPostHog(page);
   await answerAnalyze(page, "result");
+  await page.route("**/api/reports/*/email", (route) => route.fulfill({ status: 500, body: "" }));
 
   await page.goto("/analyze");
   await uploadFace(page);
@@ -208,6 +216,15 @@ test("sends a declined consent, and a second report_requested after Back", async
   await page.goBack();
   await page.getByRole("button", { name: "Get my full report" }).click();
   await expect(page.getByRole("heading", { name: "Get your full report" })).toBeVisible();
+  // An address the device refuses, then a send the route fails: neither opens the report.
+  const field = page.getByLabel("Where should we send your report?");
+  await field.fill("funnel.e2e@");
+  await page.getByRole("button", { name: "Send my report" }).click();
+  await expect(page.getByText("Enter an email like you@example.com")).toBeVisible();
+  await field.fill(ADDRESS);
+  await page.getByRole("button", { name: "Send my report" }).click();
+  await expect(page.getByText("We couldn't send your report")).toBeVisible();
+  await page.getByRole("link", { name: "Seasonly" }).click();
 
   await expect
     .poll(posthog.named, POLL)
@@ -221,11 +238,12 @@ test("sends a declined consent, and a second report_requested after Back", async
       "analysis_result",
       "report_requested",
       "report_requested",
+      "$pageview /",
     ]);
   expect(posthog.find("consent_answered").map((e) => e.properties.agreed)).toEqual([false, true]);
 });
 
-/** {@link openspec/specs/analytics/spec.md#scenario-the-analysis-times-out} */
+/** {@link openspec/specs/analytics/spec.md#requirement-the-flows-new-events-carry-only-their-outcome} */
 test("sends one analysis_failed when the analysis fails", async ({ page }) => {
   test.setTimeout(90_000);
   const posthog = await recordPostHog(page);
@@ -240,6 +258,43 @@ test("sends one analysis_failed when the analysis fails", async ({ page }) => {
   await expect.poll(posthog.named, POLL).toContain("analysis_failed");
   expect(posthog.find("analysis_failed")).toHaveLength(1);
   expect(posthog.find("analysis_failed")[0]?.properties).toMatchObject({ quiz_only: false });
+});
+
+/** {@link openspec/specs/analytics/spec.md#scenario-the-analysis-times-out} */
+test("sends one analysis_failed when the analysis times out", async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.clock.install();
+  const posthog = await recordPostHog(page);
+  await answerAnalyze(page, "hold");
+
+  await page.goto("/analyze");
+  await uploadFace(page);
+  await page.getByRole("button", { name: "Agree and upload" }).click();
+  await answerQuiz(page);
+  await expect(page.getByText("Question 4 of 4")).toBeHidden();
+  // Past the client's 45 s limit.
+  await page.clock.fastForward("00:46");
+  await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
+
+  await expect.poll(posthog.named, POLL).toContain("analysis_failed");
+  expect(posthog.find("analysis_failed")).toHaveLength(1);
+});
+
+/**
+ * A visitor whose first page is a report, as from the email link: the id stays out of every
+ * request, and no flags request carries the first page's URL.
+ *
+ * {@link openspec/specs/analytics/spec.md#requirement-no-report-id-reaches-posthog}
+ */
+test("keeps the id out when a report is the first page", async ({ page }) => {
+  const posthog = await recordPostHog(page);
+  await page.goto(`/r/${ID}`);
+  await expect(page.getByRole("heading", { name: "We couldn't open your report" })).toBeVisible();
+  await page.getByRole("link", { name: "Seasonly" }).click();
+
+  await expect.poll(posthog.named, POLL).toEqual(["$pageview /r/:id", "$pageview /"]);
+  expect(posthog.bodies.join("\n")).not.toContain(ID);
+  expect(posthog.bodies.filter((b) => b.includes("/flags"))).toEqual([]);
 });
 
 /** {@link openspec/specs/analytics/spec.md#scenario-back-while-analyzing} */
