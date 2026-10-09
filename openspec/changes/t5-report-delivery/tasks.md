@@ -121,7 +121,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   First render the card twice in Vitest and once under `next start` to confirm the bytes are stable (design.md decision 9), and note the result here. Done when the E2E fails only for the missing UI.
 
-  Result 2026-10-09: the bytes are stable. Two Vitest renders of the Soft Autumn story card were identical, and `next start` on the production build served the same bytes (`af4866f1…`, 100,236 B, macOS). The golden was generated on macOS, not Linux. resvg renders with the bundled fonts only, so the bytes should not depend on the platform; the first CI run on Linux confirms it.
+  Result 2026-10-09: the bytes are stable. Two Vitest renders of the Soft Autumn story card were identical, and `next start` on the production build served the same bytes (`af4866f1…`, 100,236 B, macOS). The golden was generated on macOS, not Linux. resvg renders with the bundled fonts only. CI on Linux (commit `7313865`) passed the E2E golden comparison, so the bytes match there too.
 
 ## 4. Env
 
@@ -148,7 +148,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 - [x] 5.9 Commit the golden PNG and make 3.9 pass. Delete BL-03 from `docs/backlog.md`, or, if decision 9's fallback failed, rewrite BL-03 with what was found.
 - [x] 5.10 Run `pnpm fix`, `pnpm test` and `pnpm --filter web build`. Done when all pass, and the build output lists `/r/[id]` as dynamic and both `/api/reports/[id]/…` routes.
 
-  Result 2026-10-09: `pnpm fix` changed nothing, 570 unit tests pass, and the build lists `ƒ /r/[id]`, `ƒ /api/reports/[id]/email` and `ƒ /api/reports/[id]/interest`. E2E on the built server: 47 of 48 pass, including all of `report-delivery.spec.ts`. The one failure is `site-structure.spec.ts`: `/seasons/Soft-Autumn` answers 200 locally. This change does not touch it. It is the prerendered `soft-autumn` page served from macOS's case-insensitive disk; CI runs on Linux.
+  Result 2026-10-09: `pnpm fix` changed nothing, 570 unit tests pass, and the build lists `ƒ /r/[id]`, `ƒ /api/reports/[id]/email` and `ƒ /api/reports/[id]/interest`. E2E on the built server: 47 of 48 pass, including all of `report-delivery.spec.ts`. The one failure is `site-structure.spec.ts`: `/seasons/Soft-Autumn` answers 200 locally. This change does not touch it. It is the prerendered `soft-autumn` page served from macOS's case-insensitive disk. On Linux CI (commit `7313865`) the whole E2E suite passed, this case included.
 
 ## 6. Checks with the user
 
