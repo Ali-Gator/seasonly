@@ -65,6 +65,9 @@ export async function readReport(
   id: string,
   { select = supabaseSelect }: { select?: ReportSelect } = {},
 ): Promise<StoredReport | null> {
+  // THROWAWAY (task 6.3 step 7): a forced read failure for one test report. Reverted next commit.
+  if (id === "V-kYLkoMe9pEnkRAify84A")
+    select = async () => ({ data: null, error: new Error("forced read failure (task 6.3)") });
   const read = await withTimeout(
     "report read failed",
     async (signal) => {
