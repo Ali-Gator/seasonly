@@ -82,7 +82,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Done when the new cases fail for the missing modules.
 
-- [ ] 3.4 `report-page`, new files under `apps/web/src/lib/report/`:
+- [x] 3.4 `report-page`, new files under `apps/web/src/lib/report/`:
   - `ReportView` rendered from injected records:
     - Soft Autumn photo: the season block, then the six section overlines and titles in order, 24 then 6 colors, Soft Coral first and Espresso last, every swatch with name and hex, the draping frames on `/api/face/<id>` with the draping line, and the footer's three lines;
     - all 12 seasons: palette plus neutrals are 30 distinct colors;
@@ -95,7 +95,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Done when they fail for the missing modules.
 
-- [ ] 3.5 `interest-button`, new files under `apps/web/src/lib/interest/` and `apps/web/src/app/api/reports/[id]/interest/`:
+- [x] 3.5 `interest-button`, new files under `apps/web/src/lib/interest/` and `apps/web/src/app/api/reports/[id]/interest/`:
   - the route: `short` gets 404 with no database call; an unknown id (a `23503` error) gets 404; the first and a repeated tap get 200; a store failure gets 500 and reaches Sentry;
   - `PremiumCard`: idle; clicked with `maya.reyes@gmail.com`; clicked with no address ("We'll email you once"); a failed tap back to idle with the error line; opened with recorded interest shows the clicked state.
 
@@ -136,13 +136,13 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 - [x] 5.4 Write `apps/web/src/lib/email/` (`address.ts`, `render.ts`, `send.ts`, `store.ts`), the email route with `withErrorCapture`, BotID and `after()`, and add the path to `BOTID_PROTECT`. Done when 3.3 and 3.8 pass.
 - [x] 5.5 Add EmailInput to `apps/web/src/components/ds/` with its `.sn-field*` rules in `ds.css` (from `bundle.css`, with token variables), export it, and make a disabled Button with `href` render without one. Done when 3.7 passes and the class-coverage test passes. Delete BL-05 from `docs/backlog.md`.
 - [ ] 5.6 Flow: the `email` step and `open-email` in `flow-state.ts`; "Get my full report" and the null-id Note with "Try again" in `_reveal/steps.tsx`; `_email/step.tsx` wired in `flow.tsx`. Done when 3.6 passes and the existing E2E still passes.
-- [ ] 5.7 Report:
+- [x] 5.7 Report:
   - move `apps/web/src/app/(flow)/r/[id]/page.tsx` to `apps/web/src/app/(report)/r/[id]/`, with `(report)/layout.tsx`, `not-found.tsx` and `error.tsx` from board 10c;
   - write `lib/report/` (`read.ts`, `view.tsx` and the client islands, design.md decisions 3, 7 and 8).
 
   Done when 3.4 and the approved `seo.test.ts` pass, and the site-structure route-map test still passes.
 
-- [ ] 5.8 Interest: `lib/interest/` and the interest route with `withErrorCapture`, and `PremiumCard` placed in the report view. Done when 3.5 passes.
+- [x] 5.8 Interest: `lib/interest/` and the interest route with `withErrorCapture`, and `PremiumCard` placed in the report view. Done when 3.5 passes.
 - [ ] 5.9 Commit the golden PNG and make 3.9 pass. Delete BL-03 from `docs/backlog.md`, or, if decision 9's fallback failed, rewrite BL-03 with what was found.
 - [ ] 5.10 Run `pnpm fix`, `pnpm test` and `pnpm --filter web build`. Done when all pass, and the build output lists `/r/[id]` as dynamic and both `/api/reports/[id]/…` routes.
 

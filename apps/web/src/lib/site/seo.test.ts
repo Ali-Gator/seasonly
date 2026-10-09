@@ -43,7 +43,7 @@ describe("robots", () => {
 describe("report page", () => {
   /** {@link openspec/specs/site-structure/spec.md#scenario-a-report-page} */
   it("gives a report any id without throwing, and noindex", async () => {
-    const { generateMetadata } = await import("@/app/(flow)/r/[id]/page");
+    const { generateMetadata } = await import("@/app/(report)/r/[id]/page");
     for (const id of ["k7m2qx", "a/b", " "]) {
       const meta = await generateMetadata({ params: Promise.resolve({ id }) });
       expect(meta.robots, id).toEqual({ index: false });
