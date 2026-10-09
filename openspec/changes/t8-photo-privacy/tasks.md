@@ -40,7 +40,7 @@
 
   Done when the user approves the text in chat; record the date here.
 
-- [ ] 1.4 Legal check: the user has the approved text reviewed by someone qualified, or waives a review for the beta in writing in chat. Record which, who and the date here. The text the agent drafts is not legal advice. It does not block the code tasks, but archive, the PR and auto-merge all wait for it (8.2).
+- [ ] 1.4 Legal check: the user has the approved text reviewed by someone qualified, or waives a review for the beta in writing in chat. Record which, who and the date here. The text the agent drafts is not legal advice. It does not block the code tasks, but archive, the PR and auto-merge all wait for it (7.2).
 
 ## 2. Plan and test-edit approval
 
