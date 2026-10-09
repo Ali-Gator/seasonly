@@ -53,7 +53,7 @@ beforeEach(() => {
 });
 
 describe("POST /api/reports/<id>/email", () => {
-  /** {@link openspec/specs/abuse-controls/spec.md#scenario-a-bot} */
+  /** {@link openspec/specs/abuse-controls/spec.md#scenario-a-bot-on-the-email-route} */
   it("answers a bot 403 and reads nothing", async () => {
     vi.mocked(checkBotId).mockResolvedValue({ ...human, isHuman: false, isBot: true });
     expect((await post(ID, { email: "maya@example.com" })).status).toBe(403);

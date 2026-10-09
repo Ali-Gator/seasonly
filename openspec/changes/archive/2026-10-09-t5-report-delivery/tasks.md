@@ -201,7 +201,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Logged: BL-08 (race untested), BL-09 (draping DOM switch untested) and BL-10 (deleted copy on any face error), plus BL-11 (a local production build reports to Sentry as production), found in 6.3. BL-01, BL-03 and BL-05 are deleted. BL-04 stands, deferred: no DOM ShareCard preview ships. `_Next id:_` is BL-12.
 
-- [ ] 7.2 At archive:
+- [x] 7.2 At archive:
   - add the README rows:
     - `email-capture`: `apps/web/src/app/(flow)/analyze/_email/**`, `apps/web/src/app/api/reports/[id]/email/**`, `apps/web/src/lib/email/**`, `supabase/migrations/*_report_emails.sql`;
     - `report-page`: `apps/web/src/app/(report)/**`, `apps/web/src/lib/report/**`;
@@ -216,6 +216,14 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
     - `t7-paywall-off`: the paywall replaces the email step and unlocks the report page.
 
   Done when `openspec validate --specs` and the README mapping test pass.
+
+  Done 2026-10-09:
+  - The three new specs carry their Public Interface, Behavior and Edge Cases.
+  - The README rows are in, with a note that `lib/http/**` is shared and has no row.
+  - EmailInput is in the ui-components interface, and its stale disabled-`href` edge case is rewritten.
+  - site-structure names the `(report)` group.
+  - observability's Purpose records that `onRequestError` did not fire on the preview, and that the read capture closes the gap for `/r/[id]`.
+  - The new abuse-controls scenarios "A bot" and "The browser protects the request" collided with the analyze route's, so the main spec names them "A bot on the email route" and "The browser protects the email request".
 
 ## Workflow follow-up
 

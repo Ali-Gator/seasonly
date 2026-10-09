@@ -35,7 +35,7 @@ export function pageMetadata(path: string, routes?: readonly Route[]): Metadata;
 
 A page exports `metadata = pageMetadata("/its-path")`, or a `generateMetadata` that calls it with the concrete path. Adding a page means adding one `ROUTES` entry and its `page.tsx`; the unit suite fails until both exist. Shipping a page's content means flipping its `ready` in the same change; nothing else moves. The season pages share one entry, so one flag covers all 12.
 
-Pages live in two route groups: `(site)` carries the shared header and footer, `(flow)` (`/analyze`, `/r/[id]`) a header bar with only the wordmark. The root `not-found.tsx` gives unmatched URLs the site chrome; `(flow)/not-found.tsx` serves an unknown report inside the flow layout.
+Pages live in three route groups: `(site)` carries the shared header and footer, `(flow)` (`/analyze`) a header bar with only the wordmark, and `(report)` (`/r/[id]`) no chrome, since the report draws its own header (report-page). The root `not-found.tsx` gives unmatched URLs the site chrome; `(report)/r/[id]/not-found.tsx` serves an unknown report under the wordmark-only header.
 
 ## Edge Cases
 
@@ -75,6 +75,11 @@ Every other page path SHALL answer 404 and SHALL NOT be indexed; the season-name
 
 - **WHEN** `/r/<id>` is requested for an id that has no report
 - **THEN** it answers 404 and the page carries `noindex`
+
+#### Scenario: A stored report
+
+- **WHEN** `/r/<id>` is requested for an id that has a report
+- **THEN** it answers 200 and the page carries `noindex`
 
 #### Scenario: An unknown path
 

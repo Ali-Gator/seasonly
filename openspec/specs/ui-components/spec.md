@@ -65,6 +65,13 @@ export type DrapingPairProps = {
   className?: string;
 } & ({ faceSrc: string; faceAlt: string } | { faceSrc?: undefined; faceAlt?: undefined });
 
+export interface EmailInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
+  label: string;
+  hint?: string;
+  error?: string; // replaces the hint; marks the field invalid and reads "Error: …"
+  ref?: Ref<HTMLInputElement>;
+}
+
 export function Button(props: ButtonProps): JSX.Element;
 export function Icon(props: IconProps): JSX.Element;
 export function Swatch(props: SwatchProps): JSX.Element;
@@ -72,6 +79,7 @@ export function SwatchGrid(props: SwatchGridProps): JSX.Element;
 export function Note(props: NoteProps): JSX.Element;
 export function ReportSection(props: ReportSectionProps): JSX.Element;
 export function DrapingPair(props: DrapingPairProps): JSX.Element; // the face is /api/face/<report id> (draping-preview)
+export function EmailInput(props: EmailInputProps): JSX.Element; // the report email step (email-capture)
 ```
 
 Styles: `apps/web/src/components/ds/ds.css`, imported once from `globals.css` right after Tailwind.
@@ -96,7 +104,7 @@ They are server components: no state, no effects, no `"use client"`. ReportSecti
 - No grid label: the list renders without `aria-label`.
 - Empty `id` on ReportSection: falls back to `useId()`, so the region is never labeled by `""`.
 - A Note with no title and no body: shows only its icon. Callers always pass words; the tone needs them.
-- `disabled` with `href`: passed to the `<a>`, where it has no effect, as in the bundle. Use no `href` for a disabled action.
+- `disabled` or `aria-disabled="true"` with `href`: a plain `<a role="link" aria-disabled="true">` with no `href` and no click handler, so it goes nowhere. The bundle keeps the live link; this departs from it on purpose (BL-05, `t5-report-delivery`).
 - Classes rendered only as hooks, with no rule: `sn-note--neutral` (neutral is the base `.sn-note`) and `sn-report__overline` (styled by `.overline`).
 
 ## Requirements
@@ -131,7 +139,7 @@ A swatch grid SHALL render one swatch per color, in the order given, as a list t
 
 ### Requirement: A button is a link when it navigates and a button when it acts
 
-A button SHALL come in the design system's three variants (primary, secondary and ghost), with primary as the default. It SHALL take the full column width when asked. With a destination, it SHALL render a link to that destination. Without one, it SHALL render a native button that does not submit a form unless a submit type is given. A disabled or `aria-disabled` button SHALL keep its label and that attribute, and show the disabled style.
+A button SHALL come in the design system's three variants (primary, secondary and ghost), with primary as the default. It SHALL take the full column width when asked. With a destination, it SHALL render a link to that destination. Without one, it SHALL render a native button that does not submit a form unless a submit type is given. A disabled or `aria-disabled` button SHALL keep its label and that attribute, and show the disabled style. A disabled or `aria-disabled` button with a destination SHALL NOT navigate: it SHALL render no `href`.
 
 #### Scenario: A button without a destination
 
@@ -147,6 +155,11 @@ A button SHALL come in the design system's three variants (primary, secondary an
 
 - **WHEN** a button labeled "Analyzing your photo" is rendered with `aria-disabled="true"`
 - **THEN** it keeps `aria-disabled="true"` and its label text
+
+#### Scenario: A disabled button with a destination
+
+- **WHEN** a button with destination `/analyze` is rendered with `aria-disabled="true"`
+- **THEN** it has no `href`, keeps `aria-disabled="true"` and shows the disabled style
 
 ### Requirement: An icon is decorative unless it is labeled
 
@@ -264,3 +277,17 @@ Without a face source, each frame SHALL show a slot labeled "Face" in place of t
 
 - **WHEN** DrapingPair renders with no face source
 - **THEN** each frame shows a slot labeled "Face" and no image
+
+### Requirement: An email input is labeled and states its error in words
+
+EmailInput SHALL render a visible label tied to an email field that asks for the email keyboard and autofill (`type="email"`, `autocomplete="email"`, `inputmode="email"`). A hint or an error SHALL be tied to the field as its description. With an error, the field SHALL be marked invalid, and the error SHALL show a cross icon and start with "Error:" for assistive technology, so it is never told by color alone.
+
+#### Scenario: A hint
+
+- **WHEN** EmailInput renders with the label "Where should we send your report?" and a hint
+- **THEN** the field is named by that label and described by the hint
+
+#### Scenario: An error
+
+- **WHEN** EmailInput renders with the error "Enter an email like you@example.com"
+- **THEN** the field has `aria-invalid="true"`, is described by the error, and the error reads "Error: Enter an email like you@example.com" to assistive technology
