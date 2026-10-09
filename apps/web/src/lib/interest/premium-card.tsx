@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { Button, Icon, Note } from "@/components/ds";
+import { track } from "@/lib/analytics";
 import { postWithin } from "@/lib/http/post-within";
 
 /**
@@ -93,6 +94,9 @@ export function PremiumCard({
     setPhase("sending");
     const tapped = await tapPremium(reportId);
     if (tapped.kind === "failed") return setPhase("failed");
+    // Never the id or the address.
+    // {@link openspec/specs/analytics/spec.md#requirement-share-and-save-events-carry-how-they-ended}
+    track("premium_tapped", {});
     setEmail(tapped.email);
     setPhase("clicked");
   };

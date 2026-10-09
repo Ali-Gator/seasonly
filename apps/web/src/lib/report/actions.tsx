@@ -4,14 +4,17 @@ import type { SeasonSlug } from "@seasonly/analysis";
 import { useEffect, useRef, useState } from "react";
 
 import { Button, Icon } from "@/components/ds";
+import { track } from "@/lib/analytics";
 
 import { downloadFile, fileFor, savePalette, shareSeason } from "./share";
 
 /**
  * "Share my season" and "Save my palette": the phone's share sheet where it takes files, the
- * share panel (boards 10e) or a download elsewhere.
+ * share panel (boards 10e) or a download elsewhere. Their events carry how each tap ended, never
+ * the report id.
  *
  * @see openspec/specs/report-page/spec.md
+ * {@link openspec/specs/analytics/spec.md#requirement-share-and-save-events-carry-how-they-ended}
  */
 const storyUrl = (slug: SeasonSlug) => `/images/share/${slug}/story`;
 const postUrl = (slug: SeasonSlug) => `/images/share/${slug}/post`;
@@ -26,6 +29,7 @@ export function ShareButton({
   variant = "primary",
   block = true,
   className,
+  place = "actions",
 }: {
   slug: SeasonSlug;
   season: string;
@@ -34,6 +38,8 @@ export function ShareButton({
   variant?: "primary" | "ghost";
   block?: boolean;
   className?: string;
+  /** Where the button sits, for its event. */
+  place?: "header" | "actions";
 }) {
   const panel = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -43,6 +49,7 @@ export function ShareButton({
   const onClick = async () => {
     const file = await fileFor(storyUrl(slug), `seasonly-${slug}-story.png`);
     const outcome = await shareSeason({ nav: navigator, file, season });
+    track("share_tapped", { place, outcome: outcome === "idle" ? "cancelled" : outcome });
     if (outcome === "panel") panel.current?.showModal();
   };
 
@@ -85,6 +92,7 @@ export function ShareButton({
                 <a
                   href={url}
                   download={`seasonly-${slug}-${ratio}.png`}
+                  onClick={() => track("share_card_downloaded", { ratio })}
                   className="sn-btn sn-btn--secondary sn-btn--block mt-auto"
                 >
                   Download
@@ -121,13 +129,19 @@ export function SaveButton({ slug }: { slug: SeasonSlug }) {
 
   const onClick = async () => {
     const file = await fileFor(paletteUrl(slug), name);
+    let downloaded = false;
     const outcome = await savePalette({
       nav: navigator,
       file,
       slug,
-      download: (f, n) => downloadFile(f, n, paletteUrl(slug)),
+      download: (f, n) => {
+        downloaded = true;
+        downloadFile(f, n, paletteUrl(slug));
+      },
     });
-    if (outcome === "saved") setSaved(true);
+    if (outcome !== "saved") return;
+    track("palette_saved", { method: downloaded ? "download" : "share-sheet" });
+    setSaved(true);
   };
 
   return <SaveButtonView saved={saved} onClick={onClick} />;

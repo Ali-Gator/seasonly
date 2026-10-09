@@ -14,16 +14,25 @@ import { Capture, Checking, Consent, Guide, Retake } from "./_capture/steps";
 import { EmailStep } from "./_email/step";
 import { QuizStep } from "./_quiz/quiz";
 import { AnalysisError, Analyzing, NoResult, Reveal } from "./_reveal/steps";
-import { initialState, reduce, stepProgress, toFormData } from "./flow-state";
+import {
+  initialState,
+  type Question,
+  QUESTIONS,
+  reduce,
+  stepProgress,
+  toFormData,
+} from "./flow-state";
 
 /** The client gives up after this; the route's worst case is 26 s. */
 const TIMEOUT_MS = 45_000;
 
 /**
  * The whole analysis at one URL. Each new step pushes a history entry and the browser's Back
- * pops it; a reload starts again at the guide.
+ * pops it; a reload starts again at the guide. Funnel events fire from the tap or the outcome,
+ * never from a render.
  *
  * @see openspec/specs/capture-flow/spec.md
+ * {@link openspec/specs/analytics/spec.md#requirement-the-flows-new-events-carry-only-their-outcome}
  */
 export function Flow() {
   const [state, dispatch] = useReducer(reduce, undefined, initialState);
@@ -160,7 +169,10 @@ export function Flow() {
         dispatch({ type: "analyzed", response });
       })
       .catch(() => {
-        if (!left) dispatch({ type: "failed" });
+        // Back (and StrictMode's aborted first run) left the step: nothing failed.
+        if (left) return;
+        track("analysis_failed", { quiz_only: !request.photo });
+        dispatch({ type: "failed" });
       })
       .finally(() => clearTimeout(timer));
     return () => {
@@ -194,8 +206,14 @@ export function Flow() {
       {step.name === "consent" && state.photo && (
         <Consent
           cropUrl={state.photo.cropUrl}
-          onAgree={() => dispatch({ type: "agree" })}
-          onDecline={() => dispatch({ type: "decline" })}
+          onAgree={() => {
+            track("consent_answered", { agreed: true });
+            dispatch({ type: "agree" });
+          }}
+          onDecline={() => {
+            track("consent_answered", { agreed: false });
+            dispatch({ type: "decline" });
+          }}
         />
       )}
       {step.name === "quiz" && (
@@ -203,7 +221,13 @@ export function Flow() {
           question={step.question}
           answers={state.answers}
           onAnswer={(question, value) => dispatch({ type: "answer", question, value })}
-          onNext={() => dispatch({ type: "next" })}
+          onNext={() => {
+            // The reducer's own guard: the last question, answered.
+            const last = step.question === QUESTIONS.length - 1;
+            if (last && state.answers[QUESTIONS[step.question] as Question])
+              track("quiz_completed", { quiz_only: state.quizOnly });
+            dispatch({ type: "next" });
+          }}
           onBack={back}
         />
       )}
@@ -212,7 +236,11 @@ export function Flow() {
         <Reveal
           result={step.result}
           onRetake={retake}
-          onReport={() => dispatch({ type: "open-email" })}
+          onReport={() => {
+            if (step.result.reportId)
+              track("report_requested", { quiz_only: step.result.agreement === "quiz-only" });
+            dispatch({ type: "open-email" });
+          }}
           onTryAgain={() => dispatch({ type: "try-again" })}
         />
       )}
