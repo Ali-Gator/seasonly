@@ -165,7 +165,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Confirmed 2026-10-09 (https://claude.ai/artifact/Cu43qoSa4uq31nWeQJnq7g). The quiz-only report `3VWeBndhiaMTL0eIbSjDew` (True Autumn) went through the flow locally, and its email reached the Inbox at oleg.aztours@gmail.com. A test photo record `tZmsqxf6-mO_T_7Dp9bIPQ`, with the E2E fixture face uploaded as its crop, showed the draping preview with the face and, once the crop was deleted, the deleted-photo state.
 
-- [ ] 6.3 On the preview deployment, with the user's yes for one paid analysis, from the user's iPhone:
+- [x] 6.3 On the preview deployment, with the user's yes for one paid analysis, from the user's iPhone:
   1. run a photo analysis, choose "Get my full report" and send the user's own address;
   2. check that the report opens at once, and that the email arrives with the right season, 4 highlights and a working link, in Gmail and Apple Mail;
   3. check that the draping preview shows the face, that "Share my season" opens the share sheet with the story card, and that "Save my palette" saves the palette image;
@@ -175,6 +175,16 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
   7. on a throwaway commit, make `readReport` throw for one fixed id, open it, check the 500 page and the Sentry event, record whether `onRequestError` also fired, then revert the commit.
 
   Delete the test report (its address, interest and crop go with it or by hand). Done when a Tracker Log line records the results.
+
+  Done 2026-10-09 on preview `seasonly-bqt2w1fcr` (commit `6e0f8b4`), one paid analysis from the user's iPhone. Report `V-kYLkoMe9pEnkRAify84A`: Deep Winter, `differ`, personal text.
+  1. The report opened at once.
+  2. "Your Deep Winter color report" reached the Gmail Inbox at oleg.aztours@gmail.com with the selfie wording. Its link goes to `https://seasonly.me/r/<id>`, which answers 404 until this change is in production; that follows from the spec (links always point at production).
+  3. The draping preview showed the face. Both buttons open the iPhone share sheet: "Share my season" with the story card, "Save my palette" with the palette image.
+  4. The Premium tap recorded an `interest_clicks` row, `is_test`, and the address row is `is_test`.
+  5. From the page (BotID's patched `fetch`), three more addresses answered 200, 200, 429, and a fifth 429 again.
+  6. The same POST from `curl`, without BotID's challenge, answered 403. `/r/<id>` answered 200 with `private, no-cache, no-store, max-age=0, must-revalidate` and `x-robots-tag: noindex`.
+  7. Throwaway commit `38dd101` (reverted in `58cff14`) made the read fail for that id. The page answered 500 with board 10c's page, and Sentry got the report from `withTimeout` (SEASONLY-7, environment `preview`, mechanism `generic`). `onRequestError` did not fire on Vercel. It did fire under a local `next start` (SEASONLY-6).
+     The three test reports, their addresses, the interest row and the crops are deleted.
 
 ## 7. Backlog and archive prep
 
