@@ -1,8 +1,7 @@
 import { randomBytes } from "node:crypto";
 
 import type { Agreement, QuizAnswers, SeasonSlug, Traits } from "@seasonly/analysis";
-import * as Sentry from "@sentry/nextjs";
-
+import { withTimeout } from "@/lib/observability/with-timeout";
 import type { FallbackReason, PhotoVerdict } from "@/lib/report-text";
 import { supabase } from "@/lib/supabase";
 
@@ -45,8 +44,6 @@ export interface ReportRow {
 
 export type ReportInsert = (row: ReportRow, signal: AbortSignal) => PromiseLike<{ error: unknown }>;
 
-const TIMEOUT_MS = 3000;
-
 const supabaseInsert: ReportInsert = (row, signal) =>
   supabase().from("reports").insert(row).abortSignal(signal);
 
@@ -74,24 +71,9 @@ export async function saveReport(
     agreement_note: record.agreementNote,
     is_test: process.env.VERCEL_ENV !== "production",
   };
-  const controller = new AbortController();
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const timeout = new Promise<Error>((resolve) => {
-    timer = setTimeout(() => {
-      controller.abort();
-      resolve(new Error("report save timed out after 3 s"));
-    }, TIMEOUT_MS);
+  const saved = await withTimeout("report save failed", async (signal) => {
+    const { error } = await insert(row, signal);
+    if (error) throw error;
   });
-  const save = (async () => (await insert(row, controller.signal)).error)().catch(
-    (error: unknown) => error ?? new Error("report save failed"),
-  );
-  try {
-    const error = await Promise.race([save, timeout]);
-    if (!error) return row.id;
-    Sentry.captureException(new Error("report save failed", { cause: error }));
-    await Sentry.flush(2000);
-    return null;
-  } finally {
-    clearTimeout(timer);
-  }
+  return saved.ok ? row.id : null;
 }

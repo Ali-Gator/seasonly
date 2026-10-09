@@ -28,13 +28,6 @@ fold items in.
 
 ## Code quality
 
-- **[BL-01] One timeout-and-report helper for `saveReport` and `storeCrop`** — both race a 3 s
-  timeout against a Supabase call, wrap the error with a cause, send it to Sentry and flush. The
-  logic is copied, so a fix to one (say, the flush budget) can miss the other. Extract one helper
-  next to `withErrorCapture` and call it from both.
-  _Refs:_ `apps/web/src/lib/analysis/store.ts` (`saveReport`), `apps/web/src/lib/draping/crops.ts`
-  (`storeCrop`) · _Status:_ open — `t5-report-images` phase review, 2026-10-07
-
 - **[BL-02] A hung crop upload is abandoned, not cancelled** — `upload()` in
   `@supabase/storage-js` 2.117 takes no abort signal, so after the 3 s timeout the request keeps
   running until the function's time limit ends it. It is harmless today because the response is
