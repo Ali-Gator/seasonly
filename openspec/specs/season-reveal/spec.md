@@ -182,6 +182,7 @@ A season result SHALL show the reveal of canvas artboard 08:
 - the season's tagline;
 - the season's reveal line;
 - the note "One more step to your subtype", with "<Family> has three subtypes. Your full report names yours and gives you 30 colors.";
+- "Get my full report", which opens the email step;
 - "Retake my photo".
 
 A quiz-only result SHALL say that it comes from the quiz alone, and SHALL offer to add a photo instead of a retake. The subtype's name SHALL NOT appear on the reveal.
@@ -195,6 +196,11 @@ A quiz-only result SHALL say that it comes from the quiz alone, and SHALL offer 
 
 - **WHEN** the person chooses "Retake my photo"
 - **THEN** the capture step is shown, and the quiz answers are kept
+
+#### Scenario: Get my full report
+
+- **WHEN** the person chooses "Get my full report" on a result with a report id
+- **THEN** the email step is shown for that report
 
 ### Requirement: Each analysis outcome is reported without photo data
 
@@ -236,3 +242,17 @@ On a 390 × 844 viewport, a person SHALL be able to go from the landing page to 
 
 - **WHEN** the E2E test's analyze request is answered
 - **THEN** its text source is not `personal` and its report id is null
+
+### Requirement: A reveal without a report id offers to try again
+
+When a result comes with no report id, because its save failed, the reveal SHALL NOT offer "Get my full report". It SHALL show the note "We couldn't save your report" with "Your season is below, but your full report needs one more try." and offer "Try again", which re-sends the same request. The rest of the reveal SHALL stay as it is.
+
+#### Scenario: The save failed
+
+- **WHEN** the analyze response carries a season and a null report id
+- **THEN** the reveal shows the family, "We couldn't save your report" and "Try again", and no "Get my full report"
+
+#### Scenario: Trying again
+
+- **WHEN** the person chooses "Try again" on that reveal
+- **THEN** the analyzing step is shown and the same request is sent again

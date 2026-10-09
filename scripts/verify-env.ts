@@ -87,6 +87,12 @@ export const PROBES: Probe[] = [
     hint: "vision calls per UTC day; defaults to 200",
     shape: /^[1-9]\d*$/,
   },
+  {
+    name: "RESEND_API_KEY",
+    phase: 1,
+    hint: "Resend → API Keys, sending access",
+    shape: /^re_/,
+  },
 ];
 
 function loadEnvLocal(): Record<string, string> {

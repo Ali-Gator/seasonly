@@ -1,6 +1,6 @@
-import * as Sentry from "@sentry/nextjs";
 import { StorageApiError } from "@supabase/supabase-js";
 
+import { withTimeout } from "@/lib/observability/with-timeout";
 import { supabase } from "@/lib/supabase";
 
 /**
@@ -15,7 +15,6 @@ export type CropUpload = (path: string, bytes: Uint8Array) => PromiseLike<{ erro
 export type CropDownload = (path: string) => PromiseLike<{ data: Blob | null; error: unknown }>;
 
 const BUCKET = "crops";
-const TIMEOUT_MS = 3000;
 
 const supabaseUpload: CropUpload = (path, bytes) =>
   supabase().storage.from(BUCKET).upload(path, bytes, { contentType: "image/jpeg", upsert: false });
@@ -33,21 +32,10 @@ export async function storeCrop(
   bytes: Uint8Array,
   { upload = supabaseUpload }: { upload?: CropUpload } = {},
 ): Promise<void> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const timeout = new Promise<Error>((resolve) => {
-    timer = setTimeout(() => resolve(new Error("crop upload timed out after 3 s")), TIMEOUT_MS);
+  await withTimeout("crop upload failed", async () => {
+    const { error } = await upload(`${id}.jpg`, bytes);
+    if (error) throw error;
   });
-  const store = (async () => (await upload(`${id}.jpg`, bytes)).error)().catch(
-    (error: unknown) => error ?? new Error("crop upload failed"),
-  );
-  try {
-    const error = await Promise.race([store, timeout]);
-    if (!error) return;
-    Sentry.captureException(new Error("crop upload failed", { cause: error }));
-    await Sentry.flush(2000);
-  } finally {
-    clearTimeout(timer);
-  }
 }
 
 /**

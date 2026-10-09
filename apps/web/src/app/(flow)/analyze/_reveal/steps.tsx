@@ -1,9 +1,10 @@
 "use client";
 
-import { AGREEMENT_COPY, SEASON_COPY, seasonFamily } from "@seasonly/analysis";
+import { AGREEMENT_COPY, SEASON_COPY } from "@seasonly/analysis";
 import { useEffect, useState } from "react";
 
 import { Button, Icon, Note } from "@/components/ds";
+import { familyName } from "@/lib/site/routes";
 
 import type { Result } from "../flow-state";
 
@@ -84,16 +85,36 @@ export function Analyzing({ cropUrl }: { cropUrl: string | null }) {
   );
 }
 
-const capitalize = (s: string) => s[0]?.toUpperCase() + s.slice(1);
-
-/** {@link openspec/specs/season-reveal/spec.md#requirement-the-reveal-shows-the-season-family} */
-export function Reveal({ result, onRetake }: { result: Result; onRetake: () => void }) {
-  const family = capitalize(seasonFamily(result.season));
+/**
+ * {@link openspec/specs/season-reveal/spec.md#requirement-the-reveal-shows-the-season-family}
+ * {@link openspec/specs/season-reveal/spec.md#requirement-a-reveal-without-a-report-id-offers-to-try-again}
+ */
+export function Reveal({
+  result,
+  onRetake,
+  onReport,
+  onTryAgain,
+}: {
+  result: Result;
+  onRetake: () => void;
+  onReport: () => void;
+  onTryAgain: () => void;
+}) {
+  const family = familyName(result.season);
   const copy = SEASON_COPY[result.season];
   const quizOnly = result.agreement === "quiz-only";
+  const saved = result.reportId !== null;
   return (
     <div className="flex min-h-[70svh] flex-col gap-(--space-8)">
-      <div className="flex flex-col gap-(--space-3) pt-(--space-16) text-center">
+      {/* Board 08f: the note comes first, since it says "Your season is below". */}
+      {!saved && (
+        <Note title="We couldn't save your report">
+          Your season is below, but your full report needs one more try.
+        </Note>
+      )}
+      <div
+        className={`flex flex-col gap-(--space-3) text-center ${saved ? "pt-(--space-16)" : "pt-(--space-8)"}`}
+      >
         <p className="overline">Your season family</p>
         <h1 className="display" tabIndex={-1}>
           {family}
@@ -108,6 +129,15 @@ export function Reveal({ result, onRetake }: { result: Result; onRetake: () => v
         {family} has three subtypes. Your full report names yours and gives you 30 colors.
       </Note>
       <div className="sn-stack mt-auto">
+        {saved ? (
+          <Button block onClick={onReport}>
+            Get my full report
+          </Button>
+        ) : (
+          <Button block onClick={onTryAgain}>
+            Try again
+          </Button>
+        )}
         <Button variant="ghost" block onClick={onRetake}>
           {quizOnly && <Icon name="camera" size={18} />}
           {quizOnly ? "Add a photo" : "Retake my photo"}

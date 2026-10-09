@@ -13,6 +13,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 /**
  * Ported from the design system's bundle.js; a destination renders `next/link` for client navigation.
+ * Unlike the bundle, a disabled destination renders no href.
  *
  * @see openspec/specs/ui-components/spec.md
  */
@@ -25,6 +26,20 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const classes = cx("sn-btn", `sn-btn--${variant}`, block && "sn-btn--block", className);
+  // A disabled destination is a link that goes nowhere: no href, so no tap or keyboard navigates.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- dropped: a disabled link does nothing
+  const { disabled, onClick, ...anchor } = rest;
+  if (href && (disabled || String(rest["aria-disabled"]) === "true"))
+    return (
+      <a
+        role="link"
+        {...(anchor as AnchorHTMLAttributes<HTMLAnchorElement>)}
+        aria-disabled="true"
+        className={classes}
+      >
+        {children}
+      </a>
+    );
   if (href)
     return (
       // Every prop passes through, as in the bundle; the handlers' element type is the only mismatch.

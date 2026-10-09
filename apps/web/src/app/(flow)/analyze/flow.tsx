@@ -8,8 +8,10 @@ import type { AnalyzeResponse } from "@/lib/analysis/request";
 import { photoCheckedProps, track } from "@/lib/capture/events";
 import { loadVision } from "@/lib/capture/mediapipe";
 import { checkImage } from "@/lib/capture/photo";
+import { familyName } from "@/lib/site/routes";
 
 import { Capture, Checking, Consent, Guide, Retake } from "./_capture/steps";
+import { EmailStep } from "./_email/step";
 import { QuizStep } from "./_quiz/quiz";
 import { AnalysisError, Analyzing, NoResult, Reveal } from "./_reveal/steps";
 import { initialState, reduce, stepProgress, toFormData } from "./flow-state";
@@ -206,7 +208,21 @@ export function Flow() {
         />
       )}
       {step.name === "analyzing" && <Analyzing cropUrl={request?.photo?.cropUrl ?? null} />}
-      {step.name === "reveal" && <Reveal result={step.result} onRetake={retake} />}
+      {step.name === "reveal" && (
+        <Reveal
+          result={step.result}
+          onRetake={retake}
+          onReport={() => dispatch({ type: "open-email" })}
+          onTryAgain={() => dispatch({ type: "try-again" })}
+        />
+      )}
+      {step.name === "email" && step.result.reportId && (
+        <EmailStep
+          reportId={step.result.reportId}
+          family={familyName(step.result.season)}
+          quizOnly={step.result.agreement === "quiz-only"}
+        />
+      )}
       {step.name === "no-result" && (
         <NoResult onChange={() => dispatch({ type: "change-answers" })} onPhoto={retake} />
       )}

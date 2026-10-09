@@ -64,6 +64,55 @@
     cursor: not-allowed;
   }
 
+  /* Email field */
+  .sn-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .sn-field__label {
+    font: 600 15px/20px var(--font-sans);
+    color: var(--ink);
+  }
+  .sn-field__input {
+    min-height: var(--size-tap);
+    padding: 0 var(--space-4);
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-md);
+    font: 400 16px/22px var(--font-sans); /* 16px keeps iOS from zooming */
+  }
+  .sn-field__input:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .sn-field__input::placeholder {
+    color: var(--ink-subtle);
+  }
+  .sn-field--error .sn-field__input {
+    border-color: var(--danger);
+    border-width: 2px;
+    padding: 0 calc(var(--space-4) - 1px);
+  }
+  .sn-field__hint,
+  .sn-field__error {
+    display: flex;
+    gap: var(--space-1);
+    align-items: flex-start;
+    font-size: 13px;
+    line-height: 18px;
+  }
+  .sn-field__hint {
+    color: var(--ink-muted);
+  }
+  .sn-field__error {
+    color: var(--danger);
+  }
+  .sn-field__error .sn-icon {
+    margin-top: 2px;
+  }
+
   /* Swatch */
   .sn-swatch {
     display: flex;

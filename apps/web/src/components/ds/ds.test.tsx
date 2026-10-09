@@ -10,6 +10,7 @@ import {
   Button,
   CameraFrame,
   DrapingPair,
+  EmailInput,
   Icon,
   Note,
   PhotoTipCard,
@@ -106,6 +107,21 @@ describe("Button", () => {
     const out = html(<Button aria-disabled="true">Analyzing your photo</Button>);
     expect(out).toContain('aria-disabled="true"');
     expect(out).toContain(">Analyzing your photo</button>");
+  });
+
+  /** {@link openspec/specs/ui-components/spec.md#requirement-a-button-is-a-link-when-it-navigates-and-a-button-when-it-acts} */
+  it("renders no href when disabled with a destination", () => {
+    for (const off of [{ "aria-disabled": "true" as const }, { disabled: true }]) {
+      const out = html(
+        <Button href="/analyze" {...off}>
+          Saved
+        </Button>,
+      );
+      expect(out).not.toContain("href=");
+      expect(out).toContain('aria-disabled="true"');
+      expect(out).toContain('class="sn-btn sn-btn--primary"');
+      expect(out).toContain(">Saved</a>");
+    }
   });
 });
 
@@ -212,6 +228,8 @@ describe("Stylesheets", () => {
         Ghost
       </Button>
       <Button aria-disabled="true">Disabled</Button>
+      <EmailInput label="Email" hint="Hint" />
+      <EmailInput label="Email" error="Error" />
       <Icon name="lock" label="Locked" />
       <Swatch name="Terracotta" hex="#b4694f" />
       <Swatch name="Terracotta" hex="#b4694f" size="lg" />
