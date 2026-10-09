@@ -1,4 +1,956 @@
 {
   "version": 1,
-  "photos": []
+  "photos": [
+    {
+      "file": "p01/1-green-backdrop.jpg",
+      "person": "p01",
+      "season": "light-spring",
+      "light": "green-backdrop",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/92/Blake_Lively-yehzov-hair.jpg",
+      "sha256": "1cfe80124d97b09b0e5834e11f102b917973cade54450b991d6f6e85197c0068",
+      "license": "CC BY-SA 2.0",
+      "author": "Kristin Dos Santos from Los Angeles, California, United States Touch-up by Rama"
+    },
+    {
+      "file": "p01/2-stage-warm.jpg",
+      "person": "p01",
+      "season": "light-spring",
+      "light": "stage-warm",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Blake_Lively_Comic-Con_%28cropped%29.jpg",
+      "sha256": "2be44684e4040687db6fe77c0f58f5502c806bd1b0bb9977ee1205ab06c78220",
+      "license": "CC BY-SA 2.0",
+      "author": "Ronald Woan"
+    },
+    {
+      "file": "p01/3-indoor-daylight.jpg",
+      "person": "p01",
+      "season": "light-spring",
+      "light": "indoor-daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/5/59/Blake_Lively_2018_%28cropped_2%29.jpg",
+      "sha256": "8fdd24b42255fb595888fc697f8b35972afc0a4a1fde1e3532af1aa00ffe30c4",
+      "license": "CC BY 3.0",
+      "author": "MTV International"
+    },
+    {
+      "file": "p01/4-daylight.jpg",
+      "person": "p01",
+      "season": "light-spring",
+      "light": "daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/0/09/Cannes_090_%2827830786580%29_%28cropped%29.jpg",
+      "sha256": "67f4ba94fb4b61d9206f3abdbc2a0f67ad69cea43427892d2e8f7eabdaaeaa34",
+      "license": "CC BY-SA 2.0",
+      "author": "GabboT"
+    },
+    {
+      "file": "p01/5-flash.jpg",
+      "person": "p01",
+      "season": "light-spring",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Blake_Lively_2011_Shankbone_4_%28cropped%29.JPG",
+      "sha256": "025d413736b56a9ed4a0d7fd20fdee51fab8dbc2ca6ba35ac10f032b5fe009e4",
+      "license": "CC BY 3.0",
+      "author": "David Shankbone"
+    },
+    {
+      "file": "p01/6-night-flash.jpg",
+      "person": "p01",
+      "season": "light-spring",
+      "light": "night-flash",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Blake_Lively_and_Penn_Badgley_%40_CW_Upfront_Presentation.jpg",
+      "sha256": "10cbb5d4776f0e32056919260725b62fb63f4fcd32a69aae305e2d76738a6693",
+      "license": "CC BY-SA 2.0",
+      "author": "Kristin Dos Santos from Los Angeles, California, United States"
+    },
+    {
+      "file": "p02/1-indoor-daylight.jpg",
+      "person": "p02",
+      "season": "true-spring",
+      "light": "indoor-daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Amy_Adams_May_2009_cropped.jpg",
+      "sha256": "1d68d7ced00b0d52e062c594046bd2131782fa664ba1f0960bb28cbc1fbc7626",
+      "license": "CC BY 3.0",
+      "author": "WilsonAdamsStillerMay09.jpg: cranberries at https://www.flickr.com/photos/51531384@N00/ derivative work: Mario Žamić (talk)"
+    },
+    {
+      "file": "p02/2-night-flash.jpg",
+      "person": "p02",
+      "season": "true-spring",
+      "light": "night-flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/1/19/Amy_Adams_2011.jpg",
+      "sha256": "abd28ca691044c08084cfe257e854d2b4c6669958e4b81a35b4fd6ab571ce1a0",
+      "license": "CC BY-SA 2.0",
+      "author": "Mingle MediaTV at https://www.flickr.com/photos/minglemediatv"
+    },
+    {
+      "file": "p02/3-stage-warm.jpg",
+      "person": "p02",
+      "season": "true-spring",
+      "light": "stage-warm",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Amy_Adams_2013_%2810232977824%29.jpg",
+      "sha256": "3b6cf8ba454de03be754ae863c5a5ea68f454dbea451c94e4d9dda73d3be7e4e",
+      "license": "CC BY 2.0",
+      "author": "https://www.flickr.com/photos/aphrodite-in-nyc/"
+    },
+    {
+      "file": "p02/4-flash.jpg",
+      "person": "p02",
+      "season": "true-spring",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/1/12/Amy_Adams_UK_Nocturnal_Animals_Premiere_%28cropped%29.jpg",
+      "sha256": "9c7a04ef041c0366ee5580dca54337c697a87642daea671bb320bdc44310d0b2",
+      "license": "CC BY-SA 2.0",
+      "author": "Patrick L."
+    },
+    {
+      "file": "p02/5-daylight.jpg",
+      "person": "p02",
+      "season": "true-spring",
+      "light": "daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/21/Amy_Adams_%2829708985502%29.jpg",
+      "sha256": "5d46dab77fba57a30779d782ccf156589c843e1cd339be45314b7c022ea5918f",
+      "license": "CC BY-SA 2.0",
+      "author": "Gordon Correll"
+    },
+    {
+      "file": "p02/6-stage-daylight.jpg",
+      "person": "p02",
+      "season": "true-spring",
+      "light": "stage-daylight",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b5/SDCC_2015_-_Amy_Adams_%26_Henry_Cavill_%2819091120273%29.jpg",
+      "sha256": "c966fd60ffe2a604c59816fda95950a73c86967f3f93c9863a1c875d194c4dbc",
+      "license": "CC BY-SA 2.0",
+      "author": "Gage Skidmore from Peoria, AZ, United States of America"
+    },
+    {
+      "file": "p03/1-daylight.jpg",
+      "person": "p03",
+      "season": "bright-spring",
+      "light": "daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Emma_Stone_2014.jpg",
+      "sha256": "826df93d5add821c1396bb903ff69106adb1048b1f07cc9cf639daeca0dac243",
+      "license": "CC BY-SA 2.0",
+      "author": "Eva Rinaldi"
+    },
+    {
+      "file": "p03/2-overcast.jpg",
+      "person": "p03",
+      "season": "bright-spring",
+      "light": "overcast",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/a/af/Emma_Stone_%2830498079137%29_%28cropped%29.jpg",
+      "sha256": "6585d13d78f577385b8f5938564bea2d546d789f1eab4a2415a9a65895865f73",
+      "license": "CC BY-SA 2.0",
+      "author": "https://www.flickr.com/photos/greg2600/"
+    },
+    {
+      "file": "p03/3-flash-magenta.jpg",
+      "person": "p03",
+      "season": "bright-spring",
+      "light": "flash-magenta",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/74/Emma_Stone_at_the_2024_New_York_Film_Festival_2_%28cropped%29.jpg",
+      "sha256": "107567364e74dbf86835ce6976843cb66e477e4f6f0223ccae877ad35f2e86fc",
+      "license": "CC BY-SA 4.0",
+      "author": "Bryan Berlin"
+    },
+    {
+      "file": "p03/4-daylight.jpg",
+      "person": "p03",
+      "season": "bright-spring",
+      "light": "daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Emma_Stone_at_the_2025_Cannes_Film_Festival_04.jpg",
+      "sha256": "4414f21efe97aad0b9773f965b59083a65cc9a00e440c28ef0bbb09071818938",
+      "license": "CC BY-SA 4.0",
+      "author": "Gabriel Hutchinson"
+    },
+    {
+      "file": "p03/5-stage-orange.jpg",
+      "person": "p03",
+      "season": "bright-spring",
+      "light": "stage-orange",
+      "expect": "tint",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/a/aa/BugoniaBFILFF101025-27_%2854848940897%29.jpg",
+      "sha256": "6354ed0beec7aaedb5d6b7788a3c1ef603472f2fe1505f5e586ac339d32b34fb",
+      "license": "CC BY 4.0",
+      "author": "Raph_PH"
+    },
+    {
+      "file": "p03/6-indoor-flash.jpg",
+      "person": "p03",
+      "season": "bright-spring",
+      "light": "indoor-flash",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Venice_Film_Festival_-_73_-_Mostra_del_cinema_di_Venezia_%2829522412161%29_%28cropped%29.jpg",
+      "sha256": "f61cea7af5aba447dc3203782bed721895592ca9f875b451f13e3d4a4d72af8e",
+      "license": "CC BY-SA 2.0",
+      "author": "Gianni Torre from Venice, Italy"
+    },
+    {
+      "file": "p04/1-night-warm.jpg",
+      "person": "p04",
+      "season": "light-summer",
+      "light": "night-warm",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/78/MKr26816_Cate_Blanchett_%28T%C3%A1r%2C_Berlinale_2023%29.jpg",
+      "sha256": "26608f067801c7174fb4491b7b12d7aeebd575409d65dd623d89142fbe36b4b7",
+      "license": "CC BY-SA 4.0",
+      "author": "Martin Kraft"
+    },
+    {
+      "file": "p04/2-stage-daylight.jpg",
+      "person": "p04",
+      "season": "light-summer",
+      "light": "stage-daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Cate_Blanchett_in_2017_by_Gage_Skidmore.jpg",
+      "sha256": "1473c7da2ad9604b2eceee8e5bd71c771bc7369d34d10de15414dc4439eb8103",
+      "license": "CC BY-SA 2.0",
+      "author": "Gage Skidmore from Peoria, AZ, United States of America"
+    },
+    {
+      "file": "p04/3-night-flash.jpg",
+      "person": "p04",
+      "season": "light-summer",
+      "light": "night-flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Cate_Blanchett-0547.jpg",
+      "sha256": "cb8f0f6dac2b9865b7aba98b1915b05eb1dc0c98cf5dae169f53e4ded841adb4",
+      "license": "CC BY-SA 3.0",
+      "author": "Harald Krichel"
+    },
+    {
+      "file": "p04/4-flash.jpg",
+      "person": "p04",
+      "season": "light-summer",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Cate_Blanchett_at_the_2024_Toronto_International_Film_Festival_2_%28cropped%29.jpg",
+      "sha256": "8a639fc0908a825509dc0673b92a78e4a5bf6bc50bf24af8f24280e787b13bb8",
+      "license": "CC BY-SA 4.0",
+      "author": "John Sears"
+    },
+    {
+      "file": "p04/5-daylight.jpg",
+      "person": "p04",
+      "season": "light-summer",
+      "light": "daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/6/61/Cate_Blanchett-63298.jpg",
+      "sha256": "ae30d71a1c9e08aa4f39219cea8edd1ea5fbf87e27a3cd9faa0c0483f6699810",
+      "license": "CC BY-SA 4.0",
+      "author": "Harald Krichel"
+    },
+    {
+      "file": "p04/6-stage-daylight.jpg",
+      "person": "p04",
+      "season": "light-summer",
+      "light": "stage-daylight",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Cate_Blanchett_%2836243178645%29.jpg",
+      "sha256": "29b0a5234c846ad6f63f2dcea1d065b8d3e07c0252aa7ee388b8e51f3f76411c",
+      "license": "CC BY-SA 2.0",
+      "author": "Gage Skidmore from Peoria, AZ, United States of America"
+    },
+    {
+      "file": "p05/1-daylight.jpg",
+      "person": "p05",
+      "season": "light-summer",
+      "light": "daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Taylor_Swift_2009_2.jpg",
+      "sha256": "95b7453bc18f2c3de6fb9be4fda08aa88eac9791a1e599e0ae0eb9d9469f8ee8",
+      "license": "CC BY 2.0",
+      "author": "Keith HInkle"
+    },
+    {
+      "file": "p05/2-flash.jpg",
+      "person": "p05",
+      "season": "light-summer",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Taylor_Swift_2_-_2019_by_Glenn_Francis_%28cropped_2%29.jpg",
+      "sha256": "36e5a1b764980eebfd715c77ddbf1cbc68afd082381c99dbd23bf044ab8c35db",
+      "license": "CC BY-SA 4.0",
+      "author": "Toglenn"
+    },
+    {
+      "file": "p05/3-indoor-mixed.jpg",
+      "person": "p05",
+      "season": "light-summer",
+      "light": "indoor-mixed",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Taylor_Swift_GMA_2012.jpg",
+      "sha256": "b291ab577c2316d8839dd4d19077308b7938d5a22617647975ca8dd12982af8c",
+      "license": "CC BY 2.0",
+      "author": "Paolo Villanueva"
+    },
+    {
+      "file": "p05/4-indoor-mixed.jpg",
+      "person": "p05",
+      "season": "light-summer",
+      "light": "indoor-mixed",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/f/fc/Taylor_Swift_GMA_%288114001031%29.jpg",
+      "sha256": "90bc0abd9d386b5a78fe888ebd2fb6552863b138eaf544cf060d11beafe69658",
+      "license": "CC BY 2.0",
+      "author": "Paolo Villanueva from New York, USA"
+    },
+    {
+      "file": "p06/1-flash-blue.jpg",
+      "person": "p06",
+      "season": "true-summer",
+      "light": "flash-blue",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/c/cb/NicoleKidmanApr10.jpg",
+      "sha256": "107917d8136af0538b5096c671f72fdf03d7b51dea7077cb10b48ca3ac43f3b2",
+      "license": "CC BY 2.0",
+      "author": "Keith Hinkle at https://www.flickr.com/photos/burningkarma/"
+    },
+    {
+      "file": "p06/2-overcast.jpg",
+      "person": "p06",
+      "season": "true-summer",
+      "light": "overcast",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/77/Nicole_Kidman_on_the_red_carpet_before_the_premiere_of_The_Railway_Man_at_the_2013_Toronto_International_Film_Festival_%2813306477003%29.jpg",
+      "sha256": "91a76fc18a41ed6a44f9b4cdd070c87404ac89e02eedfb1276e07be7f704305a",
+      "license": "CC BY 2.0",
+      "author": "Mr. Bombdiggity"
+    },
+    {
+      "file": "p06/3-stage-daylight.jpg",
+      "person": "p06",
+      "season": "true-summer",
+      "light": "stage-daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Nicole_Kidman_2_%2829900987478%29.jpg",
+      "sha256": "18951a3b83f5157a58d7e73d91a481d2a35a10d835763edca1f59187c2ebd6e6",
+      "license": "CC BY-SA 2.0",
+      "author": "Gage Skidmore from Peoria, AZ, United States of America"
+    },
+    {
+      "file": "p06/4-daylight.jpg",
+      "person": "p06",
+      "season": "true-summer",
+      "light": "daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Nicole_Kidman-66059_%28cropped%29.jpg",
+      "sha256": "49157ea5464d2ac53f3909d638bc0823e22b60001c710aa29bae2a18e4f2bb22",
+      "license": "CC BY-SA 4.0",
+      "author": "Harald Krichel"
+    },
+    {
+      "file": "p06/5-black-and-white.jpg",
+      "person": "p06",
+      "season": "true-summer",
+      "light": "black-and-white",
+      "expect": "filter",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/d/da/Nicole_Kidman_%286902395937%29.jpg",
+      "sha256": "9ab760f459157602bf50bb1adfe83a1bf43dcd1b82bc125a294821930f3ca8c5",
+      "license": "CC BY-SA 2.0",
+      "author": "Eva Rinaldi"
+    },
+    {
+      "file": "p06/6-night-flash.jpg",
+      "person": "p06",
+      "season": "true-summer",
+      "light": "night-flash",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Nicole_Kidman_4.jpg",
+      "sha256": "a1dc30c654ab60cb9e7f872d7c7bfd2dbfc597a397469f27194b9f2505f5a587",
+      "license": "CC BY 2.0",
+      "author": "Galeria de burningkarma"
+    },
+    {
+      "file": "p07/1-indoor-dim.jpg",
+      "person": "p07",
+      "season": "soft-summer",
+      "light": "indoor-dim",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Emily_Blunt_TIFF_2011.jpg",
+      "sha256": "e1bd3b5883a21b88b0c1221cc3d93b12d9d300ffd08734d29926d62df8c0e3eb",
+      "license": "CC BY-SA 2.0",
+      "author": "Tabercil"
+    },
+    {
+      "file": "p07/2-daylight.jpg",
+      "person": "p07",
+      "season": "soft-summer",
+      "light": "daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/4d/EmilyBluntTIFFSept2012.jpg",
+      "sha256": "1650d643c5845861a498060a1633168255a2098ccc548b07e6a72fde39f5bd96",
+      "license": "CC BY-SA 2.0",
+      "author": "gdcgraphics"
+    },
+    {
+      "file": "p07/3-stage-warm.jpg",
+      "person": "p07",
+      "season": "soft-summer",
+      "light": "stage-warm",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/5/50/Emily_Blunt_Comic-Con_2013.jpg",
+      "sha256": "a3e3e4226f30aa6b026a0f922fd2e53752327641dec972ce78ab55a0fbf19640",
+      "license": "CC BY-SA 2.0",
+      "author": "Gage Skidmore"
+    },
+    {
+      "file": "p07/4-night-flash.jpg",
+      "person": "p07",
+      "season": "soft-summer",
+      "light": "night-flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/0/06/Emily_Blunt_%2832056670378%29.jpg",
+      "sha256": "5cc197339bbb0eadb931d5393c7a73bf53766903bc06d74b8e76a2ad67ef4d35",
+      "license": "CC BY-SA 2.0",
+      "author": "https://www.flickr.com/photos/greg2600/"
+    },
+    {
+      "file": "p07/5-flash.jpg",
+      "person": "p07",
+      "season": "soft-summer",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b2/Emily_Blunt_at_WWD_Style_Awards_2026.jpg",
+      "sha256": "03db5597f985a73c942c979bce6e0553bee35b225a15a75818b601ca18042f8a",
+      "license": "CC BY 4.0",
+      "author": "Kevin Paul"
+    },
+    {
+      "file": "p07/6-stage-warm.jpg",
+      "person": "p07",
+      "season": "soft-summer",
+      "light": "stage-warm",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/2b/SDCC_2013_Emily_Blunt_and_Tom_Cruise_01.jpg",
+      "sha256": "2bf85d7b2671ed99fb1f35970afd4e2240e760990a7a4c06ce6e91c62e1e92d6",
+      "license": "CC BY-SA 2.0",
+      "author": "Gage Skidmore"
+    },
+    {
+      "file": "p08/1-flash.jpg",
+      "person": "p08",
+      "season": "soft-autumn",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Julia_Roberts_2011_Shankbone.JPG",
+      "sha256": "d868a380c33d1115ceb1b0680eb924cf0c9df05c8910af75f60943ee10fead5c",
+      "license": "CC BY 3.0",
+      "author": "David Shankbone"
+    },
+    {
+      "file": "p08/2-daylight.jpg",
+      "person": "p08",
+      "season": "soft-autumn",
+      "light": "daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/3d/2013_Toronto_Film_Festival_August_05_%289734425847%29.jpg",
+      "sha256": "1489bf5fa1df36f9cdcebf321f1506765e0c58c0a1b4af29d153c00a0ca5cf80",
+      "license": "CC BY-SA 2.0",
+      "author": "GabboT"
+    },
+    {
+      "file": "p08/3-overcast.jpg",
+      "person": "p08",
+      "season": "soft-autumn",
+      "light": "overcast",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Homecoming_17_%2844698652532%29.jpg",
+      "sha256": "7e2d82a16bc43d16baa7cd0936cb4b4222edaf39ca0404452be98af2424e2db6",
+      "license": "CC BY-SA 2.0",
+      "author": "GabboT"
+    },
+    {
+      "file": "p08/4-flash-green.jpg",
+      "person": "p08",
+      "season": "soft-autumn",
+      "light": "flash-green",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Julia_Roberts_After_The_Hunt-27.jpg",
+      "sha256": "a1ffe80b45dce8b498e572e119f140137db8f9ed48e62d6487f7d181514f2c3c",
+      "license": "CC BY-SA 4.0",
+      "author": "Bryan Berlin"
+    },
+    {
+      "file": "p08/5-night-flash.jpg",
+      "person": "p08",
+      "season": "soft-autumn",
+      "light": "night-flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Julia_Roberts_2025_%28cropped%29.jpg",
+      "sha256": "31a8218f72dc40e9eac4b82aa733158d23d539dcfca6a49dad390eeee1de8817",
+      "license": "CC BY-SA 4.0",
+      "author": "Colleen Sturtevant"
+    },
+    {
+      "file": "p08/6-night-mixed.jpg",
+      "person": "p08",
+      "season": "soft-autumn",
+      "light": "night-mixed",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/7f/AfterTheHuntBFILFF111025-51_%2854858710588%29.jpg",
+      "sha256": "aff430b2980eb63109bd893b57578cd906886bbe0de3417d76eba0f5fc695823",
+      "license": "CC BY 4.0",
+      "author": "Raph_PH"
+    },
+    {
+      "file": "p09/1-flash.jpg",
+      "person": "p09",
+      "season": "true-autumn",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/8/82/Julianne_Moore_by_David_Shankbone.jpg",
+      "sha256": "a54addc1bdc86e76d762a6d11ff9ff691de4ef9cddd9dbd3e63f9b379342019a",
+      "license": "CC BY-SA 3.0",
+      "author": "David Shankbone"
+    },
+    {
+      "file": "p09/2-daylight.jpg",
+      "person": "p09",
+      "season": "true-autumn",
+      "light": "daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Julianne_Moore_66%C3%A8me_Festival_de_Venise_%28Mostra%29_color.jpg",
+      "sha256": "248d5242b77c205767d277c4d771444a54ed2e15813e16e4465107ccfba6e553",
+      "license": "CC BY-SA 2.0",
+      "author": "nicolas genin"
+    },
+    {
+      "file": "p09/3-night-warm.jpg",
+      "person": "p09",
+      "season": "true-autumn",
+      "light": "night-warm",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Julianne_Moore-60954.jpg",
+      "sha256": "f72ae1793b69b6f0fa195acf3560da1400df56414c3fa715408a519a74c1a204",
+      "license": "CC BY-SA 4.0",
+      "author": "Harald Krichel"
+    },
+    {
+      "file": "p09/4-flash.jpg",
+      "person": "p09",
+      "season": "true-autumn",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/5/5a/RoomNextDoorBFILFFRFH191024_%2889_of_159%29_%2854080057657%29_%28cropped%29.jpg",
+      "sha256": "be0201b8d36164edffff62a2e8b02ad07faa8d73f372809eebc5e4a11bfa36f9",
+      "license": "CC BY 2.0",
+      "author": "Raph_PH"
+    },
+    {
+      "file": "p09/5-outdoor-shade.jpg",
+      "person": "p09",
+      "season": "true-autumn",
+      "light": "outdoor-shade",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Julianne_Moore_04_%2821345069546%29.jpg",
+      "sha256": "99d59874bdc980eed6b48f13392a0317a9cfbdb30b4984afc38c18ce5b6b2f94",
+      "license": "CC BY-SA 2.0",
+      "author": "GabboT"
+    },
+    {
+      "file": "p09/6-night-flash.jpg",
+      "person": "p09",
+      "season": "true-autumn",
+      "light": "night-flash",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/6/61/Flickr_-_nicogenin_-_66%C3%A8me_Festival_de_Venise_%28Mostra%29_%2855%29.jpg",
+      "sha256": "cc11173e04166235b7f4c35b935333289e2039fde033e8b6d4df08f37d518cb9",
+      "license": "CC BY-SA 2.0",
+      "author": "nicolas genin from Paris, France"
+    },
+    {
+      "file": "p10/1-flash.jpg",
+      "person": "p10",
+      "season": "deep-autumn",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/34/Kerry_Washington_by_David_Shankbone.jpg",
+      "sha256": "396f45402a4fdc3143a6c7e8bf36b4e601e30d4db26de150e314dd22acd46744",
+      "license": "CC BY-SA 3.0",
+      "author": "David Shankbone"
+    },
+    {
+      "file": "p10/2-overcast.jpg",
+      "person": "p10",
+      "season": "deep-autumn",
+      "light": "overcast",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/35/Kerry_Washington_in_%282024%29_%28cropped%29.jpg",
+      "sha256": "4e47c308ce3f37a0b5b5947e7f8d238141df1b9287c6774a0768d10b426a6503",
+      "license": "Public domain",
+      "author": "Arlington National Cemetery"
+    },
+    {
+      "file": "p10/3-flash.jpg",
+      "person": "p10",
+      "season": "deep-autumn",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/71/Kerry_Washington_TIFF_2025_%28cropped%29.jpg",
+      "sha256": "1ed250eaf50354ec557f7590d5dabadbaf920caaec92dc482c9a3dc4eecbd9cc",
+      "license": "CC BY 4.0",
+      "author": "Max Surprenant"
+    },
+    {
+      "file": "p10/4-daylight.jpg",
+      "person": "p10",
+      "season": "deep-autumn",
+      "light": "daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Kerry_Washington%2C_Deliver_Commencement_Address_GWU_%288753937935%29.jpg",
+      "sha256": "07f8972d8d7b399f81f71323198b7f9fa9021658c71670cd182cc6e33de6ee60",
+      "license": "CC BY 2.0",
+      "author": "www.GlynLowe.com from lisbon, Portugal"
+    },
+    {
+      "file": "p10/5-night-dim.jpg",
+      "person": "p10",
+      "season": "deep-autumn",
+      "light": "night-dim",
+      "expect": "dark",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Flickr_-_Bucajack_-_Kerry_Washington_-_TIFF_09.jpg",
+      "sha256": "b62e868b2cdb2f832a8b106146a7d6e020eb638df314a2ea2d0ca3821799edfd",
+      "license": "CC BY-SA 2.0",
+      "author": "Mark Dunne from Toronto, Canada"
+    },
+    {
+      "file": "p10/6-daylight.jpg",
+      "person": "p10",
+      "season": "deep-autumn",
+      "light": "daylight",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Kerry_Washington%2C_Deliver_Commencement_Address_GWU_%288753928299%29.jpg",
+      "sha256": "303d7b9ed958b41906a350439bd5c0b940f87a8e7e600d0854210adaa5ab51aa",
+      "license": "CC BY 2.0",
+      "author": "www.GlynLowe.com from lisbon, Portugal"
+    },
+    {
+      "file": "p11/1-stage-warm.jpg",
+      "person": "p11",
+      "season": "deep-autumn",
+      "light": "stage-warm",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/8/81/Mindy_Kaling_May_2019.jpg",
+      "sha256": "5fd63fa19093e95761553cc58281c5336f908fc31d5546b41e86f7f05e9ce088",
+      "license": "CC BY 2.0",
+      "author": "Montclair Film"
+    },
+    {
+      "file": "p11/2-daylight.jpg",
+      "person": "p11",
+      "season": "deep-autumn",
+      "light": "daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Mindy_Kaling_by_Claire_Leahy_%28cropped%29.jpg",
+      "sha256": "b68321d21c56400e38301d33ed9b901de9e0721de644ea2bcd97cfb1984b72be",
+      "license": "CC BY-SA 4.0",
+      "author": "Claire Leahy"
+    },
+    {
+      "file": "p11/3-indoor-flash.jpg",
+      "person": "p11",
+      "season": "deep-autumn",
+      "light": "indoor-flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Mindy_Kaling_Jan_2023.jpg",
+      "sha256": "6ee7497f0be020869b224a29fa49841392ec1fcde021bc84280a02967fafdb4a",
+      "license": "CC BY 2.0",
+      "author": "US Department of Education"
+    },
+    {
+      "file": "p11/4-flash.jpg",
+      "person": "p11",
+      "season": "deep-autumn",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Mindy_Kaling_at_WWD_Style_Awards_2026.jpg",
+      "sha256": "7efb749963c3ad04f59645e45ecae49a3ce79042920b174c57064f585ef869ed",
+      "license": "CC BY 4.0",
+      "author": "Kevin Paul"
+    },
+    {
+      "file": "p11/5-blue-curtain.jpg",
+      "person": "p11",
+      "season": "deep-autumn",
+      "light": "blue-curtain",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Mindy_Kaling_at_PaleyFest_2013.jpg",
+      "sha256": "d9c49cc5863595e21c6493e3e6e17687e5069ab65b599d68e417dfff2a6fb26b",
+      "license": "CC BY-SA 2.0",
+      "author": "iDominick"
+    },
+    {
+      "file": "p11/6-indoor-flash.jpg",
+      "person": "p11",
+      "season": "deep-autumn",
+      "light": "indoor-flash",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/a/a8/Cardona%2C_Kaling_and_Emhoff_2023.jpg",
+      "sha256": "874c48e98a6d49593bef066ebd1ea3116654914bff832f7c288b66a821f7e09a",
+      "license": "CC BY 2.0",
+      "author": "US Department of Education"
+    },
+    {
+      "file": "p12/1-daylight.jpg",
+      "person": "p12",
+      "season": "deep-autumn",
+      "light": "daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/72/Viola_Davis_2009.jpg",
+      "sha256": "4d04bb718b65c73d90bdd372ea841e426329e92758e301da2daab7bb259c97e6",
+      "license": "CC BY 3.0",
+      "author": "Chrisa Hickey at https://www.flickr.com/photos/chrisahickey/"
+    },
+    {
+      "file": "p12/2-flash.jpg",
+      "person": "p12",
+      "season": "deep-autumn",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Viola_Davis_June_2015.jpg",
+      "sha256": "18ac2768fa9d2725dd0cd90d84b6b4f874ef43384095509b39ef5e743a3f62ba",
+      "license": "CC BY-SA 2.0",
+      "author": "Red Carpet Report on Mingle Media TV"
+    },
+    {
+      "file": "p12/3-indoor-mixed.jpg",
+      "person": "p12",
+      "season": "deep-autumn",
+      "light": "indoor-mixed",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/40/SDCC_2015_-_David_Ayer_%26_Viola_Davis_%2819521093010%29_%28cropped%29.jpg",
+      "sha256": "81dd1d6fb7836e859a2365a6664b70fbdae4cc4a66a58d3272e646476092bb10",
+      "license": "CC BY-SA 2.0",
+      "author": "Gage Skidmore from Peoria, AZ, United States of America"
+    },
+    {
+      "file": "p12/4-stage-warm.jpg",
+      "person": "p12",
+      "season": "deep-autumn",
+      "light": "stage-warm",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/8/85/Viola_Davis_by_Gage_Skidmore.jpg",
+      "sha256": "fbc1d2fb89a367a3f71bbecf32e7bad772efc611c2c8edd140f9d3c676e66686",
+      "license": "CC BY-SA 3.0",
+      "author": "Gage Skidmore"
+    },
+    {
+      "file": "p12/5-stage-warm.jpg",
+      "person": "p12",
+      "season": "deep-autumn",
+      "light": "stage-warm",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Viola_Davis_%26_Joel_Kinnaman_%2828316628690%29.jpg",
+      "sha256": "055d3a224468e6318525b0cdc5a32b0f2f1c98d8cfd3ee60b47116ca40dd45bb",
+      "license": "CC BY-SA 2.0",
+      "author": "Gage Skidmore from Peoria, AZ, United States of America"
+    },
+    {
+      "file": "p13/1-indoor-warm.jpg",
+      "person": "p13",
+      "season": "deep-winter",
+      "light": "indoor-warm",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/28/Nyong%27o_NYFF_2013_%28cropped%29.jpg",
+      "sha256": "30634b408c1530f00037942db76c56493cd9fb10c6a601ea0a2b1cf2bdba8f9d",
+      "license": "CC BY 2.0",
+      "author": "aphrodite-in-nyc"
+    },
+    {
+      "file": "p13/2-stage-warm.jpg",
+      "person": "p13",
+      "season": "deep-winter",
+      "light": "stage-warm",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Lupita_Nyong%27o_in_2017_by_Gage_Skidmore_%281%29.jpg",
+      "sha256": "21401c783a8c8ed14686ab42a7030372001ad45c1dfb0de8b504d13e8aaff202",
+      "license": "CC BY-SA 2.0",
+      "author": "Gage Skidmore from Peoria, AZ, United States of America"
+    },
+    {
+      "file": "p13/3-indoor-flat.jpg",
+      "person": "p13",
+      "season": "deep-winter",
+      "light": "indoor-flat",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/34/SXSW_2019_4_%2847282558132%29_%28cropped%29.jpg",
+      "sha256": "7c5a8a7a662f6bb5a813db8e163e1c8dc5d97c542a4c3c8b9634cfe6ae434e5f",
+      "license": "CC BY 2.0",
+      "author": "Daniel Benavides from Austin, TX"
+    },
+    {
+      "file": "p13/4-flash.jpg",
+      "person": "p13",
+      "season": "deep-winter",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Lupita_Nyong%27o_%2853673310248%29_cropped.jpg",
+      "sha256": "2d12af7fc263f9a0a9757711e4f0a1a5193807c7fa9a20d16a3ba406d94ce066",
+      "license": "CC BY-SA 2.0",
+      "author": "Gage Skidmore from Surprise, AZ, United States of America"
+    },
+    {
+      "file": "p13/5-stage-blue.jpg",
+      "person": "p13",
+      "season": "deep-winter",
+      "light": "stage-blue",
+      "expect": "tint",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/23/Lupita_Nyong%27o_%2852160581232%29_%28cropped%29.jpg",
+      "sha256": "63b9c1bb8c321de82db468bcd5871445518c979ab9478182dbf2e198650ac089",
+      "license": "CC BY 2.0",
+      "author": "Collision Conf"
+    },
+    {
+      "file": "p13/6-stage-warm.jpg",
+      "person": "p13",
+      "season": "deep-winter",
+      "light": "stage-warm",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/33/Lupita_Nyong%27o_%26_Michael_B._Jordan_%2835852137500%29.jpg",
+      "sha256": "6395dcb6dbc02cc143b8ef7d912736d0afdef8e33248d5385e1affffa692a1f0",
+      "license": "CC BY-SA 2.0",
+      "author": "Gage Skidmore from Peoria, AZ, United States of America"
+    },
+    {
+      "file": "p14/1-flash.jpg",
+      "person": "p14",
+      "season": "deep-winter",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/37/Selena_Gomez_2008_%28retouched%29.jpg",
+      "sha256": "1185fb1e261358c9796e1d06ea307cf2d659887c3857172273d53c08040467ae",
+      "license": "CC BY-SA 1.0",
+      "author": "Jennifer"
+    },
+    {
+      "file": "p14/2-flash.jpg",
+      "person": "p14",
+      "season": "deep-winter",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Selena_Gomez_UNICEF_2012.jpg",
+      "sha256": "fbe5c0e76be398024c91b31d2173602397c31a0439c0c27902b85a3bca9ee08d",
+      "license": "CC BY-SA 2.0",
+      "author": "Joella Marano from Manhattan, NYC"
+    },
+    {
+      "file": "p14/3-flash.jpg",
+      "person": "p14",
+      "season": "deep-winter",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/8/81/Selena_Gomez_at_the_2024_Toronto_International_Film_Festival_10_%28cropped%29.jpg",
+      "sha256": "3c7f43d13e4f330ec811094962adc03b65478d23f7852d23d8643d6be5ee7495",
+      "license": "CC BY-SA 4.0",
+      "author": "Frank Sun"
+    },
+    {
+      "file": "p14/4-daylight.jpg",
+      "person": "p14",
+      "season": "deep-winter",
+      "light": "daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Selena_Gomez_TODAY_Show_Live_2015_%2850144934103%29.jpg",
+      "sha256": "3ea5ae29d2726186958a4618a93ea6b99a4b8728f5c9e298a86497ffb3a0005d",
+      "license": "CC BY 2.0",
+      "author": "Anthony Quintano from Westminster, United States"
+    },
+    {
+      "file": "p14/5-stage-blue.jpg",
+      "person": "p14",
+      "season": "deep-winter",
+      "light": "stage-blue",
+      "expect": "tint",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Stars_Dance_Tour%2C_Norway_5_cropped.jpg",
+      "sha256": "d4c0434fd3188958f4a0717cc1174eaa2c797c21c3081192101dee5bb942d412",
+      "license": "CC BY-SA 2.0",
+      "author": "Lisa Bjorheim"
+    },
+    {
+      "file": "p14/6-stage-warm.jpg",
+      "person": "p14",
+      "season": "deep-winter",
+      "light": "stage-warm",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Spring_Breakers_cast_%288487510140%29.jpg",
+      "sha256": "21b264aade8b9ecc13435c561d20df1c194e43723a2cd98e35edc973afc81faa",
+      "license": "CC BY 2.0",
+      "author": "https://www.flickr.com/photos/nivrae/"
+    },
+    {
+      "file": "p15/1-indoor-warm.jpg",
+      "person": "p15",
+      "season": "true-winter",
+      "light": "indoor-warm",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Lucy_Liu_%40_USAID_Human_Trafficking_Symposium_01.jpg",
+      "sha256": "afedb17239c2e30f2205871a8727a353e90dea9449432da21ad044d531fe6fc9",
+      "license": "CC BY 2.0",
+      "author": "Bethany from Pittsburgh, PA, United States"
+    },
+    {
+      "file": "p15/2-night-flash.jpg",
+      "person": "p15",
+      "season": "true-winter",
+      "light": "night-flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Lucy_Liu_2011.jpg",
+      "sha256": "c92513bcbffb326a03b9350d0170006dc36fe19cfe67fc6b7b607c0e2731206c",
+      "license": "CC BY-SA 2.0",
+      "author": "Eva Rinaldi"
+    },
+    {
+      "file": "p15/3-stage-daylight.jpg",
+      "person": "p15",
+      "season": "true-winter",
+      "light": "stage-daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/90/Lucy_Liu_DCC_2012_%2875882241089%29_%28cropped%29.jpg",
+      "sha256": "96c3045da6e55d4fdb14ab0c805601d79ecfb039b532a0b8c8ad93bec9134267",
+      "license": "CC BY 2.0",
+      "author": "https://www.flickr.com/photos/genevieve719/"
+    },
+    {
+      "file": "p15/4-flash.jpg",
+      "person": "p15",
+      "season": "true-winter",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Lucy_Liu_Rosemead-13_%28cropped%29.jpg",
+      "sha256": "b8609ed2721df06da78cf321df64ef5f2e403dfaed48a06851591e5d4dae1901",
+      "license": "CC BY-SA 4.0",
+      "author": "Bryan Berlin"
+    },
+    {
+      "file": "p15/5-stage-red.jpg",
+      "person": "p15",
+      "season": "true-winter",
+      "light": "stage-red",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Lucy_Liu_at_the_78th_Locarno_Film_Festival_in_2025_11.jpg",
+      "sha256": "00507110a98c63bc70a64789e39a9c323fbad888eaaed5ac36b650362c54fda0",
+      "license": "CC BY 4.0",
+      "author": "Quejaytee"
+    },
+    {
+      "file": "p15/6-indoor-flash.jpg",
+      "person": "p15",
+      "season": "true-winter",
+      "light": "indoor-flash",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/0/08/Vikas_shrivastav_and_hollwood_star_lucy_liu.JPG",
+      "sha256": "10083cb4f79bf0e5d24f74d5109e6857f1f826d1177ae1db8e46b3b18e56c06e",
+      "license": "CC BY-SA 3.0",
+      "author": "Vikas shrivastav actor"
+    },
+    {
+      "file": "p16/1-flash-yellow.jpg",
+      "person": "p16",
+      "season": "bright-winter",
+      "light": "flash-yellow",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Anne_Hathaway_at_MIFF.jpg",
+      "sha256": "f5bee56c8bf0cd2f8595aad05c51dc9352470c9192091fddda4b7a7498810d71",
+      "license": "CC BY-SA 2.0",
+      "author": "MiamiFilmFestivalPhoto by Rene G"
+    },
+    {
+      "file": "p16/2-indoor-dim.jpg",
+      "person": "p16",
+      "season": "bright-winter",
+      "light": "indoor-dim",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/20/Anne_Hathaway_2019_%28cropped%29_%282%29.jpg",
+      "sha256": "f6d3bcad1e7befd7ae39ccaf7e19470fec546b04f4a5985e9648e116b61ee7ad",
+      "license": "CC BY-SA 2.0",
+      "author": "https://www.flickr.com/photos/greg2600"
+    },
+    {
+      "file": "p16/3-stage-daylight.jpg",
+      "person": "p16",
+      "season": "bright-winter",
+      "light": "stage-daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Anne_Hathaway-26.jpg",
+      "sha256": "dce9850e32dbeab1f53aa8fced4a5f358c3515c578f59918b92404961636e88a",
+      "license": "CC BY-SA 3.0",
+      "author": "Harald Krichel"
+    },
+    {
+      "file": "p16/4-flash.jpg",
+      "person": "p16",
+      "season": "bright-winter",
+      "light": "flash",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/0/03/Anne_Hathaway_at_The_Apprentice_in_NYC_03_%28cropped2%29.jpg",
+      "sha256": "ce5a31bef257951f688189c478e0e60292c79be0840bca26441ac92ba773db12",
+      "license": "CC BY-SA 4.0",
+      "author": "Jay Dixit"
+    },
+    {
+      "file": "p16/5-indoor-daylight.jpg",
+      "person": "p16",
+      "season": "bright-winter",
+      "light": "indoor-daylight",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/d/da/Anne_Hathaway-_Press_conference_for_the_film_%22The_Devil_Wears_Prada_2%22_-_55194764955_%28cropped%29.jpg",
+      "sha256": "b6a13563d36aaab3bfa59eb7f2e0c718ef0680e154bfc086fb308acb5a805eef",
+      "license": "CC BY-SA 4.0",
+      "author": "Ministry of culture, sports and Tourism- Lee Jeong-woo"
+    },
+    {
+      "file": "p16/6-stage-mixed.jpg",
+      "person": "p16",
+      "season": "bright-winter",
+      "light": "stage-mixed",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Anne_Hathaway_%40_2018.09.15_Human_Rights_Campaign_National_Dinner%2C_Washington%2C_DC_USA_06194_%2843805104245%29_%28cropped_3%29.jpg",
+      "sha256": "289d2b3fb79cb23f03cc71eb3e6f4246863806796dfd76c5d965797bd41dd0c8",
+      "license": "CC BY-SA 2.0",
+      "author": "Ted Eytan"
+    }
+  ]
 }

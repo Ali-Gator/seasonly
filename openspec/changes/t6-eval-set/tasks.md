@@ -95,7 +95,7 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only
 
 ## 4. The photo set (user approval)
 
-- [ ] 4.1 Search Wikimedia Commons for candidates (design decision 5):
+- [x] 4.1 Search Wikimedia Commons for candidates (design decision 5):
   - 12–16 public figures, with 4–6 photos each in clearly different light;
   - skin tones from light to deep, and all four season families;
   - at least 4 photos with a second person visible;
@@ -103,12 +103,15 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only
 
   Note each photo's file page, original URL, license and author, a proposed season with a one-line reason, and a proposed `expect`. Done when the list is drafted.
 
-- [ ] 4.2 Publish the candidate list as a private review page: source, license, author, the proposed season and `expect` for each photo. An artifact page cannot hotlink Commons images, so link each Commons file page rather than downloading before approval. **The user approves or edits** the people, photos, labels and expected outcomes. Done when the user says yes.
-- [ ] 4.3 Download the approved photos, compute their SHA-256, and write the manifest entries (`p01`… person ids). Done when `pnpm eval:fetch` reports nothing missing, and `pnpm test:eval`'s manifest test passes.
+- [x] 4.2 Publish the candidate list as a private review page: source, license, author, the proposed season and `expect` for each photo. An artifact page cannot hotlink Commons images, so link each Commons file page rather than downloading before approval. **The user approves or edits** the people, photos, labels and expected outcomes. Done when the user says yes.
+- [x] 4.3 Download the approved photos, compute their SHA-256, and write the manifest entries (`p01`… person ids). Done when `pnpm eval:fetch` reports nothing missing, and `pnpm test:eval`'s manifest test passes.
 
 ## 5. Measure, then tune
 
-- [ ] 5.1 First run, untuned. Commit its `results.json` and copy its metrics to `baseline.json` as v0. Also record v0 here, in the Tracker log and in the PR. If a variant factor is not plainly bad to the eye on the first run, adjust it once before recording v0. Done when `pnpm test:eval` passes with v0.
+- [x] 5.1 First run, untuned. Commit its `results.json` and copy its metrics to `baseline.json` as v0. Also record v0 here, in the Tracker log and in the PR. If a variant factor is not plainly bad to the eye on the first run, adjust it once before recording v0. Done when `pnpm test:eval` passes with v0.
+
+  **v0, 2026-10-09** (16 people, 93 photos, 165 variants; untuned): agreement 0.4911, family agreement 0.6667, label accuracy 0.1389, family accuracy 0.2639, false-reject rate 0.2361 (dark 9, filter 5, tint 2, several-faces 1), expected-problem rate 0.5238, catch rate 0.8606, pass rate 0.6237. Variant factors kept as designed: each variant is plainly bad to the eye. 14 warm variants got `filter` instead of `tint`, which is a matter for the check's limits (5.2).
+
 - [ ] 5.2 Tune the photo check (design decision 6, step 2): a small grid over eye-white L*, eye-white C*ab, the skin-hue floor and the several-faces width, using cached runs. Keep the setting with the fewest false rejects that holds all four ratcheted metrics at v0 or better. A looser check admits harder photos, which can lower agreement or accuracy. If the best setting trades one metric for another, bring the numbers to the user, and lower the baseline only with the user's approval. Done when the chosen values are in the code. Any existing test that pins a moved limit (for example `photo-check.test.ts` L* 25 and C*ab 25) is listed for the user, and **edited only with the user's approval**.
 - [ ] 5.3 Update `photo-check` with the new limits and the measured rates through `/opsx:update`, replacing "provisional", and do the same for `capture-flow` if the several-faces width moved. If `face.jpg` now fails, swap the fixture per its README. Done when `openspec validate t6-eval-set` passes, along with `pnpm test:unit`, `pnpm test:eval` (fresh results) and `e2e/analysis-flow.spec.ts`.
 - [ ] 5.4 Tune sampling and the classifier (design decision 6, step 3). From `report.json`, find what light moves in each person's traits, and adjust the fewest `traits.ts` and `reference.ts` constants that explain it. Keep a change only if agreement and label accuracy both rise. Existing tests that pin a moved constant wait for the user's approval. Done when a fresh `results.json` beats the 5.3 numbers on both. If no change earns its place, record that, and leave the constants and their specs as they are.
