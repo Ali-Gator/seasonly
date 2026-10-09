@@ -120,8 +120,13 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new files only
 
   After archive, also update the permanent spec's Behavior section, which a delta cannot carry: `dark` below L* 22, `tint` above C*ab 22, hue range −10° to 100°, and "provisional until `t6-eval-set`" replaced by the measured rates.
 
-- [ ] 5.4 Tune sampling and the classifier (design decision 6, step 3). From `report.json`, find what light moves in each person's traits, and adjust the fewest `traits.ts` and `reference.ts` constants that explain it. Keep a change only if agreement and label accuracy both rise. Existing tests that pin a moved constant wait for the user's approval. Done when a fresh `results.json` beats the 5.3 numbers on both. If no change earns its place, record that, and leave the constants and their specs as they are.
-- [ ] 5.5 Update `color-sampling` and `season-classifier` with the moved constants, and drop "provisional" where a constant is now measured, through `/opsx:update`. Done when `openspec validate t6-eval-set` passes, along with `pnpm test:unit` and `pnpm test:eval`.
+- [x] 5.4 Tune sampling and the classifier (design decision 6, step 3). From `report.json`, find what light moves in each person's traits, and adjust the fewest `traits.ts` and `reference.ts` constants that explain it. Keep a change only if agreement and label accuracy both rise. Existing tests that pin a moved constant wait for the user's approval. Done when a fresh `results.json` beats the 5.3 numbers on both. If no change earns its place, record that, and leave the constants and their specs as they are.
+
+  **Done, 2026-10-09:** one constant moved. `SKIN_C` midpoint 20 → 26, the set's mean skin chroma (26.3). Traits read cool and bright overall: skin hue averages 47° against a midpoint of 55°, and contrast averages 50 against 30. Recentring each trait midpoint on its measured value, one at a time and then greedily, kept only `SKIN_C`; recentring all eight lowered agreement. Agreement 0.5240 → 0.6021, label accuracy 0.1389 → 0.1806. Reference-point moves (soft clarity −0.6 or −0.4, light value 0.6 or 0.5, deep value −0.6, true temperature ±0.7, bright clarity 0.7) each traded one metric for the other, so `reference.ts` is unchanged. No existing test pins the moved constant.
+
+- [x] 5.5 Update `color-sampling` and `season-classifier` with the moved constants, and drop "provisional" where a constant is now measured, through `/opsx:update`. Done when `openspec validate t6-eval-set` passes, along with `pnpm test:unit` and `pnpm test:eval`.
+
+  **Done, 2026-10-09:** no requirement of `color-sampling` or `season-classifier` names a constant, and the moved one keeps every monotonicity rule, so neither gets a delta. After archive, update the permanent specs' Behavior prose: `color-sampling` says skin chroma is centered on the eval set's measured mean and the other trait constants were checked; `season-classifier` says the reference points were checked against the eval set and kept.
 
 ## 6. Paid vision run (user approval)
 

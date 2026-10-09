@@ -69,8 +69,8 @@ Planned. Each delta is written with real numbers during apply, once the first ru
 
 - `photo-check`: the eye-white and skin-hue limits, set from the eval (L* 22, C*ab 22, hue floor −10°); "provisional" removed. Skin just below hue 0° now passes.
 - `capture-flow`: not modified. The several-faces width did not move: the set has one several-faces false reject, and a narrower width would only reject more.
-- `color-sampling`: the trait constants, if tuning moves them.
-- `season-classifier`: the reference points, if tuning moves them.
+- `color-sampling`: no requirement delta. The skin chroma midpoint moved (20 → 26), which no requirement names; the Behavior prose is updated after archive.
+- `season-classifier`: not modified. No reference-point move raised both agreement and accuracy.
 - `report-text`: the several-faces rule, only if the paid run shows the model rejects usable photos too often.
 
 ## Impact

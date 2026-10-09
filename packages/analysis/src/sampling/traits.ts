@@ -1,7 +1,10 @@
 /**
  * Region colors → temperature, value and clarity.
  *
- * Every constant here is provisional: t6-eval-set tunes them against labeled photos.
+ * SKIN_C is measured (t6-eval-set, 2026-10-09): its midpoint sits at the eval set's mean skin
+ * chroma, 26, which raised agreement across one person's photos from 0.52 to 0.60 and label
+ * accuracy from 0.14 to 0.18. Moving any other midpoint to its measured center did not raise
+ * both, so the rest stay as first set.
  *
  * @see openspec/specs/color-sampling/spec.md
  */
@@ -30,7 +33,7 @@ const HAIR_HUE = [60, 20] as const;
 const SKIN_L = [62, 15] as const;
 const HAIR_L = [40, 25] as const;
 const EYES_L = [40, 20] as const;
-const SKIN_C = [20, 8] as const;
+const SKIN_C = [26, 8] as const;
 const EYES_C = [20, 15] as const;
 /** How much darker than the skin the hair or the eyes are, whichever is darker. */
 const CONTRAST = [30, 20] as const;
