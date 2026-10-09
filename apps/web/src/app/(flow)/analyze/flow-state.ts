@@ -21,6 +21,8 @@ export type Step =
   | { name: "quiz"; question: number }
   | { name: "analyzing" }
   | { name: "reveal"; result: Result }
+  /** The email step for a result with a report id. */
+  | { name: "email"; result: Result }
   | { name: "no-result"; reason: "no-answers" | "answers-cancel" }
   | { name: "error" };
 
@@ -78,6 +80,7 @@ export type FlowEvent =
   | { type: "analyzed"; response: AnalyzeResponse }
   | { type: "failed" }
   | { type: "try-again" }
+  | { type: "open-email" }
   | { type: "back" };
 
 export function initialState(): FlowState {
@@ -180,8 +183,13 @@ export function reduce(s: FlowState, e: FlowEvent): FlowState {
     case "failed":
       return step.name === "analyzing" ? replace(s, { name: "error" }) : s;
     case "try-again":
-      return step.name === "error"
+      // From the error screen, or from a reveal whose result was not saved.
+      return step.name === "error" || (step.name === "reveal" && !step.result.reportId)
         ? { ...replace(s, { name: "analyzing" }), attempt: s.attempt + 1 }
+        : s;
+    case "open-email":
+      return step.name === "reveal" && step.result.reportId
+        ? push(s, { name: "email", result: step.result })
         : s;
     case "back": {
       const previous = s.trail.at(-1);
@@ -195,11 +203,11 @@ export function reduce(s: FlowState, e: FlowEvent): FlowState {
   }
 }
 
-/** The step progress's current index: Photo, Quiz, Result; none on the reveal. */
+/** The step progress's current index: Photo, Quiz, Result; none on the reveal or the email step. */
 export function stepProgress(step: Step): number | null {
   if (step.name === "quiz") return 1;
   if (step.name === "analyzing" || step.name === "no-result" || step.name === "error") return 2;
-  if (step.name === "reveal") return null;
+  if (step.name === "reveal" || step.name === "email") return null;
   return 0;
 }
 

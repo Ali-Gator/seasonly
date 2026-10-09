@@ -101,7 +101,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Done when they fail for the missing modules.
 
-- [ ] 3.6 Flow and reveal:
+- [x] 3.6 Flow and reveal:
   - make the edits approved in 2.2 to `flow-state.test.ts`;
   - in a new `apps/web/src/app/(flow)/analyze/_reveal/reveal.test.tsx`: a result with an id shows "Get my full report"; a null id shows "We couldn't save your report" and "Try again", and no "Get my full report";
   - in a new `apps/web/src/app/(flow)/analyze/_email/email-step.test.tsx`: the photo and quiz-only lists; an invalid address shows the error and sends no request; 200 and 429 both push `/r/<id>`; a 500 shows the danger Note with the address kept; the button is disabled while sending.

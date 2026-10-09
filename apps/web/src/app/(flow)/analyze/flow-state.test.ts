@@ -411,3 +411,47 @@ describe("review fixes", () => {
     expect(reduce(second, { ...passed, id: 2 }).step.name).toBe("consent");
   });
 });
+
+describe("report delivery", () => {
+  const result = (reportId: string | null) =>
+    ({
+      kind: "result",
+      reportId,
+      season: "soft-autumn",
+      agreement: "agree",
+      confidence: 0.5,
+      photo: "ok",
+      text: "personal",
+    }) as const;
+  const revealWith = (reportId: string | null) =>
+    reduce(run(toAnalyzing), { type: "analyzed", response: result(reportId) });
+
+  /** {@link openspec/specs/email-capture/spec.md#scenario-back-from-the-email-step} */
+  it("opens the email step from the reveal as a new entry, and Back returns to the reveal", () => {
+    const reveal = revealWith("k7m2qxAAAAAAAAAAAAAAAA");
+    const email = reduce(reveal, { type: "open-email" });
+    expect(email.step).toEqual({ name: "email", result: result("k7m2qxAAAAAAAAAAAAAAAA") });
+    expect(email.trail).toHaveLength(reveal.trail.length + 1);
+    expect(stepProgress(email.step)).toBeNull();
+    expect(reduce(email, { type: "back" }).step).toEqual(reveal.step);
+  });
+
+  /** {@link openspec/specs/email-capture/spec.md#requirement-the-full-report-needs-an-email-address} */
+  it("does not open the email step without a report id", () => {
+    const reveal = revealWith(null);
+    expect(reduce(reveal, { type: "open-email" })).toBe(reveal);
+  });
+
+  /** {@link openspec/specs/season-reveal/spec.md#scenario-trying-again} */
+  it("re-sends the same request from a reveal with no report id", () => {
+    const analyzing = run(toAnalyzing);
+    const reveal = reduce(analyzing, { type: "analyzed", response: result(null) });
+    const retry = reduce(reveal, { type: "try-again" });
+    expect(retry.step.name).toBe("analyzing");
+    expect(retry.request).toBe(analyzing.request);
+    expect(retry.attempt).toBe(analyzing.attempt + 1);
+    expect(reduce(revealWith("k7m2qxAAAAAAAAAAAAAAAA"), { type: "try-again" }).step.name).toBe(
+      "reveal",
+    );
+  });
+});
