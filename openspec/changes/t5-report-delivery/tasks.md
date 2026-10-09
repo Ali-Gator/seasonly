@@ -152,7 +152,10 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
 ## 6. Checks with the user
 
-- [ ] 6.1 Ask the user to confirm applying both migrations to the Supabase project `seasonly` (ref `qisseuermrrwvvnfyjet`) through the connector, as `crops_bucket` was on 2026-10-07. Rename the local files to the applied versions. Done when the connector lists both migrations, and a select as `anon` on each table is refused.
+- [x] 6.1 Ask the user to confirm applying both migrations to the Supabase project `seasonly` (ref `qisseuermrrwvvnfyjet`) through the connector, as `crops_bucket` was on 2026-10-07. Rename the local files to the applied versions. Done when the connector lists both migrations, and a select as `anon` on each table is refused.
+
+  Applied 2026-10-09 with the user's yes, as `20261009075315_report_emails` and `20261009075318_interest_clicks`; the local files carry those versions. As `anon`, a select on each table and a call to `store_report_email` are refused (insufficient privilege). `anon` and `authenticated` hold no select, insert or execute; `service_role` holds execute; RLS is on for both tables.
+
 - [ ] 6.2 Run the app locally against the project with `.env.local`. Create one quiz-only report through the flow: free, no model call, and an `is_test` row. Show the user, in a scratch Artifact:
   - screenshots of that report at 375 and 1280;
   - the same report with a photo record's draping, with the crop present and missing (pointing at the Soft Autumn crop from 6.3, once it exists, or at a placeholder JPEG);
