@@ -288,6 +288,14 @@ describe("checkPhoto", () => {
       expect(problem(face({ skin: [150, 95, 97] }))).toBeNull(); // C*ab 24, hue 20°
     });
 
+    /** {@link openspec/specs/photo-check/spec.md#requirement-a-filter-is-judged-from-skin-color-no-natural-skin-has} */
+    it("passes skin just below hue 0°, as daylight and flash render some light skin", () => {
+      const check = checkPhoto(face({ skin: [182, 160, 167] })); // C*ab 9, hue −5°
+      expect(check.problem).toBeNull();
+      const skin = check.measures.skin ?? { a: 0, b: 1 };
+      expect(Math.atan2(skin.b, skin.a)).toBeLessThan(0);
+    });
+
     it("ignores the hue of near-gray skin", () => {
       expect(problem(face({ skin: [120, 124, 130] }))).toBeNull(); // C*ab 3.8, hue −94°
     });

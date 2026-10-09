@@ -67,8 +67,8 @@ The Phase 1 table gives `t6-eval-set` the `analysis-eval` capability, with this 
 
 Planned. Each delta is written with real numbers during apply, once the first run shows which constants move (`/opsx:update`). No limit is invented before it is measured.
 
-- `photo-check`: the eye-white and skin-hue limits, set from the eval; "provisional" removed.
-- `capture-flow`: the several-faces width, set from the eval; the "provisional until `t6-eval-set`" note replaced by the measured rate.
+- `photo-check`: the eye-white and skin-hue limits, set from the eval (L* 22, C*ab 22, hue floor −10°); "provisional" removed. Skin just below hue 0° now passes.
+- `capture-flow`: not modified. The several-faces width did not move: the set has one several-faces false reject, and a narrower width would only reject more.
 - `color-sampling`: the trait constants, if tuning moves them.
 - `season-classifier`: the reference points, if tuning moves them.
 - `report-text`: the several-faces rule, only if the paid run shows the model rejects usable photos too often.

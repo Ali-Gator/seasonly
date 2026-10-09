@@ -1,17 +1,17 @@
 {
-  "inputsHash": "7927863ef22b6f297caf523665ff6647b92f6b84a829a5f843b685d8e8e6640b",
+  "inputsHash": "3304579da93a7eaf8643b0f23acfe52ca1062348ee59abb5d05dad5d79a21b18",
   "mediapipe": "1.0.1",
-  "counts": { "photos": 93, "people": 16, "variants": 165 },
+  "counts": { "photos": 93, "people": 16, "variants": 177 },
   "metrics": {
-    "agreement": 0.4911,
-    "familyAgreement": 0.6667,
+    "agreement": 0.524,
+    "familyAgreement": 0.7177,
     "accuracy": 0.1389,
-    "familyAccuracy": 0.2639,
-    "falseRejectRate": 0.2361,
-    "falseRejects": { "no-face": 0, "dark": 9, "tint": 2, "filter": 5, "several-faces": 1 },
+    "familyAccuracy": 0.2778,
+    "falseRejectRate": 0.1806,
+    "falseRejects": { "no-face": 0, "dark": 6, "tint": 4, "filter": 2, "several-faces": 1 },
     "expectedProblemRate": 0.5238,
-    "catchRate": 0.8606,
-    "passRate": 0.6237
+    "catchRate": 0.887,
+    "passRate": 0.6667
   },
   "people": [
     {
@@ -71,8 +71,8 @@
       "label": "true-spring",
       "measured": true,
       "season": "light-summer",
-      "agreement": 0.4,
-      "familyAgreement": 0.6,
+      "agreement": 0.5,
+      "familyAgreement": 0.75,
       "photos": [
         {
           "file": "p02/1-indoor-daylight.jpg",
@@ -92,8 +92,8 @@
           "file": "p02/3-stage-warm.jpg",
           "light": "stage-warm",
           "expect": "pass",
-          "problem": null,
-          "season": "true-spring"
+          "problem": "tint",
+          "season": null
         },
         {
           "file": "p02/4-flash.jpg",
@@ -123,15 +123,15 @@
       "label": "bright-spring",
       "measured": true,
       "season": "light-summer",
-      "agreement": 0.6667,
-      "familyAgreement": 0.6667,
+      "agreement": 0.5,
+      "familyAgreement": 0.75,
       "photos": [
         {
           "file": "p03/1-daylight.jpg",
           "light": "daylight",
           "expect": "pass",
-          "problem": "filter",
-          "season": null
+          "problem": null,
+          "season": "soft-summer"
         },
         {
           "file": "p03/2-overcast.jpg",
@@ -165,8 +165,8 @@
           "file": "p03/6-indoor-flash.jpg",
           "light": "indoor-flash",
           "expect": "several-faces",
-          "problem": null,
-          "season": "true-winter"
+          "problem": "tint",
+          "season": null
         }
       ]
     },
@@ -225,10 +225,10 @@
     {
       "person": "p05",
       "label": "light-summer",
-      "measured": false,
-      "season": null,
-      "agreement": null,
-      "familyAgreement": null,
+      "measured": true,
+      "season": "true-summer",
+      "agreement": 1,
+      "familyAgreement": 1,
       "photos": [
         {
           "file": "p05/1-daylight.jpg",
@@ -241,8 +241,8 @@
           "file": "p05/2-flash.jpg",
           "light": "flash",
           "expect": "pass",
-          "problem": "filter",
-          "season": null
+          "problem": null,
+          "season": "true-summer"
         },
         {
           "file": "p05/3-indoor-mixed.jpg",
@@ -317,8 +317,8 @@
       "label": "soft-summer",
       "measured": true,
       "season": "light-spring",
-      "agreement": 0.3333,
-      "familyAgreement": 0.6667,
+      "agreement": 0.5,
+      "familyAgreement": 0.75,
       "photos": [
         {
           "file": "p07/1-indoor-dim.jpg",
@@ -338,8 +338,8 @@
           "file": "p07/3-stage-warm.jpg",
           "light": "stage-warm",
           "expect": "pass",
-          "problem": "dark",
-          "season": null
+          "problem": null,
+          "season": "light-spring"
         },
         {
           "file": "p07/4-night-flash.jpg",
@@ -352,7 +352,7 @@
           "file": "p07/5-flash.jpg",
           "light": "flash",
           "expect": "pass",
-          "problem": "filter",
+          "problem": "tint",
           "season": null
         },
         {
@@ -421,8 +421,8 @@
       "label": "true-autumn",
       "measured": true,
       "season": "light-spring",
-      "agreement": 0.3333,
-      "familyAgreement": 0.3333,
+      "agreement": 0.25,
+      "familyAgreement": 0.5,
       "photos": [
         {
           "file": "p09/1-flash.jpg",
@@ -442,8 +442,8 @@
           "file": "p09/3-night-warm.jpg",
           "light": "night-warm",
           "expect": "pass",
-          "problem": "dark",
-          "season": null
+          "problem": null,
+          "season": "true-summer"
         },
         {
           "file": "p09/4-flash.jpg",
@@ -657,8 +657,8 @@
           "file": "p13/5-stage-blue.jpg",
           "light": "stage-blue",
           "expect": "tint",
-          "problem": "filter",
-          "season": null
+          "problem": null,
+          "season": "deep-winter"
         },
         {
           "file": "p13/6-stage-warm.jpg",
@@ -761,8 +761,8 @@
           "file": "p15/5-stage-red.jpg",
           "light": "stage-red",
           "expect": "pass",
-          "problem": "dark",
-          "season": null
+          "problem": null,
+          "season": "true-winter"
         },
         {
           "file": "p15/6-indoor-flash.jpg",
