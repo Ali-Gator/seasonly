@@ -167,21 +167,34 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
 ## 6. Checks with the user
 
-- [ ] 6.1 Ask the user to confirm applying `<ts>_retention.sql` to the Supabase project `seasonly` (ref `qisseuermrrwvvnfyjet`) through the connector. Rename the local file to the applied version. Done when, as `service_role`, a delete on a throwaway `is_test` report succeeds and removes its address row; record the date here.
-- [ ] 6.2 Run the app locally against the project with `.env.local`. Show the user `/privacy`, `/terms`, the consent step and the draping-failure state at 375 and 1280, in a scratch Artifact. Done when the user confirms they match the approved boards and text; record the date here.
-- [ ] 6.3 Try the deletion-request procedure in `docs/privacy-requests.md` on one quiz-only `is_test` report with an address:
+- [x] 6.1 Ask the user to confirm applying `<ts>_retention.sql` to the Supabase project `seasonly` (ref `qisseuermrrwvvnfyjet`) through the connector. Rename the local file to the applied version. Done when, as `service_role`, a delete on a throwaway `is_test` report succeeds and removes its address row; record the date here.
+
+  **2026-10-10:** applied with the user's yes as version `20261010084236` (local file renamed). Before it, `service_role` already held delete on `reports` through Supabase's default privileges (as the phase review found), so the migration states the grant rather than adding it. As `service_role`, deleting throwaway `is_test` report `t8throwawayAAAAAAAAAAA` succeeded and removed its address row.
+- [x] 6.2 Run the app locally against the project with `.env.local`. Show the user `/privacy`, `/terms`, the consent step and the draping-failure state at 375 and 1280, in a scratch Artifact. Done when the user confirms they match the approved boards and text; record the date here.
+
+  **Confirmed 2026-10-10** on https://claude.ai/artifact/FdP1fiVY81WQR9ERqLuCmb (local dev against the project; consent shown at 375 only, since the flow is a phone screen at every width).
+- [x] 6.3 Try the deletion-request procedure in `docs/privacy-requests.md` on one quiz-only `is_test` report with an address:
   - by link: the report, its address and its interest row are gone, and `/r/<id>` answers 404;
   - by address, on a second test report: the address is gone and the report remains.
 
   Done when both results are recorded here.
 
-- [ ] 6.4 Prove the job on the preview deployment before merge. The user runs `curl -H "Authorization: Bearer $CRON_SECRET" https://<preview>/api/cron/retention` with the Vercel bypass for SSO, or approves the agent running it. Check that:
+  **2026-10-10, with the user's yes:**
+  - by link, on photo report `__gd1JDZrt_xFk2k1vca4A` from the 1.3 capture (with one address, an interest row added for the check, and its crop): the crop removed through the Storage API, the report deleted in SQL; report, address, interest row and crop all gone, and `https://seasonly.me/r/<id>` and `/api/face/<id>` answer 404;
+  - by address, on `is_test` report `t8byaddressAAAAAAAAAAA`: the request written `  T8-ByAddress@Example.com ` matched through `lower(trim(…))`; the address is gone and the report remained (then removed as test clean-up).
+
+- [x] 6.4 Prove the job on the preview deployment before merge. The user runs `curl -H "Authorization: Bearer $CRON_SECRET" https://<preview>/api/cron/retention` with the Vercel bypass for SSO, or approves the agent running it. Check that:
   - it answers 200 with its counts;
   - no crop older than 24 h remains (list the `crops` bucket through the connector);
   - `select count(*) from reports where is_test and created_at < now() - interval '24 hours'` is 0;
   - the same request without the header answers 401.
 
   Previews share the production Supabase project, so this run is the real first cleanup. Done when the results are recorded here.
+
+  **2026-10-10, with the user's yes**, on preview `seasonly-ftl86fyck-aligators-projects.vercel.app` (commit cddaa67), through a Vercel share link for SSO. Production held no old crop or test report, so the agent seeded one `is_test` report 25 h old (two addresses, an interest row), one 1 h old, and two crops, one backdated to 25 h:
+  - no header: 401; a wrong token: 401;
+  - the right token: 200 `{"crops":1,"testReports":1}`;
+  - after the run: no crop older than 24 h, `select count(*) from reports where is_test and created_at < now() - interval '24 hours'` is 0, the old report's addresses and interest row are gone, and the fresh crop and fresh report remained (then removed as test clean-up).
 
 ## 7. Backlog and archive prep
 
