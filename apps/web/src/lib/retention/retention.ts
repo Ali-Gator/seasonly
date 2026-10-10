@@ -36,7 +36,8 @@ const supabaseDeleteTestReports: DeleteTestReports = (cutoff) =>
 /**
  * Deletes every crop created before `cutoff` and answers how many. Each pass lists from the start
  * again, since the removed names are gone; paging by offset across deletions would skip objects.
- * A remove that deletes fewer than asked throws, so the loop never spins.
+ * A remove may delete fewer than asked when a crop is already gone (an overlapping run, a deletion
+ * by hand); a crop that lists again after its remove is stuck and throws, so the loop never spins.
  *
  * {@link openspec/specs/data-retention/spec.md#requirement-the-job-deletes-face-crops-older-than-24-hours}
  */
@@ -45,6 +46,7 @@ export async function deleteOldCrops(
   { list = supabaseList, remove = supabaseRemove }: { list?: ListCrops; remove?: RemoveCrops } = {},
 ): Promise<number> {
   let deleted = 0;
+  let asked = new Set<string>();
   for (;;) {
     const { data, error } = await list();
     if (error || !data) throw error ?? new Error("crop listing gave no data");
@@ -53,13 +55,16 @@ export async function deleteOldCrops(
       .filter((o) => o.id && o.created_at && new Date(o.created_at) < cutoff)
       .map((o) => o.name);
     if (old.length === 0) return deleted;
-    const removed = await remove(old);
-    if (removed.error || !removed.data)
-      throw removed.error ?? new Error("crop remove gave no data");
-    if (removed.data.length < old.length) {
-      throw new Error(`crop remove removed ${removed.data.length} of ${old.length}`);
+    const stuck = old.filter((name) => asked.has(name));
+    if (stuck.length > 0) {
+      throw new Error(`crop remove left ${stuck.length} behind, such as ${stuck[0]}`);
     }
-    deleted += old.length;
+    asked = new Set(old);
+    const removed = await remove(old);
+    if (removed.error || !removed.data) {
+      throw removed.error ?? new Error("crop remove gave no data");
+    }
+    deleted += removed.data.length;
   }
 }
 

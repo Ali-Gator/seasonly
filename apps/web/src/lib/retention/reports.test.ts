@@ -1,7 +1,10 @@
 /**
  * The reports, report_emails, interest_clicks and retention migrations run as SQL in PGlite, after
  * recreating Supabase's roles and replaying its default grants on `public`, as in
- * email/store.test.ts. The job's delete runs as the server's role, so a missing grant fails here.
+ * email/store.test.ts. Those defaults already give the server's role every privilege, so delete is
+ * revoked before the retention migration: the grant test then depends on the migration. The job's
+ * delete runs as the server's role, so the cascade into the child tables is proven without grants
+ * on them.
  *
  * @see openspec/specs/data-retention/spec.md
  */
@@ -28,14 +31,13 @@ beforeAll(async () => {
     alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
     alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
   `);
-  for (const m of [
-    "_reports.sql",
-    "_report_emails.sql",
-    "_interest_clicks.sql",
-    "_retention.sql",
-  ]) {
+  for (const m of ["_reports.sql", "_report_emails.sql", "_interest_clicks.sql"]) {
     await db.exec(migration(m));
   }
+  await db.exec(
+    "revoke delete on public.reports, public.report_emails, public.interest_clicks from service_role",
+  );
+  await db.exec(migration("_retention.sql"));
 }, 30_000);
 
 const report = async (id: string, isTest: boolean, hoursOld: number) => {

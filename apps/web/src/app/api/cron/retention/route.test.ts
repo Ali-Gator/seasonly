@@ -14,6 +14,7 @@ vi.mock("@sentry/nextjs", () => ({
   init: vi.fn(),
   createTransport: vi.fn(),
   captureException: vi.fn(),
+  captureMessage: vi.fn(),
   flush: vi.fn(async () => true),
 }));
 vi.mock("@/lib/retention/retention", () => ({ runRetention: vi.fn() }));
@@ -38,6 +39,7 @@ describe("GET /api/cron/retention", () => {
     vi.stubEnv("CRON_SECRET", SECRET);
     expect((await get()).status).toBe(401);
     expect(runRetention).not.toHaveBeenCalled();
+    expect(Sentry.captureMessage).not.toHaveBeenCalled();
   });
 
   /** {@link openspec/specs/data-retention/spec.md#scenario-a-wrong-secret} */
@@ -56,6 +58,10 @@ describe("GET /api/cron/retention", () => {
     expect((await get("Bearer undefined")).status).toBe(401);
     expect((await get("Bearer ")).status).toBe(401);
     expect(runRetention).not.toHaveBeenCalled();
+    expect(Sentry.captureMessage).toHaveBeenCalledWith(
+      expect.stringMatching(/CRON_SECRET/),
+      "error",
+    );
   });
 
   /** {@link openspec/specs/data-retention/spec.md#scenario-a-run} */

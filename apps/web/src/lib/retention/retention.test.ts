@@ -6,6 +6,8 @@
  */
 import { describe, expect, it, vi } from "vitest";
 
+import { supabase } from "@/lib/supabase";
+
 import {
   type CropEntry,
   deleteOldCrops,
@@ -14,6 +16,8 @@ import {
   type RemoveCrops,
   runRetention,
 } from "./retention";
+
+vi.mock("@/lib/supabase", () => ({ supabase: vi.fn() }));
 
 const NOW = new Date("2026-10-10T04:00:00Z");
 const HOUR = 3_600_000;
@@ -79,13 +83,23 @@ describe("deleteOldCrops", () => {
   });
 
   /** {@link openspec/specs/data-retention/spec.md#requirement-the-job-deletes-face-crops-older-than-24-hours} */
-  it("throws instead of looping when a remove deletes fewer than asked", async () => {
+  it("throws instead of looping when a removed crop lists again", async () => {
     const b = bucket([crop("a.jpg", 30), crop("b.jpg", 30)]);
     const remove = vi.fn<RemoveCrops>(async () => ({ data: [], error: null }));
-    await expect(deleteOldCrops(CUTOFF, { list: b.list, remove })).rejects.toThrow(
-      /removed 0 of 2/,
-    );
+    await expect(deleteOldCrops(CUTOFF, { list: b.list, remove })).rejects.toThrow(/left 2 behind/);
     expect(remove).toHaveBeenCalledTimes(1);
+  });
+
+  /** {@link openspec/specs/data-retention/spec.md#requirement-the-job-deletes-face-crops-older-than-24-hours} */
+  it("goes on when a crop was deleted elsewhere during the run", async () => {
+    const b = bucket([crop("a.jpg", 30), crop("b.jpg", 30)]);
+    // An overlapping run, or a deletion by hand, takes b.jpg between the listing and the remove.
+    const remove = vi.fn<RemoveCrops>(async (names) => {
+      await b.remove(["b.jpg"]);
+      return b.remove(names);
+    });
+    expect(await deleteOldCrops(CUTOFF, { list: b.list, remove })).toBe(1);
+    expect(b.names()).toEqual([]);
   });
 
   /** {@link openspec/specs/data-retention/spec.md#scenario-storage-fails} */
@@ -140,5 +154,42 @@ describe("runRetention", () => {
         deleteTestReports: async () => ({ count: null, error }),
       }),
     ).rejects.toBe(error);
+  });
+});
+
+describe("runRetention against Supabase", () => {
+  /**
+   * The real calls, with the client mocked: the bucket, the listing order and the report filters.
+   * A slip in a filter would delete real or fresh reports while every injected test stays green.
+   *
+   * {@link openspec/specs/data-retention/spec.md#scenario-a-real-report}
+   * {@link openspec/specs/data-retention/spec.md#scenario-a-fresh-test-report}
+   */
+  it("lists crops oldest first and deletes only is_test reports before the cutoff", async () => {
+    const list = vi.fn();
+    list.mockResolvedValueOnce({ data: [crop("1.jpg", 30)], error: null });
+    list.mockResolvedValueOnce({ data: [], error: null });
+    const remove = vi.fn(async (names: string[]) => ({ data: names, error: null }));
+    const lt = vi.fn(async () => ({ count: 2, error: null }));
+    const eq = vi.fn(() => ({ lt }));
+    const del = vi.fn(() => ({ eq }));
+    const storageFrom = vi.fn(() => ({ list, remove }));
+    const from = vi.fn(() => ({ delete: del }));
+    vi.mocked(supabase).mockReturnValue({
+      storage: { from: storageFrom },
+      from,
+    } as unknown as ReturnType<typeof supabase>);
+
+    expect(await runRetention({ now: NOW })).toEqual({ crops: 1, testReports: 2 });
+    expect(storageFrom).toHaveBeenCalledWith("crops");
+    expect(list).toHaveBeenCalledWith("", {
+      limit: PAGE,
+      sortBy: { column: "created_at", order: "asc" },
+    });
+    expect(remove).toHaveBeenCalledWith(["1.jpg"]);
+    expect(from).toHaveBeenCalledWith("reports");
+    expect(del).toHaveBeenCalledWith({ count: "exact" });
+    expect(eq).toHaveBeenCalledWith("is_test", true);
+    expect(lt).toHaveBeenCalledWith("created_at", CUTOFF.toISOString());
   });
 });

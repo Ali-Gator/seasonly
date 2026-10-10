@@ -6,7 +6,7 @@ Deletes what Seasonly promises not to keep: face crops after 24 hours and test r
 
 ### Requirement: The job deletes face crops older than 24 hours
 
-Each run of the retention job SHALL delete every object in the `crops` bucket that was created more than 24 hours before the run, and SHALL leave every younger object. A crop is selected by its age alone, so a crop that a missed or failed run left behind is deleted by the next run that succeeds. The job SHALL delete every old crop however many there are, not only the first page of a listing.
+Each run of the retention job SHALL delete every crop in the `crops` bucket (one `<report id>.jpg` per photo report, at the bucket root) that was created more than 24 hours before the run, and SHALL leave every younger object. A crop is selected by its age alone, so a crop that a missed or failed run left behind is deleted by the next run that succeeds. The job SHALL delete every old crop however many there are, not only the first page of a listing.
 
 #### Scenario: An old crop
 

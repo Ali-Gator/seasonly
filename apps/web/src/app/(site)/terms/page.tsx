@@ -39,7 +39,7 @@ const SECTIONS: [heading: string, body: ReactNode][] = [
     <>
       The law of Bulgaria governs these terms. If you live in the EU, you also keep the protection
       of your own country&apos;s consumer law. Questions go to{" "}
-      <a href="mailto:privacy@seasonly.me">privacy@seasonly.me</a>.
+      <a href="mailto:care@seasonly.me">care@seasonly.me</a>.
     </>,
   ],
 ];

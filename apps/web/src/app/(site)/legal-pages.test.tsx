@@ -80,7 +80,7 @@ describe("/privacy", () => {
   /** {@link openspec/specs/legal-pages/spec.md#scenario-asking-for-deletion} */
   it("gives the operator, the contact address, what to send and the 30-day answer", () => {
     expect(privacy).toMatch(/run by an individual in Bulgaria/);
-    expect(privacyHtml).toContain('href="mailto:privacy@seasonly.me"');
+    expect(privacyHtml).toContain('href="mailto:care@seasonly.me"');
     expect(privacy).toMatch(/Send your report link, or the email address you used/);
     expect(privacy).toContain("We answer within 30 days.");
     expect(privacy).toMatch(/copy of your data, ask us to correct it, or ask us to delete it/);
@@ -103,7 +103,7 @@ describe("/terms", () => {
       /We may change these terms\. We post the new version on this page with a new date/,
     );
     expect(terms).toContain("The law of Bulgaria governs these terms.");
-    expect(termsHtml).toContain('href="mailto:privacy@seasonly.me"');
+    expect(termsHtml).toContain('href="mailto:care@seasonly.me"');
     expect(termsHtml).toContain('href="/privacy"');
     expect(terms).toMatch(/Last updated/);
   });

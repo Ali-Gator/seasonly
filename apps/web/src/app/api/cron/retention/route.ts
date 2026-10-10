@@ -1,5 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 
+import * as Sentry from "@sentry/nextjs";
+
 import { withErrorCapture } from "@/lib/observability/with-error-capture";
 import { runRetention } from "@/lib/retention/retention";
 
@@ -19,6 +21,11 @@ function authorized(header: string | null): boolean {
  * {@link openspec/specs/data-retention/spec.md#requirement-the-job-runs-daily-only-for-the-cron-secret}
  */
 export const GET = withErrorCapture(async (request: Request) => {
+  if (!process.env.CRON_SECRET) {
+    // Every run would answer 401 and delete nothing, so say so where someone looks.
+    Sentry.captureMessage("CRON_SECRET is not set: the retention job cannot run", "error");
+    await Sentry.flush(2000);
+  }
   if (!authorized(request.headers.get("authorization"))) {
     return new Response("Unauthorized", { status: 401 });
   }

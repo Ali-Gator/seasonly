@@ -35,10 +35,10 @@
   Recorded 2026-10-10, from the user:
   - operator: "Seasonly", run by an individual (no legal entity yet), in Bulgaria;
   - governing law: Bulgaria (EU, so the GDPR applies; the authority is Bulgaria's Commission for Personal Data Protection);
-  - contact: `privacy@seasonly.me` (Porkbun forwarding, set up by the user);
+  - contact: `care@seasonly.me` (changed from `privacy@` by the user on 2026-10-10; it will also be on the contact page);
   - minimum age: 16.
 
-- [ ] 1.3 Draft both pages' full text in a scratch Artifact, from the inventory:
+- [x] 1.3 Draft both pages' full text in a scratch Artifact, from the inventory:
   - the migrations;
   - `lib/report-text/index.ts` (what the vision call sends);
   - `lib/capture/mediapipe.ts`;
@@ -73,7 +73,11 @@
 
   Done when the user approves the text in chat; record the date here.
 
-- [ ] 1.4 Legal check: the user has the approved text reviewed by someone qualified, or waives a review for the beta in writing in chat. Record which, who and the date here. The text the agent drafts is not legal advice. It does not block the code tasks, but archive, the PR and auto-merge all wait for it (7.2).
+  **Approved 2026-10-10** (draft doc https://claude.ai/artifact/Hio6CA23jzRxKPr9q83uLH), with the user's answers: contact `care@seasonly.me`; Resend click and open tracking stay on and are named in the Resend row; Sentry org `blockdev` is on the free Developer plan, so 30 days holds; Google's "up to 90 days" and the MediaPipe log row stand.
+
+- [x] 1.4 Legal check: the user has the approved text reviewed by someone qualified, or waives a review for the beta in writing in chat. Record which, who and the date here. The text the agent drafts is not legal advice. It does not block the code tasks, but archive, the PR and auto-merge all wait for it (7.2).
+
+  **Recorded 2026-10-10:** the user reviewed and approved the text themselves ("I'll review", then "I approve"). No outside qualified reviewer; for the beta this stands in place of one.
 
 ## 2. Plan and test-edit approval
 
@@ -146,7 +150,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
 - [x] 5.1 Write `supabase/migrations/<ts>_retention.sql` (design.md decision 5). Do not apply it. Done when 3.2 passes.
 - [x] 5.2 Write `apps/web/src/lib/retention/` (decisions 4 and 5) and `apps/web/src/app/api/cron/retention/route.ts` (decision 3), wrapped in `withErrorCapture`, with the job's results as JSON. Add `apps/web/vercel.json` with the daily `0 4 * * *` cron. Done when 3.1 and 3.3 pass and `BOTID_PROTECT` is unchanged.
-- [ ] 5.3 Write `/privacy` and `/terms` from the text approved in 1.3 and the layout of the legal-page board from 1.1 (decision 7), and set both routes `ready: true` in `lib/site/routes.ts`. Done when 3.4 passes and the site-structure tests pass.
+- [x] 5.3 Write `/privacy` and `/terms` from the text approved in 1.3 and the layout of the legal-page board from 1.1 (decision 7), and set both routes `ready: true` in `lib/site/routes.ts`. Done when 3.4 passes and the site-structure tests pass.
 - [x] 5.4 Consent copy in `_capture/steps.tsx`, and the BL-10 line in `lib/report/draping.tsx` (decision 8), both from the approved boards. Done when 3.5 passes. Delete BL-10 from `docs/backlog.md`.
 - [x] 5.5 Write `docs/privacy-requests.md` (decision 6). Rewrite the Edge Case notes that point at `t8-photo-privacy` in the permanent specs:
   - `draping-preview`: "Nothing deletes crops yet";
@@ -181,7 +185,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
 ## 7. Backlog and archive prep
 
-- [ ] 7.1 Before archive, log in `docs/backlog.md`, under the next free `BL-nn` ids, and name them in the PR:
+- [x] 7.1 Before archive, log in `docs/backlog.md`, under the next free `BL-nn` ids, and name them in the PR:
   - every phase-review finding not fixed, and every defect found on the way that is worth fixing later;
   - deferred, "until Vercel Pro or before paid promotion (T15)": deletion runs daily, so a crop can stay about 49 h while the pages say 24 h. The fix is an hourly scheduler calling the same route;
   - deferred, "before paid promotion or a complaint": the PostHog cookie is set without consent. The fix is `cookieless_mode` or a banner with `on_reject`.

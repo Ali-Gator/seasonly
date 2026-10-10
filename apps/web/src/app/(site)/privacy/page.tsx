@@ -181,8 +181,8 @@ export default function Page() {
         <h2 className="h2">Who runs Seasonly</h2>
         <p>
           Seasonly is run by an individual in Bulgaria, not a company. Write to{" "}
-          <a href="mailto:privacy@seasonly.me">privacy@seasonly.me</a> about your privacy or a
-          deletion request.
+          <a href="mailto:care@seasonly.me">care@seasonly.me</a> about your privacy or a deletion
+          request.
         </p>
         <p>When this page changes, the date at the top changes too.</p>
       </section>

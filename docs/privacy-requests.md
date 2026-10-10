@@ -1,6 +1,6 @@
 # Privacy requests
 
-How a request sent to `privacy@seasonly.me` is handled. Requests are rare in the beta, so this is done
+How a request sent to `care@seasonly.me` is handled. Requests are rare in the beta, so this is done
 by hand. Answer every request within 30 days of receiving it.
 
 Spec: `openspec/specs/data-retention/spec.md` (A deletion request is honored within 30 days).
@@ -23,7 +23,7 @@ select email, created_at from public.report_emails where report_id = '<id>';
 select created_at from public.interest_clicks where report_id = '<id>';
 
 -- By address
-select report_id, created_at from public.report_emails where email = '<address>';
+select report_id, created_at from public.report_emails where email = lower(trim('<address>'));
 ```
 
 For a request for a copy, send the rows above, with the report link, as the reply. For a correction,
@@ -46,16 +46,17 @@ to the right one.
 
 3. Check that `https://seasonly.me/r/<id>` answers 404.
 
-**By address only**: every stored copy of the address. The reports stay, because the address alone
+**By address only**: every stored copy of the address. Addresses are stored trimmed and lowercased,
+so match them the same way. The reports stay, because the address alone
 does not show who owns them.
 
 ```sql
-delete from public.report_emails where email = '<address>';
+delete from public.report_emails where email = lower(trim('<address>'));
 ```
 
 ## 4. Answer
 
-Reply from `privacy@seasonly.me` saying what was deleted and when. Copies held by the services on
+Reply from `care@seasonly.me` saying what was deleted and when. Copies held by the services on
 `/privacy` (Resend's 30-day email log, Sentry's error reports, PostHog's anonymous events) are not
 reached by this; the policy says so, and the reply can repeat it.
 
