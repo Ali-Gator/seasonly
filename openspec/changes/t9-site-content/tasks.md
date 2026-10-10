@@ -114,7 +114,7 @@ The pre-commit hook runs `test:unit`, so a red test is committed together with t
 
 - [ ] 3.3 Add `apps/web/src/lib/site-content/seasons.ts`: a `Record<SeasonSlug, SeasonContent>` with `about`, `neighbours` and `famous`, holding the approved copy (decision 1). Done when typecheck passes and the `about` and neighbour cases of 2.1 pass.
 
-- [ ] 3.4 Move the report sections out of `apps/web/src/lib/report/view.tsx` into `ReportSections` in `apps/web/src/lib/report/sections.tsx` (decision 3). Done when every report-page unit and E2E test passes unchanged.
+- [x] 3.4 Move the report sections out of `apps/web/src/lib/report/view.tsx` into `ReportSections` in `apps/web/src/lib/report/sections.tsx` (decision 3). Done when every report-page unit and E2E test passes unchanged.
 
 - [ ] 3.5 Landing (`(site)/page.tsx`) from Main and Landing-1280. Done when the landing cases of 2.1 pass and `e2e/funnel.spec.ts` stays green.
 
