@@ -134,7 +134,9 @@ The pre-commit hook runs `test:unit`, so a red test is committed together with t
 
 ## 4. Verify
 
-- [ ] 4.1 Run `pnpm fix` then `pnpm test`, and `pnpm test:e2e` with `CI=1` (the prebuilt mode). Done when all pass, apart from the known BL-12 and BL-21 local cases, which are named here.
+- [x] 4.1 Run `pnpm fix` then `pnpm test`, and `pnpm test:e2e` with `CI=1` (the prebuilt mode). Done when all pass, apart from the known BL-12 and BL-21 local cases, which are named here.
+
+  Done 2026-10-10: `pnpm fix` changed nothing; unit tests all pass. `pnpm test:e2e` (dev): 54 passed, 1 failed, BL-12 ("answers a report it cannot read with 500", the dev cache header). `CI=1 pnpm test:e2e`: 54 passed, 1 failed, BL-21 (`/seasons/Soft-Autumn` answers 200 on macOS's case-insensitive disk).
 
 - [ ] 4.2 On the branch's Vercel preview (behind SSO, so use a share link or the user's Chrome):
   - check each core page at 375 and 1280 against its board;
