@@ -164,12 +164,14 @@ The pre-commit hook runs `test:unit`, so a red test is committed together with t
 
 ## 5. Backlog and archive
 
-- [ ] 5.1 Before archive:
+- [x] 5.1 Before archive:
   - delete BL-06 from `docs/backlog.md`;
   - log every phase-review finding not fixed, and every defect found on the way, under the next free `BL-nn`;
   - name the added and deleted ids in the PR.
 
-- [ ] 5.2 At archive:
+  Done 2026-10-10: BL-06 deleted; added BL-23 (PostHog recorder copy), BL-24 to BL-26 (phase review), BL-27 and BL-28 (SEO audit). `_Next id:_` is BL-29.
+
+- [x] 5.2 At archive:
   - add the `site-content` row to `openspec/specs/README.md`: `apps/web/src/lib/site-content/**` plus the six content `page.tsx` files, and not `privacy/` or `terms/`;
   - re-add Public Interface, Behavior and Edge Cases to `openspec/specs/site-content/spec.md`;
   - in the plan's "Carried in from finished changes" list, remove the three `t9-site-content` items. The contact item closes by the user's choice of 2026-10-10: the address is already on `/privacy` and `/terms`;

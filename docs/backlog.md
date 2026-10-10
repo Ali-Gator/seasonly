@@ -150,13 +150,6 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   DOM card preview (`t5-report-delivery` shows the PNGs themselves); check whether the 2026-10-07
   redesign session already updated the canvas
 
-- **[BL-06] Placeholder icons and empty photo slots** — the icons are the bundle's placeholder
-  glyphs, and the photo-tip and draping example slots show labels, not photos. Choose an icon set
-  and real example photos.
-  _Refs:_ `apps/web/src/components/ds/icon.tsx`, design system
-  (https://claude.ai/artifact/E11hciU9VsyCxTFnJJNbHD) · _Status:_ gated — your choice of icon set
-  and photos (open since T3, 2026-10-01)
-
 - **[BL-24] Famous people's names are read twice** — each famous photo's alt text is the
   person's name, and the name is printed right under it, so a screen reader says it twice. Use
   `alt=""` with the name as the caption (a `figure`/`figcaption`), or describe the photo instead;
