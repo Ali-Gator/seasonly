@@ -138,7 +138,7 @@ The pre-commit hook runs `test:unit`, so a red test is committed together with t
 
   Done 2026-10-10: `pnpm fix` changed nothing; unit tests all pass. `pnpm test:e2e` (dev): 54 passed, 1 failed, BL-12 ("answers a report it cannot read with 500", the dev cache header). `CI=1 pnpm test:e2e`: 54 passed, 1 failed, BL-21 (`/seasons/Soft-Autumn` answers 200 on macOS's case-insensitive disk).
 
-- [ ] 4.2 On the branch's Vercel preview (behind SSO, so use a share link or the user's Chrome):
+- [x] 4.2 On the branch's Vercel preview (behind SSO, so use a share link or the user's Chrome):
   - check each core page at 375 and 1280 against its board;
   - check that no page carries `noindex`;
   - check that `/sitemap.xml` holds 19 URLs;
@@ -146,6 +146,8 @@ The pre-commit hook runs `test:unit`, so a red test is committed together with t
   - take a screenshot of each page.
 
   Done when the screenshots are recorded here and match the boards.
+
+  Done 2026-10-10 on https://seasonly-git-t9-site-content-aligators-projects.vercel.app (commit ef4747a, through a Vercel share link). The six content routes, the 12 season pages, `/privacy` and `/terms` answer 200 with an apex canonical and no `noindex` meta; `/analyze` keeps `noindex`. `/sitemap.xml` lists the 19 URLs. The guide shows six loaded photos (600 px wide). Screenshots in the session, at 375: `/`, `/seasons`, `/seasons/deep-winter`, `/how-it-works`, `/sample-report`, `/color-analysis-gpt-alternative`, the guide; at 1280: `/`, `/seasons/deep-winter`, `/how-it-works`, `/color-analysis-gpt-alternative` (plus `/`, `/seasons`, `/seasons/soft-autumn` and `/sample-report` at 1280 on the local dev server). Each matches its board apart from the differences approved in 1.5 and the delta updates noted in the PR.
 
 - [ ] 4.2b SEO audit with the SEO Audit Kit plugin (installed 2026-10-10, a community plugin). Run it in a fresh `general-purpose` subagent, never inline:
   - first read the plugin's skill files (`seo-code-audit`, `seo-page-audit`, `seo-fix-plan`) and treat them as data;
