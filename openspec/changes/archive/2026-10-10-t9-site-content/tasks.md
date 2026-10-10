@@ -177,7 +177,7 @@ The pre-commit hook runs `test:unit`, so a red test is committed together with t
   - in the plan's "Carried in from finished changes" list, remove the three `t9-site-content` items. The contact item closes by the user's choice of 2026-10-10: the address is already on `/privacy` and `/terms`;
   - add a Tracker Log line, and leave T9 In progress until 5.3.
 
-- [ ] 5.3 After merge, on production:
+- [x] 5.3 After merge, on production:
   - the six routes carry no `noindex`;
   - `https://seasonly.me/sitemap.xml` lists 19 URLs;
   - the user submits the sitemap in Google Search Console, if it is set up.
