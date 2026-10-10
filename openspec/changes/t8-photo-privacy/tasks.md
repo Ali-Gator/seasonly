@@ -1,6 +1,6 @@
 ## 1. Design, copy and operator details (user gate)
 
-- [ ] 1.1 The user pastes this prompt into Claude Design, on the MVP canvas (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3), or the agent edits the canvas in place with the user's yes:
+- [x] 1.1 The user pastes this prompt into Claude Design, on the MVP canvas (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3), or the agent edits the canvas in place with the user's yes:
 
   ```text
   Using the "Seasonly" design system, add or change these boards. Reuse the existing boards'
@@ -18,6 +18,11 @@
   ```
 
   Done when the user approves the new and changed boards in chat. Record the date here and in the `mvp-design-canvas` memory. If the user changes any copy on the canvas, update the `capture-flow` and `report-page` deltas before 3.x cites it.
+
+  Approved 2026-10-10 (canvas version 33, edited in place by the agent, no design-system change):
+  - Board 20 already existed as the T14 legal template, so it was changed: "20 Legal page · /privacy and /terms", 375 and a new 1280 (`Legal-1280.dc.html`). Board 21 and the T14 note moved right. The service list is a plain `<dl>`, two columns, hairline rows.
+  - The board's body text is a draft from this proposal. Operator, country, contact, date and rights under the governing law are placeholders until 1.2; the "send us your report link" line in Your rights is unconfirmed and settles with `docs/privacy-requests.md` (5.5). Final page text comes from 1.3.
+  - 05 Consent and 10d carry the copy above word for word; the `capture-flow` and `report-page` deltas already match. 10d is renamed "10d Draping preview · photo could not load".
 
 - [ ] 1.2 Ask the user for the facts the pages need. The agent invents none of them:
   - the operator's name as shown, and their country;
