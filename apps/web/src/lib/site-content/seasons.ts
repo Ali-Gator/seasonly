@@ -1,0 +1,877 @@
+/**
+ * Each season page's own copy: a longer description, three neighbouring seasons and three famous
+ * people with credited Commons photos and a linked source for the season. Approved by the user on
+ * 2026-10-10 (t9-site-content tasks 1.3 and 1.4). Colors and the shared season copy come from the
+ * analysis core, never from here.
+ *
+ * @see openspec/specs/site-content/spec.md
+ */
+import type { SeasonSlug } from "@seasonly/analysis";
+
+export interface Famous {
+  name: string;
+  /** Under `/images/famous/<slug>/`: the Commons photo, cropped to 3:4. */
+  image: string;
+  alt: string;
+  credit: { author: string; license: string; licenseUrl: string; commonsUrl: string };
+  /** The published color analysis that types this person as the season. */
+  source: { title: string; url: string };
+}
+
+export interface SeasonContent {
+  /** Paragraphs, at least 120 words in all. */
+  about: readonly string[];
+  neighbours: readonly { slug: SeasonSlug; why: string }[];
+  famous: readonly Famous[];
+}
+
+/** Above the famous people: `plural` is "Soft Autumns". */
+export const famousIntro = (plural: string) =>
+  `Public figures a color analysis studio has typed as ${plural}, from public photos.`;
+
+/** Under the famous people, the studio's name linking to the season's source. */
+export const FAMOUS_NOTE = {
+  before: "These are readings of public photos by ",
+  studio: "Four Seasons Studio",
+  after: ", not results from Seasonly. No one shown here endorses Seasonly.",
+};
+
+export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
+  "light-spring": {
+    about: [
+      "Light Spring sits where Spring meets Summer. The warmth is there, but it is delicate: golden-blonde or light strawberry hair, light eyes in blue, green or soft hazel, and skin that flushes peach rather than pink. Nothing about the coloring is heavy, so heavy colors get noticed before the face does.",
+      "Dress the way the light falls in spring. Peach, light coral, buttercup yellow, mint and light turquoise belong near the face, with ivory instead of stark white. Keep colors clear rather than dusty, and keep contrast gentle. A light warm navy does the job others give to black. If black is a must, wear it below the waist and bring a light color up to the face.",
+      "Light Springs are often mistaken for Light Summers. The tell is the undertone: Light Summer leans rosy and cool, Light Spring golden. Honey and gold in the hair are usually the clue.",
+    ],
+    neighbours: [
+      {
+        slug: "true-spring",
+        why: "Just as warm, but deeper and more golden.",
+      },
+      {
+        slug: "light-summer",
+        why: "Just as light, but cool and rosy.",
+      },
+      {
+        slug: "bright-spring",
+        why: "Warm too, but clearer, with more contrast.",
+      },
+    ],
+    famous: [
+      {
+        name: "Taylor Swift",
+        image: "/images/famous/light-spring/taylor-swift.webp",
+        alt: "Taylor Swift",
+        credit: {
+          author: "iHeartRadioCA",
+          license: "CC BY 3.0",
+          licenseUrl: "https://creativecommons.org/licenses/by/3.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_(3).png",
+        },
+        source: {
+          title: "Light Spring Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/light-spring-celebrities",
+        },
+      },
+      {
+        name: "Saoirse Ronan",
+        image: "/images/famous/light-spring/saoirse-ronan.webp",
+        alt: "Saoirse Ronan",
+        credit: {
+          author: "Martin Kraft",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:MKr349648_Saoirse_Ronan_(The_Outrun,_Berlinale_2024).jpg",
+        },
+        source: {
+          title: "Light Spring Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/light-spring-celebrities",
+        },
+      },
+      {
+        name: "Elle Fanning",
+        image: "/images/famous/light-spring/elle-fanning.webp",
+        alt: "Elle Fanning",
+        credit: {
+          author: "Gage Skidmore",
+          license: "CC BY-SA 3.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:Elle_Fanning_by_Gage_Skidmore_2.jpg",
+        },
+        source: {
+          title: "Light Spring Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/light-spring-celebrities",
+        },
+      },
+    ],
+  },
+  "true-spring": {
+    about: [
+      "True Spring is warmth with clarity. Hair is often golden blonde, strawberry, copper or warm light brown, eyes are bright, and skin has a golden or peachy cast that tans easily. The coloring is lively rather than dramatic, with medium contrast.",
+      "That warmth wants color with sun in it: coral, poppy red, marigold, grass green and turquoise. Camel and golden brown are the neutrals, with a clear navy for depth. Gold jewelry looks like part of the outfit, while silver can look grey against the skin. Dusty, greyed colors and icy pastels pull the life out of the face.",
+      "True Spring sits between Light Spring and Bright Spring, and next to True Autumn. If earthy rust and olive look as good as coral, the answer may be Autumn. If they look heavy, it is Spring.",
+    ],
+    neighbours: [
+      {
+        slug: "light-spring",
+        why: "Just as warm, but lighter and more delicate.",
+      },
+      {
+        slug: "bright-spring",
+        why: "Warm too, but brighter, with more contrast.",
+      },
+      {
+        slug: "true-autumn",
+        why: "Just as warm, but richer and more muted.",
+      },
+    ],
+    famous: [
+      {
+        name: "Kelly Reilly",
+        image: "/images/famous/true-spring/kelly-reilly.webp",
+        alt: "Kelly Reilly",
+        credit: {
+          author: "Georges Biard",
+          license: "CC BY-SA 3.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:Kelly_Reilly_2013.jpg",
+        },
+        source: {
+          title: "True Spring Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/true-spring-celebrities",
+        },
+      },
+      {
+        name: "Amy Adams",
+        image: "/images/famous/true-spring/amy-adams.webp",
+        alt: "Amy Adams",
+        credit: {
+          author: "Sara Komatsu",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Amy_Adams_at_the_2024_Toronto_International_Film_Festival._03_(cropped).jpg",
+        },
+        source: {
+          title: "True Spring Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/true-spring-celebrities",
+        },
+      },
+      {
+        name: "Jessica Chastain",
+        image: "/images/famous/true-spring/jessica-chastain.webp",
+        alt: "Jessica Chastain",
+        credit: {
+          author: "Harald Krichel",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Jessica_Chastain-64631_(cropped).jpg",
+        },
+        source: {
+          title: "True Spring Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/true-spring-celebrities",
+        },
+      },
+    ],
+  },
+  "bright-spring": {
+    about: [
+      "Bright Spring borrows its clarity from Winter and its warmth from Spring. The look is vivid: bright eyes, often clear blue, green or topaz, against darker hair, and skin with a warm or neutral cast. Contrast is high, so the colors around the face need to keep up.",
+      "Saturated, clear colors do that best: bright coral, hot pink, emerald, bright turquoise, royal blue and sunflower yellow. Swap black for ink navy or chocolate, and white for bright ivory. Polished gold and shiny finishes suit the clarity better than antique or matte ones. Muted colors such as mushroom, dusty rose and olive drab make the face look tired, because they cannot match its intensity.",
+      "Bright Spring is easy to confuse with Bright Winter. Both wear vivid color, but Bright Spring's brights lean warm, toward coral and orange, while Bright Winter's lean cool, toward fuchsia and icy tones.",
+    ],
+    neighbours: [
+      {
+        slug: "true-spring",
+        why: "Warm too, but softer, with less contrast.",
+      },
+      {
+        slug: "bright-winter",
+        why: "Just as bright, but cool.",
+      },
+      {
+        slug: "light-spring",
+        why: "Warm and clear too, but much lighter and gentler.",
+      },
+    ],
+    famous: [
+      {
+        name: "Emma Stone",
+        image: "/images/famous/bright-spring/emma-stone.webp",
+        alt: "Emma Stone",
+        credit: {
+          author: "Harald Krichel",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Emma_Stone_at_the_2025_Venice_Film_Festival-6313_(cropped).jpg",
+        },
+        source: {
+          title: "Bright Spring Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/bright-spring-celebrities",
+        },
+      },
+      {
+        name: "Jane Levy",
+        image: "/images/famous/bright-spring/jane-levy.webp",
+        alt: "Jane Levy",
+        credit: {
+          author: "Gage Skidmore",
+          license: "CC BY-SA 2.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/2.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:Jane_Levy_WonderCon_2013.jpg",
+        },
+        source: {
+          title: "Bright Spring Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/bright-spring-celebrities",
+        },
+      },
+      {
+        name: "Jared Leto",
+        image: "/images/famous/bright-spring/jared-leto.webp",
+        alt: "Jared Leto",
+        credit: {
+          author: "Gage Skidmore",
+          license: "CC BY-SA 3.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:Jared_Leto_by_Gage_Skidmore_2.jpg",
+        },
+        source: {
+          title: "Bright Spring Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/bright-spring-celebrities",
+        },
+      },
+    ],
+  },
+  "light-summer": {
+    about: [
+      "Light Summer is the airiest of the Summers. Hair is usually ash blonde or light ash brown, eyes are soft blue, grey or green, and skin is fair with a pink or rosy cast. Everything is light and cool, with little contrast between hair, skin and eyes.",
+      "Pastels with a cool, rosy base belong here: powder blue, periwinkle, lavender, rose pink and soft teal, with soft white, grey and soft navy as neutrals. Silver, platinum and white gold sit well on the skin. Black, orange and earthy browns are too heavy and too warm, and they reach the eye before the face does.",
+      "The closest neighbour is Light Spring, just as light but warm. If peach and golden yellow make the skin look sallow while powder blue and rose make it glow, the coloring is Summer.",
+    ],
+    neighbours: [
+      {
+        slug: "true-summer",
+        why: "Just as cool, but deeper, with more color.",
+      },
+      {
+        slug: "light-spring",
+        why: "Just as light, but warm and golden.",
+      },
+      {
+        slug: "soft-summer",
+        why: "Cool too, but deeper and dustier.",
+      },
+    ],
+    famous: [
+      {
+        name: "Margot Robbie",
+        image: "/images/famous/light-summer/margot-robbie.webp",
+        alt: "Margot Robbie",
+        credit: {
+          author: "Ondine Goat",
+          license: "CC0",
+          licenseUrl: "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Margot_Robbie_Wuthering_Heights_premiere_(cropped).jpg",
+        },
+        source: {
+          title: "Light Summer Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/light-summer-celebrities",
+        },
+      },
+      {
+        name: "Cate Blanchett",
+        image: "/images/famous/light-summer/cate-blanchett.webp",
+        alt: "Cate Blanchett",
+        credit: {
+          author: "Harald Krichel",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Cate_Blanchett-63298_(cropped_2).jpg",
+        },
+        source: {
+          title: "Light Summer Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/light-summer-celebrities",
+        },
+      },
+      {
+        name: "Sydney Sweeney",
+        image: "/images/famous/light-summer/sydney-sweeney.webp",
+        alt: "Sydney Sweeney",
+        credit: {
+          author: "Jay Dixit",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Sydney_Sweeney_at_the_2024_Toronto_International_Film_Festival_01_(3x4_cropped_and_rotated).jpg",
+        },
+        source: {
+          title: "Light Summer Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/light-summer-celebrities",
+        },
+      },
+    ],
+  },
+  "true-summer": {
+    about: [
+      "True Summer is the coolest Summer. The undertone is clearly pink or blue, hair is usually ash brown or ash blonde, and eyes are blue, grey or cool green. Depth is medium and contrast soft, so the coloring reads calm rather than bright.",
+      "Cool colors with a touch of grey suit that calm: slate blue, soft blue, rose pink, raspberry, plum and sea green. Navy, charcoal blue and cool grey replace black and camel. Silver, platinum and pewter flatter more than yellow gold. Orange, gold and warm browns fight the pink in the skin and can make it look red or sallow.",
+      "True Summer is often confused with Soft Summer. Both are cool, but True Summer can carry clearer color: a raspberry or a sky blue that would overwhelm a Soft Summer looks just right here.",
+    ],
+    neighbours: [
+      {
+        slug: "light-summer",
+        why: "Just as cool, but lighter and airier.",
+      },
+      {
+        slug: "soft-summer",
+        why: "Cool too, but more muted and smoky.",
+      },
+      {
+        slug: "true-winter",
+        why: "Just as cool, but clearer, with high contrast.",
+      },
+    ],
+    famous: [
+      {
+        name: "Emily Blunt",
+        image: "/images/famous/true-summer/emily-blunt.webp",
+        alt: "Emily Blunt",
+        credit: {
+          author: "Kevin Paul",
+          license: "CC BY 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Emily_Blunt_at_WWD_Style_Awards_2026-02.jpg",
+        },
+        source: {
+          title: "True Summer Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/true-summer-celebrities",
+        },
+      },
+      {
+        name: "Anna Kendrick",
+        image: "/images/famous/true-summer/anna-kendrick.webp",
+        alt: "Anna Kendrick",
+        credit: {
+          author: "Jay Dixit",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Anna_Kendrick_at_Toronto_International_Film_Festival_2026_-_photographed_by_Jay_Dixit_-_d90c76eb.jpg",
+        },
+        source: {
+          title: "True Summer Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/true-summer-celebrities",
+        },
+      },
+      {
+        name: "Kaya Scodelario",
+        image: "/images/famous/true-summer/kaya-scodelario.webp",
+        alt: "Kaya Scodelario",
+        credit: {
+          author: "Desmond Herzfelder",
+          license: "CC BY 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Kaya_Scodelario_at_the_2025_Toronto_International_Film_Festival_(cropped).jpg",
+        },
+        source: {
+          title: "True Summer Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/true-summer-celebrities",
+        },
+      },
+    ],
+  },
+  "soft-summer": {
+    about: [
+      "Soft Summer is cool to neutral, with medium depth and low contrast. Hair is often ash brown or dark ash blonde, eyes grey-green, grey-blue or soft hazel, and skin neutral with a cool lean. The overall impression is gentle and smoky, never sharp.",
+      "Colors that look as if they have a little grey mixed in blend with it: dusty rose, slate, smoky teal, grey violet and soft plum. Charcoal, grey navy and soft white work better than black and stark white. Brushed silver, pewter and rose gold suit the softness. Bright, saturated and warm colors overpower it: next to bright yellow, kelly green or orange, the face fades.",
+      "Soft Summer's mirror image is Soft Autumn, just as muted but warm. If dusty rose looks better than terracotta, and pewter better than brass, Soft Summer is the likelier match.",
+    ],
+    neighbours: [
+      {
+        slug: "soft-autumn",
+        why: "Just as muted, but warm.",
+      },
+      {
+        slug: "true-summer",
+        why: "Cool too, but clearer and rosier.",
+      },
+      {
+        slug: "light-summer",
+        why: "Cool and soft too, but lighter.",
+      },
+    ],
+    famous: [
+      {
+        name: "Jennifer Aniston",
+        image: "/images/famous/soft-summer/jennifer-aniston.webp",
+        alt: "Jennifer Aniston",
+        credit: {
+          author: "Angela George",
+          license: "CC BY-SA 3.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/3.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:JenniferAnistonHWoFFeb2012.jpg",
+        },
+        source: {
+          title: "Soft Summer Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/soft-summer-celebrities",
+        },
+      },
+      {
+        name: "Dakota Johnson",
+        image: "/images/famous/soft-summer/dakota-johnson.webp",
+        alt: "Dakota Johnson",
+        credit: {
+          author: "Gabriel Hutchinson",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Dakota_Johnson_at_the_2025_Cannes_Film_Festival_(cropped).jpg",
+        },
+        source: {
+          title: "Soft Summer Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/soft-summer-celebrities",
+        },
+      },
+      {
+        name: "Kristen Stewart",
+        image: "/images/famous/soft-summer/kristen-stewart.webp",
+        alt: "Kristen Stewart",
+        credit: {
+          author: "Kevin Paul",
+          license: "CC BY 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Kristen_Stewart_at_WWD_Style_Awards_2026.jpg",
+        },
+        source: {
+          title: "Soft Summer Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/soft-summer-celebrities",
+        },
+      },
+    ],
+  },
+  "soft-autumn": {
+    about: [
+      "Soft Autumn is warm, but quietly so. Hair is often soft brown, dark blonde or muted auburn, eyes hazel, soft green or warm brown, and skin warm to neutral without much flush. No single feature stands out from the rest: the coloring blends, and the clothes should blend with it.",
+      "Earthy colors with a little dust in them do that: terracotta, camel, sage, olive, dusty rose and deep teal. Ivory cream, oatmeal, mushroom and espresso replace black and stark white. Brushed gold, bronze and rose gold sit better than polished silver. Bright, icy and very dark colors compete: fuchsia, electric blue and jet black stand out on their own, apart from the face.",
+      "Soft Autumns are often mistaken for Soft Summers, since both are muted. The tell is warmth: if terracotta warms the skin and fuchsia looks loud, Soft Autumn fits.",
+    ],
+    neighbours: [
+      {
+        slug: "true-autumn",
+        why: "Just as warm, but richer and clearer.",
+      },
+      {
+        slug: "soft-summer",
+        why: "Just as muted, but cool.",
+      },
+      {
+        slug: "deep-autumn",
+        why: "Warm too, but darker, with more contrast.",
+      },
+    ],
+    famous: [
+      {
+        name: "Elizabeth Olsen",
+        image: "/images/famous/soft-autumn/elizabeth-olsen.webp",
+        alt: "Elizabeth Olsen",
+        credit: {
+          author: "JoshPopov",
+          license: "CC BY 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:ElizabethOlsen-TIFF2025-02_(cropped).png",
+        },
+        source: {
+          title: "Soft Autumn Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/soft-autumn-celebrities",
+        },
+      },
+      {
+        name: "Scarlett Johansson",
+        image: "/images/famous/soft-autumn/scarlett-johansson.webp",
+        alt: "Scarlett Johansson",
+        credit: {
+          author: "Harald Krichel",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:Scarlett_Johansson-8588.jpg",
+        },
+        source: {
+          title: "Soft Autumn Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/soft-autumn-celebrities",
+        },
+      },
+      {
+        name: "Adele",
+        image: "/images/famous/soft-autumn/adele.webp",
+        alt: "Adele",
+        credit: {
+          author: "Marc E.",
+          license: "CC BY 2.0",
+          licenseUrl: "https://creativecommons.org/licenses/by/2.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:Adele_2016.jpg",
+        },
+        source: {
+          title: "Soft Autumn Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/soft-autumn-celebrities",
+        },
+      },
+    ],
+  },
+  "true-autumn": {
+    about: [
+      "True Autumn is golden and earthy through and through. Hair is often auburn, copper, golden brown or warm chestnut, eyes brown, hazel or warm green, and skin golden, peach or bronze, sometimes with freckles. Depth and contrast are both medium.",
+      "Rich, warm colors look like they belong: pumpkin, rust, mustard, olive, forest green and peacock teal. Camel, olive and chocolate are the neutrals. Gold, copper and bronze look better than silver. Cool and icy colors, and pinks with a blue base such as fuchsia and bubblegum, drain the skin and leave it grey.",
+      "True Autumn's closest neighbours are Soft Autumn, softer and dustier, and Deep Autumn, darker with more contrast. Across the wheel sits True Spring, just as warm but brighter. If pumpkin and olive feel natural and coral feels a little loud, Autumn is the family.",
+    ],
+    neighbours: [
+      {
+        slug: "soft-autumn",
+        why: "Just as warm, but softer and dustier.",
+      },
+      {
+        slug: "deep-autumn",
+        why: "Warm too, but darker, with more contrast.",
+      },
+      {
+        slug: "true-spring",
+        why: "Just as warm, but clearer and brighter.",
+      },
+    ],
+    famous: [
+      {
+        name: "Julia Roberts",
+        image: "/images/famous/true-autumn/julia-roberts.webp",
+        alt: "Julia Roberts",
+        credit: {
+          author: "Colleen Sturtevant",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:Julia_Roberts_2025.jpg",
+        },
+        source: {
+          title: "True Autumn Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/true-autumn-celebrities",
+        },
+      },
+      {
+        name: "Julianne Moore",
+        image: "/images/famous/true-autumn/julianne-moore.webp",
+        alt: "Julianne Moore",
+        credit: {
+          author: "Harald Krichel",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Julianne_Moore_at_the_2026_Cannes_Film_Festival-65472_(cropped).jpg",
+        },
+        source: {
+          title: "True Autumn Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/true-autumn-celebrities",
+        },
+      },
+      {
+        name: "Ana de Armas",
+        image: "/images/famous/true-autumn/ana-de-armas.webp",
+        alt: "Ana de Armas",
+        credit: {
+          author: "Gage Skidmore",
+          license: "CC BY-SA 2.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/2.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Ana_de_Armas_(54462619561)_(cropped_3).jpg",
+        },
+        source: {
+          title: "True Autumn Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/true-autumn-celebrities",
+        },
+      },
+    ],
+  },
+  "deep-autumn": {
+    about: [
+      "Deep Autumn is deep, warm and rich. Hair is usually dark brown, chestnut or near black with warm tones, eyes dark brown, hazel or deep olive, and skin warm to neutral at any depth. Contrast runs medium to high, with plenty of depth in the features.",
+      "Dark, warm colors match that depth: deep rust, tomato red, oxblood, forest green, deep teal, saffron and aubergine. Espresso and chocolate stand in for black, and cream for stark white. Antique gold, bronze and copper suit the skin better than polished silver. Pastels and icy colors, such as pastel pink, icy blue and lavender, wash it out.",
+      "Deep Autumn borders on Deep Winter. Both wear depth, but Deep Winter's colors are cool and sharp, Deep Autumn's warm and earthy. If true black looks harsh and espresso looks rich, the coloring leans Autumn.",
+    ],
+    neighbours: [
+      {
+        slug: "deep-winter",
+        why: "Just as deep, but cool.",
+      },
+      {
+        slug: "true-autumn",
+        why: "Just as warm, but lighter and more golden.",
+      },
+      {
+        slug: "soft-autumn",
+        why: "Warm too, but lighter and more muted, with low contrast.",
+      },
+    ],
+    famous: [
+      {
+        name: "Zendaya",
+        image: "/images/famous/deep-autumn/zendaya.webp",
+        alt: "Zendaya",
+        credit: {
+          author: "PhilipRomano",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:Zendaya-byPhilipRomano.jpg",
+        },
+        source: {
+          title: "Dark Autumn Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/dark-autumn-celebrities",
+        },
+      },
+      {
+        name: "Halle Berry",
+        image: "/images/famous/deep-autumn/halle-berry.webp",
+        alt: "Halle Berry",
+        credit: {
+          author: "Harald Krichel",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:Halle_Berry-1910.jpg",
+        },
+        source: {
+          title: "Dark Autumn Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/dark-autumn-celebrities",
+        },
+      },
+      {
+        name: "Freida Pinto",
+        image: "/images/famous/deep-autumn/freida-pinto.webp",
+        alt: "Freida Pinto",
+        credit: {
+          author: "DFID - UK Department for International Development",
+          license: "CC BY 2.0",
+          licenseUrl: "https://creativecommons.org/licenses/by/2.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Freida_Pinto_-_Youth_For_Change_(cropped).jpg",
+        },
+        source: {
+          title: "Dark Autumn Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/dark-autumn-celebrities",
+        },
+      },
+    ],
+  },
+  "deep-winter": {
+    about: [
+      "Deep Winter has dark hair and eyes, often near black and deep brown, cool to neutral skin at any depth, and high contrast. The coloring has weight, and it can carry colors that would overwhelm lighter seasons.",
+      "Dark, saturated colors match it: true red, burgundy, emerald, cobalt, royal purple and navy. Black and pure white both work, along with charcoal and dark navy. A touch of icy pink, blue or mint lifts a dark outfit near the face. Silver, platinum and gunmetal flatter more than yellow gold. Warm, golden and earthy colors, such as mustard, camel and rust, make the skin look tired or sallow.",
+      "Deep Winter's neighbour on the warm side is Deep Autumn. If black looks crisp rather than harsh, and true red beats tomato, Deep Winter fits.",
+    ],
+    neighbours: [
+      {
+        slug: "deep-autumn",
+        why: "Just as deep, but warm.",
+      },
+      {
+        slug: "true-winter",
+        why: "Cool too, but icier, with less depth.",
+      },
+      {
+        slug: "bright-winter",
+        why: "Cool and high-contrast too, but brighter and lighter.",
+      },
+    ],
+    famous: [
+      {
+        name: "Dua Lipa",
+        image: "/images/famous/deep-winter/dua-lipa.webp",
+        alt: "Dua Lipa",
+        credit: {
+          author: "Harald Krichel",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:Dua_Lipa-69798_(cropped).jpg",
+        },
+        source: {
+          title: "Dark Winter Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/dark-winter-celebrities",
+        },
+      },
+      {
+        name: "Lucy Liu",
+        image: "/images/famous/deep-winter/lucy-liu.webp",
+        alt: "Lucy Liu",
+        credit: {
+          author: "Bryan Berlin",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:Lucy_Liu_Rosemead-13_(cropped).jpg",
+        },
+        source: {
+          title: "Dark Winter Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/dark-winter-celebrities",
+        },
+      },
+      {
+        name: "Salma Hayek",
+        image: "/images/famous/deep-winter/salma-hayek.webp",
+        alt: "Salma Hayek",
+        credit: {
+          author: "Martin Kraft",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:MKr383631_Salma_Hayek_(Women_In_Motion,_Cannes_2025)_crop.jpg",
+        },
+        source: {
+          title: "Dark Winter Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/dark-winter-celebrities",
+        },
+      },
+    ],
+  },
+  "true-winter": {
+    about: [
+      "True Winter has a clearly blue or pink undertone. Hair is usually dark and cool, from cool brown to blue-black, eyes are often dark or a clear cool color, and contrast between hair and skin is high. The look is crisp and graphic.",
+      "Clear, bold, cool colors match it: blue red, fuchsia, royal blue, emerald, sapphire and lemon yellow, with icy pastels as accents. Black and pure white work, and so do navy, charcoal and cool grey. Silver, platinum and white gold beat yellow gold. Warm, golden and earthy colors clash: peach, camel, orange and rust turn the skin sallow.",
+      "True Winter shares its coolness with True Summer, which has far less contrast. If soft slate blue makes the face look washed out and cobalt makes it look sharp, the coloring is Winter.",
+    ],
+    neighbours: [
+      {
+        slug: "deep-winter",
+        why: "Just as striking, but deeper and a touch less cool.",
+      },
+      {
+        slug: "bright-winter",
+        why: "Just as clear, but brighter and a touch less cool.",
+      },
+      {
+        slug: "true-summer",
+        why: "Just as cool, but softer, with low contrast.",
+      },
+    ],
+    famous: [
+      {
+        name: "Katy Perry",
+        image: "/images/famous/true-winter/katy-perry.webp",
+        alt: "Katy Perry",
+        credit: {
+          author: "Colleen Sturtevant",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Katy_Perry_2026_Tribeca_Film_Festival_(cropped_1).jpg",
+        },
+        source: {
+          title: "True Winter Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/true-winter-celebrities",
+        },
+      },
+      {
+        name: "Marion Cotillard",
+        image: "/images/famous/true-winter/marion-cotillard.webp",
+        alt: "Marion Cotillard",
+        credit: {
+          author: "Harald Krichel",
+          license: "CC BY-SA 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:Marion_Cotillard-1061.jpg",
+        },
+        source: {
+          title: "True Winter Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/true-winter-celebrities",
+        },
+      },
+      {
+        name: "Phoebe Waller-Bridge",
+        image: "/images/famous/true-winter/phoebe-waller-bridge.webp",
+        alt: "Phoebe Waller-Bridge",
+        credit: {
+          author: "Scottish Government",
+          license: "CC BY 2.0",
+          licenseUrl: "https://creativecommons.org/licenses/by/2.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Nicola_Benedetti_Humza_Yousaf_Phoebe_Waller-Bridge_-_All_Festivals_Reception_(Waller-Bridge_cropped)_(cropped).jpg",
+        },
+        source: {
+          title: "True Winter Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/true-winter-celebrities",
+        },
+      },
+    ],
+  },
+  "bright-winter": {
+    about: [
+      "Bright Winter has very high contrast, often bright blue, green or grey eyes against dark hair, with cool to neutral skin. The coloring looks clear and sharp, and soft colors look dull beside it.",
+      "Vivid, saturated colors match that intensity: hot pink, clear red, electric blue, bright turquoise, bright violet and emerald. Black and pure white work, and so do ink navy and charcoal. Polished silver, platinum and chrome suit the shine, and makeup can be just as clear: a clear red or hot fuchsia lip. Dusty, muted and earthy colors, such as dusty rose, mushroom and olive drab, dull the face.",
+      "Bright Winter is often confused with Bright Spring, which is just as bright but warm. If hot pink beats coral, and polished silver beats gold, Bright Winter is the closer match.",
+    ],
+    neighbours: [
+      {
+        slug: "true-winter",
+        why: "Just as clear, but cooler and less electric.",
+      },
+      {
+        slug: "bright-spring",
+        why: "Just as bright, but warm.",
+      },
+      {
+        slug: "deep-winter",
+        why: "Cool and high-contrast too, but deeper and darker.",
+      },
+    ],
+    famous: [
+      {
+        name: "Megan Fox",
+        image: "/images/famous/bright-winter/megan-fox.webp",
+        alt: "Megan Fox",
+        credit: {
+          author: "Kevin Paul",
+          license: "CC BY 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by/4.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:Megan_Fox_-_Jennifer%27s_Body.jpg",
+        },
+        source: {
+          title: "Bright Winter Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/bright-winter-celebrities",
+        },
+      },
+      {
+        name: "Courteney Cox",
+        image: "/images/famous/bright-winter/courteney-cox.webp",
+        alt: "Courteney Cox",
+        credit: {
+          author: "Albert Domasin",
+          license: "CC BY-SA 2.0",
+          licenseUrl: "https://creativecommons.org/licenses/by-sa/2.0",
+          commonsUrl: "https://commons.wikimedia.org/wiki/File:Courteney_Cox_%2710_PaleyFest.jpg",
+        },
+        source: {
+          title: "Bright Winter Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/bright-winter-celebrities",
+        },
+      },
+      {
+        name: "Krysten Ritter",
+        image: "/images/famous/bright-winter/krysten-ritter.webp",
+        alt: "Krysten Ritter",
+        credit: {
+          author: "Kevin Paul",
+          license: "CC BY 4.0",
+          licenseUrl: "https://creativecommons.org/licenses/by/4.0",
+          commonsUrl:
+            "https://commons.wikimedia.org/wiki/File:Krysten_Ritter_-_LA_Times_Festival_of_Books_2025.jpg",
+        },
+        source: {
+          title: "Bright Winter Celebrities, Four Seasons Studio",
+          url: "https://fourseasons.studio/blogs/news/bright-winter-celebrities",
+        },
+      },
+    ],
+  },
+};

@@ -75,7 +75,7 @@
 
 The pre-commit hook runs `test:unit`, so a red test is committed together with the section 3 code that turns it green, never on its own.
 
-- [ ] 2.1 `apps/web/src/lib/site-content/content.test.tsx`: one test per `site-content` scenario, each citing `{@link openspec/specs/site-content/spec.md#…}`:
+- [x] 2.1 `apps/web/src/lib/site-content/content.test.tsx`: one test per `site-content` scenario, each citing `{@link openspec/specs/site-content/spec.md#…}`:
   - no placeholder and the word floor, for every core page and all 12 slugs (decision 7);
   - the landing sample's 12 names and hex codes are Soft Autumn colors, and the 12-seasons links and strips match the highlights;
   - a season page's palette sections equal `PALETTES[slug]` in order;
@@ -94,7 +94,7 @@ The pre-commit hook runs `test:unit`, so a red test is committed together with t
 
   Done when the new case fails and the edited ones pass.
 
-- [ ] 2.3 Test for `capture-flow` "The guide's example photos": the guide renders three tip cards with six `img` elements, each with alt text and no `sn-slot__label`. Add the same assertion to the E2E guide case in `e2e/`.
+- [x] 2.3 Test for `capture-flow` "The guide's example photos": the guide renders three tip cards with six `img` elements, each with alt text and no `sn-slot__label`. Add the same assertion to the E2E guide case in `e2e/`.
 
   Done when both fail on the placeholders.
 
@@ -102,7 +102,7 @@ The pre-commit hook runs `test:unit`, so a red test is committed together with t
 
   Done when it fails on the placeholder glyphs.
 
-- [ ] 2.5 E2E `e2e/sample-report.spec.ts` for "Nothing is sent": open `/sample-report`, scroll to the end, and assert no `/api/` request and none of the nine custom funnel events (reuse `funnel.spec.ts`'s PostHog route stub). Delete the approved stub case in `e2e/site-structure.spec.ts`.
+- [x] 2.5 E2E `e2e/sample-report.spec.ts` for "Nothing is sent": open `/sample-report`, scroll to the end, and assert no `/api/` request and none of the nine custom funnel events (reuse `funnel.spec.ts`'s PostHog route stub). Delete the approved stub case in `e2e/site-structure.spec.ts`.
 
   Done when the spec runs. It may pass on the stub already; it guards the real page.
 
@@ -110,23 +110,25 @@ The pre-commit hook runs `test:unit`, so a red test is committed together with t
 
 - [x] 3.1 Add `lucide` to `apps/web` (design.md decision 6: `lucide-react` was tried and dropped) and map `Icon`'s 11 names to it (decision 6). Done when 2.4 and every existing DS test pass.
 
-- [ ] 3.2 Put the approved images in `apps/web/public/images/examples/` and `apps/web/public/images/famous/<slug>/` as WebP, sized per decision 4 and decision 5. Add `apps/web/src/lib/site-content/images.ts` with paths, alt text and credits. Done when every file is at most about 80 KB and typecheck passes.
+- [x] 3.2 Put the approved images in `apps/web/public/images/examples/` and `apps/web/public/images/famous/<slug>/` as WebP, sized per decision 4 and decision 5. Add `apps/web/src/lib/site-content/images.ts` with paths, alt text and credits. Done when every file is at most about 80 KB and typecheck passes.
 
-- [ ] 3.3 Add `apps/web/src/lib/site-content/seasons.ts`: a `Record<SeasonSlug, SeasonContent>` with `about`, `neighbours` and `famous`, holding the approved copy (decision 1). Done when typecheck passes and the `about` and neighbour cases of 2.1 pass.
+- [x] 3.3 Add `apps/web/src/lib/site-content/seasons.ts`: a `Record<SeasonSlug, SeasonContent>` with `about`, `neighbours` and `famous`, holding the approved copy (decision 1). Done when typecheck passes and the `about` and neighbour cases of 2.1 pass.
 
 - [x] 3.4 Move the report sections out of `apps/web/src/lib/report/view.tsx` into `ReportSections` in `apps/web/src/lib/report/sections.tsx` (decision 3). Done when every report-page unit and E2E test passes unchanged.
 
-- [ ] 3.5 Landing (`(site)/page.tsx`) from Main and Landing-1280. Done when the landing cases of 2.1 pass and `e2e/funnel.spec.ts` stays green.
+- [x] 3.5 Landing (`(site)/page.tsx`) from Main and Landing-1280. Done when the landing cases of 2.1 pass and `e2e/funnel.spec.ts` stays green.
 
-- [ ] 3.6 `/seasons` and `/seasons/[season]` from the Seasons and Season boards, reading `PALETTES`, `SEASON_COPY` and `site-content`. Done when the season cases of 2.1 pass for all 12 slugs.
+- [x] 3.6 `/seasons` and `/seasons/[season]` from the Seasons and Season boards, reading `PALETTES`, `SEASON_COPY` and `site-content`. Done when the season cases of 2.1 pass for all 12 slugs.
 
-- [ ] 3.7 `/how-it-works` from HowItWorks. Done when its cases of 2.1 pass.
+- [x] 3.7 `/how-it-works` from HowItWorks. Done when its cases of 2.1 pass.
 
-- [ ] 3.8 `/sample-report` from SampleReport, with `ReportSections` and a static `DrapingPair` on the sample face. Done when its 2.1 cases and 2.5 pass.
+- [x] 3.8 `/sample-report` from SampleReport, with `ReportSections` and a static `DrapingPair` on the sample face. Done when its 2.1 cases and 2.5 pass.
 
-- [ ] 3.9 `/color-analysis-gpt-alternative` from GptAlternative. Re-check OpenAI's FAQ the same day and record the date here. Done when its 2.1 case passes.
+- [x] 3.9 `/color-analysis-gpt-alternative` from GptAlternative. Re-check OpenAI's FAQ the same day and record the date here. Done when its 2.1 case passes.
 
-- [ ] 3.10 Guide photos in `(flow)/analyze/_capture/steps.tsx`, with `src` and `alt` on the three `PhotoTipCard`s. Done when 2.3 passes.
+  Re-checked 2026-10-10 in the browser: retirement Dec 11, 2026 (Feb 11, 2027 for approved Enterprise deferrals); GPTs and their pages become inaccessible then; existing conversations stay accessible; the selected model and custom actions don't carry over, and access to a GPT doesn't give access to its replacement plugin. The page's copy matches. Route title and description unchanged.
+
+- [x] 3.10 Guide photos in `(flow)/analyze/_capture/steps.tsx`, with `src` and `alt` on the three `PhotoTipCard`s. Done when 2.3 passes.
 
 - [ ] 3.11 Set `ready: true` on the six content routes in `apps/web/src/lib/site/routes.ts`, and remove the "Stub until…" comments. Done when 2.2 passes and `pnpm build` lists the 12 season pages as static.
 

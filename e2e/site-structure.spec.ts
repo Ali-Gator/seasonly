@@ -57,12 +57,6 @@ test.describe("public routes", () => {
     // The step progress is a nav landmark of its own; no site nav or footer.
     await expect(page.locator('nav:not([aria-label="Progress"]), footer')).toHaveCount(0);
   });
-
-  /** {@link openspec/specs/site-structure/spec.md#scenario-a-stub-page} */
-  test("a stub page carries noindex", async ({ page }) => {
-    await page.goto("/how-it-works");
-    expect(await robotsMeta(page)).toContain("noindex");
-  });
 });
 
 test.describe("not found", () => {

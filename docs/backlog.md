@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-23**
+_Next id:_ **BL-24**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -129,6 +129,13 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   against a build.
   _Refs:_ `e2e/report-delivery.spec.ts`, `playwright.config.ts` · _Status:_ open — found in
   `t5-funnel-analytics`, 2026-10-09
+
+- **[BL-23] Two copies of the E2E PostHog recorder** — `e2e/posthog.ts` (the sample report's
+  "nothing is sent" check) and `funnel.spec.ts` each route the dead PostHog host and decode its
+  bodies. Point `funnel.spec.ts` at the shared helper, so a change in posthog-js's body format is
+  fixed once. It is an edit to an existing test, so it waits for the user's approval.
+  _Refs:_ `e2e/posthog.ts`, `e2e/funnel.spec.ts` · _Status:_ open — found in `t9-site-content`,
+  2026-10-10
 
 ## Design / UX
 
