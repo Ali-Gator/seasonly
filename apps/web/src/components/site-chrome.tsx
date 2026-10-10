@@ -98,6 +98,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             id="ft-more"
             title="More"
             links={[
+              ["/sample-report", "Sample report"],
               ["/color-analysis-gpt-alternative", "Color analysis GPT alternative"],
               ["/privacy", "Privacy"],
               ["/terms", "Terms"],

@@ -82,11 +82,11 @@ const REPORT_PATTERN = "/r/[id]";
 export const ROUTES: readonly Route[] = [
   {
     path: "/",
-    title: "Seasonly: find your colors from one selfie",
+    title: "Seasonal color analysis from one selfie · Seasonly",
     description:
       "One daylight selfie and four quick questions. In under a minute you get your season and 30 colors that work with you.",
     indexable: true,
-    ready: false,
+    ready: true,
   },
   {
     path: "/seasons",
@@ -94,14 +94,14 @@ export const ROUTES: readonly Route[] = [
     description:
       "Seasonal color analysis sorts coloring into four families, then splits each family in three. Three questions decide where you land.",
     indexable: true,
-    ready: false,
+    ready: true,
   },
   {
     path: SEASON_PATTERN,
     title: "{season} color palette and colors to avoid · Seasonly",
     description: "{summary} The {season} palette, colors to avoid, best neutrals and metals.",
     indexable: true,
-    ready: false,
+    ready: true,
   },
   {
     path: "/how-it-works",
@@ -109,7 +109,7 @@ export const ROUTES: readonly Route[] = [
     description:
       "One daylight selfie and four quick questions. Here is what happens to each, and why.",
     indexable: true,
-    ready: false,
+    ready: true,
   },
   {
     path: "/sample-report",
@@ -117,7 +117,7 @@ export const ROUTES: readonly Route[] = [
     description:
       "A full sample Soft Autumn report: the palette with hex codes, colors to avoid, neutrals, metals and a draping preview.",
     indexable: true,
-    ready: false,
+    ready: true,
   },
   {
     path: "/color-analysis-gpt-alternative",
@@ -125,7 +125,7 @@ export const ROUTES: readonly Route[] = [
     description:
       "The color analysis GPT is retiring. Seasonly finds your season from one selfie and four questions, with a photo check, a draping preview and a palette with hex codes.",
     indexable: true,
-    ready: false,
+    ready: true,
   },
   {
     path: "/privacy",

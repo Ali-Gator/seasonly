@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-18**
+_Next id:_ **BL-29**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -49,6 +49,29 @@ fold items in.
   _Refs:_ `.github/workflows/ci.yml`, `evals/gate.ts` · _Status:_ deferred — until fetching about
   100 Commons originals per CI run is judged stable
 
+## Privacy
+
+- **[BL-18] A crop can stay about 49 h while the pages say 24 h** — the retention job runs once a
+  day (Vercel Hobby) with a 24 h cutoff, so a crop stored just after a run lasts until the run
+  after next. Move to an hourly scheduler (Vercel Pro, or `pg_cron` + `pg_net` calling the same
+  route); no other code changes.
+  _Refs:_ `apps/web/vercel.json`, `openspec/specs/data-retention/spec.md` · _Status:_ deferred —
+  Vercel Pro or before paid promotion (T15); the user's choice, 2026-10-09
+
+- **[BL-19] The PostHog cookie is set without consent** — an ePrivacy risk for EU visitors,
+  disclosed on `/privacy`. Turn on `cookieless_mode`, or add a banner with `on_reject`.
+  _Refs:_ `apps/web/src/lib/observability/posthog.ts`, `openspec/specs/analytics/spec.md` ·
+  _Status:_ deferred — before paid promotion or a complaint; the user's choice, 2026-10-09
+
+- **[BL-20] The consent screen undersells what is kept and where the crop goes** — "We keep only
+  your result: your season and your colors" leaves out the measured traits, quiz answers and
+  personal text the report stores, and the screen does not say Google may keep the crop up to
+  90 days for abuse checks, though `/privacy` cites this screen as the basis for using the crop.
+  The report email footer repeats the line. Needs a canvas line first.
+  _Refs:_ `apps/web/src/app/(flow)/analyze/_capture/steps.tsx`, `apps/web/src/lib/email/render.ts`,
+  `openspec/specs/capture-flow/spec.md` · _Status:_ open — phase review of `t8-photo-privacy`,
+  2026-10-10
+
 ## Code quality
 
 - **[BL-02] A hung crop upload is abandoned, not cancelled** — `upload()` in
@@ -67,6 +90,20 @@ fold items in.
   _Status:_ open — found in `t6-eval-set`, 2026-10-09
 
 ## Testing
+
+- **[BL-21] Two e2e cases fail on a Mac** — run locally, `/seasons/Soft-Autumn` answers 200
+  (the case-insensitive disk serves the prerendered `soft-autumn` page) and, on the dev server
+  (no `CI=1`), the report-500 page carries `no-cache, must-revalidate` instead of
+  `private, no-store`. CI on Linux passes. Skip or adapt both locally so a clean run is green.
+  _Refs:_ `e2e/site-structure.spec.ts`, `e2e/report-delivery.spec.ts`, `playwright.config.ts` ·
+  _Status:_ open — found in `t8-photo-privacy`, 2026-10-10
+
+- **[BL-22] A report page's RSC request answered 503 once** — moving from the email step to
+  `/r/<id>` on a preview, the `?_rsc` request answered 503 before the page loaded normally.
+  Find out whether the router fetched the report before it was readable and whether a visitor
+  can see an error.
+  _Refs:_ `apps/web/src/app/(report)/`, `openspec/specs/report-page/spec.md` · _Status:_ open —
+  network capture of `t8-photo-privacy`, 2026-10-10
 
 - **[BL-17] Two analysis-eval scenarios are proven one level down** — "A photo cannot be had"
   is tested on the results writer, not on `eval:run` failing after a failed fetch, and "A usable
@@ -93,6 +130,13 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   _Refs:_ `e2e/report-delivery.spec.ts`, `playwright.config.ts` · _Status:_ open — found in
   `t5-funnel-analytics`, 2026-10-09
 
+- **[BL-23] Two copies of the E2E PostHog recorder** — `e2e/posthog.ts` (the sample report's
+  "nothing is sent" check) and `funnel.spec.ts` each route the dead PostHog host and decode its
+  bodies. Point `funnel.spec.ts` at the shared helper, so a change in posthog-js's body format is
+  fixed once. It is an edit to an existing test, so it waits for the user's approval.
+  _Refs:_ `e2e/posthog.ts`, `e2e/funnel.spec.ts` · _Status:_ open — found in `t9-site-content`,
+  2026-10-10
+
 ## Design / UX
 
 - **[BL-04] The design system's ShareCard overflows on long names** — the approved
@@ -106,9 +150,33 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   DOM card preview (`t5-report-delivery` shows the PNGs themselves); check whether the 2026-10-07
   redesign session already updated the canvas
 
-- **[BL-06] Placeholder icons and empty photo slots** — the icons are the bundle's placeholder
-  glyphs, and the photo-tip and draping example slots show labels, not photos. Choose an icon set
-  and real example photos.
-  _Refs:_ `apps/web/src/components/ds/icon.tsx`, design system
-  (https://claude.ai/artifact/E11hciU9VsyCxTFnJJNbHD) · _Status:_ gated — your choice of icon set
-  and photos (open since T3, 2026-10-01)
+- **[BL-24] Famous people's names are read twice** — each famous photo's alt text is the
+  person's name, and the name is printed right under it, so a screen reader says it twice. Use
+  `alt=""` with the name as the caption (a `figure`/`figcaption`), or describe the photo instead;
+  the approved alt texts are the names (`t9-site-content` content.json).
+  _Refs:_ `apps/web/src/app/(site)/seasons/[season]/page.tsx`, `apps/web/src/lib/site-content/seasons.ts`
+  · _Status:_ open — t9 phase review, 2026-10-10
+
+- **[BL-25] Season names in the strips are not headings** — on the landing, `/seasons` and a
+  season page's neighbours, each season's name is a `span.h3` inside its link, as the boards draw
+  it, so heading navigation skips the 12 seasons. Make them `h3`s if the boards agree.
+  _Refs:_ `apps/web/src/lib/site-content/season-link.tsx`, MVP canvas boards Main, Seasons, Season
+  · _Status:_ open — t9 phase review, 2026-10-10
+
+- **[BL-26] The famous photos bypass `Slot`** — the season page builds its own `sn-slot` and
+  `img` only to add `loading="lazy"`. Give the design system's `Slot` (and bundle.js) a `loading`
+  prop and use it there.
+  _Refs:_ `apps/web/src/components/ds/slot.tsx`, `apps/web/src/app/(site)/seasons/[season]/page.tsx`
+  · _Status:_ open — t9 phase review, 2026-10-10
+
+- **[BL-27] The GPT-alternative page goes stale on December 11** — its title, description, h1
+  and lead say the GPT "is retiring" on December 11, 2026. Re-check OpenAI's FAQ and switch the
+  copy to the past tense ("has retired") on that date, or sooner if OpenAI moves it.
+  _Refs:_ `apps/web/src/lib/site/routes.ts`, `apps/web/src/app/(site)/color-analysis-gpt-alternative/page.tsx`
+  · _Status:_ deferred — December 11, 2026 (t9 SEO audit, 2026-10-10)
+
+- **[BL-28] Two redirect hops on legacy URL shapes** — `http://www.seasonly.me/seasons` and
+  `/seasons/warm-autumn/` each take two 308s to reach the canonical URL. Harmless on a new domain
+  with no inbound links; collapse them at the Vercel domain level if links ever point there.
+  _Refs:_ `apps/web/next.config.ts`, Vercel domain settings · _Status:_ deferred — inbound links
+  to those shapes (t9 SEO audit, 2026-10-10)

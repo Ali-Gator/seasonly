@@ -140,3 +140,24 @@ test("Back stays inside the flow, also after a reload", async ({ page }) => {
   await page.goBack();
   await expect(page).not.toHaveURL(/\/analyze/);
 });
+
+/**
+ * {@link openspec/specs/capture-flow/spec.md#requirement-the-photo-guide-and-capture-follow-the-canvas}
+ * (scenario "The guide's example photos")
+ */
+test("the guide shows a loaded good and bad photo on each tip card", async ({ page }) => {
+  await page.goto("/analyze");
+  const cards = page.locator(".sn-tip");
+  await expect(cards).toHaveCount(3);
+  for (const card of await cards.all()) {
+    const photos = card.locator("img");
+    await expect(photos).toHaveCount(2);
+    for (const img of await photos.all()) {
+      await expect(img).toHaveAttribute("alt", /\w/);
+      await expect
+        .poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth))
+        .toBeGreaterThan(0);
+    }
+  }
+  await expect(page.locator(".sn-slot__label")).toHaveCount(0);
+});

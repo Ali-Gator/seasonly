@@ -144,16 +144,21 @@ describe("pageMetadata", () => {
     expect(() => pageMetadata("/pricing")).toThrow(/pricing/);
   });
 
+  /** The real route map with `/how-it-works` marked ready or not: no real stub is left. */
+  const withHowItWorks = (ready: boolean) =>
+    ROUTES.map((r) => (r.path === "/how-it-works" ? { ...r, ready } : r));
+
   /** {@link openspec/specs/site-structure/spec.md#scenario-a-stub-page} */
   it("marks a stub noindex and leaves it out of the sitemap", () => {
-    expect(routeAt("/how-it-works")?.ready).toBe(false);
-    expect(pageMetadata("/how-it-works").robots).toEqual({ index: false });
-    expect(indexedUrls()).not.toContain("https://seasonly.me/how-it-works");
+    const routes = withHowItWorks(false);
+    expect(routeAt("/how-it-works", routes)?.ready).toBe(false);
+    expect(pageMetadata("/how-it-works", routes).robots).toEqual({ index: false });
+    expect(indexedUrls(routes)).not.toContain("https://seasonly.me/how-it-works");
   });
 
   /** {@link openspec/specs/site-structure/spec.md#scenario-a-page-marked-ready} */
   it("drops noindex and lists a route once it is marked ready", () => {
-    const routes = ROUTES.map((r) => (r.path === "/how-it-works" ? { ...r, ready: true } : r));
+    const routes = withHowItWorks(true);
     expect(pageMetadata("/how-it-works", routes).robots).toBeUndefined();
     expect(indexedUrls(routes)).toContain("https://seasonly.me/how-it-works");
   });

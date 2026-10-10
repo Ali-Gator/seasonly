@@ -5,6 +5,7 @@ import Link from "next/link";
 import { type ChangeEvent, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { Button, CameraFrame, Icon, Note, PhotoTipCard } from "@/components/ds";
+import { TIP_PHOTOS } from "@/lib/site-content/images";
 
 /**
  * Photo guide, capture, check, retake and consent: the copy of canvas artboards 02 to 05, 04e
@@ -69,20 +70,20 @@ export function Guide({ onCamera, onPhoto }: { onCamera: () => void; onPhoto: On
       <PhotoTipCard
         title="Face a window"
         body="Natural daylight from the front. Lamps and screens tint your skin."
-        good={{ caption: "Facing a window" }}
-        bad={{ caption: "Under a ceiling lamp" }}
+        good={{ caption: "Facing a window", ...TIP_PHOTOS.light.good }}
+        bad={{ caption: "Under a ceiling lamp", ...TIP_PHOTOS.light.bad }}
       />
       <PhotoTipCard
         title="Skip the makeup"
         body="Foundation and bronzer hide your undertone. Pull your hair back too."
-        good={{ caption: "Bare skin, hair back" }}
-        bad={{ caption: "Foundation, bronzer" }}
+        good={{ caption: "Bare skin, hair back", ...TIP_PHOTOS.makeup.good }}
+        bad={{ caption: "Foundation, bronzer", ...TIP_PHOTOS.makeup.bad }}
       />
       <PhotoTipCard
         title="No filter"
         body="Filters and beauty mode shift skin tone. Use the plain camera."
-        good={{ caption: "Straight from the camera" }}
-        bad={{ caption: "Beauty filter on" }}
+        good={{ caption: "Straight from the camera", ...TIP_PHOTOS.filter.good }}
+        bad={{ caption: "Beauty filter on", ...TIP_PHOTOS.filter.bad }}
       />
       <div className="sn-stack">
         <Button block disabled={!hydrated} onClick={onCamera}>
