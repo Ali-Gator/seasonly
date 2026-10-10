@@ -266,15 +266,23 @@ export function Consent({
       <ul className="flex flex-col gap-(--space-3)">
         {[
           ["What we upload", "A crop of your face, not the whole photo."],
-          ["Why", "We read the colors of your skin, eyes and hair from it to find your season."],
+          [
+            "Why",
+            "We read the colors of your skin, eyes and hair from it to find your season.",
+            "An AI model from Google, through Vercel, reads the colors. It does not train on your photo.",
+          ],
           [
             "How long we keep it",
             "We delete it within 24 hours. We keep only your result: your season and your colors.",
           ],
-        ].map(([title, body]) => (
+        ].map(([title, ...body]) => (
           <li key={title} className="sn-card flex flex-col gap-(--space-1)">
             <h2 className="h3">{title}</h2>
-            <p className="text-(--ink-muted)">{body}</p>
+            {body.map((line) => (
+              <p key={line} className="text-(--ink-muted)">
+                {line}
+              </p>
+            ))}
           </li>
         ))}
       </ul>

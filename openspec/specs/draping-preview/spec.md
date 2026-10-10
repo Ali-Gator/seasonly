@@ -42,7 +42,7 @@ values ('crops', 'crops', false, 524288, array['image/jpeg']); -- no storage pol
 
 ## Edge Cases
 
-- Nothing deletes crops yet. `t8-photo-privacy` adds the 24 h retention job, deletes crops of `is_test` reports, and discloses the crop on the privacy page. The user accepted this gap on 2026-10-06, and the launch gate needs `t8-photo-privacy`.
+- The daily retention job (`data-retention`) deletes every crop older than 24 hours, `is_test` reports' crops included, and `/privacy` discloses the crop. The job runs once a day, so a crop can stay up to about 49 h (BL backlog item, deferred until Vercel Pro or before paid promotion).
 - Anyone holding a report link can fetch its face: the same trust as the report itself, a 128-bit id and no listing.
 - If the function is stopped before `after()` runs, the report has no crop and the face route answers 404, which the report page handles.
 

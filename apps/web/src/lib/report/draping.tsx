@@ -37,7 +37,7 @@ export function DrapingView({
       )}
       {deleted && (
         <p className="text-(--ink-muted)">
-          Your photo has been deleted, so this shows the two colors only.
+          We couldn&apos;t load your photo, so this shows the two colors only.
         </p>
       )}
     </>

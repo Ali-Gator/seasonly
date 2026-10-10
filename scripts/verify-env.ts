@@ -93,6 +93,12 @@ export const PROBES: Probe[] = [
     hint: "Resend → API Keys, sending access",
     shape: /^re_/,
   },
+  {
+    name: "CRON_SECRET",
+    phase: 1,
+    hint: "Any random string, 32+ chars; Vercel sends it as the cron's bearer token",
+    shape: /^\S{32,}$/,
+  },
 ];
 
 function loadEnvLocal(): Record<string, string> {

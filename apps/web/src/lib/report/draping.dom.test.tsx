@@ -11,7 +11,7 @@ import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { ReportDraping } from "./draping";
 
 const ID = "k7m2qxAAAAAAAAAAAAAAAA";
-const DELETED = "Your photo has been deleted, so this shows the two colors only.";
+const DELETED = "We couldn't load your photo, so this shows the two colors only.";
 let root: Root;
 let container: HTMLDivElement;
 
@@ -48,5 +48,29 @@ describe("ReportDraping", () => {
     await act(async () => face?.dispatchEvent(new Event("error")));
     expect(container.querySelectorAll("img").length).toBe(0);
     expect(container.textContent).toContain(DELETED);
+  });
+
+  /**
+   * A 500 fires the same `<img>` error event as a 404, so the line must not claim a deletion.
+   *
+   * {@link openspec/specs/report-page/spec.md#scenario-the-face-request-fails}
+   */
+  it("says the photo could not load, never that it was deleted, when the face request fails", async () => {
+    container = document.createElement("div");
+    document.body.append(container);
+    root = createRoot(container);
+    const swatch = (name: string, hex: string) => ({ name, hex });
+    await act(async () =>
+      root.render(
+        <ReportDraping
+          id={ID}
+          best={swatch("Rust", "#B7410E")}
+          worst={swatch("Icy pink", "#F4D7E3")}
+        />,
+      ),
+    );
+    await act(async () => container.querySelector("img")?.dispatchEvent(new Event("error")));
+    expect(container.textContent).toContain(DELETED);
+    expect(container.textContent).not.toMatch(/deleted/i);
   });
 });

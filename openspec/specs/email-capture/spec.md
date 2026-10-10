@@ -99,7 +99,7 @@ create function public.store_report_email(p_report_id text, p_email text, p_is_t
 - The report link always points at `https://seasonly.me`, so an email sent from a preview links to a report that production only serves once this change is live.
 - Resend's free tier sends 100 emails a day. A send over the limit is a Sentry error, and the report still opens.
 - A cancelled `after()` (the function stopped) leaves an address stored with no email sent; the person still has the report open.
-- Addresses are kept until `t8-photo-privacy` adds deletion and the privacy page names them.
+- Addresses are kept until the person asks for deletion (`data-retention`, by hand from `docs/privacy-requests.md`); `/privacy` names them and how long they are kept. Addresses of `is_test` reports go with their report after 24 hours.
 
 ## Requirements
 

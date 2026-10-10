@@ -72,8 +72,8 @@ export default function ReportPage(props: {
 
 ## Edge Cases
 
-- Any failure to load the face, not only a 404, shows the deleted-photo line (BL-10).
-- The footer says the photo is deleted within 24 hours, which holds only once `t8-photo-privacy` ships the deletion job.
+- Any failure to load the face, a 404 or a 500, shows the same line, which does not claim a deletion.
+- The footer says the photo is deleted within 24 hours. The daily retention job (`data-retention`) deletes it, up to about 49 h in the worst case (backlog).
 - In CI there is no database, so a well-formed id answers 500 (the E2E asserts this) and only a malformed id reaches the 404.
 
 ## Requirements
@@ -113,7 +113,7 @@ When the record's text source is `personal`, the report SHALL show the stored su
 
 ### Requirement: The draping preview shows the stored face
 
-A photo report's draping section SHALL show the season's draping best and worst colors on the face from `/api/face/<id>`, with the season's draping line as its intro. When the face cannot be loaded, the section SHALL show the two colors without a face and say "Your photo has been deleted, so this shows the two colors only."
+A photo report's draping section SHALL show the season's best and worst draping colors on the face from `/api/face/<id>`, with the season's draping line as its intro. When the face cannot be loaded for any reason, the section SHALL show the two colors without a face and say "We couldn't load your photo, so this shows the two colors only." The reason may be a deleted crop or a failed request. The line SHALL NOT claim the photo was deleted, because inside the 24-hour window a failed request does not mean it was.
 
 #### Scenario: A stored crop
 
@@ -123,7 +123,12 @@ A photo report's draping section SHALL show the season's draping best and worst 
 #### Scenario: The crop is gone
 
 - **WHEN** `/api/face/<id>` answers 404 for a photo report
-- **THEN** both frames show the face slot without an image, and the section says the photo has been deleted
+- **THEN** both frames show the face slot without an image, and the section says "We couldn't load your photo, so this shows the two colors only."
+
+#### Scenario: The face request fails
+
+- **WHEN** `/api/face/<id>` answers 500 for a photo report
+- **THEN** the section shows the same two colors and the same line, and does not say the photo was deleted
 
 ### Requirement: A quiz-only report has no draping section
 

@@ -106,14 +106,6 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   DOM card preview (`t5-report-delivery` shows the PNGs themselves); check whether the 2026-10-07
   redesign session already updated the canvas
 
-- **[BL-10] Any failure to load the face says the photo was deleted** — `ReportDraping` shows
-  "Your photo has been deleted" for every image error, a storage 500 included, which is false
-  inside the 24 h window; a reload would bring the face back. The spec says "cannot be loaded",
-  so this is a copy question: tell a 404 (deleted) from other failures, or soften the line for
-  the second case. Needs a canvas line first.
-  _Refs:_ `apps/web/src/lib/report/draping.tsx`, `openspec/specs/report-page/spec.md` (The
-  draping preview shows the stored face) · _Status:_ open — phase review, 2026-10-09
-
 - **[BL-06] Placeholder icons and empty photo slots** — the icons are the bundle's placeholder
   glyphs, and the photo-tip and draping example slots show labels, not photos. Choose an icon set
   and real example photos.

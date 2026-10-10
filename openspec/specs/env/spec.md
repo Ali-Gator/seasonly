@@ -4,20 +4,21 @@
 
 Catalogues every environment variable the code reads and checks a deployment has them. Values live in Vercel and in `apps/web/.env.local`; the template is `apps/web/.env.example`. Catalogue (phase = earliest phase that needs it):
 
-| Variable                         | Phase | Required | Exposed to browser | Where to get it                                    |
-| -------------------------------- | ----- | -------- | ------------------ | -------------------------------------------------- |
-| `NEXT_PUBLIC_SENTRY_DSN`         | 0     | yes      | yes                | Sentry → Project settings → Client Keys (DSN)      |
-| `NEXT_PUBLIC_SENTRY_ENVIRONMENT` | 0     | no       | yes                | Defaults to the Vercel environment                 |
-| `SENTRY_ORG`                     | 0     | no       | no                 | Sentry org slug; build-time, source-map upload     |
-| `SENTRY_PROJECT`                 | 0     | no       | no                 | Sentry project slug; build-time, source-map upload |
-| `SENTRY_AUTH_TOKEN`              | 0     | no       | no                 | Sentry → Settings → Auth Tokens (org token)        |
-| `NEXT_PUBLIC_POSTHOG_KEY`        | 0     | yes      | yes                | PostHog → Project settings → Project API key       |
-| `NEXT_PUBLIC_POSTHOG_HOST`       | 0     | no       | yes                | Defaults to `https://us.i.posthog.com`             |
-| `SUPABASE_URL`                   | 1     | yes      | no                 | `https://<ref>.supabase.co`, no path               |
-| `SUPABASE_SECRET_KEY`            | 1     | yes      | no                 | Supabase → Project settings → API Keys (secret)    |
-| `AI_GATEWAY_API_KEY`             | 1     | no       | no                 | Vercel → AI Gateway → API Keys; local only (OIDC)  |
-| `DAILY_ANALYSIS_CAP`             | 1     | no       | no                 | Vision calls per UTC day; defaults to 200          |
-| `RESEND_API_KEY`                 | 1     | yes      | no                 | Resend → API Keys, sending access                  |
+| Variable                         | Phase | Required | Exposed to browser | Where to get it                                                          |
+| -------------------------------- | ----- | -------- | ------------------ | ------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SENTRY_DSN`         | 0     | yes      | yes                | Sentry → Project settings → Client Keys (DSN)                            |
+| `NEXT_PUBLIC_SENTRY_ENVIRONMENT` | 0     | no       | yes                | Defaults to the Vercel environment                                       |
+| `SENTRY_ORG`                     | 0     | no       | no                 | Sentry org slug; build-time, source-map upload                           |
+| `SENTRY_PROJECT`                 | 0     | no       | no                 | Sentry project slug; build-time, source-map upload                       |
+| `SENTRY_AUTH_TOKEN`              | 0     | no       | no                 | Sentry → Settings → Auth Tokens (org token)                              |
+| `NEXT_PUBLIC_POSTHOG_KEY`        | 0     | yes      | yes                | PostHog → Project settings → Project API key                             |
+| `NEXT_PUBLIC_POSTHOG_HOST`       | 0     | no       | yes                | Defaults to `https://us.i.posthog.com`                                   |
+| `SUPABASE_URL`                   | 1     | yes      | no                 | `https://<ref>.supabase.co`, no path                                     |
+| `SUPABASE_SECRET_KEY`            | 1     | yes      | no                 | Supabase → Project settings → API Keys (secret)                          |
+| `AI_GATEWAY_API_KEY`             | 1     | no       | no                 | Vercel → AI Gateway → API Keys; local only (OIDC)                        |
+| `DAILY_ANALYSIS_CAP`             | 1     | no       | no                 | Vision calls per UTC day; defaults to 200                                |
+| `RESEND_API_KEY`                 | 1     | yes      | no                 | Resend → API Keys, sending access                                        |
+| `CRON_SECRET`                    | 1     | yes      | no                 | Any random string, 32+ chars; Vercel sends it as the cron's bearer token |
 
 ## Requirements
 

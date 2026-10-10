@@ -146,16 +146,16 @@ describe("pageMetadata", () => {
 
   /** {@link openspec/specs/site-structure/spec.md#scenario-a-stub-page} */
   it("marks a stub noindex and leaves it out of the sitemap", () => {
-    expect(routeAt("/terms")?.ready).toBe(false);
-    expect(pageMetadata("/terms").robots).toEqual({ index: false });
-    expect(indexedUrls()).not.toContain("https://seasonly.me/terms");
+    expect(routeAt("/how-it-works")?.ready).toBe(false);
+    expect(pageMetadata("/how-it-works").robots).toEqual({ index: false });
+    expect(indexedUrls()).not.toContain("https://seasonly.me/how-it-works");
   });
 
   /** {@link openspec/specs/site-structure/spec.md#scenario-a-page-marked-ready} */
   it("drops noindex and lists a route once it is marked ready", () => {
-    const routes = ROUTES.map((r) => (r.path === "/terms" ? { ...r, ready: true } : r));
-    expect(pageMetadata("/terms", routes).robots).toBeUndefined();
-    expect(indexedUrls(routes)).toContain("https://seasonly.me/terms");
+    const routes = ROUTES.map((r) => (r.path === "/how-it-works" ? { ...r, ready: true } : r));
+    expect(pageMetadata("/how-it-works", routes).robots).toBeUndefined();
+    expect(indexedUrls(routes)).toContain("https://seasonly.me/how-it-works");
   });
 
   /** {@link openspec/specs/site-structure/spec.md#scenario-the-flow-page} */
