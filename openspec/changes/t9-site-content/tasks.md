@@ -14,12 +14,14 @@
 
   Done 2026-10-10: all five recovered verbatim from the t8 session's backlog write (BL-20 and BL-22 included); `_Next id:_` is BL-23.
 
-- [ ] 1.2 Generate the example photos (design.md decision 4). This is a **paid run**:
+- [x] 1.2 Generate the example photos (design.md decision 4). This is a **paid run**:
   - Ask the user for a yes first, naming the model and the estimated cost.
   - After the yes, write `scripts/generate-photos.ts` and run it once. It makes the base portrait, three edited "bad" twins (ceiling lamp, foundation and bronzer, beauty filter) and the face crop for draping.
   - Results go to the scratchpad. Nothing goes into the repo before 1.5.
 
   Done when the images exist and the model, cost and prompts are recorded here.
+
+  Done 2026-10-10 (the user's yes, cap $1): `google/gemini-2.5-flash-image` through the Gateway, about $0.039 per image. Six calls, $0.24 in total: the base, the three twins, and a second try of the makeup twin (its blush came out blotchy) and of the filter twin (the first one was hardly different from the base). The prompts are in `scripts/generate-photos.ts`. All four share one face. Each output is 864 × 1184 with a phone at the bottom edge, so each is cut to the same 750 × 1000 (3:4) window, and the draping face is cut tight around the face from the base.
 
 - [ ] 1.3 Propose three famous people per season (design.md decision 5). Make a table with these columns: season, name, source for the season (title and URL, opened, not taken from a snippet), Commons file URL, author, license.
   - Only CC0, CC BY and CC BY-SA photos qualify.
@@ -50,7 +52,7 @@
 
   Done when the user approves the boards in chat. Record the date and canvas version here and in the `mvp-design-canvas` memory. **Gate:** no task in sections 2–4 starts before this one is checked. If the approved copy differs from a delta, update the delta first.
 
-- [ ] 1.6 Ask the user to approve these edits to existing tests (design.md decision 8):
+- [x] 1.6 Ask the user to approve these edits to existing tests (design.md decision 8):
   - `apps/web/src/lib/site/routes.test.ts`: "marks a stub noindex and leaves it out of the sitemap" and "drops noindex and lists a route once it is marked ready" move to a fixture route list.
   - `e2e/site-structure.spec.ts`: "a stub page carries noindex" is deleted.
   - Any DS test that pins icon path data (check `apps/web/src/components/ds/ds.test.tsx`).
