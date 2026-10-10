@@ -161,9 +161,9 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Each now states the shipped behavior. Done when no permanent spec mentions `t8-photo-privacy` as future work (`grep -rn t8-photo-privacy openspec/specs`).
 
-- [ ] 5.6 Run `pnpm fix`, `pnpm test` and `pnpm --filter web build`. Done when all pass, the build lists `ƒ /api/cron/retention`, and `/privacy` and `/terms` are static.
+- [x] 5.6 Run `pnpm fix`, `pnpm test` and `pnpm --filter web build`. Done when all pass, the build lists `ƒ /api/cron/retention`, and `/privacy` and `/terms` are static.
 
-  2026-10-10, local: `pnpm fix` clean; unit 664/664; the build lists `ƒ /api/cron/retention` and `○ /privacy`, `○ /terms`. E2E with `CI=1` (prebuilt, as CI runs it): 53/54. The one failure, `/seasons/Soft-Autumn` answering 200, is macOS only: its case-insensitive disk serves the prerendered `soft-autumn` page. Without `CI=1` (dev server), the report-500 case also fails, on `no-cache, must-revalidate` instead of `private, no-store`. Neither touches this change; CI on Linux decides.
+  2026-10-10, local: `pnpm fix` clean; unit 664/664; the build lists `ƒ /api/cron/retention` and `○ /privacy`, `○ /terms`. E2E with `CI=1` (prebuilt, as CI runs it): 53/54. The one failure, `/seasons/Soft-Autumn` answering 200, is macOS only: its case-insensitive disk serves the prerendered `soft-autumn` page. Without `CI=1` (dev server), the report-500 case also fails, on `no-cache, must-revalidate` instead of `private, no-store`. Neither touches this change (BL-21). CI on Linux, commit cddaa67: CI, E2E and OpenSpec all pass.
 
 ## 6. Checks with the user
 
