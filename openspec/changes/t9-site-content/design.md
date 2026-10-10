@@ -22,11 +22,11 @@ The boards' season strips, neighbour colors and landing sample are design data w
 
 `Icon` draws 11 hand-made placeholder paths on a 20 px viewBox.
 
-OpenAI's custom-GPT retirement, from coverage of OpenAI's FAQ fetched 2026-10-10 (the FAQ page itself returned 403 to the fetcher):
+OpenAI's custom-GPT retirement, from OpenAI's FAQ, read in the browser on 2026-10-10:
 
-- Custom GPTs retire on Dec 11, 2026, with timing varying by workspace. Enterprise deferrals run to Feb 11, 2027.
-- Creators can migrate a GPT to a plugin.
-- Chats do not migrate, and existing users do not automatically get the plugin.
+- Custom GPTs retire on Dec 11, 2026, and their pages become inaccessible then. Enterprise workspaces with an approved deferral retire on Feb 11, 2027.
+- Creators can migrate a GPT to a plugin. A user's access, the sharing settings, the chosen model and custom actions do not carry over.
+- Existing conversations with custom GPTs stay accessible after retirement.
 
 Sources: https://help.openai.com/en/articles/20001519-custom-gpt-retirement-and-migration-faq and https://virtualizationreview.com/articles/2026/09/28/openai-to-retire-custom-gpts-replace-them-with-plugins.aspx.
 

@@ -23,13 +23,15 @@
 
   Done 2026-10-10 (the user's yes, cap $1): `google/gemini-2.5-flash-image` through the Gateway, about $0.039 per image. Six calls, $0.24 in total: the base, the three twins, and a second try of the makeup twin (its blush came out blotchy) and of the filter twin (the first one was hardly different from the base). The prompts are in `scripts/generate-photos.ts`. All four share one face. Each output is 864 × 1184 with a phone at the bottom edge, so each is cut to the same 750 × 1000 (3:4) window, and the draping face is cut tight around the face from the base.
 
-- [ ] 1.3 Propose three famous people per season (design.md decision 5). Make a table with these columns: season, name, source for the season (title and URL, opened, not taken from a snippet), Commons file URL, author, license.
+- [x] 1.3 Propose three famous people per season (design.md decision 5). Make a table with these columns: season, name, source for the season (title and URL, opened, not taken from a snippet), Commons file URL, author, license.
   - Only CC0, CC BY and CC BY-SA photos qualify.
   - Publish the table in a scratch Artifact for the user.
 
   Done when the user approves the 36 rows. If a season cannot reach three, the user decides between fewer figures (which needs a delta update to "three") and another figure.
 
-- [ ] 1.4 Draft the missing copy in the same scratch Artifact:
+  Approved 2026-10-10 (review page https://claude.ai/artifact/EHcn642XFvRC47sCiJiVCE). Every season reached three. One source for all 12 seasons: Four Seasons Studio's "<Season> Celebrities" posts, opened page by page. Their Dark Autumn and Dark Winter are our Deep Autumn and Deep Winter. Every photo is the person's Wikipedia lead image on Commons (CC0, CC BY or CC BY-SA), cropped to 3:4. Six photos were swapped for other names on the same lists: Liv Tyler (black and white), Beyoncé and Sabrina Carpenter (stage light), Blake Lively, Rose McGowan and Jennifer Connelly (too distant). The rows, credits and sources are in `content.json` beside this file. The WebP files are already in `apps/web/public/images/famous/<slug>/`. Gabrielle Arruda's per-season guides sit behind a Cloudflare check. If a second source is ever wanted, the user can open them in Chrome.
+
+- [x] 1.4 Draft the missing copy in the same scratch Artifact:
   - The `about` description for all 12 seasons: at least 120 words each, all distinct, written from `SEASON_COPY` and `PALETTES`, never contradicting them.
   - Three neighbours per season, each with a one-line `why`.
   - For How it works:
@@ -39,6 +41,8 @@
   - For the GPT page: the retirement date and what does not carry over, re-checked against OpenAI's FAQ (design.md Context), with the source link.
 
   Done when the user approves the copy.
+
+  Approved 2026-10-10, together with 1.3. The copy is in `content.json`: `seasons.<slug>.about` and `neighbours`, `famousIntro` and `famousNote`, `howItWorks` and `gpt`. The six example photos' alt texts are under `images`. OpenAI's FAQ was re-read in the browser on 2026-10-10. Past chats with custom GPTs **stay accessible** after retirement. What does not carry over: users don't get access to the replacement plugin automatically, and the GPT's chosen model and custom actions don't transfer. The page no longer names the "Personal Color Analysis GPT".
 
 - [ ] 1.5 Update the canvas (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3) and the design system (https://claude.ai/code/artifact/69473bf0-748a-4814-892f-1cfe8b16ddac). Edit in place with the user's yes:
   - **Season and Season-1280:** fill the "More about" text and the famous section with photos, credits, sources and the no-endorsement note, all from 1.3 and 1.4. Use highlight-based neighbour strips.
@@ -51,6 +55,12 @@
   - **Design system:** switch the Icon glyphs to Lucide (decision 6) and bump the DS version.
 
   Done when the user approves the boards in chat. Record the date and canvas version here and in the `mvp-design-canvas` memory. **Gate:** no task in sections 2–4 starts before this one is checked. If the approved copy differs from a delta, update the delta first.
+
+  Edited 2026-10-10 with the user's yes. Canvas version 34 (1791630124-7896). Design system version 25 (1791630013-0c3d): the Icon draws Lucide glyphs, and the canvas's `project/ds/seasonly/components/bundle.js` is the same file. The 8 images are canvas assets. **Still open: the user's approval of the boards**, then check this task. Points for that review:
+  - Main (375) shows 8 sample colors and Landing-1280 shows 12. The spec says 12, so either the code shows 12 on both, or the board and the spec are aligned first.
+  - How it works: "Each of these changes how your skin reads in the photo" now also sits under "More than one face", which is not about skin.
+  - The design system README rules out "washed out" and "sallow". The approved `about` copy uses "wash it out" and "sallow" in a few places, as `SEASON_COPY` already does.
+  - `canvas.json`'s `designSystems` record still names DS version 1791392463-d4cf. The bundle was copied over by hand, and the index was left alone.
 
 - [x] 1.6 Ask the user to approve these edits to existing tests (design.md decision 8):
   - `apps/web/src/lib/site/routes.test.ts`: "marks a stub noindex and leaves it out of the sitemap" and "drops noindex and lists a route once it is marked ready" move to a fixture route list.
