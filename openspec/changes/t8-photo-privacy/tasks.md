@@ -66,7 +66,7 @@
 
 Existing tests change only as approved in 2.2. New tests go in new files and cite their scenario at its permanent path.
 
-- [ ] 3.1 `data-retention`, in a new `apps/web/src/lib/retention/retention.test.ts`, with storage and time injected:
+- [x] 3.1 `data-retention`, in a new `apps/web/src/lib/retention/retention.test.ts`, with storage and time injected:
   - a crop 25 h old is removed and one 23 h old is kept;
   - 250 old crops among young ones are all removed across pages of 100;
   - one 47 h old (after a missed run) is removed;
@@ -75,14 +75,14 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Done when it fails for the missing module.
 
-- [ ] 3.2 The migration, in PGlite, in the same file or a new `apps/web/src/lib/retention/reports.test.ts`:
+- [x] 3.2 The migration, in PGlite, in the same file or a new `apps/web/src/lib/retention/reports.test.ts`:
   - with the existing reports, report_emails and interest_clicks migrations applied, deleting old `is_test` reports removes the 25 h old test report with its two addresses and its interest row;
   - it keeps a year-old real report and a test report from an hour ago, and returns a count of 1;
   - `service_role` holds `delete` on `reports` and `anon` does not.
 
   Done when it fails for the missing migration.
 
-- [ ] 3.3 The route, in a new `apps/web/src/app/api/cron/retention/route.test.ts`, with the job injected or mocked:
+- [x] 3.3 The route, in a new `apps/web/src/app/api/cron/retention/route.test.ts`, with the job injected or mocked:
   - no header, a wrong token and an unset `CRON_SECRET` with `Bearer undefined` each answer 401 and call nothing;
   - the right token answers 200 `{ crops: 3, testReports: 1 }`;
   - a listing error answers 500 and reaches Sentry (`withErrorCapture`).
@@ -111,8 +111,8 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
 ## 5. Implementation
 
-- [ ] 5.1 Write `supabase/migrations/<ts>_retention.sql` (design.md decision 5). Do not apply it. Done when 3.2 passes.
-- [ ] 5.2 Write `apps/web/src/lib/retention/` (decisions 4 and 5) and `apps/web/src/app/api/cron/retention/route.ts` (decision 3), wrapped in `withErrorCapture`, with the job's results as JSON. Add `apps/web/vercel.json` with the daily `0 4 * * *` cron. Done when 3.1 and 3.3 pass and `BOTID_PROTECT` is unchanged.
+- [x] 5.1 Write `supabase/migrations/<ts>_retention.sql` (design.md decision 5). Do not apply it. Done when 3.2 passes.
+- [x] 5.2 Write `apps/web/src/lib/retention/` (decisions 4 and 5) and `apps/web/src/app/api/cron/retention/route.ts` (decision 3), wrapped in `withErrorCapture`, with the job's results as JSON. Add `apps/web/vercel.json` with the daily `0 4 * * *` cron. Done when 3.1 and 3.3 pass and `BOTID_PROTECT` is unchanged.
 - [ ] 5.3 Write `/privacy` and `/terms` from the text approved in 1.3 and the layout of the legal-page board from 1.1 (decision 7), and set both routes `ready: true` in `lib/site/routes.ts`. Done when 3.4 passes and the site-structure tests pass.
 - [ ] 5.4 Consent copy in `_capture/steps.tsx`, and the BL-10 line in `lib/report/draping.tsx` (decision 8), both from the approved boards. Done when 3.5 passes. Delete BL-10 from `docs/backlog.md`.
 - [ ] 5.5 Write `docs/privacy-requests.md` (decision 6). Rewrite the Edge Case notes that point at `t8-photo-privacy` in the permanent specs:
