@@ -28,7 +28,7 @@ On production (checked 2026-10-09), every page except `/privacy` and `/terms` is
   - `/color-analysis-gpt-alternative`: the retirement date and what does not carry over, cited from OpenAI's FAQ and checked again at implementation.
 - **All six content routes marked ready:** `/`, `/seasons`, `/seasons/<slug>` (all 12), `/how-it-works`, `/sample-report` and `/color-analysis-gpt-alternative`. They drop `noindex` and enter the sitemap: 19 URLs with `/privacy` and `/terms`.
 - **No stub is left, so the stub-page scenario moves to a fixture route list.** The scenario stays in force for any page added later. Its E2E half is retired. Both are edits to existing tests, so they wait for the user's approval.
-- **Lucide icons (the user's choice, 2026-10-10).** `Icon` keeps its 11 names and its API, but draws Lucide glyphs (`lucide-react`). The design system's bundle switches too, so the canvas and the app match.
+- **Lucide icons (the user's choice, 2026-10-10).** `Icon` keeps its 11 names and its API, but draws Lucide glyphs (the `lucide` package). The design system's bundle switches too, so the canvas and the app match.
 - **No contact link (the user's choice, 2026-10-10).** `care@seasonly.me` is already on `/privacy` and `/terms`. The plan's carried "contact page" item closes without new UI.
 - **Folded in from `docs/backlog.md`:** BL-06 (placeholder icons and empty photo slots) is deleted when this change ships.
 - **Backlog repair.** Merged PR #15 cites BL-18 to BL-22, but none of them reached `docs/backlog.md`.
@@ -62,7 +62,7 @@ On production (checked 2026-10-09), every page except `/privacy` and `/terms` is
   - `apps/web/src/app/(flow)/analyze/_capture/steps.tsx`: the guide images.
   - `apps/web/src/components/ds/icon.tsx`: Lucide.
 - **Assets:** about 8 generated images and 36 Commons photos under `apps/web/public/images/` (spec-exempt), resized to WebP. The credits live in code beside the content.
-- **Dependencies:** `lucide-react` (ISC).
+- **Dependencies:** `lucide` (ISC).
 - **Paid run (user gate):** image generation through the AI Gateway.
 - **Existing tests (user approval):**
   - `apps/web/src/lib/site/routes.test.ts` ("marks a stub noindex…" and "drops noindex… once it is marked ready", both on `/how-it-works`);

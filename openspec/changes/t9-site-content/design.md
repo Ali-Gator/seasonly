@@ -107,7 +107,7 @@ The proposal, as a table of name, season, source, Commons URL and license, is pa
 
 - **Alternative: hotlinking `upload.wikimedia.org`.** Rejected. It adds another third-party host that sees visitors' IPs, and `/privacy` would have to name it.
 
-### 6. Lucide through `lucide-react`, keeping `Icon`'s API
+### 6. Lucide through the `lucide` package, keeping `Icon`'s API
 
 `Icon` maps its 11 names to Lucide components:
 
@@ -130,6 +130,7 @@ The `sn-icon` class, the size, `aria-hidden` without a label and `role="img"` wi
 The design system artifact's `bundle.js` Icon is switched to the same Lucide path data, so the canvas renders what the app renders. This is part of task 1, a DS change that needs its own version note.
 
 - **Alternative: copying Lucide's path data inline.** This avoids the dependency. Rejected: Lucide icons are multi-element SVGs, and `lucide-react` tree-shakes to the 11 icons used.
+- **Alternative: `lucide-react`.** Tried first, at implementation. Rejected: its components always add `lucide` and `lucide-<name>` classes, which have no design-system rule and fail the stylesheet test ({@link openspec/specs/ui-components/spec.md#requirement-every-class-a-component-renders-has-a-design-system-style}), and its `Icon` is a client component. `Icon` instead draws the shape data the vanilla `lucide` package exports (ISC, tree-shaken to the 11 icons) inside its own `svg`, on Lucide's 24 px viewBox.
 
 ### 7. Word floor and placeholder checks run on rendered HTML
 
@@ -158,7 +159,7 @@ All three test edits need the user's approval before they are made.
 - **OpenAI's dates may move before Dec 11.** Mitigation: the page states the date with "OpenAI says" and links the FAQ. Task 3.9 re-checks it the day the page ships, and the Tracker gets a reminder to re-check in November.
 - **Indexing six routes at once exposes copy errors to crawlers.** Mitigation: the user does a read-through on the preview before merge, as part of the acceptance task.
 - **The word floor counts swatch names and figure credits.** A page could clear 250 words on lists alone. Mitigation: the per-season `about` check (120 words, distinct) guards the thinnest template, and the canvas approval guards the rest.
-- **The new dependency adds bundle weight.** `lucide-react` with named imports adds under 3 KB for 11 icons.
+- **The new dependency adds bundle weight.** `lucide` with named imports adds under 3 KB for 11 icons.
 
 ## Migration Plan
 

@@ -98,7 +98,7 @@ The pre-commit hook runs `test:unit`, so a red test is committed together with t
 
   Done when both fail on the placeholders.
 
-- [ ] 2.4 Test for `ui-components` "A Lucide glyph": `Icon name="trash" size={20}` renders Lucide's Trash2 at 20 × 20 with `stroke="currentColor"`. The decorative and labeled cases stay unchanged.
+- [x] 2.4 Test for `ui-components` "A Lucide glyph": `Icon name="trash" size={20}` renders Lucide's Trash2 at 20 × 20 with `stroke="currentColor"`. The decorative and labeled cases stay unchanged.
 
   Done when it fails on the placeholder glyphs.
 
@@ -108,7 +108,7 @@ The pre-commit hook runs `test:unit`, so a red test is committed together with t
 
 ## 3. Build
 
-- [ ] 3.1 Add `lucide-react` to `apps/web` and map `Icon`'s 11 names to it (decision 6). Done when 2.4 and every existing DS test pass.
+- [x] 3.1 Add `lucide` to `apps/web` (design.md decision 6: `lucide-react` was tried and dropped) and map `Icon`'s 11 names to it (decision 6). Done when 2.4 and every existing DS test pass.
 
 - [ ] 3.2 Put the approved images in `apps/web/public/images/examples/` and `apps/web/public/images/famous/<slug>/` as WebP, sized per decision 4 and decision 5. Add `apps/web/src/lib/site-content/images.ts` with paths, alt text and credits. Done when every file is at most about 80 KB and typecheck passes.
 

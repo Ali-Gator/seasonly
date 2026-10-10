@@ -2,7 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { PALETTES } from "@seasonly/analysis";
-import type { ReactElement } from "react";
+import { Trash2 } from "lucide";
+import { createElement, type ReactElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
@@ -141,6 +142,16 @@ describe("Icon", () => {
     expect(out).toContain('role="img"');
     expect(out).toContain('aria-label="Locked"');
     expect(out).not.toContain("aria-hidden");
+  });
+
+  /** {@link openspec/specs/ui-components/spec.md#requirement-an-icon-is-decorative-unless-it-is-labeled} (scenario "A Lucide glyph") */
+  it("draws Lucide's glyph for its name, at the given size, in the current color", () => {
+    const out = html(<Icon name="trash" size={20} />);
+    const trash2 = Trash2.map(([tag, attrs]) => html(createElement(tag, attrs))).join("");
+    expect(/^<svg[^>]*>(.*)<\/svg>$/.exec(out)?.[1]).toBe(trash2);
+    expect(out).toContain('width="20" height="20"');
+    expect(out).toContain('stroke="currentColor"');
+    expect(out).toContain('class="sn-icon');
   });
 });
 

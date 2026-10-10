@@ -35,7 +35,7 @@ The six core routes (`/`, `/seasons`, `/seasons/<slug>`, `/how-it-works`, `/samp
 
 The landing SHALL show:
 
-- the hero with a "Find my colors" action to `/analyze` and the line "Free while we are in early access. No account needed.";
+- the hero with "Take a selfie" and "Upload a photo" actions to `/analyze` and the line "Free while we are in early access. No account needed." The header's "Find my colors" stays the page's only link of that name;
 - a sample result: "This is a Soft Autumn" with the 12 Soft Autumn colors of the approved board, each with its name and hex code. Each is one of the 30 Soft Autumn colors (24 best colors and 6 neutrals) in the shared season palettes;
 - the three how-it-works steps;
 - the light photo tip, with its good and bad example photos;

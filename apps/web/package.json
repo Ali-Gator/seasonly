@@ -16,6 +16,7 @@
     "@vercel/speed-insights": "^2.0.0",
     "ai": "^7.0.127",
     "botid": "^1.5.11",
+    "lucide": "^1.54.0",
     "next": "^16.3.8",
     "posthog-js": "^1.435.3",
     "react": "^19.3.0",
