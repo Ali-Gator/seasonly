@@ -91,6 +91,10 @@ export default function Page() {
             label="A sample Soft Autumn palette"
             className="lg:grid-cols-6!"
           />
+          <Link href="/sample-report" className="label sn-navlink">
+            See the full sample report
+            <Icon name="arrow-right" size={18} />
+          </Link>
         </div>
       </section>
 

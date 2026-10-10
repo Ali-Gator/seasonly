@@ -127,6 +127,7 @@ describe("/", () => {
       "Mushroom",
     ]);
     for (const s of sample) expect(pool).toContainEqual(s);
+    expect(out).toContain('href="/sample-report"');
   });
 
   /** {@link openspec/specs/site-content/spec.md#scenario-every-season-linked} */
@@ -252,6 +253,10 @@ describe("/sample-report", () => {
     expect(text(out)).toContain("This is a sample Soft Autumn report");
     expect(out.indexOf("This is a sample Soft Autumn report")).toBeLessThan(out.indexOf("<h1"));
     expect(text(out)).toContain("Section 6 of 6");
+    expect(text(/<h1[^>]*>(.*?)<\/h1>/.exec(out)?.[1] ?? "")).toMatch(
+      /sample color analysis report/i,
+    );
+    expect(out).toContain('href="/seasons/soft-autumn"');
     expect(imgs(out)).toEqual([SAMPLE_FACE, SAMPLE_FACE]);
     expect(text(out)).not.toMatch(/\b(Share|Save|Premium)\b/);
     expect(out).not.toContain("/api/");

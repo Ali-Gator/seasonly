@@ -36,7 +36,7 @@ The six core routes (`/`, `/seasons`, `/seasons/<slug>`, `/how-it-works`, `/samp
 The landing SHALL show:
 
 - the hero with "Take a selfie" and "Upload a photo" actions to `/analyze` and the line "Free while we are in early access. No account needed." The header's "Find my colors" stays the page's only link of that name;
-- a sample result: "This is a Soft Autumn" with the 12 Soft Autumn colors of the approved board, each with its name and hex code. Each is one of the 30 Soft Autumn colors (24 best colors and 6 neutrals) in the shared season palettes;
+- a sample result: "This is a Soft Autumn" with the 12 Soft Autumn colors of the approved board, each with its name and hex code. Each is one of the 30 Soft Autumn colors (24 best colors and 6 neutrals) in the shared season palettes, and a link to `/sample-report`;
 - the three how-it-works steps;
 - the light photo tip, with its good and bad example photos;
 - the note "Your photo is deleted within 24 hours";
@@ -45,7 +45,7 @@ The landing SHALL show:
 #### Scenario: The sample result
 
 - **WHEN** the landing is rendered
-- **THEN** it shows "This is a Soft Autumn" and 12 swatches, each with a name and hex code that match one of the 30 Soft Autumn colors
+- **THEN** it shows "This is a Soft Autumn" and 12 swatches, each with a name and hex code that match one of the 30 Soft Autumn colors, and links to `/sample-report`
 
 #### Scenario: Every season linked
 
@@ -112,14 +112,14 @@ The section SHALL say that these are readings of public photos and that no figur
 
 ### Requirement: The sample report is static and sends nothing
 
-`/sample-report` SHALL show the full Soft Autumn report: the season, the agreement note, the six report sections and the draping preview on the sample face. It SHALL be marked as a sample above the season, and SHALL end with an action to `/analyze`.
+`/sample-report` SHALL show the full Soft Autumn report: the season, the agreement note, the six report sections and the draping preview on the sample face. It SHALL be marked as a sample above the season, and SHALL end with an action to `/analyze`. Its main heading SHALL name it a sample report, and it SHALL link to `/seasons/soft-autumn`, so it does not compete with the season page for the season's name.
 
 The page SHALL have no share, save or Premium action. It SHALL make no request to `/api/`. It SHALL send none of the funnel's custom events: `consent_answered`, `quiz_completed`, `analysis_failed`, `report_requested`, `email_submitted`, `share_tapped`, `share_card_downloaded`, `palette_saved` and `premium_tapped`. PostHog's automatic events, such as `$pageview`, are sent as on every page.
 
 #### Scenario: A sample, not a report
 
 - **WHEN** `/sample-report` is rendered
-- **THEN** it says it is a sample Soft Autumn report, shows the six sections and a draping pair on the sample face, and offers no share, save or Premium action
+- **THEN** it says it is a sample Soft Autumn report, its main heading names it a sample report, it links to `/seasons/soft-autumn`, it shows the six sections and a draping pair on the sample face, and it offers no share, save or Premium action
 
 #### Scenario: Nothing is sent
 

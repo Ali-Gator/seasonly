@@ -82,7 +82,7 @@ const REPORT_PATTERN = "/r/[id]";
 export const ROUTES: readonly Route[] = [
   {
     path: "/",
-    title: "Seasonly: find your colors from one selfie",
+    title: "Seasonal color analysis from one selfie · Seasonly",
     description:
       "One daylight selfie and four quick questions. In under a minute you get your season and 30 colors that work with you.",
     indexable: true,

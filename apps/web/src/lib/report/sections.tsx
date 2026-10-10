@@ -81,6 +81,8 @@ export interface ReportSectionsProps {
   agreementNote?: string | null;
   /** Section 6's draping pair; not shown for a quiz-only report. */
   draping: ReactNode;
+  /** Shown under the season name inside the h1, as the sample report names itself. */
+  subtitle?: string;
 }
 
 export function ReportSections({
@@ -90,6 +92,7 @@ export function ReportSections({
   summary,
   agreementNote,
   draping,
+  subtitle,
 }: ReportSectionsProps) {
   const name = seasonName(season);
   const copy = SEASON_COPY[season];
@@ -103,7 +106,15 @@ export function ReportSections({
     <>
       <section className="flex flex-col gap-(--space-4) lg:col-span-4 lg:col-start-1 lg:row-start-1 lg:gap-(--space-5)">
         <p className="overline">{seasonOverline}</p>
-        <h1 className="display">{name}</h1>
+        <h1 className="display">
+          {name}
+          {subtitle && (
+            <>
+              <span className="sn-visually-hidden">: </span>
+              <span className="h3 mt-(--space-2) block">{subtitle}</span>
+            </>
+          )}
+        </h1>
         <p className="quote text-(--ink-muted)">{copy.tagline}</p>
         <p>{summary || copy.summary}</p>
         <SeasonTraits season={season} />

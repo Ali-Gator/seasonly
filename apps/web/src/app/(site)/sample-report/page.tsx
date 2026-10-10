@@ -1,4 +1,5 @@
 import { PALETTES } from "@seasonly/analysis";
+import Link from "next/link";
 
 import { Button, DrapingPair, Icon } from "@/components/ds";
 import { ReportSections } from "@/lib/report/sections";
@@ -43,6 +44,7 @@ export default function Page() {
           season="soft-autumn"
           agreement="agree"
           overline="Sample season"
+          subtitle="A sample color analysis report"
           agreementNote="Green veins and gold jewelry point warm. Your soft brown hair and hazel eyes point muted."
           draping={
             <DrapingPair
@@ -55,6 +57,11 @@ export default function Page() {
           }
         />
       </div>
+
+      <Link href="/seasons/soft-autumn" className="label sn-navlink">
+        Everything about Soft Autumn
+        <Icon name="arrow-right" size={18} />
+      </Link>
 
       <section className="flex flex-col gap-(--space-4) border-t border-(--line) pt-(--space-6) lg:flex-row lg:items-center lg:justify-between lg:gap-(--space-6) lg:py-(--space-8)">
         <div className="flex flex-col gap-(--space-4) lg:gap-(--space-2)">
