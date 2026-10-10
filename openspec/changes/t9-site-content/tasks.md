@@ -88,7 +88,7 @@ The pre-commit hook runs `test:unit`, so a red test is committed together with t
 
   Done when `pnpm test:unit` runs them and they fail on the stubs.
 
-- [ ] 2.2 The `site-structure` tests:
+- [x] 2.2 The `site-structure` tests:
   - make the two approved fixture edits in `routes.test.ts`;
   - in `seo.test.ts`, add the `site-content` case "The core routes are ready": `indexedUrls()` on the real `ROUTES` equals the 19 URLs.
 
@@ -130,7 +130,7 @@ The pre-commit hook runs `test:unit`, so a red test is committed together with t
 
 - [x] 3.10 Guide photos in `(flow)/analyze/_capture/steps.tsx`, with `src` and `alt` on the three `PhotoTipCard`s. Done when 2.3 passes.
 
-- [ ] 3.11 Set `ready: true` on the six content routes in `apps/web/src/lib/site/routes.ts`, and remove the "Stub until…" comments. Done when 2.2 passes and `pnpm build` lists the 12 season pages as static.
+- [x] 3.11 Set `ready: true` on the six content routes in `apps/web/src/lib/site/routes.ts`, and remove the "Stub until…" comments. Done when 2.2 passes and `pnpm build` lists the 12 season pages as static. Done 2026-10-10: `pnpm build` prerenders `/seasons/<slug>` as SSG for all 12, and the other five content routes as static. The pages' stub comments went with the rewrite.
 
 ## 4. Verify
 

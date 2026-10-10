@@ -30,6 +30,22 @@ describe("sitemap", () => {
   });
 });
 
+describe("core routes", () => {
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-core-routes-are-ready} */
+  it("are ready, so the sitemap lists the 19 URLs", () => {
+    expect(indexedUrls()).toEqual([
+      "https://seasonly.me",
+      "https://seasonly.me/seasons",
+      ...SEASON_SLUGS.map((s) => `https://seasonly.me/seasons/${s}`),
+      "https://seasonly.me/how-it-works",
+      "https://seasonly.me/sample-report",
+      "https://seasonly.me/color-analysis-gpt-alternative",
+      "https://seasonly.me/privacy",
+      "https://seasonly.me/terms",
+    ]);
+  });
+});
+
 describe("robots", () => {
   /** {@link openspec/specs/site-structure/spec.md#scenario-robotstxt-contents} */
   it("allows the site, blocks the API and names the apex sitemap", () => {
