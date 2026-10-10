@@ -24,13 +24,19 @@
   - The board's body text is a draft from this proposal. Operator, country, contact, date and rights under the governing law are placeholders until 1.2; the "send us your report link" line in Your rights is unconfirmed and settles with `docs/privacy-requests.md` (5.5). Final page text comes from 1.3.
   - 05 Consent and 10d carry the copy above word for word; the `capture-flow` and `report-page` deltas already match. 10d is renamed "10d Draping preview · photo could not load".
 
-- [ ] 1.2 Ask the user for the facts the pages need. The agent invents none of them:
+- [x] 1.2 Ask the user for the facts the pages need. The agent invents none of them:
   - the operator's name as shown, and their country;
   - the governing law;
   - the contact address. The suggestion is `privacy@seasonly.me`, forwarded with Porkbun's free email forwarding, which the user sets up;
   - the minimum age. The suggestion is 16, the GDPR default for consent without a parent.
 
   Done when all four are recorded here.
+
+  Recorded 2026-10-10, from the user:
+  - operator: "Seasonly", run by an individual (no legal entity yet), in Bulgaria;
+  - governing law: Bulgaria (EU, so the GDPR applies; the authority is Bulgaria's Commission for Personal Data Protection);
+  - contact: `privacy@seasonly.me` (Porkbun forwarding, set up by the user);
+  - minimum age: 16.
 
 - [ ] 1.3 Draft both pages' full text in a scratch Artifact, from the inventory:
   - the migrations;
@@ -58,14 +64,14 @@
 
   Done when the Log shows the line and the carried list holds no `t8-photo-privacy` item.
 
-- [ ] 2.2 Ask the user to approve these edits to existing tests (CLAUDE.md gate):
+- [x] 2.2 Ask the user to approve these edits to existing tests (CLAUDE.md gate):
   - `apps/web/src/lib/site/routes.test.ts`: the "stub page" case moves from `/terms` to `/how-it-works`;
   - `e2e/site-structure.spec.ts`: "a stub page carries noindex" moves from `/terms` to `/how-it-works`;
   - `apps/web/src/lib/report/draping.dom.test.tsx` and `apps/web/src/lib/report/view.test.tsx` (lines 210–214): "Your photo has been deleted, so this shows the two colors only." becomes the new BL-10 line, and the `not.toContain("has been deleted")` check stays.
 
   No existing test asserts the consent step's body copy (`e2e/analysis-flow.spec.ts` checks only the "Before we upload" heading), so the provider line needs no edit.
 
-  Done when the user approves in chat; record the date here.
+  Done when the user approves in chat; record the date here. **Approved 2026-10-10.**
 
 ## 3. Tests first
 
@@ -106,13 +112,13 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
 ## 4. Env
 
-- [ ] 4.1 Add `CRON_SECRET` (phase 1, required, server only, "Any random string, 32+ chars; Vercel sends it as the cron's bearer token") to:
+- [x] 4.1 Add `CRON_SECRET` (phase 1, required, server only, "Any random string, 32+ chars; Vercel sends it as the cron's bearer token") to:
   - the route;
   - `apps/web/.env.example`;
   - the catalogue in `openspec/specs/env/spec.md`;
   - `scripts/verify-env.ts`.
 
-  The user puts one generated value in `apps/web/.env.local` and in Vercel Production and Preview (Preview is used by 6.4). `verify:env` runs in no CI job and no build, so a missing value cannot break a deploy; the route refuses every request instead. Done when `pnpm verify:env 1` reports it `ok` locally.
+  The user puts one generated value in `apps/web/.env.local` and in Vercel Production and Preview (Preview is used by 6.4). `verify:env` runs in no CI job and no build, so a missing value cannot break a deploy; the route refuses every request instead. Done when `pnpm verify:env 1` reports it `ok` locally. **`ok` on 2026-10-10; the user set it in Vercel Production and Preview the same day.**
 
 ## 5. Implementation
 
