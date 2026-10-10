@@ -49,6 +49,29 @@
 
   Each service's own retention (Vercel request logs, AI Gateway logging and Google's abuse-monitoring window, Resend's sent-email logs, PostHog's event retention, Sentry's event retention) is looked up in that service's current docs or account settings, never from memory, and recorded here with its source. Also check in Resend whether click or open tracking is on for `seasonly.me`. If click tracking is on, every report link passes through Resend's link domain. Turn it off with the user's yes, or name it on the page.
 
+
+  Network capture, 2026-10-10, preview `seasonly-4oecvdgd1-aligators-projects.vercel.app` (commit c3234c7) in the user's Chrome: one photo analysis (paid, approved), the email step and the report page. Hosts:
+  - the deployment itself: pages, `/api/analyze`, `/api/reports/<id>/email`, `/api/face/<id>`, the share and palette images, BotID (`/149e9513…/a-4-a`, `/.well-known/vercel/jwe`) and Speed Insights (`/e93758f6c792abd7/script.js`);
+  - `cdn.jsdelivr.net` (MediaPipe wasm) and `storage.googleapis.com` (`mediapipe-models`: face landmarker, hair segmenter);
+  - `odml.pa.googleapis.com/v1/log`: MediaPipe's own usage log (task type, running mode, timings; no image), sent from every page that runs face detection. It has no opt-out in the 1.0.1 API. Missing from the original `legal-pages` list, so the delta now names it;
+  - `eu.i.posthog.com` (`/e/`), with the first-party `ph_phc_…_posthog` cookie;
+  - `o4508841814130688.ingest.de.sentry.io` (Sentry, Germany);
+  - `vercel.live`: the preview feedback toolbar only, not served on production;
+  - server side (from the code, not visible to the browser): Vercel AI Gateway to Google (`lib/report-text/index.ts`), Supabase, Resend.
+  - Report email (Gmail, test inbox): every link goes through `l.seasonly.me/CL0/…` and the email carries an `l.seasonly.me/CI0/…` pixel, so Resend click **and** open tracking are on for `seasonly.me`. The agent cannot sign in to Resend, and the API key is sending-only.
+  - Test report `__gd1JDZrt_xFk2k1vca4A` (`is_test`, photo, one address, crop stored) is kept for the by-link check in 6.3, which deletes it.
+
+  Retention of each service, looked up 2026-10-10:
+  - Vercel runtime logs: 1 hour on Hobby ([Runtime Logs, Limits](https://vercel.com/docs/logs/runtime)).
+  - Vercel AI Gateway: keeps no prompts or outputs, "immediately and permanently deleted after requests are completed"; without ZDR, routing ignores provider retention ([AI Gateway ZDR](https://vercel.com/docs/ai-gateway/security-and-compliance/zdr)). The model is served by `google` or `vertex`.
+  - Google: Gemini API paid services log prompts and responses "for a limited period of time" for abuse monitoring and never train on them ([Gemini API terms](https://ai.google.dev/gemini-api/terms)); Vertex AI keeps abuse-monitoring logs "for up to 90 days" ([Vertex AI abuse monitoring](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/abuse-monitoring)). The page says up to 90 days.
+  - Resend: email data, logs and metrics 30 days on Free, Pro and Scale ([account quotas and limits](https://resend.com/docs/knowledge-base/account-quotas-and-limits)).
+  - PostHog: events 7 years on paid plans; the org is pay-as-you-go ([events retention](https://posthog.com/docs/data/events-retention)).
+  - Sentry: errors 30 days on Developer, 90 on Team ([data retention periods](https://docs.sentry.io/security-legal-pii/security/data-retention-periods/)). Plan of org `blockdev` to confirm.
+  - Supabase: no automatic backups on the Free plan, so a deleted row is gone ([backups](https://supabase.com/docs/guides/platform/backups)).
+  - jsDelivr: IP addresses aggregated "often within hours, and then deleted" ([jsDelivr blog](https://jsdelivr.com/blog/how-the-german-courts-ruling-on-google-fonts-affects-jsdelivr-and-why-it-is-safe-to-use)).
+  - Google Cloud Storage and the MediaPipe log: no published period; Google's privacy policy applies.
+
   Done when the user approves the text in chat; record the date here.
 
 - [ ] 1.4 Legal check: the user has the approved text reviewed by someone qualified, or waives a review for the beta in writing in chat. Record which, who and the date here. The text the agent drafts is not legal advice. It does not block the code tasks, but archive, the PR and auto-merge all wait for it (7.2).

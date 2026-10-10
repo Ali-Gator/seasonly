@@ -38,6 +38,7 @@ It SHALL say that the full photo never leaves the device. It SHALL say that face
 - PostHog, EU: anonymous funnel events with report ids masked and no address. It sets a first-party cookie;
 - Sentry, Germany: error reports, which can include a report id;
 - jsDelivr and Google Cloud Storage: the browser downloads the face-detection code and model from them, so they see the visitor's IP address.
+- Google, through the face-detection code: MediaPipe sends Google a usage log from the browser (which task ran and how long it took, never the photo), so Google sees the visitor's IP address. MediaPipe offers no switch to turn it off.
 
 For each service, the page SHALL also say how long that service keeps what it receives, as the service's own documentation or account settings state it. A deletion request reaches Seasonly's own records, not these copies, and the page SHALL say so.
 
