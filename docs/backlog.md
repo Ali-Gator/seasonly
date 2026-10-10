@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-24**
+_Next id:_ **BL-27**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -156,3 +156,22 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   _Refs:_ `apps/web/src/components/ds/icon.tsx`, design system
   (https://claude.ai/artifact/E11hciU9VsyCxTFnJJNbHD) · _Status:_ gated — your choice of icon set
   and photos (open since T3, 2026-10-01)
+
+- **[BL-24] Famous people's names are read twice** — each famous photo's alt text is the
+  person's name, and the name is printed right under it, so a screen reader says it twice. Use
+  `alt=""` with the name as the caption (a `figure`/`figcaption`), or describe the photo instead;
+  the approved alt texts are the names (`t9-site-content` content.json).
+  _Refs:_ `apps/web/src/app/(site)/seasons/[season]/page.tsx`, `apps/web/src/lib/site-content/seasons.ts`
+  · _Status:_ open — t9 phase review, 2026-10-10
+
+- **[BL-25] Season names in the strips are not headings** — on the landing, `/seasons` and a
+  season page's neighbours, each season's name is a `span.h3` inside its link, as the boards draw
+  it, so heading navigation skips the 12 seasons. Make them `h3`s if the boards agree.
+  _Refs:_ `apps/web/src/lib/site-content/season-link.tsx`, MVP canvas boards Main, Seasons, Season
+  · _Status:_ open — t9 phase review, 2026-10-10
+
+- **[BL-26] The famous photos bypass `Slot`** — the season page builds its own `sn-slot` and
+  `img` only to add `loading="lazy"`. Give the design system's `Slot` (and bundle.js) a `loading`
+  prop and use it there.
+  _Refs:_ `apps/web/src/components/ds/slot.tsx`, `apps/web/src/app/(site)/seasons/[season]/page.tsx`
+  · _Status:_ open — t9 phase review, 2026-10-10

@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { Button, DrapingPair, Icon, Note, SwatchGrid } from "@/components/ds";
 import { SAMPLE_FACE } from "@/lib/site-content/images";
+import { softAutumnColors } from "@/lib/site-content/sample";
 import { pageMetadata } from "@/lib/site/routes";
 
 export const metadata = pageMetadata("/color-analysis-gpt-alternative");
@@ -13,7 +14,7 @@ const SOURCE =
 const palette = PALETTES["soft-autumn"];
 
 /** The board's 8 sample colors, read by name from the Soft Autumn palette. */
-const SAMPLE = [
+const SAMPLE = softAutumnColors([
   "Terracotta",
   "Camel",
   "Sage",
@@ -22,11 +23,7 @@ const SAMPLE = [
   "Olive",
   "Soft Coral",
   "Mushroom",
-].map((name) => {
-  const color = [...palette.best, ...palette.neutrals].find((c) => c.name === name);
-  if (!color) throw new Error(`No Soft Autumn color named ${name}`);
-  return color;
-});
+]);
 
 const SECTION = "flex flex-col gap-(--space-4) border-t border-(--line) pt-(--space-6)";
 
@@ -97,7 +94,10 @@ export default function Page() {
         </ul>
       </section>
 
-      <section aria-labelledby="adds-title" className={`${SECTION} gap-(--space-8)`}>
+      <section
+        aria-labelledby="adds-title"
+        className="flex flex-col gap-(--space-8) border-t border-(--line) pt-(--space-6)"
+      >
         <h2 className="h2" id="adds-title">
           What Seasonly adds
         </h2>

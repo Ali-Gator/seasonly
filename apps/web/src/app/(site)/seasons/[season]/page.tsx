@@ -1,10 +1,10 @@
-import { PALETTES, SEASON_COPY, type Swatch } from "@seasonly/analysis";
+import { PALETTES, SEASON_COPY } from "@seasonly/analysis";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { ReactNode } from "react";
 
-import { Button, Icon, ReportSection, SwatchGrid } from "@/components/ds";
+import { Button, Icon, ReportSection } from "@/components/ds";
+import { Colors, Group, SeasonTraits } from "@/lib/report/sections";
 import { SeasonLink } from "@/lib/site-content/season-link";
 import { FAMOUS_NOTE, famousIntro, SEASON_CONTENT } from "@/lib/site-content/seasons";
 import { familyName, pageMetadata, SEASON_SLUGS, SEASONS, seasonName } from "@/lib/site/routes";
@@ -20,31 +20,6 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return pageMetadata(`/seasons/${(await params).season}`);
-}
-
-/** A grid of `columns` on a phone and `wide` from 1024 px. */
-function Colors({
-  colors,
-  label,
-  columns,
-  wide,
-}: {
-  colors: readonly Swatch[];
-  label: string;
-  columns: number;
-  wide: 2 | 4 | 6;
-}) {
-  const lg = { 2: "lg:grid-cols-2!", 4: "lg:grid-cols-4!", 6: "lg:grid-cols-6!" }[wide];
-  return <SwatchGrid colors={colors} columns={columns} label={label} className={lg} />;
-}
-
-function Group({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="flex flex-col gap-(--space-3)">
-      <h3 className="h3">{title}</h3>
-      {children}
-    </div>
-  );
 }
 
 function FindOut({ name, className }: { name: string; className?: string }) {
@@ -88,20 +63,7 @@ export default async function Season({ params }: Props) {
           {about.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
-          <dl className="sn-card m-0 grid grid-cols-[auto_1fr] gap-x-(--space-4) gap-y-(--space-3)">
-            {(
-              [
-                ["Undertone", copy.undertone],
-                ["Chroma", copy.chroma],
-                ["Contrast", copy.contrast],
-              ] as const
-            ).map(([term, value]) => (
-              <div key={term} className="contents">
-                <dt className="label">{term}</dt>
-                <dd className="m-0 text-(--ink-muted)">{value}</dd>
-              </div>
-            ))}
-          </dl>
+          <SeasonTraits season={season} />
           <FindOut name={name} />
         </section>
 
@@ -126,7 +88,7 @@ export default async function Season({ params }: Props) {
           <ReportSection overline="Metals" title="Best metals" intro={copy.metalsIntro}>
             <div className="flex flex-col gap-(--space-6) lg:grid lg:grid-cols-[2fr_1fr]">
               <Group title="Wear">
-                <Colors colors={palette.metals} columns={4} wide={4} label="Best metals" />
+                <Colors colors={palette.metals} columns={4} label="Best metals" />
               </Group>
               <Group title="Go easy on">
                 <Colors

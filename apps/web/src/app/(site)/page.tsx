@@ -1,15 +1,16 @@
-import { type Family, PALETTES, SEASON_SLUGS, seasonFamily } from "@seasonly/analysis";
+import { type Family, SEASON_SLUGS, seasonFamily } from "@seasonly/analysis";
 import Link from "next/link";
 
 import { Button, Icon, Note, PhotoTipCard, SwatchGrid } from "@/components/ds";
 import { TIP_PHOTOS } from "@/lib/site-content/images";
 import { SeasonLink } from "@/lib/site-content/season-link";
+import { softAutumnColors } from "@/lib/site-content/sample";
 import { pageMetadata } from "@/lib/site/routes";
 
 export const metadata = pageMetadata("/");
 
 /** The board's 12 sample colors, read by name from the Soft Autumn palette. */
-const SAMPLE = [
+const SAMPLE = softAutumnColors([
   "Soft Coral",
   "Terracotta",
   "Rust",
@@ -22,12 +23,7 @@ const SAMPLE = [
   "Sage",
   "Deep Teal",
   "Mushroom",
-].map((name) => {
-  const { best, neutrals } = PALETTES["soft-autumn"];
-  const color = [...best, ...neutrals].find((c) => c.name === name);
-  if (!color) throw new Error(`No Soft Autumn color named ${name}`);
-  return color;
-});
+]);
 
 const STEPS = [
   [

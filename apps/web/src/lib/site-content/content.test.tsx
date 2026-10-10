@@ -194,6 +194,8 @@ describe("/seasons/<slug>", () => {
     const out = await seasonPage(slug);
     const { famous } = SEASON_CONTENT[slug];
     expect(famous).toHaveLength(3);
+    // The page links the studio once, under all three: every figure must share that source.
+    expect(new Set(famous.map((f) => f.source.url)).size).toBe(1);
     for (const f of famous) {
       expect(f.image).toMatch(new RegExp(`^/images/famous/${slug}/[a-z-]+\\.webp$`));
       expect(imgs(out)).toContainEqual({ src: f.image, alt: f.alt });

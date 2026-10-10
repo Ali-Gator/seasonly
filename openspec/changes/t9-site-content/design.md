@@ -125,7 +125,7 @@ The proposal, as a table of name, season, source, Commons URL and license, is pa
 | `info`        | `Info`           |
 | `arrow-right` | `ArrowRight`     |
 
-The `sn-icon` class, the size, `aria-hidden` without a label and `role="img"` with a label all stay. The stroke width is 1.75 to match today's weight.
+The `sn-icon` class, the size, `aria-hidden` without a label and `role="img"` with a label all stay. The stroke width is 1.75 on Lucide's 24 px grid, as the approved design system's bundle.js (version 25) draws it; that is about 17% lighter than the old placeholders' 1.75 on a 20 px grid.
 
 The design system artifact's `bundle.js` Icon is switched to the same Lucide path data, so the canvas renders what the app renders. This is part of task 1, a DS change that needs its own version note.
 

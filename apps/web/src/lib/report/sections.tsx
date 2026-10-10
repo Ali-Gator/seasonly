@@ -18,7 +18,7 @@ import { seasonName } from "@/lib/site/routes";
  *
  * @see openspec/specs/report-page/spec.md
  */
-function Group({ title, children }: { title: string; children: ReactNode }) {
+export function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-(--space-3)">
       <h3 className="h3">{title}</h3>
@@ -28,7 +28,7 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
 }
 
 /** A grid of 3 or 4 on a phone and `wide` columns from 1024 px. */
-function Colors({
+export function Colors({
   colors,
   label,
   columns,
@@ -46,6 +46,27 @@ function Colors({
       label={label}
       className={wide === 6 ? "lg:grid-cols-6!" : wide === 2 ? "lg:grid-cols-2!" : undefined}
     />
+  );
+}
+
+/** The season's undertone, chroma and contrast, as a report and a season page show them. */
+export function SeasonTraits({ season }: { season: SeasonSlug }) {
+  const copy = SEASON_COPY[season];
+  return (
+    <dl className="sn-card m-0 grid grid-cols-[auto_1fr] gap-x-(--space-4) gap-y-(--space-3)">
+      {(
+        [
+          ["Undertone", copy.undertone],
+          ["Chroma", copy.chroma],
+          ["Contrast", copy.contrast],
+        ] as const
+      ).map(([term, value]) => (
+        <div key={term} className="contents">
+          <dt className="label">{term}</dt>
+          <dd className="m-0 text-(--ink-muted)">{value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -85,20 +106,7 @@ export function ReportSections({
         <h1 className="display">{name}</h1>
         <p className="quote text-(--ink-muted)">{copy.tagline}</p>
         <p>{summary || copy.summary}</p>
-        <dl className="sn-card m-0 grid grid-cols-[auto_1fr] gap-x-(--space-4) gap-y-(--space-3)">
-          {(
-            [
-              ["Undertone", copy.undertone],
-              ["Chroma", copy.chroma],
-              ["Contrast", copy.contrast],
-            ] as const
-          ).map(([term, value]) => (
-            <div key={term} className="contents">
-              <dt className="label">{term}</dt>
-              <dd className="m-0 text-(--ink-muted)">{value}</dd>
-            </div>
-          ))}
-        </dl>
+        <SeasonTraits season={season} />
         <Note icon={agreement === "agree" ? "check" : "info"} title={note.title}>
           {agreementNote || note.body}
         </Note>
