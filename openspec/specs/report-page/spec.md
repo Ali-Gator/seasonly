@@ -72,8 +72,8 @@ export default function ReportPage(props: {
 
 ## Edge Cases
 
-- Any failure to load the face, not only a 404, shows the deleted-photo line (BL-10).
-- The footer says the photo is deleted within 24 hours, which holds only once `t8-photo-privacy` ships the deletion job.
+- Any failure to load the face, a 404 or a 500, shows the same line, which does not claim a deletion.
+- The footer says the photo is deleted within 24 hours. The daily retention job (`data-retention`) deletes it, up to about 49 h in the worst case (backlog).
 - In CI there is no database, so a well-formed id answers 500 (the E2E asserts this) and only a malformed id reaches the 404.
 
 ## Requirements

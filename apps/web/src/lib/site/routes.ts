@@ -132,14 +132,14 @@ export const ROUTES: readonly Route[] = [
     title: "Privacy policy · Seasonly",
     description: "How Seasonly handles your photo and your data.",
     indexable: true,
-    ready: false,
+    ready: true,
   },
   {
     path: "/terms",
     title: "Terms of use · Seasonly",
     description: "The terms for using Seasonly.",
     indexable: true,
-    ready: false,
+    ready: true,
   },
   {
     path: "/analyze",

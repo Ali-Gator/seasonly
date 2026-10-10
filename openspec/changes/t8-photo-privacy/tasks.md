@@ -49,7 +49,6 @@
 
   Each service's own retention (Vercel request logs, AI Gateway logging and Google's abuse-monitoring window, Resend's sent-email logs, PostHog's event retention, Sentry's event retention) is looked up in that service's current docs or account settings, never from memory, and recorded here with its source. Also check in Resend whether click or open tracking is on for `seasonly.me`. If click tracking is on, every report link passes through Resend's link domain. Turn it off with the user's yes, or name it on the page.
 
-
   Network capture, 2026-10-10, preview `seasonly-4oecvdgd1-aligators-projects.vercel.app` (commit c3234c7) in the user's Chrome: one photo analysis (paid, approved), the email step and the report page. Hosts:
   - the deployment itself: pages, `/api/analyze`, `/api/reports/<id>/email`, `/api/face/<id>`, the share and palette images, BotID (`/149e9513…/a-4-a`, `/.well-known/vercel/jwe`) and Speed Insights (`/e93758f6c792abd7/script.js`);
   - `cdn.jsdelivr.net` (MediaPipe wasm) and `storage.googleapis.com` (`mediapipe-models`: face landmarker, hair segmenter);
@@ -123,7 +122,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Done when it fails for the missing route.
 
-- [ ] 3.4 `legal-pages`, in a new `apps/web/src/app/(site)/legal-pages.test.tsx`, rendering both pages to static markup:
+- [x] 3.4 `legal-pages`, in a new `apps/web/src/app/(site)/legal-pages.test.tsx`, rendering both pages to static markup:
   - privacy names the crop with "24 hours", the report record, the addresses, the interest record, the report-link sentence, each service in the spec's list, the 30-day answer, the contact address and "Last updated";
   - terms states the estimate, the minimum age, own photos only, no warranty, governing law and contact, and links to `/privacy`;
   - neither holds "Coming soon";
@@ -149,7 +148,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 - [x] 5.2 Write `apps/web/src/lib/retention/` (decisions 4 and 5) and `apps/web/src/app/api/cron/retention/route.ts` (decision 3), wrapped in `withErrorCapture`, with the job's results as JSON. Add `apps/web/vercel.json` with the daily `0 4 * * *` cron. Done when 3.1 and 3.3 pass and `BOTID_PROTECT` is unchanged.
 - [ ] 5.3 Write `/privacy` and `/terms` from the text approved in 1.3 and the layout of the legal-page board from 1.1 (decision 7), and set both routes `ready: true` in `lib/site/routes.ts`. Done when 3.4 passes and the site-structure tests pass.
 - [x] 5.4 Consent copy in `_capture/steps.tsx`, and the BL-10 line in `lib/report/draping.tsx` (decision 8), both from the approved boards. Done when 3.5 passes. Delete BL-10 from `docs/backlog.md`.
-- [ ] 5.5 Write `docs/privacy-requests.md` (decision 6). Rewrite the Edge Case notes that point at `t8-photo-privacy` in the permanent specs:
+- [x] 5.5 Write `docs/privacy-requests.md` (decision 6). Rewrite the Edge Case notes that point at `t8-photo-privacy` in the permanent specs:
   - `draping-preview`: "Nothing deletes crops yet";
   - `email-capture`: "Addresses are kept until…";
   - `interest-button`: the address shown to link holders, now disclosed;
@@ -159,6 +158,8 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
   Each now states the shipped behavior. Done when no permanent spec mentions `t8-photo-privacy` as future work (`grep -rn t8-photo-privacy openspec/specs`).
 
 - [ ] 5.6 Run `pnpm fix`, `pnpm test` and `pnpm --filter web build`. Done when all pass, the build lists `ƒ /api/cron/retention`, and `/privacy` and `/terms` are static.
+
+  2026-10-10, local: `pnpm fix` clean; unit 664/664; the build lists `ƒ /api/cron/retention` and `○ /privacy`, `○ /terms`. E2E with `CI=1` (prebuilt, as CI runs it): 53/54. The one failure, `/seasons/Soft-Autumn` answering 200, is macOS only: its case-insensitive disk serves the prerendered `soft-autumn` page. Without `CI=1` (dev server), the report-500 case also fails, on `no-cache, must-revalidate` instead of `private, no-store`. Neither touches this change; CI on Linux decides.
 
 ## 6. Checks with the user
 

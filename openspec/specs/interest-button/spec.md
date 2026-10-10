@@ -60,7 +60,7 @@ where not i.is_test and not r.is_test;
 
 ## Edge Cases
 
-- Anyone holding the report link can tap Premium and read the address in the note: the user's choice of 2026-10-08, disclosed by `t8-photo-privacy`.
+- Anyone holding the report link can tap Premium and read the address in the note: the user's choice of 2026-10-08, disclosed on `/privacy` ("Your report link").
 - The one launch email to people who tapped Premium is not built yet; this capability only keeps what it needs.
 
 ## Requirements

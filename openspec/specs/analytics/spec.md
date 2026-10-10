@@ -43,8 +43,8 @@ export function ShareButton(props: { /* … */ place?: "header" | "actions" }): 
 
 - An encoded id (`%2Fr%2F…`) passes the mask; nothing on the site writes one.
 - Ad blockers drop PostHog requests, so counts are a floor. The demand gate counts analyses from `reports`.
-- PostHog keeps its first-party cookie without a consent banner (the user's choice, 2026-10-09); the decision is carried to `t8-photo-privacy`.
-- Sentry still receives report ids (`extra.reportId`, request URLs); carried to `t8-photo-privacy`.
+- PostHog keeps its first-party cookie without a consent banner (the user's choice, 2026-10-09), disclosed on `/privacy` (backlog: cookieless mode or a banner before paid promotion or a complaint).
+- Sentry receives report ids (`extra.reportId`, request URLs) on purpose (the user's choice, 2026-10-09), disclosed on `/privacy`.
 - Turning flags on needs the first page's URL masked first; carried to `t7-paywall-off`.
 
 ## Requirements
