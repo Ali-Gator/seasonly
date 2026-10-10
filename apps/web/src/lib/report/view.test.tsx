@@ -207,7 +207,7 @@ describe("DrapingView", () => {
     expect(gone).not.toContain("<img");
     expect(gone.match(/sn-slot__label">Face</g)).toHaveLength(2);
     expect(words(gone)).toContain(
-      "Your photo has been deleted, so this shows the two colors only.",
+      "We couldn't load your photo, so this shows the two colors only.",
     );
     const shown = renderToStaticMarkup(<DrapingView id={ID} {...pair} deleted={false} />);
     expect(shown).toContain(`src="/api/face/${ID}"`);

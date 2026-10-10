@@ -60,7 +60,7 @@ test.describe("public routes", () => {
 
   /** {@link openspec/specs/site-structure/spec.md#scenario-a-stub-page} */
   test("a stub page carries noindex", async ({ page }) => {
-    await page.goto("/terms");
+    await page.goto("/how-it-works");
     expect(await robotsMeta(page)).toContain("noindex");
   });
 });

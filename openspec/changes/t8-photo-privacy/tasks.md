@@ -108,7 +108,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 
   Done when it fails on the stubs.
 
-- [ ] 3.5 Make the edits approved in 2.2. Add the consent-provider scenario in a new `apps/web/src/app/(flow)/analyze/_capture/consent.test.tsx` (it renders `Consent` and finds the Google line and the `/privacy` link), and the draping 500 scenario (`The face request fails`) to the draping DOM test. Done when the new and edited cases fail for the old copy, and the `/how-it-works` stub cases pass.
+- [x] 3.5 Make the edits approved in 2.2. Add the consent-provider scenario in a new `apps/web/src/app/(flow)/analyze/_capture/consent.test.tsx` (it renders `Consent` and finds the Google line and the `/privacy` link), and the draping 500 scenario (`The face request fails`) to the draping DOM test. Done when the new and edited cases fail for the old copy, and the `/how-it-works` stub cases pass.
 
 ## 4. Env
 
@@ -125,7 +125,7 @@ Existing tests change only as approved in 2.2. New tests go in new files and cit
 - [x] 5.1 Write `supabase/migrations/<ts>_retention.sql` (design.md decision 5). Do not apply it. Done when 3.2 passes.
 - [x] 5.2 Write `apps/web/src/lib/retention/` (decisions 4 and 5) and `apps/web/src/app/api/cron/retention/route.ts` (decision 3), wrapped in `withErrorCapture`, with the job's results as JSON. Add `apps/web/vercel.json` with the daily `0 4 * * *` cron. Done when 3.1 and 3.3 pass and `BOTID_PROTECT` is unchanged.
 - [ ] 5.3 Write `/privacy` and `/terms` from the text approved in 1.3 and the layout of the legal-page board from 1.1 (decision 7), and set both routes `ready: true` in `lib/site/routes.ts`. Done when 3.4 passes and the site-structure tests pass.
-- [ ] 5.4 Consent copy in `_capture/steps.tsx`, and the BL-10 line in `lib/report/draping.tsx` (decision 8), both from the approved boards. Done when 3.5 passes. Delete BL-10 from `docs/backlog.md`.
+- [x] 5.4 Consent copy in `_capture/steps.tsx`, and the BL-10 line in `lib/report/draping.tsx` (decision 8), both from the approved boards. Done when 3.5 passes. Delete BL-10 from `docs/backlog.md`.
 - [ ] 5.5 Write `docs/privacy-requests.md` (decision 6). Rewrite the Edge Case notes that point at `t8-photo-privacy` in the permanent specs:
   - `draping-preview`: "Nothing deletes crops yet";
   - `email-capture`: "Addresses are kept until…";
