@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-18**
+_Next id:_ **BL-23**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -49,6 +49,29 @@ fold items in.
   _Refs:_ `.github/workflows/ci.yml`, `evals/gate.ts` · _Status:_ deferred — until fetching about
   100 Commons originals per CI run is judged stable
 
+## Privacy
+
+- **[BL-18] A crop can stay about 49 h while the pages say 24 h** — the retention job runs once a
+  day (Vercel Hobby) with a 24 h cutoff, so a crop stored just after a run lasts until the run
+  after next. Move to an hourly scheduler (Vercel Pro, or `pg_cron` + `pg_net` calling the same
+  route); no other code changes.
+  _Refs:_ `apps/web/vercel.json`, `openspec/specs/data-retention/spec.md` · _Status:_ deferred —
+  Vercel Pro or before paid promotion (T15); the user's choice, 2026-10-09
+
+- **[BL-19] The PostHog cookie is set without consent** — an ePrivacy risk for EU visitors,
+  disclosed on `/privacy`. Turn on `cookieless_mode`, or add a banner with `on_reject`.
+  _Refs:_ `apps/web/src/lib/observability/posthog.ts`, `openspec/specs/analytics/spec.md` ·
+  _Status:_ deferred — before paid promotion or a complaint; the user's choice, 2026-10-09
+
+- **[BL-20] The consent screen undersells what is kept and where the crop goes** — "We keep only
+  your result: your season and your colors" leaves out the measured traits, quiz answers and
+  personal text the report stores, and the screen does not say Google may keep the crop up to
+  90 days for abuse checks, though `/privacy` cites this screen as the basis for using the crop.
+  The report email footer repeats the line. Needs a canvas line first.
+  _Refs:_ `apps/web/src/app/(flow)/analyze/_capture/steps.tsx`, `apps/web/src/lib/email/render.ts`,
+  `openspec/specs/capture-flow/spec.md` · _Status:_ open — phase review of `t8-photo-privacy`,
+  2026-10-10
+
 ## Code quality
 
 - **[BL-02] A hung crop upload is abandoned, not cancelled** — `upload()` in
@@ -67,6 +90,20 @@ fold items in.
   _Status:_ open — found in `t6-eval-set`, 2026-10-09
 
 ## Testing
+
+- **[BL-21] Two e2e cases fail on a Mac** — run locally, `/seasons/Soft-Autumn` answers 200
+  (the case-insensitive disk serves the prerendered `soft-autumn` page) and, on the dev server
+  (no `CI=1`), the report-500 page carries `no-cache, must-revalidate` instead of
+  `private, no-store`. CI on Linux passes. Skip or adapt both locally so a clean run is green.
+  _Refs:_ `e2e/site-structure.spec.ts`, `e2e/report-delivery.spec.ts`, `playwright.config.ts` ·
+  _Status:_ open — found in `t8-photo-privacy`, 2026-10-10
+
+- **[BL-22] A report page's RSC request answered 503 once** — moving from the email step to
+  `/r/<id>` on a preview, the `?_rsc` request answered 503 before the page loaded normally.
+  Find out whether the router fetched the report before it was readable and whether a visitor
+  can see an error.
+  _Refs:_ `apps/web/src/app/(report)/`, `openspec/specs/report-page/spec.md` · _Status:_ open —
+  network capture of `t8-photo-privacy`, 2026-10-10
 
 - **[BL-17] Two analysis-eval scenarios are proven one level down** — "A photo cannot be had"
   is tested on the results writer, not on `eval:run` failing after a failed fetch, and "A usable
