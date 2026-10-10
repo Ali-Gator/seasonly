@@ -51,10 +51,9 @@ describe("ReportDraping", () => {
   });
 
   /**
-   * The face request fails (a 500, not a deletion): the `<img>` error event is the same, so the
-   * line must not claim a deletion.
+   * A 500 fires the same `<img>` error event as a 404, so the line must not claim a deletion.
    *
-   * {@link openspec/specs/report-page/spec.md#requirement-the-draping-preview-shows-the-stored-face}
+   * {@link openspec/specs/report-page/spec.md#scenario-the-face-request-fails}
    */
   it("says the photo could not load, never that it was deleted, when the face request fails", async () => {
     container = document.createElement("div");

@@ -153,7 +153,7 @@ A route that may be indexed SHALL be marked ready only once the change that deli
 
 #### Scenario: A stub page
 
-- **WHEN** `/terms` is live but not marked ready
+- **WHEN** `/how-it-works` is live but not marked ready
 - **THEN** it carries `noindex` and is absent from the sitemap
 
 #### Scenario: A page marked ready
