@@ -44,7 +44,7 @@
 
 ## 2. Plan and test-edit approval
 
-- [ ] 2.1 Update the plan for `t8-photo-privacy` on branch `t8-photo-privacy`:
+- [x] 2.1 Update the plan for `t8-photo-privacy` on branch `t8-photo-privacy`:
   - Add a "t8-photo-privacy planned" line at the top of the Tracker Log (newest first). Name the user's choices of 2026-10-09: daily Vercel Cron with the 24 h wording kept for the beta (worst case about 49 h); the PostHog cookie with no banner; Sentry keeps report ids, disclosed; data kept until a request. Set T8 to In progress.
   - In the "Architecture and phases" tab:
     - in the Phase 1 table, rename the capabilities `consent, photo-retention` to `data-retention, legal-pages`, and the exit check to "Crops deleted daily after 24 h; privacy and terms live";

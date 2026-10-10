@@ -9,7 +9,7 @@ Seasonly uploads a face crop, but nothing deletes it. `/privacy` and `/terms` sa
   - it deletes every crop in the `crops` bucket that is older than 24 h;
   - it deletes every `is_test` report older than 24 h, which also removes its addresses and interest row.
 
-  Each run selects by age, so a missed run is caught up by the next one. A new migration gives the server's role `delete` on `reports` and `report_emails`.
+  Each run selects by age, so a missed run is caught up by the next one. A new migration gives the server's role `delete` on `reports`; the cascades remove the addresses and the interest row.
 
 - **Deletion is daily, not hourly (the user's choice, 2026-10-09).** Vercel Hobby runs a cron job at most once a day, ±59 min. The pages keep the "within 24 hours" wording, but in the worst case a crop is stored for about 49 h. This is a known gap the user accepted for the beta. It is logged in `docs/backlog.md` and closes on a move to Vercel Pro or an hourly scheduler.
 - **Retention on request (the user's choice, 2026-10-09).** Reports, addresses and interest rows are kept until the person asks for deletion. A request goes to the contact address and is answered within 30 days, using a documented procedure. No self-serve deletion is built.
@@ -54,7 +54,7 @@ Seasonly uploads a face crop, but nothing deletes it. `/privacy` and `/terms` sa
   - `apps/web/src/lib/site/routes.ts`: `/privacy` and `/terms` set to `ready: true`.
   - `apps/web/src/app/(flow)/analyze/_capture/steps.tsx`: the consent copy.
   - `apps/web/src/lib/report/draping.tsx`: the face-failure line.
-- **Database:** one migration, `<ts>_retention.sql`, which grants `delete` on `reports` and `report_emails` to `service_role`. It is applied to the Supabase project `seasonly` after the user confirms.
+- **Database:** one migration, `<ts>_retention.sql`, which grants `delete` on `reports` to `service_role` (the cascades need no grant on the child tables). It is applied to the Supabase project `seasonly` after the user confirms.
 - **Env:** `CRON_SECRET` (phase 1, required, server only) is added to the code, `.env.example`, the env catalogue and `verify-env`, and set in Vercel Production. Vercel sends it as the cron request's bearer token.
 - **Existing tests:**
   - `apps/web/src/lib/site/routes.test.ts` and `e2e/site-structure.spec.ts` assert that `/terms` is a stub, so they move to `/how-it-works`. This edit needs the user's approval.
