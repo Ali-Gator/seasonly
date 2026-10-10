@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-27**
+_Next id:_ **BL-29**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -175,3 +175,15 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   prop and use it there.
   _Refs:_ `apps/web/src/components/ds/slot.tsx`, `apps/web/src/app/(site)/seasons/[season]/page.tsx`
   · _Status:_ open — t9 phase review, 2026-10-10
+
+- **[BL-27] The GPT-alternative page goes stale on December 11** — its title, description, h1
+  and lead say the GPT "is retiring" on December 11, 2026. Re-check OpenAI's FAQ and switch the
+  copy to the past tense ("has retired") on that date, or sooner if OpenAI moves it.
+  _Refs:_ `apps/web/src/lib/site/routes.ts`, `apps/web/src/app/(site)/color-analysis-gpt-alternative/page.tsx`
+  · _Status:_ deferred — December 11, 2026 (t9 SEO audit, 2026-10-10)
+
+- **[BL-28] Two redirect hops on legacy URL shapes** — `http://www.seasonly.me/seasons` and
+  `/seasons/warm-autumn/` each take two 308s to reach the canonical URL. Harmless on a new domain
+  with no inbound links; collapse them at the Vercel domain level if links ever point there.
+  _Refs:_ `apps/web/next.config.ts`, Vercel domain settings · _Status:_ deferred — inbound links
+  to those shapes (t9 SEO audit, 2026-10-10)
