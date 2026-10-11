@@ -70,10 +70,21 @@ const GLUE = `(function () {
       }
     }
   }
+  // The card's own box, not the document's: a frame opened taller than the card must shrink to it.
+  // Measured at render too, since a host may show the frame before it lays out or paints.
+  var lastHeight = 0;
+  function reportSize() {
+    var box = root.getBoundingClientRect();
+    var height = Math.ceil(box.height);
+    if (height === lastHeight) return;
+    lastHeight = height;
+    notify("ui/notifications/size-changed", { width: Math.ceil(box.width), height: height });
+  }
   function show(result) {
     if (!result || (result.kind !== "season" && result.kind !== "no-result")) return;
     link = typeof result.link === "string" && result.link.indexOf(ORIGIN) === 0 ? result.link : null;
     root.innerHTML = renderCard(result);
+    reportSize();
     root.querySelector("button").addEventListener("click", function () {
       if (link) request("ui/open-link", { url: link }, function () {});
     });
@@ -107,18 +118,7 @@ const GLUE = `(function () {
     },
   );
 
-  if (window.ResizeObserver) {
-    var last = 0;
-    new ResizeObserver(function () {
-      var height = document.documentElement.scrollHeight;
-      if (height === last) return;
-      last = height;
-      notify("ui/notifications/size-changed", {
-        width: document.documentElement.scrollWidth,
-        height: height,
-      });
-    }).observe(document.body);
-  }
+  if (window.ResizeObserver) new ResizeObserver(reportSize).observe(root);
 })();`;
 
 /**

@@ -107,6 +107,9 @@ All tests cite `{@link openspec/specs/<capability>/spec.md#<anchor>}` at the per
 ## 6. Checks with the user and the submission package
 
 - [ ] 6.1 Run the MCP Inspector against the local build: list the tools, read the card, and call the tool with a season answer set, a no-answers set and an invalid value. Show the user the card rendered in the Inspector, or in a local host harness, at both widths and in both themes, in a scratch Artifact. Done when the user confirms it matches the Chat card board. Record the date here.
+
+  Prepared 2026-10-11, waiting for the user's confirmation. In place of the MCP Inspector, `curl` against `next start` (the local production build) listed the tool, read the card and called the tool with a season set, a no-answers set, an answers-cancel set, `{ veins: "purple" }` and a `photo` field; both refusals name the field and list the allowed values, and the server logged nothing about the calls. The card from that build runs in a stand-in host harness (https://claude.ai/artifact/A87wsQbn3kbgNyL4QS5Wfr) at 375 and 706 px, light and dark, for all three results. The harness found that the card never shrank its frame; it now reports its own height at render and on resize.
+
 - [ ] 6.2 Write `docs/chat-plugin-listing.md` (design.md decision 9). It covers:
   - the name, one-liner and description;
   - the categories;
@@ -138,6 +141,8 @@ All tests cite `{@link openspec/specs/<capability>/spec.md#<anchor>}` at the per
 - [ ] 7.2 Before archive, log every phase-review finding not fixed, and every defect found on the way that is worth fixing later, in `docs/backlog.md` under the next free `BL-nn` ids, and name them in the PR. Also log:
   - deferred, "if the funnel shows drop-off": pre-filling `/analyze` from the plugin's answers;
   - deferred, "if Vercel usage shows abuse": a firewall rate-limit rule for `/api/mcp`.
+  - found at apply: the quiz alone never gives Soft Autumn, Soft Summer or Bright Spring (750 combinations: 10 seasons reached), on the web quiz-only path too, unless the season-classifier spec says so by design;
+  - found at apply: Sentry 10.75 attaches an incoming request body (up to about 10 KB) to an error event by default, even with default PII off, so `/privacy`'s Sentry row understates what an error report can carry on the analyze and email routes.
 
 - [ ] 7.3 At archive:
   - add the `chat-plugin` row to `openspec/specs/README.md` (`apps/web/src/app/api/mcp/**`, `apps/web/src/lib/mcp/**`);
