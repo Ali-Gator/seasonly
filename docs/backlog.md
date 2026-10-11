@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-38**
+_Next id:_ **BL-39**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -159,6 +159,13 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   _Refs:_ `e2e/site-structure.spec.ts:67` · _Status:_ open — found in `t12-mcp-teaser`, 2026-10-11
 
 ## Design / UX
+
+- **[BL-38] Swatch names break mid-word in narrow columns** — at six columns on a narrow
+  landing (about 800 px wide), "Mushroom" renders as "Mushroo / m" and "Dusty Rose" wraps, because
+  `.sn-swatch__name` sets `overflow-wrap: anywhere`. Break at word gaps only (drop that rule,
+  or show fewer columns below a width) so a name never splits inside a word.
+  _Refs:_ `apps/web/src/components/ds/ds.css`, design system `components/bundle.css` · _Status:_
+  open — found with the heading optical-size fix, 2026-10-12
 
 - **[BL-04] The design system's ShareCard overflows on long names** — the approved
   `bundle.css` sets post-card names at 0.75 em, and "Bright Turquoise" needs about 379 px of a
