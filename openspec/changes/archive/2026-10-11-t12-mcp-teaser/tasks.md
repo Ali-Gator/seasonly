@@ -137,6 +137,9 @@ All tests cite `{@link openspec/specs/<capability>/spec.md#<anchor>}` at the per
 
   Target is Oct 20–22. The deadline is Oct 24.
 
+  - **Claude:** submitted by the user on 2026-10-11; the listing shows "In review".
+  - **ChatGPT:** draft ready on 2026-10-11. The portal now takes a plugin ZIP (source in `docs/chat-plugin-openai/`), with the domain verified, the MCP scan clean and the demo video at `review.demo_recording_url`. Submit is the user's.
+
 ## 7. Plan, backlog and archive
 
 - [x] 7.1 Update the plan (Claude Docs concept, https://claude.ai/code/artifact/23434923-c1ff-47d6-8ce6-7c86fd14856c):

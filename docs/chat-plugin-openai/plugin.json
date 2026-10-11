@@ -80,7 +80,8 @@
           ]
         },
         "commerce": false,
-        "commerce_description": "This plugin does not sell products or process payments."
+        "commerce_description": "This plugin does not sell products or process payments.",
+        "demo_recording_url": "https://drive.google.com/file/d/1ziLlUuBouJ4PTzfw8cd7j74lcSF8B0rx/view?usp=sharing"
       },
       "publication": {
         "release_notes": "Initial release."
