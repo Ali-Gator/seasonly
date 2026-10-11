@@ -1,8 +1,8 @@
 ## 1. User steps that start now
 
-- [ ] 1.1 The user starts OpenAI publisher verification (platform.openai.com → Settings → Organization → General; an individual identity is fine). It can take days, and it gates the ChatGPT submission (6.4). Done when the user says it is submitted. Record the date here, and again when it is verified.
+- [x] 1.1 The user starts OpenAI publisher verification (platform.openai.com → Settings → Organization → General; an individual identity is fine). It can take days, and it gates the ChatGPT submission (6.4). Done when the user says it is submitted. Record the date here, and again when it is verified.
 
-  Started 2026-10-11 as an **Individual**, which matches `/privacy`'s "run by an individual". The status is "Identity in review". Tick this box once it shows verified.
+  Started 2026-10-11 as an **Individual**, which matches `/privacy`'s "run by an individual". It was verified the same day (2026-10-11): Individual "Approved", in organization "Personal".
 
 - [x] 1.2 The user confirms their Claude plan can submit to the Connectors Directory (any paid plan; check `claude.ai/directory/manage` opens "Submit new"). Done when confirmed here.
 
@@ -46,7 +46,9 @@
   - **New copy beyond the prompt:** the note "It takes no photo. Only your four answers reach the plugin, and it stores nothing." The user chose to keep it.
   - **No directory links:** none are shown, as the site-content delta requires.
 
-- [ ] 2.2 Draft the `/privacy` plugin section (spec: legal-pages "The privacy policy covers the chat plugin") and the `/terms` plugin age rule (spec: legal-pages "The terms say which age rule covers the chat plugin") in a scratch Artifact. The age rule is the user's legal call; the draft only proposes one. Base it on design.md decision 7 and the route as designed: four answers in, nothing stored, Vercel logs and Sentry as for the site, and OpenAI's and Anthropic's privacy policies linked. Look those links up in their current docs, never from memory. Done when the user approves both texts in chat. Record the date here.
+- [x] 2.2 Draft the `/privacy` plugin section (spec: legal-pages "The privacy policy covers the chat plugin") and the `/terms` plugin age rule (spec: legal-pages "The terms say which age rule covers the chat plugin") in a scratch Artifact. The age rule is the user's legal call; the draft only proposes one. Base it on design.md decision 7 and the route as designed: four answers in, nothing stored, Vercel logs and Sentry as for the site, and OpenAI's and Anthropic's privacy policies linked. Look those links up in their current docs, never from memory. Done when the user approves both texts in chat. Record the date here.
+
+  Approved by the user on 2026-10-11 (draft https://claude.ai/artifact/8u4yBmwRaM4EUQvvN2MokE, version 3). The privacy section says an error report from a failed call can include the answers: Sentry attaches request bodies by default. The terms keep "You must be 16 or older to use Seasonly." and add the plugin rule after it.
 
 ## 3. Tests first
 
@@ -101,16 +103,18 @@ All tests cite `{@link openspec/specs/<capability>/spec.md#<anchor>}` at the per
 - [x] 5.1 `apps/web/src/lib/mcp/result.ts` (design.md decision 3), with the approved card copy from 2.1. Done when 3.1 passes.
 - [x] 5.2 `apps/web/src/lib/mcp/card.ts` (decision 5): `renderCard` and `CARD_HTML` with the inline glue, styled to the approved Chat card board. Done when 3.3 passes.
 - [x] 5.3 `apps/web/src/lib/mcp/server.ts` (the tool and the resource, decision 4) and `apps/web/src/app/api/mcp/route.ts` (decision 2), wrapped in `withErrorCapture`. Done when 3.2 passes and the observability route guard test passes.
-- [ ] 5.4 The `/privacy` plugin section and the `/terms` age rule from the text approved in 2.2, each with its "Last updated" date bumped, and the GPT-alternative section from the board approved in 2.1, both with `#chat-plugin`. Done when 3.4, 3.5 and the site-content word-floor and placeholder tests pass.
-- [ ] 5.5 Run `pnpm fix`, `pnpm test` and `pnpm --filter web build`. Done when all pass, the build lists `ƒ /api/mcp`, and 3.6 passes.
+- [x] 5.4 The `/privacy` plugin section and the `/terms` age rule from the text approved in 2.2, each with its "Last updated" date bumped, and the GPT-alternative section from the board approved in 2.1, both with `#chat-plugin`. Done when 3.4, 3.5 and the site-content word-floor and placeholder tests pass.
+- [x] 5.5 Run `pnpm fix`, `pnpm test` and `pnpm --filter web build`. Done when all pass, the build lists `ƒ /api/mcp`, and 3.6 passes.
+
+  Done 2026-10-11: `pnpm fix` clean, 773 unit tests pass, the build lists `ƒ /api/mcp`, and 55 of 56 E2E tests pass on the built server, 3.6 included. The one failure, `/seasons/Soft-Autumn answers 404`, fails the same way on `main` locally (it passes alone and in CI), so it is logged in the backlog, not fixed here.
 
 ## 6. Checks with the user and the submission package
 
-- [ ] 6.1 Run the MCP Inspector against the local build: list the tools, read the card, and call the tool with a season answer set, a no-answers set and an invalid value. Show the user the card rendered in the Inspector, or in a local host harness, at both widths and in both themes, in a scratch Artifact. Done when the user confirms it matches the Chat card board. Record the date here.
+- [x] 6.1 Run the MCP Inspector against the local build: list the tools, read the card, and call the tool with a season answer set, a no-answers set and an invalid value. Show the user the card rendered in the Inspector, or in a local host harness, at both widths and in both themes, in a scratch Artifact. Done when the user confirms it matches the Chat card board. Record the date here.
 
-  Prepared 2026-10-11, waiting for the user's confirmation. In place of the MCP Inspector, `curl` against `next start` (the local production build) listed the tool, read the card and called the tool with a season set, a no-answers set, an answers-cancel set, `{ veins: "purple" }` and a `photo` field; both refusals name the field and list the allowed values, and the server logged nothing about the calls. The card from that build runs in a stand-in host harness (https://claude.ai/artifact/A87wsQbn3kbgNyL4QS5Wfr) at 375 and 706 px, light and dark, for all three results. The harness found that the card never shrank its frame; it now reports its own height at render and on resize.
+  Confirmed by the user on 2026-10-11. In place of the MCP Inspector, `curl` against `next start` (the local production build) listed the tool, read the card and called the tool with a season set, a no-answers set, an answers-cancel set, `{ veins: "purple" }` and a `photo` field; both refusals name the field and list the allowed values, and the server logged nothing about the calls. The card from that build runs in a stand-in host harness (https://claude.ai/artifact/A87wsQbn3kbgNyL4QS5Wfr) at 375 and 706 px, light and dark, for all three results. The harness found that the card never shrank its frame; it now reports its own height at render and on resize.
 
-- [ ] 6.2 Write `docs/chat-plugin-listing.md` (design.md decision 9). It covers:
+- [x] 6.2 Write `docs/chat-plugin-listing.md` (design.md decision 9). It covers:
   - the name, one-liner and description;
   - the categories;
   - the docs, privacy, terms and support URLs;
@@ -119,6 +123,8 @@ All tests cite `{@link openspec/specs/<capability>/spec.md#<anchor>}` at the per
   - 5 positive and 3 negative test cases, and the starter prompts. The negatives are a photo request, a request for the exact subtype by name, and an unrelated fashion question.
 
   Done when the user approves the listing copy in chat. Record the date here.
+
+  Approved by the user on 2026-10-11, countries: all available.
 
 - [ ] 6.3 Host check on the preview (spec: "works from ChatGPT and Claude"). The user creates a Vercel "Protection Bypass for Automation" secret, then adds `https://<preview>/api/mcp?x-vercel-protection-bypass=<secret>` as a custom connector in Claude, and in ChatGPT developer mode. In each, they answer the four questions in a chat. If a host refuses the query-string URL, run this check on production right after merge, before 6.4. Done when both hosts show the card, or the text, with the right family and colors. Record each host, the date and any difference here, and take the carousel screenshots (Claude: 3–5 PNG, at least 1000 px wide, cropped to the response, each with its prompt).
 - [ ] 6.4 Submission (the user's action in each portal, after production serves `/api/mcp`; recorded in the Tracker, not blocking archive):

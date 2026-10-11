@@ -1,6 +1,6 @@
 # Seasonly chat plugin: submission package
 
-Everything the Claude Connectors Directory and the OpenAI Platform ask for when the plugin is submitted (T12, task 6.4). The user submits each listing in its portal; this file holds the copy. Draft of 2026-10-11, awaiting approval.
+Everything the Claude Connectors Directory and the OpenAI Platform ask for when the plugin is submitted (T12, task 6.4). The user submits each listing in its portal; this file holds the copy. Approved by the user on 2026-10-11.
 
 ## Server
 
@@ -49,7 +49,7 @@ A brand name; it does not use or imply "GPT", "ChatGPT", "OpenAI", "Claude" or "
 
 **Categories:** Lifestyle (both portals; the closest offered if the portal names it differently).
 
-**Countries (ChatGPT):** [THE USER CHOOSES: all available countries is the default proposal].
+**Countries (ChatGPT):** all available countries (approved 2026-10-11).
 
 ### URLs
 

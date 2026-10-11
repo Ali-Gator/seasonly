@@ -63,7 +63,7 @@ export default function Page() {
       <div className="flex flex-col gap-(--space-3) border-b border-(--line) pb-(--space-6)">
         <p className="overline">Legal</p>
         <h1 className="h1">Privacy policy</h1>
-        <p className="caption text-(--ink-muted)">Last updated October 10, 2026</p>
+        <p className="caption text-(--ink-muted)">Last updated October 11, 2026</p>
         <p className="lead">
           Seasonly needs a crop of your face to find your colors. This page says what we keep, who
           else sees it, and how to have it deleted.
@@ -125,6 +125,39 @@ export default function Page() {
             </div>
           ))}
         </dl>
+      </section>
+
+      {/* Approved 2026-10-11 (t12 task 2.2). The plugin listings link here.
+          {@link openspec/specs/legal-pages/spec.md#requirement-the-privacy-policy-covers-the-chat-plugin} */}
+      <section id="chat-plugin" className="flex flex-col gap-(--space-3)">
+        <h2 className="h2">The Seasonly plugin for ChatGPT and Claude</h2>
+        <p>
+          The Seasonly plugin asks the four quiz questions inside ChatGPT or Claude and answers with
+          your season family and 6 of its colors.
+        </p>
+        <ul className="flex list-disc flex-col gap-(--space-2) pl-(--space-5)">
+          <li>
+            It receives only the four quiz answers the chat passes to it: your vein color, the
+            jewelry that suits you, how your skin takes the sun and your natural hair color. It
+            receives no photo, no message text, no name and no account.
+          </li>
+          <li>It stores nothing, sets no cookie and sends no analytics event.</li>
+          <li>
+            Vercel&apos;s request logs and Sentry&apos;s error reports apply to it as to the site,
+            as listed above. Vercel&apos;s logs hold no answers. If a call fails, its error report
+            can include the answers sent with it.
+          </li>
+          <li>
+            The chat app handles your conversation under its own privacy policy: OpenAI for ChatGPT
+            (<a href="https://openai.com/policies/privacy-policy/">OpenAI privacy policy</a>) and
+            Anthropic for Claude (
+            <a href="https://www.anthropic.com/legal/privacy">Anthropic privacy policy</a>).
+          </li>
+        </ul>
+        <p>
+          The plugin&apos;s link opens seasonly.me with a tag that says you came from the plugin.
+          From there, the rest of this policy applies.
+        </p>
       </section>
 
       <section className="flex flex-col gap-(--space-3)">
