@@ -1,0 +1,90 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "seasonly",
+  "version": "1.0.0",
+  "description": "Find your seasonal color family from four quick questions, with 6 of your colors and their hex codes. No photo.",
+  "author": {
+    "name": "Seasonly",
+    "email": "care@seasonly.me",
+    "url": "https://seasonly.me"
+  },
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Seasonly",
+        "shortDescription": "Find your color season",
+        "longDescription": "Seasonly finds your seasonal color family, Spring, Summer, Autumn or Winter, from four questions about your natural coloring: the color of the veins on your wrist, the jewelry that suits you, what your skin does in the sun, and your natural hair color.\n\nYou get your family, a line on what suits it, and 6 of its colors, each with its name and hex code, so you can match them in a shop or an app. Answer \"not sure\" to any question; if your answers point to no season, Seasonly tells you why.\n\nSeasonly takes no photo and stores nothing: only your four answers reach it. For your exact season out of 12 and all 30 of your colors, the result links to the photo analysis on seasonly.me.",
+        "developerName": "Seasonly",
+        "category": "Creativity",
+        "capabilities": ["Find your season family", "Show 6 of your colors with hex codes"],
+        "websiteURL": "https://seasonly.me/color-analysis-gpt-alternative#chat-plugin",
+        "supportURL": "https://seasonly.me/terms",
+        "privacyPolicyURL": "https://seasonly.me/privacy#chat-plugin",
+        "termsOfServiceURL": "https://seasonly.me/terms",
+        "defaultPrompt": [
+          "Find my color season",
+          "Which colors suit me? I tan easily and have dark brown hair",
+          "Am I a warm or a cool season?"
+        ],
+        "brandColor": "#1A1A1A",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Full answers, warm coloring",
+              "prompt": "What's my color season? My veins look green, gold jewelry suits me, I tan easily and my hair is medium brown.",
+              "tools_triggered": "find_season_family",
+              "expected_behavior": "Calls find_season_family with { veins: \"green\", jewelry: \"gold\", sun: \"tan\", hair: \"medium\" } and shows Autumn, \"Warm, rich and golden.\", 6 colors from Pumpkin to Camel Tan, and the link to the photo analysis."
+            },
+            {
+              "description": "Full answers, cool coloring",
+              "prompt": "Am I a summer or a winter? Blue veins, silver looks better on me, I burn and rarely tan, and my hair is dark brown.",
+              "tools_triggered": "find_season_family",
+              "expected_behavior": "Calls find_season_family with { veins: \"blue\", jewelry: \"silver\", sun: \"burn\", hair: \"dark\" } and shows Winter, \"Cool, crisp and bold.\", 6 colors from Blue Red to Charcoal, and the link."
+            },
+            {
+              "description": "Two answers only",
+              "prompt": "I have natural red hair and I burn in the sun. Which colors suit me?",
+              "tools_triggered": "find_season_family",
+              "expected_behavior": "Calls find_season_family with { sun: \"burn\", hair: \"red\" } and shows Spring, \"Warm, light and fresh.\", 6 colors from Peach to Light Taupe, and the link."
+            },
+            {
+              "description": "No answers yet",
+              "prompt": "Help me find my seasonal color palette.",
+              "tools_triggered": "find_season_family",
+              "expected_behavior": "Asks the four questions (veins, jewelry, sun, hair), then calls find_season_family with the answers given and shows the family, its 6 colors and the link."
+            },
+            {
+              "description": "All answers unsure",
+              "prompt": "I honestly can't tell my vein color, jewelry, tan or hair, it's all hard to say.",
+              "tools_triggered": "find_season_family",
+              "expected_behavior": "Calls find_season_family with all four answers \"unsure\" and shows \"These answers don't point to one season\", why, and the link to the photo analysis."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Photo request",
+              "prompt": "Here's my selfie, can you analyze my colors from it?"
+            },
+            {
+              "description": "Subtype request",
+              "prompt": "Am I a Soft Autumn or a True Autumn?"
+            },
+            {
+              "description": "Unrelated style question",
+              "prompt": "What should I wear to a wedding in October?"
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "This plugin does not sell products or process payments."
+      },
+      "publication": {
+        "release_notes": "Initial release."
+      }
+    }
+  }
+}
