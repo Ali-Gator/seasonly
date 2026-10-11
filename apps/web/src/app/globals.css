@@ -68,7 +68,7 @@ body {
     line-height: 46px;
     font-weight: 500;
     letter-spacing: -0.01em;
-    font-variation-settings: "opsz" 24;
+    font-variation-settings: "opsz" 14;
   }
   .h1 {
     font-family: var(--font-serif);
@@ -76,21 +76,21 @@ body {
     line-height: 36px;
     font-weight: 500;
     letter-spacing: -0.005em;
-    font-variation-settings: "opsz" 20;
+    font-variation-settings: "opsz" 11;
   }
   .h2 {
     font-family: var(--font-serif);
     font-size: 24px;
     line-height: 30px;
     font-weight: 500;
-    font-variation-settings: "opsz" 16;
+    font-variation-settings: "opsz" 9;
   }
   .h3 {
     font-family: var(--font-serif);
     font-size: 19px;
     line-height: 24px;
     font-weight: 500;
-    font-variation-settings: "opsz" 12;
+    font-variation-settings: "opsz" 7;
   }
   .quote {
     font-family: var(--font-serif);
@@ -98,7 +98,7 @@ body {
     line-height: 27px;
     font-weight: 400;
     font-style: italic;
-    font-variation-settings: "opsz" 12;
+    font-variation-settings: "opsz" 7;
   }
   .lead {
     font-family: var(--font-sans);
