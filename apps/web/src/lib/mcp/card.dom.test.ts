@@ -92,6 +92,8 @@ describe("CARD_HTML glue", () => {
     const sent = boot();
     const init = sent.find((m) => m.method === "ui/initialize");
     expect(init?.params).toMatchObject({ protocolVersion: "2026-01-26" });
+    // The host sends nothing before `initialized`, and the card sends it only after the reply.
+    expect(sent.map((m) => m.method)).not.toContain("ui/notifications/initialized");
 
     fromHost({ jsonrpc: "2.0", id: init?.id, result: { hostContext: { theme: "dark" } } });
     expect(sent.map((m) => m.method)).toContain("ui/notifications/initialized");
@@ -124,14 +126,37 @@ describe("CARD_HTML glue", () => {
     expect(document.querySelectorAll("li")).toHaveLength(0);
   });
 
-  it("opens only the plugin's own origin", () => {
+  it.each(["https://evil.example/", "https://seasonly.me.evil.com/analyze"])(
+    "opens only the plugin's own origin, not %s",
+    (link) => {
+      const sent = boot();
+      fromHost({
+        jsonrpc: "2.0",
+        method: "ui/notifications/tool-result",
+        params: { structuredContent: { ...SEASON, link } },
+      });
+      document.querySelector("button")?.click();
+      expect(sent.find((m) => m.method === "ui/open-link")).toBeUndefined();
+    },
+  );
+
+  it("answers a host request it has no use for, so the host does not wait", () => {
     const sent = boot();
+    fromHost({ jsonrpc: "2.0", id: 77, method: "ui/resource-teardown", params: {} });
+    expect(sent).toContainEqual({ jsonrpc: "2.0", id: 77, result: {} });
+  });
+
+  it("falls back to opening the link itself when the host refuses ui/open-link", () => {
+    const sent = boot();
+    const open = vi.spyOn(window, "open").mockImplementation(() => null);
     fromHost({
       jsonrpc: "2.0",
       method: "ui/notifications/tool-result",
-      params: { structuredContent: { ...SEASON, link: "https://evil.example/" } },
+      params: { structuredContent: SEASON },
     });
     document.querySelector("button")?.click();
-    expect(sent.find((m) => m.method === "ui/open-link")).toBeUndefined();
+    const request = sent.find((m) => m.method === "ui/open-link");
+    fromHost({ jsonrpc: "2.0", id: request?.id, error: { code: -32000, message: "denied" } });
+    expect(open).toHaveBeenCalledWith(PLUGIN_LINK, "_blank", "noopener");
   });
 });

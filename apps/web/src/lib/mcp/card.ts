@@ -10,6 +10,8 @@
  *
  * {@link openspec/specs/chat-plugin/spec.md#requirement-the-result-is-an-inline-card-with-text-for-hosts-without-one}
  */
+import { ORIGIN } from "@/lib/site/routes";
+
 import type { PluginResult } from "./result";
 
 /**
@@ -39,7 +41,7 @@ export function renderCard(result: PluginResult): string {
 /** The bridge: plain browser JS, run in the host's sandboxed iframe. */
 const GLUE = `(function () {
   var renderCard = (${renderCard.toString()});
-  var ORIGIN = "https://seasonly.me/";
+  var ORIGIN = ${JSON.stringify(`${ORIGIN}/`)};
   var root = document.getElementById("card");
   var host = window.parent;
   var nextId = 1;
@@ -86,7 +88,12 @@ const GLUE = `(function () {
     root.innerHTML = renderCard(result);
     reportSize();
     root.querySelector("button").addEventListener("click", function () {
-      if (link) request("ui/open-link", { url: link }, function () {});
+      if (!link) return;
+      var url = link;
+      request("ui/open-link", { url: url }, function (_result, error) {
+        // A host that refuses the request: try the browser's own way out of the frame.
+        if (error) window.open(url, "_blank", "noopener");
+      });
     });
   }
 
@@ -97,7 +104,11 @@ const GLUE = `(function () {
     if (!message.method && message.id != null && pending[message.id]) {
       var done = pending[message.id];
       delete pending[message.id];
-      done(message.result);
+      done(message.result, message.error);
+    } else if (message.method && message.id != null) {
+      // A host request the card has no use for (ping, ui/resource-teardown): answer it, so the
+      // host never waits on it.
+      post({ id: message.id, result: {} });
     } else if (message.method === "ui/notifications/tool-result") {
       show(message.params && message.params.structuredContent);
     } else if (message.method === "ui/notifications/host-context-changed") {

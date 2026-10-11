@@ -5,6 +5,7 @@
  * {@link openspec/specs/chat-plugin/spec.md#requirement-the-mcp-endpoint-is-public-and-lists-one-tool}
  */
 import type { McpServer } from "@modelcontextprotocol/server";
+import * as Sentry from "@sentry/nextjs";
 import { QuizAnswersSchema } from "@seasonly/analysis";
 import { z } from "zod";
 
@@ -37,6 +38,25 @@ const InputSchema = z.strictObject({
   ),
 });
 
+/**
+ * The SDK turns an error thrown in a tool or resource callback into an error result, so
+ * `withErrorCapture` on the route never sees it. This reports it to Sentry first, then rethrows.
+ * {@link openspec/specs/observability/spec.md#requirement-every-route-handler-reports-its-unhandled-errors}
+ */
+export function reported<Args extends unknown[], R>(
+  callback: (...args: Args) => Promise<R>,
+): (...args: Args) => Promise<R> {
+  return async (...args) => {
+    try {
+      return await callback(...args);
+    } catch (error) {
+      Sentry.captureException(error);
+      await Sentry.flush(2000);
+      throw error;
+    }
+  };
+}
+
 export function registerSeasonly(server: McpServer): void {
   /** {@link openspec/specs/chat-plugin/spec.md#requirement-the-tool-is-annotated-read-only} */
   server.registerTool(
@@ -49,10 +69,10 @@ export function registerSeasonly(server: McpServer): void {
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
       _meta: { ui: { resourceUri: CARD_URI }, "openai/outputTemplate": CARD_URI },
     },
-    async (answers) => {
+    reported(async (answers) => {
       const { structured, text } = quizResult(answers);
       return { content: [{ type: "text", text }], structuredContent: structured };
-    },
+    }),
   );
 
   /** {@link openspec/specs/chat-plugin/spec.md#scenario-no-outside-origin} */
@@ -60,7 +80,7 @@ export function registerSeasonly(server: McpServer): void {
     "season-card",
     CARD_URI,
     { title: "Season family card", mimeType: CARD_MIME },
-    async (uri) => ({
+    reported(async (uri: URL) => ({
       contents: [
         {
           uri: uri.href,
@@ -80,6 +100,6 @@ export function registerSeasonly(server: McpServer): void {
           },
         },
       ],
-    }),
+    })),
   );
 }

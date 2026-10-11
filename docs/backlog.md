@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-29**
+_Next id:_ **BL-34**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -49,6 +49,13 @@ fold items in.
   _Refs:_ `.github/workflows/ci.yml`, `evals/gate.ts` · _Status:_ deferred — until fetching about
   100 Commons originals per CI run is judged stable
 
+- **[BL-29] The quiz alone never gives three seasons** — over all 750 answer combinations,
+  quiz-only classification reaches 10 seasons and never Soft Autumn, Soft Summer or Bright Spring,
+  on the web quiz-only path and in the chat plugin. Decide whether the quiz weights should move
+  clarity enough to reach them, or say in the season-classifier spec that a photo is needed for them.
+  _Refs:_ `packages/analysis/src/classifier/reference.ts`, `openspec/specs/season-classifier/spec.md`
+  · _Status:_ open — found in `t12-mcp-teaser`, 2026-10-11
+
 ## Privacy
 
 - **[BL-18] A crop can stay about 49 h while the pages say 24 h** — the retention job runs once a
@@ -71,6 +78,14 @@ fold items in.
   _Refs:_ `apps/web/src/app/(flow)/analyze/_capture/steps.tsx`, `apps/web/src/lib/email/render.ts`,
   `openspec/specs/capture-flow/spec.md` · _Status:_ open — phase review of `t8-photo-privacy`,
   2026-10-10
+
+- **[BL-30] Sentry error reports can carry request bodies** — Sentry 10.75 attaches an incoming
+  request's body (up to about 10 KB) to an error event by default, even with default PII off, so a
+  failed analyze or email request can send quiz answers or email addresses. `/privacy`'s Sentry row
+  says only "the page address and your browser". Either set `ignoreRequestBody` / `maxRequestBodySize`
+  or update the row (the plugin section already discloses it).
+  _Refs:_ `apps/web/sentry.server.config.ts`, `apps/web/src/app/(site)/privacy/page.tsx`
+  · _Status:_ open — found in `t12-mcp-teaser`, 2026-10-11
 
 ## Code quality
 
@@ -137,6 +152,12 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   _Refs:_ `e2e/posthog.ts`, `e2e/funnel.spec.ts` · _Status:_ open — found in `t9-site-content`,
   2026-10-10
 
+- **[BL-31] `/seasons/Soft-Autumn` answers 200 in a full local E2E run** — the "not found" test
+  for a wrong-case season path fails in the full suite on macOS (on `main` too) but passes alone
+  and in CI, likely the case-insensitive file system serving the cached `soft-autumn` page. Make
+  the check hold on any file system, or document it as Linux-only.
+  _Refs:_ `e2e/site-structure.spec.ts:67` · _Status:_ open — found in `t12-mcp-teaser`, 2026-10-11
+
 ## Design / UX
 
 - **[BL-04] The design system's ShareCard overflows on long names** — the approved
@@ -180,3 +201,12 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   with no inbound links; collapse them at the Vercel domain level if links ever point there.
   _Refs:_ `apps/web/next.config.ts`, Vercel domain settings · _Status:_ deferred — inbound links
   to those shapes (t9 SEO audit, 2026-10-10)
+
+- **[BL-32] Pre-fill `/analyze` from the plugin's answers** — the plugin's link opens the quiz
+  fresh, so a chat user answers the four questions twice.
+  _Refs:_ `openspec/specs/chat-plugin/spec.md`, `capture-flow` · _Status:_ deferred — if the funnel
+  shows drop-off at the quiz for `utm_source=chat-plugin`
+
+- **[BL-33] Rate-limit `/api/mcp`** — the endpoint is public and unauthenticated; a call is pure
+  computation, so no limit ships. Add a Vercel firewall rate-limit rule for `/api/mcp`, no code.
+  _Refs:_ `apps/web/src/app/api/mcp/route.ts` · _Status:_ deferred — if Vercel usage shows abuse

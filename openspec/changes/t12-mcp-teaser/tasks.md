@@ -135,20 +135,22 @@ All tests cite `{@link openspec/specs/<capability>/spec.md#<anchor>}` at the per
 
 ## 7. Plan, backlog and archive
 
-- [ ] 7.1 Update the plan (Claude Docs concept, https://claude.ai/code/artifact/23434923-c1ff-47d6-8ce6-7c86fd14856c):
+- [x] 7.1 Update the plan (Claude Docs concept, https://claude.ai/code/artifact/23434923-c1ff-47d6-8ce6-7c86fd14856c):
   - Add a "T12 planned" line at the top of the Tracker Log, naming the user's choices of 2026-10-11 ("middle" output, an inline card like ChatGPT's plugins, docs on the GPT-alternative page) and the confirmed publishing routes. Set T12 to In progress.
   - In "Architecture and phases", Phase 2:
     - the capability becomes `chat-plugin` at `apps/web/src/app/api/mcp`;
     - the tool returns the family, the tagline, 6 colors and a link, plus a card;
     - the exit check stays "submitted to both by Oct 24".
 
-  Done when the Log shows the line. The Log line and the In progress status were added at proposal, on 2026-10-11. The Phase 2 edits are still to do.
+  Done when the Log shows the line. The Log line and the In progress status were added at proposal, on 2026-10-11. The Phase 2 edits were made on 2026-10-11: the route path is `apps/web/src/app/api/mcp` (also in the stack table), the capability is `chat-plugin`, and the tool line describes `find_season_family` and its card; the exit check is unchanged.
 
-- [ ] 7.2 Before archive, log every phase-review finding not fixed, and every defect found on the way that is worth fixing later, in `docs/backlog.md` under the next free `BL-nn` ids, and name them in the PR. Also log:
+- [x] 7.2 Before archive, log every phase-review finding not fixed, and every defect found on the way that is worth fixing later, in `docs/backlog.md` under the next free `BL-nn` ids, and name them in the PR. Also log:
   - deferred, "if the funnel shows drop-off": pre-filling `/analyze` from the plugin's answers;
   - deferred, "if Vercel usage shows abuse": a firewall rate-limit rule for `/api/mcp`.
   - found at apply: the quiz alone never gives Soft Autumn, Soft Summer or Bright Spring (750 combinations: 10 seasons reached), on the web quiz-only path too, unless the season-classifier spec says so by design;
   - found at apply: Sentry 10.75 attaches an incoming request body (up to about 10 KB) to an error event by default, even with default PII off, so `/privacy`'s Sentry row understates what an error report can carry on the analyze and email routes.
+
+  Done 2026-10-11. The phase review (`/code-review high`, fresh subagent) found six issues, all fixed: tool and resource errors now reach Sentry (the SDK turns them into error results before `withErrorCapture`); the card answers host requests it has no use for; a refused `ui/open-link` falls back to `window.open`; the card's allowed origin comes from `ORIGIN`; the glue test pins the bridge order and a look-alike origin; and an E2E test drives the built, minified card. Logged: BL-29 (quiz-only seasons), BL-30 (Sentry request bodies), BL-31 (local `/seasons/Soft-Autumn` E2E), BL-32 (pre-fill, deferred), BL-33 (rate limit, deferred).
 
 - [ ] 7.3 At archive:
   - add the `chat-plugin` row to `openspec/specs/README.md` (`apps/web/src/app/api/mcp/**`, `apps/web/src/lib/mcp/**`);
