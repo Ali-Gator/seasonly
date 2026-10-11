@@ -4,7 +4,7 @@
 
 The citation checks the constitution requires — every anchored citation resolves, and every requirement is proven by a citing test or marked unenforced — SHALL run in the unit test suite, and therefore in the pre-commit gate, and SHALL also run in CI (`ci.yml`) on every push, so a commit made outside the agent's hook is gated too. They SHALL scan the source and test files under `apps/`, `packages/`, `scripts/`, `e2e/` and `evals/`, and SHALL count end-to-end specs as tests, since several requirements are proven only in the browser. A failure SHALL name every offending citation by file and line and every unproven requirement by capability and name, not only the first.
 
-A citation SHALL also resolve against a requirement or scenario that an unarchived change adds, modifies or renames under `openspec/changes/<change>/specs/<capability>/spec.md`, so a test written before its change is archived can already cite the permanent spec path. Only archived requirements SHALL be subject to the proven-by-a-test check.
+A citation SHALL also resolve against a requirement or scenario that an unarchived change adds, modifies or renames under `openspec/changes/<change>/specs/<capability>/spec.md` — a modified one only when its requirement exists in the permanent spec or is renamed to in the same delta, since archive refuses any other — so a test written before its change is archived can already cite the permanent spec path. Only archived requirements SHALL be subject to the proven-by-a-test check.
 
 #### Scenario: A commit with a stale citation
 
@@ -20,6 +20,11 @@ A citation SHALL also resolve against a requirement or scenario that an unarchiv
 
 - **WHEN** a test cites a scenario that exists only inside a modified requirement of an unarchived change
 - **THEN** the citation resolves and the commit is allowed
+
+#### Scenario: A modified requirement that matches nothing
+
+- **WHEN** an unarchived change modifies a requirement the permanent spec does not have, and a test cites one of its scenarios
+- **THEN** the citation does not resolve and the commit is blocked
 
 #### Scenario: Archiving a requirement nobody tests
 

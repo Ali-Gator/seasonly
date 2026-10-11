@@ -114,10 +114,12 @@ Batch name: `backlog-<n>`, `<n>` the next free number across `openspec/changes/`
 `openspec/changes/archive/` (strip the archive's date prefix). A theme batch may add a slug:
 `backlog-<n>-<theme>`. Any other shape fails the unit suite.
 
-**Note which branch the backlog you just read lives on** — it goes into `proposal.md`.
-`/backlog-fix` deletes the shipped bullets **by id**, so it has to branch from a commit that
-carries those ids. Usually that is `main`; it is not when an earlier change that logged them is
-still unmerged.
+**Branch now, before writing anything** — the id assignment above and the status corrections in
+step 3 are commits, and they never land on `main` directly (CLAUDE.md: each phase runs on its own
+branch). Pick the base — usually `origin/main` after `git fetch`; an unmerged branch when an
+earlier change that logged the ids is still open — and run `git checkout -b backlog-<n> <base>`
+before the first edit to `docs/backlog.md`. Name the base in `proposal.md`: `/backlog-fix`
+deletes the shipped bullets **by id**, so the batch has to sit on a commit that carries them.
 
 ## Step 2 — investigator fan-out, parallel, read-only
 
@@ -190,7 +192,9 @@ These are status-line edits only. **Never delete a bullet here**, retire lane in
 deletion happens in the fix lane, inside the reviewed diff.
 
 **If no member is in A, B, C or retire, create no change.** Commit the status corrections
-(`docs(backlog): …`). Under no argument, go back to step 1 for the next candidates — the rest of
+(`docs(backlog): …`) on the `backlog-<n>` branch; when the run ends with no batch, push it, open
+a PR to `main` and turn on auto-merge (`mcp__ccd_pr__set_auto_merge`, `merge_method: "merge"`) —
+the corrections ship on their own, and the number `<n>` stays free for the next batch. Under no argument, go back to step 1 for the next candidates — the rest of
 pass 1's ranking, then pass 2 — until a batch has a fixable member or every item has been swept
 this run; with a theme or id list, stop. Print what was parked and why. **No change
 directory** — an empty change fails validate, and inventing a requirement or setting
@@ -296,8 +300,7 @@ Use its `template` as the structure and `resolvedOutputPath` as the path; apply 
   - [ ] 3.1 pnpm fix, pnpm test
   - [ ] 3.2 delete shipped bullets <ids> from docs/backlog.md
   - [ ] 3.3 /code-review high in a fresh subagent; fix, log the rest as new BL items
-  - [ ] 3.4 archive (/opsx:archive flow, no Tracker)
-  - [ ] 3.5 preflight, push, PR, auto-merge
+  - [ ] 3.4 archive (/opsx:archive flow, no Tracker), preflight, push, PR, auto-merge
   ```
 
   Tests come before code in every fix group — the repo's spec → tests → code order. A task that
@@ -318,9 +321,12 @@ openspec validate --changes                     # green
 ```
 
 Both green before handing off — **validate is green at the end of triage.** A red validate here
-means the plan is incomplete; fix it now.
+means the plan is incomplete; fix it now. Green is not enough on its own: validate exits 0 on a
+`## MODIFIED` heading that matches no requirement and only prints an INFO line — so also confirm
+`openspec validate --changes 2>&1 | grep -i 'archive would refuse'` prints nothing. A hit means a
+MODIFIED heading does not match the permanent spec word for word; fix the delta.
 
-Branch `backlog-<n>` from the base branch, and commit the change directory and the backlog
+On the `backlog-<n>` branch from step 1, commit the change directory and the backlog
 corrections together (`docs(openspec): triage backlog-<n>`, `/caveman-commit` for the message).
 Then print:
 

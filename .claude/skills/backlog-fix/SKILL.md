@@ -37,7 +37,8 @@ and read `openspec/changes/backlog-<n>/design.md`. Block if any holds:
 
 - an artifact not `done` (or `skipped` under `skip_specs`), or `instructions apply` reports
   `state: "blocked"`
-- validate is red
+- validate is red, or `openspec validate --changes 2>&1 | grep -i 'archive would refuse'` prints
+  anything (validate exits 0 on a MODIFIED heading that matches nothing; archive would refuse it)
 - a `**Answer:**` line under `## Decisions` is empty
 - a lane-C member has no `**Approved:** Oleg, <date>` line naming its canvas boards and version
 
@@ -46,8 +47,8 @@ resolve it the way `/backlog-batch` step 4–5 would — ask the decision with `
 get the design approved, and fold the result into the artifacts with the
 `openspec-update-change` flow — then re-run step 0. Do not start a partial batch "meanwhile".
 
-Green: check out branch `backlog-<n>` (triage created it) — or create it **from the commit that
-carries the batch's ids, not reflexively from `main`.** Step (d) deletes the shipped bullets by
+Green: check out branch `backlog-<n>` (triage created it, from the commit that carries the
+batch's ids — not reflexively from `main`). Step (d) deletes the shipped bullets by
 `BL-nn`, so a branch whose `docs/backlog.md` predates those ids has nothing to delete. The
 batch's `proposal.md` names the base branch. Check before starting:
 
@@ -67,7 +68,8 @@ transcribe the answer into `design.md`, and continue. Only an item that turns ou
 or time rather than an answer is parked — drop it from the batch, restore its bullet's status,
 and remove its delta and tasks.
 
-Re-run `openspec validate --changes`; green before step (b).
+Re-run `openspec validate --changes`; green, with no "Archive would refuse" line, before step
+(b).
 
 ## Step (b) — tests, then code, one editing subagent at a time
 
@@ -151,7 +153,8 @@ Agent**, never inline — inline, the agent that wrote the batch judges its own 
 Brief the reviewer with only what defines intent:
 
 - the target: `git diff main...HEAD` on the batch branch, whole branch, not per commit
-- the change's `proposal.md`, `design.md`, its spec deltas and `tasks.md`, by path
+- the change's `proposal.md`, `design.md` (it records the decisions and approved test edits),
+  its spec deltas and `tasks.md`, by path
 - the instruction: run `/code-review high` over that diff, return the findings, **edit nothing**
   (one editing agent per working tree — the main agent applies the fixes)
 
@@ -169,10 +172,11 @@ one — a continued agent keeps its context, and with it whatever it already dec
 **Archive first**, on the batch branch, so the specs fold into `openspec/specs/` in the same PR
 as the code. Follow the `openspec-archive-change` flow (`/opsx:archive`). A `backlog-<n>` change
 has **no Tracker row: skip the Tracker step.** Do re-add Public Interface, Behavior and Edge
-Cases and the `openspec/specs/README.md` row for any capability the batch created. By now every
-artifact is done and every box in `tasks.md` is checked except 3.4–3.5 (tick those as you go),
-so its warnings should not fire — if one does, something upstream was skipped: stop and say
-what.
+Cases and the `openspec/specs/README.md` row for any capability the batch created. Tick the last
+task (3.4 — archive, preflight, PR) right before starting the archive flow: the rest of it runs
+after the move, and the archive flow warns on any open box. With it ticked, every artifact is
+done and every box checked, so its warnings should not fire — if one does, something upstream
+was skipped: stop and say what.
 
 Verify the folded specs read right — `openspec list --specs` shows the touched capabilities, and
 a stray code fence in a target spec makes archive append inside the fence. Commit
@@ -182,13 +186,13 @@ reopen the review.
 Then five checks. All five green → PR with auto-merge. Any one red **after one repair attempt**
 → PR **without** auto-merge, and report which check failed.
 
-| #   | Check                                                                                          | On failure                       |
-| --- | ---------------------------------------------------------------------------------------------- | -------------------------------- |
-| 1   | `pnpm format:check`, `pnpm lint`, `pnpm typecheck` clean                                       | fix, re-run                      |
-| 2   | `pnpm test` green                                                                              | fix the **code**, never the test |
-| 3   | `openspec validate --changes` green (the batch is archived; this guards any other open change) | fix the change                   |
-| 4   | the fresh-subagent review left no finding that is neither fixed nor logged as a `BL-nn`        | fix or log it                    |
-| 5   | working tree clean (`git status` clean, `git diff` empty) — everything is committed            | commit, or re-review if unseen   |
+| #   | Check                                                                                   | On failure                       |
+| --- | --------------------------------------------------------------------------------------- | -------------------------------- |
+| 1   | `pnpm format:check`, `pnpm lint`, `pnpm typecheck` clean                                | fix, re-run                      |
+| 2   | `pnpm test` green                                                                       | fix the **code**, never the test |
+| 3   | `openspec validate --all --no-interactive` green — what CI's `validate` job runs        | fix the spec or change           |
+| 4   | the fresh-subagent review left no finding that is neither fixed nor logged as a `BL-nn` | fix or log it                    |
+| 5   | working tree clean (`git status` clean, `git diff` empty) — everything is committed     | commit, or re-review if unseen   |
 
 Green:
 
