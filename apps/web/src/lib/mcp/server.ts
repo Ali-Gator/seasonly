@@ -57,16 +57,23 @@ export function reported<Args extends unknown[], R>(
   };
 }
 
+const TOOL_TITLE = "Find my season family";
+
 export function registerSeasonly(server: McpServer): void {
   /** {@link openspec/specs/chat-plugin/spec.md#requirement-the-tool-is-annotated-read-only} */
   server.registerTool(
     "find_season_family",
     {
-      title: "Find my season family",
+      title: TOOL_TITLE,
       description:
         "Finds a person's seasonal color family (Spring, Summer, Autumn or Winter) from four questions about their natural coloring. Returns the family, its tagline and a line on what suits it, and 6 of its colors with names and hex codes. Every answer is optional; a missing answer counts as unsure. When the answers point to no season, it says why. It takes no photo.",
       inputSchema: InputSchema,
-      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+      annotations: {
+        title: TOOL_TITLE,
+        readOnlyHint: true,
+        destructiveHint: false,
+        openWorldHint: false,
+      },
       _meta: { ui: { resourceUri: CARD_URI }, "openai/outputTemplate": CARD_URI },
     },
     reported(async (answers) => {

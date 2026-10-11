@@ -116,6 +116,13 @@ describe("/api/mcp", () => {
     });
   });
 
+  /** {@link openspec/specs/chat-plugin/spec.md#scenario-the-title-annotation} */
+  it("repeats the tool's title as its title annotation", async () => {
+    const tool = await theTool();
+    expect(tool.title).toBeTruthy();
+    expect(tool.annotations?.title).toBe(tool.title);
+  });
+
   /** {@link openspec/specs/chat-plugin/spec.md#scenario-no-outside-origin} */
   it("links an MCP Apps card whose CSP allows no outside origin", async () => {
     const tool = await theTool();

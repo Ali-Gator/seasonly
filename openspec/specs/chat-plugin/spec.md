@@ -14,7 +14,7 @@ Brings Seasonly into ChatGPT and Claude as an MCP server with one tool. The tool
 | Card   | `apps/web/src/lib/mcp/card.ts`      | `renderCard(result) → string`, `CARD_HTML`                                |
 
 - **Endpoint:** `POST https://seasonly.me/api/mcp`, Streamable HTTP, stateless, no credentials (`mcp-handler` 2.3, `@modelcontextprotocol/server` 2.3). `GET` and `DELETE` answer 405.
-- **Tool:** `find_season_family`, title "Find my season family", input `z.strictObject` of the core's `veins`, `jewelry`, `sun`, `hair` enums, each optional and described in the quiz's words. Annotations `readOnlyHint: true`, `destructiveHint: false`, `openWorldHint: false`. `_meta.ui.resourceUri` and `openai/outputTemplate` point at the card.
+- **Tool:** `find_season_family`, title "Find my season family", input `z.strictObject` of the core's `veins`, `jewelry`, `sun`, `hair` enums, each optional and described in the quiz's words. Annotations `title` (the same words), `readOnlyHint: true`, `destructiveHint: false`, `openWorldHint: false`. `_meta.ui.resourceUri` and `openai/outputTemplate` point at the card.
 - **Result:** one `text` item and `structuredContent`, a `PluginResult`: `{ kind: "season", family, tagline, revealLine, colors: Swatch[6], note, link }` or `{ kind: "no-result", reason: "no-answers" | "answers-cancel", title, message, link }`. `link` is `PLUGIN_LINK`, `https://seasonly.me/analyze?utm_source=chat-plugin&utm_medium=mcp`.
 - **Card resource:** `ui://seasonly/season-card.html`, MIME `text/html;profile=mcp-app`, `_meta.ui.csp` with empty `connectDomains` and `resourceDomains`, `prefersBorder: false`; for ChatGPT `openai/widgetCSP.redirect_domains: ["https://seasonly.me"]` and `openai/widgetDomain: "https://seasonly.me"` (`ui.domain` stays unset: its format is host-dependent).
 
@@ -47,7 +47,7 @@ An error in the tool or resource callback is reported to Sentry by `reported` be
 
 ### Requirement: The tool is annotated read-only
 
-The tool SHALL carry the annotations `readOnlyHint: true`, `destructiveHint: false` and `openWorldHint: false`, each set explicitly. Its description SHALL say what the tool does and what each of the four answers means. The description SHALL NOT tell the model how to behave, SHALL NOT tell it to call other tools, and SHALL NOT promote Seasonly or any other product.
+The tool SHALL carry the annotations `readOnlyHint: true`, `destructiveHint: false` and `openWorldHint: false`, each set explicitly, and the annotation `title`, equal to the tool's top-level title. Its description SHALL say what the tool does and what each of the four answers means. The description SHALL NOT tell the model how to behave, SHALL NOT tell it to call other tools, and SHALL NOT promote Seasonly or any other product.
 
 **Unenforced:** whether a description instructs the model or promotes a product is a semantic judgment. The phase review checks it, and so do both stores' reviews.
 
@@ -55,6 +55,11 @@ The tool SHALL carry the annotations `readOnlyHint: true`, `destructiveHint: fal
 
 - **WHEN** the tools are listed
 - **THEN** the tool's annotations are `readOnlyHint: true`, `destructiveHint: false` and `openWorldHint: false`
+
+#### Scenario: The title annotation
+
+- **WHEN** the tools are listed
+- **THEN** the tool's `annotations.title` is set and equals its top-level `title`
 
 ### Requirement: The tool takes the four quiz answers and nothing else
 
