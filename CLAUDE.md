@@ -8,7 +8,7 @@ pnpm workspace, Node 22.18+ (scripts and the analysis core run as TypeScript in 
 
 ## Workflow: Spec -> Tests -> Code
 
-Work is an OpenSpec change under `openspec/changes/t<N>-<slug>/` (`T<N>` = its Tracker row). Drive it with `/opsx:propose`, `/opsx:apply`, `/opsx:archive`.
+Work is an OpenSpec change under `openspec/changes/t<N>-<slug>/` (`T<N>` = its Tracker row). Drive it with `/opsx:propose`, `/opsx:apply`, `/opsx:archive`. A batch of backlog fixes is `backlog-<n>` instead, with no Tracker row: plan it with `/backlog-batch`, ship it with `/backlog-fix backlog-<n>`.
 
 1. **Spec first** — the delta at `openspec/changes/<change>/specs/<capability>/spec.md`.
 2. **Tests second** — cite the scenario at its permanent path: `{@link openspec/specs/<capability>/spec.md#<scenario-anchor>}`.

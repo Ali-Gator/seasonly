@@ -84,11 +84,11 @@ function parseRequirements(text: string): Requirement[] {
   return requirements;
 }
 
-/** Anchors a change delta makes citable before archive: its ADDED requirements and scenarios, and RENAMED targets. */
+/** Anchors a change delta makes citable before archive: its ADDED and MODIFIED requirements and scenarios, and RENAMED targets. */
 function deltaAnchors(text: string): string[] {
   const anchors: string[] = [];
   for (const section of text.split(/^(?=## )/m)) {
-    if (section.startsWith("## ADDED Requirements")) {
+    if (/^## (ADDED|MODIFIED) Requirements/.test(section)) {
       for (const r of parseRequirements(section.replace(/^## .*\n/, ""))) {
         anchors.push(r.anchor, ...r.scenarios);
       }
@@ -346,14 +346,18 @@ describe("spec citation rules", () => {
     );
   });
 
-  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-test-written-during-an-unarchived-change} */
-  it("a change delta makes its ADDED and RENAMED headings citable, not its MODIFIED ones", () => {
+  /**
+   * {@link openspec/specs/spec-workflow/spec.md#scenario-a-test-written-during-an-unarchived-change}
+   * {@link openspec/specs/spec-workflow/spec.md#scenario-a-test-citing-a-scenario-a-change-adds-to-an-existing-requirement}
+   */
+  it("a change delta makes its ADDED, MODIFIED and RENAMED headings citable", () => {
     const delta = [
       "## ADDED Requirements",
       "### Requirement: New thing",
       "#### Scenario: It works",
       "## MODIFIED Requirements",
       "### Requirement: Old thing",
+      "#### Scenario: It still works",
       "## RENAMED Requirements",
       "- FROM: `### Requirement: Before`",
       "- TO: `### Requirement: After`",
@@ -361,6 +365,8 @@ describe("spec citation rules", () => {
     expect(deltaAnchors(delta)).toEqual([
       "requirement-new-thing",
       "scenario-it-works",
+      "requirement-old-thing",
+      "scenario-it-still-works",
       "requirement-after",
     ]);
   });

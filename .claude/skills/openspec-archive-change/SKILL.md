@@ -147,6 +147,7 @@ Archive a completed change in the experimental workflow.
    **Seasonly: finish new capabilities and update the Tracker** (after the move succeeds)
 
    - For each capability this change created, re-add the sections archive drops (Public Interface, Behavior, Edge Cases) to `openspec/specs/<capability>/spec.md`, and add its row to `openspec/specs/README.md` if it owns source paths.
+   - A `backlog-<n>` change has no Tracker row: skip the next bullet entirely.
    - The change name starts with its Tracker ID (`t4-analysis-core` → `T4`; see `openspec/specs/spec-workflow/spec.md#requirement-a-change-is-tied-to-its-tracker-row`). Open the concept doc's Tracker tab with the docs tools (https://claude.ai/code/artifact/23434923-c1ff-47d6-8ce6-7c86fd14856c): set row `T<N>`'s Status (`Done` when the change completes the task, otherwise `In progress`) and add one line at the top of the Log table: today's date, `Claude Code`, what the change shipped. If the docs tools are unavailable, print the exact status and log line for the user to paste.
 
 6. **Display summary**
