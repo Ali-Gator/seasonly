@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-34**
+_Next id:_ **BL-38**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -210,3 +210,28 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
 - **[BL-33] Rate-limit `/api/mcp`** — the endpoint is public and unauthenticated; a call is pure
   computation, so no limit ships. Add a Vercel firewall rate-limit rule for `/api/mcp`, no code.
   _Refs:_ `apps/web/src/app/api/mcp/route.ts` · _Status:_ deferred — if Vercel usage shows abuse
+
+- **[BL-34] Claude calls the plugin only after a per-chat "Use"** — in claude.ai, a first prompt
+  makes Claude search the connector directory, offer a "Use" button and answer from its own
+  knowledge; once the user clicks "Use", later prompts call `find_season_family` directly. Host
+  behavior for custom connectors (it did not change with "Tools already loaded"); re-check once the
+  directory listing is live, and sharpen the tool description only if listed connectors still skip it.
+  _Refs:_ `openspec/specs/chat-plugin/spec.md`, `docs/chat-plugin-listing.md` · _Status:_ deferred
+  — directory listing live (host check 6.3, 2026-10-11)
+
+- **[BL-35] Claude skips the tool for an all-unsure answer** — positive test case 5 ("I honestly
+  can't tell…") made Claude answer itself and link to `/analyze`, because it predicted an empty
+  result; ChatGPT called the tool. The no-result card shows only on an explicit request. Either
+  accept it or move case 5 to the negative list for Claude.
+  _Refs:_ `docs/chat-plugin-listing.md` · _Status:_ open — host check 6.3, 2026-10-11
+
+- **[BL-36] Add `annotations.title` to the tool** — the Claude directory's tool check suggests it
+  ("Missing title annotation"); the tool sets only the top-level `title`. One line in the tool's
+  annotations.
+  _Refs:_ `apps/web/src/app/api/mcp/` · _Status:_ open — Claude directory submission, 2026-10-11
+
+- **[BL-37] A support page with an HTTPS URL** — both directories ask for a support URL; the site
+  has only `care@seasonly.me`, so the listings point to `/terms`, whose last section gives that
+  address. A `#contact` anchor or a small support page would be a clearer target.
+  _Refs:_ `apps/web/src/app/(site)/terms/page.tsx`, `docs/chat-plugin-listing.md` · _Status:_ open
+  — 2026-10-11

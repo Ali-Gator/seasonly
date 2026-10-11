@@ -16,6 +16,15 @@ const nextConfig: NextConfig = {
       permanent: true,
     }));
   },
+  // OpenAI's domain check reads the token as plain text; the file has no extension.
+  async headers() {
+    return [
+      {
+        source: "/.well-known/openai-apps-challenge",
+        headers: [{ key: "Content-Type", value: "text/plain; charset=utf-8" }],
+      },
+    ];
+  },
 };
 
 // Source maps upload only when SENTRY_AUTH_TOKEN is set; without it the build still passes.

@@ -47,19 +47,21 @@ A brand name; it does not use or imply "GPT", "ChatGPT", "OpenAI", "Claude" or "
 >
 > Seasonly takes no photo and stores nothing: only your four answers reach it. For your exact season out of 12 and all 30 of your colors, the result links to the free photo analysis on seasonly.me.
 
-**Categories:** Lifestyle (both portals; the closest offered if the portal names it differently).
+**Categories:** neither portal offers Lifestyle. Claude: Commerce & Shopping. ChatGPT: Creativity (the dashboard's titles are the directory's sections).
+
+**ChatGPT short description** (at most 30 characters): Find your color season. The ChatGPT long description drops "free" before "photo analysis": the portal flags pricing words.
 
 **Countries (ChatGPT):** all available countries (approved 2026-10-11).
 
 ### URLs
 
-| Field         | URL                                                              |
-| ------------- | ---------------------------------------------------------------- |
-| Documentation | `https://seasonly.me/color-analysis-gpt-alternative#chat-plugin` |
-| Privacy       | `https://seasonly.me/privacy#chat-plugin`                        |
-| Terms         | `https://seasonly.me/terms`                                      |
-| Support       | `care@seasonly.me`                                               |
-| Website       | `https://seasonly.me`                                            |
+| Field         | URL                                                                                                            |
+| ------------- | -------------------------------------------------------------------------------------------------------------- |
+| Documentation | `https://seasonly.me/color-analysis-gpt-alternative#chat-plugin`                                               |
+| Privacy       | `https://seasonly.me/privacy#chat-plugin`                                                                      |
+| Terms         | `https://seasonly.me/terms`                                                                                    |
+| Support       | `https://seasonly.me/terms` (its last section gives `care@seasonly.me`; both portals want an HTTPS URL, BL-37) |
+| Website       | `https://seasonly.me`                                                                                          |
 
 ### Icon
 
@@ -95,13 +97,16 @@ The answers below were run on the local production build on 2026-10-11. The colo
 
 ## Screenshots (Claude: 3–5 PNG, at least 1000 px wide, cropped to the response)
 
-Taken by the user in task 6.3, each with its prompt:
+In `docs/chat-plugin-screenshots/`, taken in task 6.3 on 2026-10-11, each with its prompt:
 
-1. Positive case 1 in Claude: the Autumn card.
-2. Positive case 2 in Claude: the Winter card.
-3. Positive case 5 in Claude: the no-result card.
-4. Optional: the card in dark mode.
+1. `1-spring.png`: positive case 3, the Spring card.
+2. `2-winter.png`: positive case 2, the Winter card.
+3. `3-no-result.png`: "Run the Seasonly quiz with all four answers as unsure.", the no-result card. Claude did not call the tool for case 5's wording (BL-35).
+
+## ChatGPT package
+
+OpenAI takes a plugin ZIP, not a form. Its source is `docs/chat-plugin-openai/` (`plugin.json`, `mcp.json`, `assets/`), built with `zip -X -r seasonly-plugin.zip plugin.json mcp.json assets -x '.*'` from that folder. The review test cases above live in `plugin.json`; `tools_triggered` is a string. The portal also wants `review.demo_recording_url`, a reviewer-accessible video.
 
 ## Domain challenge (ChatGPT)
 
-If the portal asks for one, the user gives the token and the agent adds it at `apps/web/public/.well-known/openai-apps-challenge` in a follow-up PR.
+The token is at `apps/web/public/.well-known/openai-apps-challenge`, with no trailing newline, served as `text/plain` by a `headers()` rule in `apps/web/next.config.ts`.
