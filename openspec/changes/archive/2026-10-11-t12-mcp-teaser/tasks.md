@@ -152,9 +152,11 @@ All tests cite `{@link openspec/specs/<capability>/spec.md#<anchor>}` at the per
 
   Done 2026-10-11. The phase review (`/code-review high`, fresh subagent) found six issues, all fixed: tool and resource errors now reach Sentry (the SDK turns them into error results before `withErrorCapture`); the card answers host requests it has no use for; a refused `ui/open-link` falls back to `window.open`; the card's allowed origin comes from `ORIGIN`; the glue test pins the bridge order and a look-alike origin; and an E2E test drives the built, minified card. Logged: BL-29 (quiz-only seasons), BL-30 (Sentry request bodies), BL-31 (local `/seasons/Soft-Autumn` E2E), BL-32 (pre-fill, deferred), BL-33 (rate limit, deferred).
 
-- [ ] 7.3 At archive:
+- [x] 7.3 At archive:
   - add the `chat-plugin` row to `openspec/specs/README.md` (`apps/web/src/app/api/mcp/**`, `apps/web/src/lib/mcp/**`);
   - re-add Public Interface, Behavior and Edge Cases to the new permanent `chat-plugin` spec;
   - add a Tracker Log line.
 
   T12 stays In progress until both submissions in 6.4 are recorded, and is set Done when the Log records them.
+
+  Done 2026-10-11: the README row, the permanent spec's Public Interface, Behavior and Edge Cases, and the Tracker Log line. 6.3 (host check, on production after merge if a host refuses the bypass URL) and 6.4 (submission) are the user's, after merge.
