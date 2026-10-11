@@ -10,7 +10,12 @@ const SECTIONS: [heading: string, body: ReactNode][] = [
     "What Seasonly is",
     "Seasonly estimates your seasonal color type from one selfie and four questions, and suggests colors to wear. A result is an estimate for choosing colors. It is not professional, medical or any other advice. Light, camera and makeup change a photo, so a result can be wrong.",
   ],
-  ["Who can use it", "You must be 16 or older to use Seasonly."],
+  [
+    "Who can use it",
+    // Approved 2026-10-11 (t12 task 2.2).
+    // {@link openspec/specs/legal-pages/spec.md#requirement-the-terms-say-which-age-rule-covers-the-chat-plugin}
+    "You must be 16 or older to use Seasonly. This covers the photo analysis and the report on seasonly.me. The Seasonly plugin for ChatGPT and Claude takes no photo and stores nothing, so it follows the age rules of the chat app you use it in.",
+  ],
   [
     "Your photo",
     <>
@@ -55,7 +60,7 @@ export default function Page() {
       <div className="flex flex-col gap-(--space-3) border-b border-(--line) pb-(--space-6)">
         <p className="overline">Legal</p>
         <h1 className="h1">Terms of use</h1>
-        <p className="caption text-(--ink-muted)">Last updated October 10, 2026</p>
+        <p className="caption text-(--ink-muted)">Last updated October 11, 2026</p>
         <p className="lead">By using Seasonly you agree to these terms. They are short.</p>
       </div>
       {SECTIONS.map(([heading, body]) => (

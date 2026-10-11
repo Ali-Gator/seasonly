@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button, DrapingPair, Icon, Note, SwatchGrid } from "@/components/ds";
 import { SAMPLE_FACE } from "@/lib/site-content/images";
 import { softAutumnColors } from "@/lib/site-content/sample";
-import { pageMetadata } from "@/lib/site/routes";
+import { ORIGIN, pageMetadata } from "@/lib/site/routes";
 
 export const metadata = pageMetadata("/color-analysis-gpt-alternative");
 
@@ -12,6 +12,9 @@ const SOURCE =
   "https://help.openai.com/en/articles/20001519-custom-gpt-retirement-and-migration-faq";
 
 const palette = PALETTES["soft-autumn"];
+
+/** The plugin's server address, for a custom connector. */
+const MCP_URL = `${ORIGIN}/api/mcp`;
 
 /** The board's 8 sample colors, read by name from the Soft Autumn palette. */
 const SAMPLE = softAutumnColors([
@@ -146,6 +149,35 @@ export default function Page() {
         <Note icon="clock" title="Your photo is deleted within 24 hours">
           Only a crop of your face is uploaded. We keep your result, not your photo.
         </Note>
+      </section>
+
+      {/* The plugin's public documentation: both directories link here. No directory listing is
+          linked until one is published. {@link openspec/specs/site-content/spec.md#requirement-the-gpt-alternative-page-documents-the-chat-plugin} */}
+      <section id="chat-plugin" aria-labelledby="plugin-title" className={SECTION}>
+        <h2 className="h2" id="plugin-title">
+          Use Seasonly in ChatGPT and Claude
+        </h2>
+        <p className="text-(--ink-muted)">
+          The Seasonly plugin asks you the same four questions in the chat. It gives you your season
+          family and 6 of its colors, each with its name and hex code, and a link to the photo
+          analysis here for your exact season.
+        </p>
+        <Note icon="camera" title="It takes no photo">
+          Only your four answers reach the plugin, and it stores nothing.
+        </Note>
+        <div className="flex flex-col gap-(--space-3)">
+          <h3 className="h3">How to add it</h3>
+          <p className="text-(--ink-muted)">
+            Add it as a custom connector in ChatGPT or Claude, with this server address:
+          </p>
+          <p className="label self-start rounded-(--radius-md) border border-(--line) bg-(--surface) px-(--space-4) py-(--space-3) [overflow-wrap:anywhere]">
+            {MCP_URL}
+          </p>
+        </div>
+        <Link href="/privacy#chat-plugin" className="label sn-navlink self-start">
+          How the plugin handles your data
+          <Icon name="arrow-right" size={18} />
+        </Link>
       </section>
 
       <section className={SECTION}>
