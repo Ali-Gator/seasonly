@@ -131,11 +131,14 @@ All tests cite `{@link openspec/specs/<capability>/spec.md#<anchor>}` at the per
   - **Claude** (claude.ai, custom connector, "No sign-in" detected): cases 2, 3 and the all-unsure request show the right card (Winter, Spring, the no-result card); case 4 asks the four questions; the card shows 6 colors in a row when wide, 3 when narrow. Differences: Claude calls the tool only after the user clicks "Use" once per chat (BL-34), and for case 5 it answered itself instead of calling the tool (BL-35).
   - **ChatGPT** (developer mode is gone; Plugins → Add → "Add custom MCP server", no authentication): cases 1 and 5 call the tool on the first prompt and show the Autumn and no-result cards. The widget is served from `seasonly-me.web-sandbox.oaiusercontent.com`, so the `widgetDomain` field is accepted; the card's button opens `seasonly.me`. The "CSP off" badge is the account's "Enforce CSP for custom apps" setting, not our CSP.
   - Screenshots: `docs/chat-plugin-screenshots/` (Spring, Winter, no-result; 1500–1548 px wide).
-- [ ] 6.4 Submission (the user's action in each portal, after production serves `/api/mcp`; recorded in the Tracker, not blocking archive):
+- [x] 6.4 Submission (the user's action in each portal, after production serves `/api/mcp`; recorded in the Tracker, not blocking archive):
   - **Claude:** the Connectors Directory, "MCP connector", with the server URL `https://seasonly.me/api/mcp`, no authentication, and the listing from 6.2;
   - **ChatGPT:** a plugin "with MCP" from the OpenAI Platform, once 1.1 is verified. If the portal asks for a domain challenge, the user gives the token, and the agent adds `apps/web/public/.well-known/openai-apps-challenge` in a follow-up PR.
 
   Target is Oct 20–22. The deadline is Oct 24.
+
+  - **Claude:** submitted by the user on 2026-10-11; the listing shows "In review".
+  - **ChatGPT:** submitted by the user on 2026-10-11 from the OpenAI Platform as a plugin ZIP (source in `docs/chat-plugin-openai/`), with the domain verified, the MCP scan clean and the demo video at `review.demo_recording_url`; review status "In review".
 
 ## 7. Plan, backlog and archive
 
