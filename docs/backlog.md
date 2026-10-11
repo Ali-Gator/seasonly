@@ -225,11 +225,6 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   accept it or move case 5 to the negative list for Claude.
   _Refs:_ `docs/chat-plugin-listing.md` · _Status:_ open — host check 6.3, 2026-10-11
 
-- **[BL-36] Add `annotations.title` to the tool** — the Claude directory's tool check suggests it
-  ("Missing title annotation"); the tool sets only the top-level `title`. One line in the tool's
-  annotations.
-  _Refs:_ `apps/web/src/app/api/mcp/` · _Status:_ open — Claude directory submission, 2026-10-11
-
 - **[BL-37] A support page with an HTTPS URL** — both directories ask for a support URL; the site
   has only `care@seasonly.me`, so the listings point to `/terms`, whose last section gives that
   address. A `#contact` anchor or a small support page would be a clearer target.
