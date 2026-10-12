@@ -6,7 +6,7 @@ The eval set has 16 people (10 light, 3 medium, 3 deep), 93 photos, 72 usable. `
 
 **Goals:**
 
-- Grow the set with 18 people, mostly medium and deep, approved by the user.
+- Grow the set with 18 people, 9 medium and 9 deep, approved by the user.
 - Keep a holdout that no tuning sees.
 - Report a continuous stability measure, trait spread, next to agreement.
 - Re-run the white-balance sweep on the grown set and record whether it now earns its place.
@@ -21,13 +21,13 @@ The eval set has 16 people (10 light, 3 medium, 3 deep), 93 photos, 72 usable. `
 
 ### D1. Candidates: Commons, as in `t6-eval-set` design decision 5
 
-Public figures with at least six free-licensed Commons photos in clearly different light (daylight, indoor, flash, stage, red carpet), each face at least about a tenth of the photo's long side, because the app scales to 1280 px and `MIN_FACE_WIDTH` is 120. Prefer event photos and candids to studio portraits. Seasons are proposed with a one-line reason and cover all four families. The user approves people, photos, labels and `expect` on a private review page that links each Commons file page. Hashes are computed only after approval.
+Public figures with three to six free-licensed Commons photos in clearly different light (daylight, indoor, flash, stage, red carpet), each face at least about a tenth of the photo's long side, because the app scales to 1280 px and `MIN_FACE_WIDTH` is 120. Prefer event photos and candids to studio portraits. Seasons are proposed with a one-line reason and cover all four families. The user approves people, photos, labels and `expect` on a private review page that links each Commons file page. Hashes are computed only after approval.
 
 Deep-skin photos are vetted by eye for exposure. The `dark` check produced most false rejects in `t6-eval-set`. If it rejects deep skin more than light skin on the grown set, that is a finding for the backlog. It is not tuned here.
 
 ### D2. Holdout: fixed by rule before the first run
 
-New people only. Within each skin band (Monk-scale light, medium, deep, as judged on the review page), in the approved list's order, the 2nd, 4th, 6th… person is held out. The rule is written here and the `holdout` flags are written into the manifest in the same commit as the photos, before `eval:run` first sees them. A person never leaves the holdout because of a result.
+New people only. Within each skin band (Monk-scale light, medium, deep, as judged on the review page), with the band's people sorted by surname, the 2nd, 4th, 6th… person is held out. The rule is written here and the `holdout` flags are written into the manifest in the same commit as the photos, before `eval:run` first sees them. A person never leaves the holdout because of a result.
 
 The flag lives on each manifest entry (`holdout: true`), checked for consistency per person like `season`. A per-person list would need a second file or a manifest version bump for one boolean.
 
@@ -50,7 +50,7 @@ Check out the balance from `1d28b3d` into a scratch worktree, never onto this br
 ## Risks / Trade-offs
 
 - **Celebrity seasons are contested.** → Agreement and trait spread need no label. The user approves every label.
-- **Deep-skin photos may fail `dark` and leave people unmeasured.** → Vet exposure when picking. Pick seven photos where a person's set is mostly stage light.
+- **Deep-skin photos may fail `dark` and leave people unmeasured.** → Vet exposure when picking. Drop wide shots where the face is under about a tenth of the frame, and second faces near the subject.
 - **Commons files change.** → `eval:fetch` checks the hash and fails loudly, as today.
-- **The holdout is small (9 people).** → It is a check against overfitting, not a precise score. Trait spread on it is continuous and still informative.
+- **The holdout is small (8 people).** → It is a check against overfitting, not a precise score. Trait spread on it is continuous and still informative.
 - **The baseline drops.** → Expected and approved up front. Today's numbers stay in `t6-eval-set`'s tasks for reference.
