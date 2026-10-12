@@ -2,18 +2,12 @@
  * Photo check: is a selfie usable for color analysis, and if not, which one problem to retake for.
  * Runs on the same input as color sampling, before it.
  *
- * The eye openings are the closed loops of FACEMESH_RIGHT_EYE and FACEMESH_LEFT_EYE, chained
- * from the edge sets in
- * https://github.com/google-ai-edge/mediapipe/blob/master/mediapipe/python/solutions/face_mesh_connections.py
- * (commit b453bf8): the lower lid from the outer corner to the inner one, then the upper lid back.
- * They stay out of REGIONS: an eye opening contains the iris, and sampling regions never overlap.
- *
  * @see openspec/specs/photo-check/spec.md
  */
-import { robustCenter, srgbToLab, type Lab } from "../sampling/color.ts";
-import { MIN_REGION_PIXELS, samplePhoto, type PhotoInput } from "../sampling/index.ts";
-import { regionPixels, type Rings } from "../sampling/regions.ts";
+import type { Lab } from "../sampling/color.ts";
+import { samplePhoto, type PhotoInput } from "../sampling/index.ts";
 
+export { EYE_OPENINGS } from "../sampling/regions.ts";
 export { RETAKE_TIPS, type RetakeReason, type RetakeTip } from "./tips.ts";
 
 // Eye-white L*, eye-white C*ab and the skin-hue floor are measured (t6-eval-set, 2026-10-09): on
@@ -33,14 +27,6 @@ const MIN_SKIN_CHROMA = 2;
 const MAX_SKIN_CHROMA = 45;
 /** Skin hue outside this range, in degrees, is a filter, judged only from `minChroma` up. */
 const SKIN_HUE = { from: -10, to: 100, minChroma: 6 };
-
-/** Share of an eye opening, brightest first, taken as the sclera: above the iris, pupil and lashes. */
-const SCLERA_SHARE = 0.4;
-
-export const EYE_OPENINGS = {
-  right: [[33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246]],
-  left: [[263, 249, 390, 373, 374, 380, 381, 382, 362, 398, 384, 385, 386, 387, 388, 466]],
-} as const satisfies Record<string, Rings>;
 
 export type PhotoProblem = "no-face" | "dark" | "tint" | "filter";
 
@@ -65,19 +51,6 @@ export type PhotoCheckInput = Omit<PhotoInput, "landmarks"> & {
 
 const chroma = (c: Lab) => Math.hypot(c.a, c.b);
 const hue = (c: Lab) => (Math.atan2(c.b, c.a) * 180) / Math.PI;
-
-/** The brightest share of both eye openings, centered; null below MIN_REGION_PIXELS. */
-function eyeWhiteOf({ pixels, width, height, landmarks }: PhotoInput): Lab | null {
-  const indices = [EYE_OPENINGS.right, EYE_OPENINGS.left].flatMap((r) =>
-    regionPixels(r, landmarks, width, height),
-  );
-  if (indices.length < MIN_REGION_PIXELS) return null;
-  const colors = indices
-    .map((i) => srgbToLab(pixels[i * 4] ?? 0, pixels[i * 4 + 1] ?? 0, pixels[i * 4 + 2] ?? 0))
-    .sort((p, q) => q.L - p.L);
-  // robustCenter's top trim then drops the catchlight.
-  return robustCenter(colors.slice(0, Math.ceil(colors.length * SCLERA_SHARE)));
-}
 
 function isFiltered(skin: Lab): boolean {
   const c = chroma(skin);
@@ -107,8 +80,7 @@ export function checkPhoto(input: PhotoCheckInput): PhotoCheck {
       );
     return { problem: "no-face", measures: { faceWidth: null, eyeWhite: null, skin: null } };
   }
-  const photo = { ...input, landmarks };
-  const sample = samplePhoto(photo);
+  const sample = samplePhoto({ ...input, landmarks });
   const skin = sample.regions.skin;
   const xs = landmarks.map((p) => p.x);
   const faceWidth = (Math.max(...xs) - Math.min(...xs)) * width;
@@ -120,7 +92,7 @@ export function checkPhoto(input: PhotoCheckInput): PhotoCheck {
   // A null traits never follows from a face this wide; checked so a pass always samples.
   if (outside || faceWidth < MIN_FACE_WIDTH || !sample.traits) return result("no-face");
 
-  const eyeWhite = eyeWhiteOf(photo);
+  const eyeWhite = sample.eyeWhite;
   measures.eyeWhite = eyeWhite;
   if (eyeWhite && eyeWhite.L < MIN_EYE_WHITE_L) return result("dark");
   if (eyeWhite && chroma(eyeWhite) > MAX_EYE_WHITE_CHROMA) return result("tint");

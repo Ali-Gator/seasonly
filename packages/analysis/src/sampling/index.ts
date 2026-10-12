@@ -1,14 +1,15 @@
 /**
- * Color sampling: pixels, face landmarks and an optional hair mask → region colors → traits.
+ * Color sampling: pixels, face landmarks and an optional hair mask → region colors → traits,
+ * plus the eye white.
  *
  * @see openspec/specs/color-sampling/spec.md
  */
 import { robustCenter, srgbToLab, type Lab } from "./color.ts";
-import { REGIONS, regionPixels, type Rings } from "./regions.ts";
+import { EYE_OPENINGS, REGIONS, regionPixels, type Rings } from "./regions.ts";
 import { traitsOf, type RegionColors, type Traits } from "./traits.ts";
 
 export { deltaE, srgbToLab, type Lab } from "./color.ts";
-export { REGIONS, type Rings } from "./regions.ts";
+export { EYE_OPENINGS, REGIONS, type Rings } from "./regions.ts";
 export { traitsOf, type RegionColors, type Traits } from "./traits.ts";
 
 export interface PhotoInput {
@@ -24,6 +25,8 @@ export interface PhotoInput {
 
 export interface Sample {
   regions: RegionColors;
+  /** The brightest share of both eye openings; null when they hold too few pixels. */
+  eyeWhite: Lab | null;
   /** Null when the skin region is too small to sample. */
   traits: Traits | null;
 }
@@ -33,6 +36,22 @@ export const MIN_REGION_PIXELS = 50;
 
 /** Pixels per region converted to Lab; larger regions are sampled at an even stride. */
 const MAX_REGION_SAMPLES = 20_000;
+
+/** Share of an eye opening, brightest first, taken as the sclera: above the iris, pupil and lashes. */
+const SCLERA_SHARE = 0.4;
+
+/** The brightest share of both eye openings, centered; null below MIN_REGION_PIXELS. */
+function eyeWhiteOf({ pixels, width, height, landmarks }: PhotoInput): Lab | null {
+  const indices = [EYE_OPENINGS.right, EYE_OPENINGS.left].flatMap((r) =>
+    regionPixels(r, landmarks, width, height),
+  );
+  if (indices.length < MIN_REGION_PIXELS) return null;
+  const colors = indices
+    .map((i) => srgbToLab(pixels[i * 4] ?? 0, pixels[i * 4 + 1] ?? 0, pixels[i * 4 + 2] ?? 0))
+    .sort((p, q) => q.L - p.L);
+  // robustCenter's top trim then drops the catchlight.
+  return robustCenter(colors.slice(0, Math.ceil(colors.length * SCLERA_SHARE)));
+}
 
 function check({ pixels, width, height, landmarks, hairMask }: PhotoInput): void {
   if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1)
@@ -49,7 +68,10 @@ function check({ pixels, width, height, landmarks, hairMask }: PhotoInput): void
     );
 }
 
-/** Samples skin, eyes, lips and hair, and reduces them to traits. Reads its input, never writes it. */
+/**
+ * Samples skin, eyes, lips and hair, reduces them to traits, and measures the eye white.
+ * Reads its input, never writes it.
+ */
 export function samplePhoto(input: PhotoInput): Sample {
   check(input);
   const { pixels, width, height, landmarks, hairMask } = input;
@@ -80,5 +102,5 @@ export function samplePhoto(input: PhotoInput): Sample {
     lips: color(inside(REGIONS.lips).filter(notHair)),
     hair: hairMask ? color(hair) : null,
   };
-  return { regions, traits: traitsOf(regions) };
+  return { regions, eyeWhite: eyeWhiteOf(input), traits: traitsOf(regions) };
 }

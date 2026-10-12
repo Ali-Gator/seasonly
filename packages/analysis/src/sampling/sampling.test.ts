@@ -21,6 +21,7 @@ import {
   type PhotoInput,
   type Traits,
 } from "./index.ts";
+import { EYE_OPENINGS } from "./regions.ts";
 
 const SIZE = 400;
 const LM = face478();
@@ -305,6 +306,52 @@ describe("traits", () => {
     const sample = samplePhoto(face({ landmarks: tiny }));
     expect(sample.regions.skin).toBeNull();
     expect(sample.traits).toBeNull();
+  });
+});
+
+describe("eye white", () => {
+  const SCLERA: RGB = [240, 237, 232];
+  /** `face()` with both eye openings painted `sclera`, the irises painted again on top. */
+  const withEyeWhites = (sclera: RGB, options: FaceOptions = {}): PhotoInput => {
+    const rings = (r: readonly (readonly number[])[]) => ringsOf(r, options.landmarks ?? LM);
+    const eyes = options.eyes ?? EYES;
+    return face({
+      ...options,
+      extra: [
+        { rings: rings(EYE_OPENINGS.right), color: sclera },
+        { rings: rings(EYE_OPENINGS.left), color: sclera },
+        { rings: rings(REGIONS.rightIris), color: eyes },
+        { rings: rings(REGIONS.leftIris), color: eyes },
+      ],
+    });
+  };
+
+  /** {@link openspec/specs/color-sampling/spec.md#scenario-the-eye-white-is-reported} */
+  it("reports the painted eye white with 468 landmarks", () => {
+    const input = withEyeWhites(SCLERA);
+    const { eyeWhite } = samplePhoto({ ...input, landmarks: input.landmarks.slice(0, 468) });
+    expect(deltaE(eyeWhite ?? lab(BG), lab(SCLERA))).toBeLessThan(2);
+  });
+
+  /** {@link openspec/specs/color-sampling/spec.md#requirement-sampling-reports-the-eye-white} */
+  it("reports the eye white with 478 landmarks and leaves regions and traits alone", () => {
+    const white = samplePhoto(withEyeWhites(SCLERA));
+    const blue = samplePhoto(withEyeWhites([200, 225, 250]));
+    expect(deltaE(white.eyeWhite ?? lab(BG), lab(SCLERA))).toBeLessThan(2);
+    expect(deltaE(blue.eyeWhite ?? lab(BG), lab([200, 225, 250]))).toBeLessThan(2);
+    expect(blue.regions).toEqual(white.regions);
+    expect(blue.traits).toEqual(white.traits);
+  });
+
+  /** {@link openspec/specs/color-sampling/spec.md#scenario-no-usable-eye-white} */
+  it("reports no eye white, and the same traits, when the eye openings are closed", () => {
+    const closed = LM.map((p) => ({ ...p }));
+    for (const ring of [...EYE_OPENINGS.right, ...EYE_OPENINGS.left])
+      for (const i of ring) closed[i] = { ...(LM[ring[0] ?? 0] as Point) };
+    const sample = samplePhoto(withEyeWhites(SCLERA, { landmarks: closed }));
+    expect(sample.eyeWhite).toBeNull();
+    expect(sample.traits).not.toBeNull();
+    expect(sample.traits).toEqual(traitsOf(sample.regions));
   });
 });
 

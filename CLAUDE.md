@@ -29,6 +29,8 @@ Tests (`__tests__`, `*.test.*`, `*.spec.*`), docs and markdown, config files (`*
 - Each phase runs on its own branch. Commit freely; review once per phase with the `phase-review` skill (`/code-review high` in a fresh subagent).
 - After `/opsx:apply` finishes, without being asked: phase review in a fresh `general-purpose` subagent (never inline), fix its findings, log what stays unfixed in `docs/backlog.md`, `/opsx:archive`, push, open a PR to `main`, and turn on its auto-merge with a merge commit (never squash).
 - You (the user) approve: a design canvas before its UI proposal, any edit to an existing test, and every paid smoke run. Agents never start a paid run on their own.
+- Decide technical choices yourself and report them in plain words. Ask the user only product, money or approval questions, one plain sentence each, with your recommendation first.
+- Before proposing a change judged by the eval, check the eval can see the expected effect: on 16 people one photo moves exact agreement about 0.03 (`t15-white-balance`).
 - `pnpm fix` then `pnpm test` is the manual phase gate. CI runs `ci.yml` (format, lint, typecheck, unit + citation gate), `openspec.yml` and `e2e.yml` on every push.
 
 ## Backlog (`docs/backlog.md`)

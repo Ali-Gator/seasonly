@@ -23,7 +23,7 @@ export type PhotoCheckInput = Omit<PhotoInput, "landmarks"> & {
 };
 export function checkPhoto(input: PhotoCheckInput): PhotoCheck;
 export const MIN_FACE_WIDTH = 120;
-export const EYE_OPENINGS: { right; left }; // landmark index rings
+export const EYE_OPENINGS: { right; left }; // landmark index rings, re-exported from sampling
 export interface RetakeTip {
   title: string;
   message: string; // what is wrong
@@ -40,7 +40,7 @@ The check runs before sampling, on the same input. In order:
 1. No landmarks: the refusals that need none (width, height, buffer and hair-mask length, with sampling's messages), then `no-face` with every measurement null.
 2. `samplePhoto` validates the input and gives the skin color.
 3. `no-face` when a landmark is outside the image or not a number, the landmark bounding box is narrower than `MIN_FACE_WIDTH`, or sampling gives no traits.
-4. The eye white: the pixels inside both eye openings (MediaPipe's `FACEMESH_RIGHT_EYE` and `FACEMESH_LEFT_EYE`, cited in `photo-check/index.ts`), the brightest 40% by L*, then sampling's robust center. Fewer than `MIN_REGION_PIXELS` pixels leaves it null and skips the next two checks. `dark` when its L* is below 22, then `tint` when its C*ab is above 22.
+4. The eye white, as sampling reports it (`Sample.eyeWhite`): the pixels inside both eye openings (MediaPipe's `FACEMESH_RIGHT_EYE` and `FACEMESH_LEFT_EYE`, cited in `sampling/regions.ts`), the brightest 40% by L*, then sampling's robust center. Fewer than `MIN_REGION_PIXELS` pixels leaves it null and skips the next two checks. `dark` when its L* is below 22, then `tint` when its C*ab is above 22.
 5. `filter` when skin C*ab is below 2 or above 45, or, from C*ab 6 up, its hue is outside −10° to 100°.
 
 The first problem found is returned with the measurements gathered so far. The eye-white L* and C*ab limits and the hue floor are measured on the labeled eval set (`analysis-eval`, 2026-10-09): the fewest false rejects that keep agreement, label accuracy and the variant catch rate at the untuned level or better, a false-reject rate of 0.18 on 72 usable photos, down from 0.24. The skin chroma range is set against the Monk Skin Tone scale (C*ab 3.8 to 27.9, hue 49° to 89°) and was left as it was. `RETAKE_TIPS` holds the copy of the approved canvas screens `BadNoFace`, `BadDark`, `BadTint` and `BadFilter`; the shared heading and buttons belong to the web flow.
