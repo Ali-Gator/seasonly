@@ -32,7 +32,7 @@ For each person with at least two usable photos that pass the check, the eval SH
 - **WHEN** a person's two passing photos have temperature 0.2 and 0.6, value 0 and 0, and clarity 0.1 and 0.1
 - **THEN** that person's spread is temperature 0.2, value 0 and clarity 0
 
-#### Scenario: One photo passes
+#### Scenario: One passing photo has no spread
 
 - **WHEN** only one of a person's photos passes the check
 - **THEN** that person does not move the set's trait spread

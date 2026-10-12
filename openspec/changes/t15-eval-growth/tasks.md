@@ -12,7 +12,7 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new test cases
 - [ ] 2.1 `manifest.test.ts`: new cases for `holdout` — valid `true`, an invalid value, and a person split across both sets ({@link openspec/specs/analysis-eval/spec.md#requirement-a-holdout-set-judges-what-the-rest-tuned}).
 - [ ] 2.2 `metrics.test.ts`: new cases for trait spread — two photos, and one passing photo ({@link openspec/specs/analysis-eval/spec.md#requirement-trait-spread-is-measured-across-one-persons-photos}).
 - [ ] 2.3 `results.test.ts`: new cases — two people, one held out; no holdout; no single photo's trait in the output ({@link openspec/specs/analysis-eval/spec.md#requirement-results-are-recorded-with-the-inputs-they-came-from}).
-- [ ] 2.4 Code: `manifest.ts` (`holdout`), `metrics.ts` (`traits` on `PhotoOutcome`, `traitSpread`), `pipeline.ts` (pass traits through), `results.ts` (split, `holdout` per person). Existing tests that need `traits` added to an outcome literal are listed for approval before they change. Done when `pnpm test:unit` passes.
+- [ ] 2.4 Code: `manifest.ts` (`holdout`), `metrics.ts` (`traits` on `PhotoOutcome`, `traitSpread`), `pipeline.ts` (pass traits through), `results.ts` (split, `holdout` per person). `traits` is optional on `PhotoOutcome`, so existing outcome literals need no change. One existing test needs an edit, pending the user's approval in 1.2: `metrics.test.ts` "an empty set" gains `traitSpread: null` in its expected metrics. Done when `pnpm test:unit` passes.
 
 ## 3. The grown set
 
