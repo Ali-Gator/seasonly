@@ -124,6 +124,7 @@ function analyze(photo: EvalPhoto, e: Extraction, check: typeof checkPhoto) {
     problem: null,
     measures: checked.measures,
     result: result.season ? result : null,
+    traits: result.season ? traits : undefined,
     variants,
   };
 }
@@ -161,6 +162,7 @@ export async function runPhotos(
       photo,
       problem: a.problem,
       season: a.result?.season ?? null,
+      ...("traits" in a && a.traits && { traits: a.traits }),
       variants: a.variants.map(({ name, expected, problem }) => ({ name, expected, problem })),
     });
     report.push({

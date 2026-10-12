@@ -126,4 +126,49 @@ describe("results.json", () => {
     const text = fs.readFileSync(out, "utf8");
     expect(await format(text, { ...config, parser: "json" })).toBe(text);
   });
+
+  /** {@link openspec/specs/analysis-eval/spec.md#scenario-two-people-one-held-out} */
+  it("gates the tuning set as metrics and reports the holdout apart", async () => {
+    const held = (o: PhotoOutcome, file: string): PhotoOutcome => ({
+      ...o,
+      photo: { ...o.photo, file, person: "p02", season: "true-winter", holdout: true },
+      season: o.season && "true-winter",
+    });
+    const heldOut = [
+      held(OUTCOMES[0] as PhotoOutcome, "p02/a.jpg"),
+      held(OUTCOMES[0] as PhotoOutcome, "p02/b.jpg"),
+    ];
+    await writeResults(
+      out,
+      [...PHOTOS, ...heldOut.map((o) => o.photo)],
+      [...OUTCOMES, ...heldOut],
+      {
+        inputsHash: HASH,
+        mediapipe: "1.0.1",
+      },
+    );
+    const results = JSON.parse(fs.readFileSync(out, "utf8"));
+    expect(results.counts).toEqual({ photos: 4, people: 2, variants: 9 });
+    expect(results.metrics).toMatchObject({ accuracy: 0.5, agreement: null });
+    expect(results.holdout).toMatchObject({ accuracy: 1, agreement: 1 });
+    expect(results.people.map((p: { holdout: boolean }) => p.holdout)).toEqual([false, true]);
+  });
+
+  /** {@link openspec/specs/analysis-eval/spec.md#scenario-no-holdout} */
+  it("records a null holdout when nobody is held out", async () => {
+    await writeResults(out, PHOTOS, OUTCOMES, { inputsHash: HASH, mediapipe: "1.0.1" });
+    expect(JSON.parse(fs.readFileSync(out, "utf8")).holdout).toBeNull();
+  });
+
+  /** {@link openspec/specs/analysis-eval/spec.md#requirement-results-are-recorded-with-the-inputs-they-came-from} */
+  it("never writes a single photo's traits", async () => {
+    const withTraits = OUTCOMES.map((o) => ({
+      ...o,
+      traits: { temperature: 0.123, value: 0.456, clarity: 0.789 },
+    }));
+    await writeResults(out, PHOTOS, withTraits, { inputsHash: HASH, mediapipe: "1.0.1" });
+    const { keys, leaves } = walk(JSON.parse(fs.readFileSync(out, "utf8")));
+    expect(keys).not.toContain("traits");
+    expect(leaves).not.toContain(0.123);
+  });
 });
