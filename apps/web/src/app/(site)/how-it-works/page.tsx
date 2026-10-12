@@ -21,7 +21,7 @@ const FAQ: [string, ReactNode][] = [
   ],
   [
     "What happens to my photo?",
-    "Only a crop of your face is uploaded, and only after you agree. It is deleted within 24 hours. We keep your result, not your photo.",
+    "Only a crop of your face is uploaded, after the photo passes the check and you finish the quiz. It is deleted within 24 hours. We keep your report, not your photo.",
   ],
   [
     "Can I wear colors that aren't in my palette?",
@@ -170,7 +170,7 @@ export default function Page() {
         </h2>
         <Note icon="lock" title="Only a crop of your face is uploaded">
           The background and the rest of the photo stay on your phone. Nothing is uploaded until the
-          photo passes the check and you agree.
+          photo passes the check and you finish the quiz.
         </Note>
         <Note icon="clock" title="Deleted within 24 hours">
           We keep your result, your season and your colors, not your photo.

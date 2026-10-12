@@ -17,7 +17,7 @@ const ID = "e2e-report";
 
 test.use({ viewport: { width: 390, height: 844 } });
 
-/** Guide, upload, consent and quiz, with the analyze route answered here. Gives its call count. */
+/** Guide, upload and quiz, with the analyze route answered here. Gives its call count. */
 async function toReveal(page: Page, reportId: string | null) {
   const calls = { analyze: 0 };
   await page.route("**/api/analyze", (route) => {
@@ -38,7 +38,6 @@ async function toReveal(page: Page, reportId: string | null) {
   const upload = page.getByLabel("Upload a photo");
   await expect(upload).toBeEnabled();
   await upload.setInputFiles(FACE);
-  await page.getByRole("button", { name: "Agree and upload" }).click();
   const answers = ["Green or olive", "Gold", "Tans easily, rarely burns", "Medium or light brown"];
   for (const [i, label] of answers.entries()) {
     await expect(page.getByText(`Question ${i + 1} of 4`)).toBeVisible();

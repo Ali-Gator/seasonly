@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-42**
+_Next id:_ **BL-45**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -80,14 +80,21 @@ fold items in.
   _Refs:_ `apps/web/src/lib/observability/posthog.ts`, `openspec/specs/analytics/spec.md` ·
   _Status:_ deferred — before paid promotion or a complaint; the user's choice, 2026-10-09
 
-- **[BL-20] The consent screen undersells what is kept and where the crop goes** — "We keep only
-  your result: your season and your colors" leaves out the measured traits, quiz answers and
-  personal text the report stores, and the screen does not say Google may keep the crop up to
-  90 days for abuse checks, though `/privacy` cites this screen as the basis for using the crop.
-  The report email footer repeats the line. Needs a canvas line first.
-  _Refs:_ `apps/web/src/app/(flow)/analyze/_capture/steps.tsx`, `apps/web/src/lib/email/render.ts`,
-  `openspec/specs/capture-flow/spec.md` · _Status:_ open — phase review of `t8-photo-privacy`,
-  2026-10-10
+- **[BL-43] The guide notice does not say Google may keep the crop** — the photo guide names
+  Google as the reader, then says "We delete it within 24 hours", while `/privacy` says Google may
+  keep the crop up to 90 days for abuse checks. The notice links to `/privacy`, but a reader of the
+  notice alone thinks every copy is gone in a day. Needs a canvas line (board 02) first.
+  _Refs:_ `apps/web/src/app/(flow)/analyze/_capture/steps.tsx` (`Guide`),
+  `openspec/specs/capture-flow/spec.md` · _Status:_ open — phase review of `t11-no-consent-step`,
+  2026-10-12 (carried from BL-20)
+
+- **[BL-44] Three site pages still say "We keep your result"** — `/how-it-works` ("Deleted within
+  24 hours" note), the landing and `/color-analysis-gpt-alternative` say only the result is kept,
+  though the report also holds the measured traits, quiz answers and personal text (the email
+  footer and the how-it-works FAQ now say "your report"). Needs a canvas line first.
+  _Refs:_ `apps/web/src/app/(site)/how-it-works/page.tsx`, `apps/web/src/app/(site)/page.tsx`,
+  `apps/web/src/app/(site)/color-analysis-gpt-alternative/page.tsx` · _Status:_ open — phase
+  review of `t11-no-consent-step`, 2026-10-12
 
 - **[BL-30] Sentry error reports can carry request bodies** — Sentry 10.75 attaches an incoming
   request's body (up to about 10 KB) to an error event by default, even with default PII off, so a
@@ -136,6 +143,15 @@ fold items in.
   can see an error.
   _Refs:_ `apps/web/src/app/(report)/`, `openspec/specs/report-page/spec.md` · _Status:_ open —
   network capture of `t8-photo-privacy`, 2026-10-10
+
+- **[BL-42] The citation gate ignores an open change's REMOVED requirements** — the gate reads
+  the main specs, so a requirement an unarchived change removes must still be cited until
+  archive. Moving its citations to the new anchors (as the change's tasks ask) fails `test:unit`
+  and the pre-commit hook until archive. Skip requirements listed under `## REMOVED Requirements`
+  in `openspec/changes/*/specs/` (not `archive/`), as the gate already does for ADDED headings.
+  It is an edit to an existing test, so it waits for the user's approval.
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — found in
+  `t11-no-consent-step`, 2026-10-12
 
 - **[BL-17] Two analysis-eval scenarios are proven one level down** — "A photo cannot be had"
   is tested on the results writer, not on `eval:run` failing after a failed fetch, and "A usable

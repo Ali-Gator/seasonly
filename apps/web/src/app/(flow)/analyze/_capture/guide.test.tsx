@@ -1,5 +1,5 @@
 /**
- * The photo guide's tip cards, rendered to static markup.
+ * The photo guide's tip cards and upload notice, rendered to static markup.
  *
  * @see openspec/specs/capture-flow/spec.md
  */
@@ -7,6 +7,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { Guide } from "./steps";
+
+const words = (html: string) =>
+  html
+    .replace(/<[^>]+>/g, "")
+    .replace(/&#x27;/g, "'")
+    .replace(/\s+/g, " ");
 
 describe("Guide", () => {
   /**
@@ -23,5 +29,14 @@ describe("Guide", () => {
       for (const alt of alts) expect(alt?.trim()).toBeTruthy();
     }
     expect(html).not.toContain("sn-slot__label");
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-the-guide-names-who-reads-the-crop} */
+  it("says only a face crop is sent once the quiz is finished, who reads it, and links to /privacy", () => {
+    const html = renderToStaticMarkup(<Guide onCamera={() => {}} onPhoto={() => {}} />);
+    expect(words(html)).toContain(
+      "Only a crop of your face is sent, once you finish the quiz. An AI model from Google, through Vercel, reads its colors and doesn't train on it. We delete it within 24 hours. Privacy policy",
+    );
+    expect(html).toContain('href="/privacy"');
   });
 });

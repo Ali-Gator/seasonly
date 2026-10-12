@@ -8,8 +8,7 @@ import { Button, CameraFrame, Icon, Note, PhotoTipCard } from "@/components/ds";
 import { TIP_PHOTOS } from "@/lib/site-content/images";
 
 /**
- * Photo guide, capture, check, retake and consent: the copy of canvas artboards 02 to 05, 04e
- * and 04f.
+ * Photo guide, capture, check and retake: the copy of canvas artboards 02 to 04, 04e and 04f.
  *
  * @see openspec/specs/capture-flow/spec.md
  */
@@ -55,6 +54,7 @@ export function UploadButton({
   );
 }
 
+/** {@link openspec/specs/capture-flow/spec.md#requirement-the-photo-guide-and-capture-follow-the-canvas} */
 export function Guide({ onCamera, onPhoto }: { onCamera: () => void; onPhoto: OnPhoto }) {
   const hydrated = useHydrated();
   return (
@@ -94,6 +94,17 @@ export function Guide({ onCamera, onPhoto }: { onCamera: () => void; onPhoto: On
           Upload a photo
         </UploadButton>
       </div>
+      <p className="caption flex items-start gap-(--space-2) text-(--ink-muted)">
+        <Icon name="lock" size={16} className="mt-0.5 flex-none" />
+        <span>
+          Only a crop of your face is sent, once you finish the quiz. An AI model from Google,
+          through Vercel, reads its colors and doesn&apos;t train on it. We delete it within 24
+          hours.{" "}
+          <Link href="/privacy" className="text-(--ink) underline">
+            Privacy policy
+          </Link>
+        </span>
+      </p>
     </>
   );
 }
@@ -231,77 +242,6 @@ export function Retake({
           Your result will then come from the quiz alone.
         </p>
       )}
-    </>
-  );
-}
-
-/** {@link openspec/specs/capture-flow/spec.md#requirement-nothing-leaves-the-device-before-consent} */
-export function Consent({
-  cropUrl,
-  onAgree,
-  onDecline,
-}: {
-  cropUrl: string;
-  onAgree: () => void;
-  onDecline: () => void;
-}) {
-  return (
-    <>
-      <div className="flex flex-col gap-(--space-3)">
-        <h1 className="h1" tabIndex={-1}>
-          Before we upload
-        </h1>
-        <p className="lead text-(--ink-muted)">
-          Here is exactly what leaves your phone, and for how long.
-        </p>
-      </div>
-      <div className="flex items-center gap-(--space-4)">
-        <div className="sn-slot h-24 w-18 flex-none rounded-full">
-          {/* eslint-disable-next-line @next/next/no-img-element -- a local object URL */}
-          <img src={cropUrl} alt="The face crop we would upload" />
-        </div>
-        <p className="text-(--ink-muted)">
-          This crop is all we send. The background and the rest of the photo stay on your phone.
-        </p>
-      </div>
-      <ul className="flex flex-col gap-(--space-3)">
-        {[
-          ["What we upload", "A crop of your face, not the whole photo."],
-          [
-            "Why",
-            "We read the colors of your skin, eyes and hair from it to find your season.",
-            "An AI model from Google, through Vercel, reads the colors. It does not train on your photo.",
-          ],
-          [
-            "How long we keep it",
-            "We delete it within 24 hours. We keep only your result: your season and your colors.",
-          ],
-        ].map(([title, ...body]) => (
-          <li key={title} className="sn-card flex flex-col gap-(--space-1)">
-            <h2 className="h3">{title}</h2>
-            {body.map((line) => (
-              <p key={line} className="text-(--ink-muted)">
-                {line}
-              </p>
-            ))}
-          </li>
-        ))}
-      </ul>
-      <div className="sn-stack">
-        <Button block onClick={onAgree}>
-          Agree and upload
-        </Button>
-        <Button variant="ghost" block onClick={onDecline}>
-          Not now, go back
-        </Button>
-      </div>
-      <p className="caption text-center text-(--ink-muted)">
-        Want the details?{" "}
-        <Link href="/privacy" className="text-(--ink) underline">
-          Read our privacy policy
-        </Link>
-        .
-      </p>
     </>
   );
 }

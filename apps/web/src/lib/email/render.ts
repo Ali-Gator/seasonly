@@ -64,7 +64,9 @@ export function renderReportEmail({
   const footer = [
     ...(quizOnly
       ? []
-      : ["Your photo is deleted within 24 hours of your analysis. We keep only your result."]),
+      : [
+          "Your photo is deleted within 24 hours of your analysis. We keep your report until you ask us to delete it.",
+        ]),
     "You got this email because you asked for your report at seasonly.me. We won't email you again unless you ask.",
   ];
 

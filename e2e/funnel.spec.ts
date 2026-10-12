@@ -19,7 +19,6 @@ const POSTHOG = "http://127.0.0.1:9";
 const NAMED = new Set([
   "$pageview",
   "photo_checked",
-  "consent_answered",
   "quiz_completed",
   "analysis_result",
   "analysis_failed",
@@ -118,8 +117,8 @@ async function answerAnalyze(page: Page, answer: "result" | 500 | "hold") {
   });
 }
 
-async function uploadFace(page: Page, label = "Upload a photo") {
-  const upload = page.getByLabel(label);
+async function uploadFace(page: Page) {
+  const upload = page.getByLabel("Upload a photo");
   await expect(upload).toBeEnabled();
   await upload.setInputFiles(FACE);
 }
@@ -152,7 +151,6 @@ test("sends one event per funnel step, from the landing to the report", async ({
   await page.goto("/");
   await page.getByRole("link", { name: "Find my colors" }).click();
   await uploadFace(page);
-  await page.getByRole("button", { name: "Agree and upload" }).click();
   await answerQuiz(page);
   await page.getByRole("button", { name: "Get my full report" }).click();
   await page.getByLabel("Where should we send your report?").fill(ADDRESS);
@@ -168,7 +166,6 @@ test("sends one event per funnel step, from the landing to the report", async ({
       "$pageview /",
       "$pageview /analyze",
       "photo_checked",
-      "consent_answered",
       "quiz_completed",
       "analysis_result",
       "report_requested",
@@ -177,7 +174,7 @@ test("sends one event per funnel step, from the landing to the report", async ({
       "$pageview /",
     ]);
   expect(posthog.errors).toEqual([]);
-  expect(posthog.find("consent_answered")[0]?.properties).toMatchObject({ agreed: true });
+  expect(posthog.events.map((e) => e.event)).not.toContain("consent_answered");
   expect(posthog.find("quiz_completed")[0]?.properties).toMatchObject({ quiz_only: false });
   expect(posthog.find("report_requested")[0]?.properties).toMatchObject({ quiz_only: false });
   const [, , report, landing] = posthog.find("$pageview").map((e) => e.properties);
@@ -193,11 +190,11 @@ test("sends one event per funnel step, from the landing to the report", async ({
 });
 
 /**
- * {@link openspec/specs/analytics/spec.md#scenario-declining-consent}
+ * {@link openspec/specs/analytics/spec.md#scenario-from-landing-to-the-report}
  * {@link openspec/specs/analytics/spec.md#scenario-back-to-a-step-already-seen}
  * {@link openspec/specs/analytics/spec.md#scenario-a-typo}
  */
-test("sends a declined consent, a second report_requested after Back, and no refused address", async ({
+test("sends a second report_requested after Back, no refused address and no consent_answered", async ({
   page,
 }) => {
   test.setTimeout(90_000);
@@ -207,9 +204,6 @@ test("sends a declined consent, a second report_requested after Back, and no ref
 
   await page.goto("/analyze");
   await uploadFace(page);
-  await page.getByRole("button", { name: "Not now, go back" }).click();
-  await uploadFace(page, "Upload a photo instead");
-  await page.getByRole("button", { name: "Agree and upload" }).click();
   await answerQuiz(page);
   await page.getByRole("button", { name: "Get my full report" }).click();
   await expect(page.getByRole("heading", { name: "Get your full report" })).toBeVisible();
@@ -231,19 +225,16 @@ test("sends a declined consent, a second report_requested after Back, and no ref
     .toEqual([
       "$pageview /analyze",
       "photo_checked",
-      "consent_answered",
-      "photo_checked",
-      "consent_answered",
       "quiz_completed",
       "analysis_result",
       "report_requested",
       "report_requested",
       "$pageview /",
     ]);
-  expect(posthog.find("consent_answered").map((e) => e.properties.agreed)).toEqual([false, true]);
+  expect(posthog.events.map((e) => e.event)).not.toContain("consent_answered");
 });
 
-/** {@link openspec/specs/analytics/spec.md#requirement-the-flows-new-events-carry-only-their-outcome} */
+/** {@link openspec/specs/analytics/spec.md#requirement-the-flows-events-carry-only-their-outcome} */
 test("sends one analysis_failed when the analysis fails", async ({ page }) => {
   test.setTimeout(90_000);
   const posthog = await recordPostHog(page);
@@ -251,7 +242,6 @@ test("sends one analysis_failed when the analysis fails", async ({ page }) => {
 
   await page.goto("/analyze");
   await uploadFace(page);
-  await page.getByRole("button", { name: "Agree and upload" }).click();
   await answerQuiz(page);
   await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
 
@@ -269,7 +259,6 @@ test("sends one analysis_failed when the analysis times out", async ({ page }) =
 
   await page.goto("/analyze");
   await uploadFace(page);
-  await page.getByRole("button", { name: "Agree and upload" }).click();
   await answerQuiz(page);
   await expect(page.getByText("Question 4 of 4")).toBeHidden();
   // Past the client's 45 s limit.
@@ -305,7 +294,6 @@ test("sends no analysis_failed when the person goes Back while analyzing", async
 
   await page.goto("/analyze");
   await uploadFace(page);
-  await page.getByRole("button", { name: "Agree and upload" }).click();
   await answerQuiz(page);
   await expect(page.getByText("Question 4 of 4")).toBeHidden();
   await page.goBack();
