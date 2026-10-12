@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-41**
+_Next id:_ **BL-42**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -176,6 +176,16 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   _Refs:_ `e2e/site-structure.spec.ts:67` · _Status:_ open — found in `t12-mcp-teaser`, 2026-10-11
 
 ## Design / UX
+
+- **[BL-41] The first screen's heading opens with a focus ring** — landing on `/analyze` shows
+  the browser's blue outline around "Three things before your selfie". The step effect in
+  `flow.tsx` focuses `main h1` (`tabIndex={-1}`) on every step, including the first render, and
+  with no click yet the browser treats that programmatic focus as `:focus-visible`. Skip the
+  focus on first mount (keep it for step changes, where screen readers need it), and/or drop the
+  outline on `h1[tabindex="-1"]:focus`, since a heading is not a control.
+  _Refs:_ `apps/web/src/app/(flow)/analyze/flow.tsx` (step focus effect),
+  `apps/web/src/app/(flow)/analyze/_capture/steps.tsx` · _Status:_ open — seen on seasonly.me
+  mobile, 2026-10-12
 
 - **[BL-38] Swatch names break mid-word in narrow columns** — at six columns on a narrow
   landing (about 800 px wide), "Mushroom" renders as "Mushroo / m" and "Dusty Rose" wraps, because
