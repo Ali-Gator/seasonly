@@ -4,7 +4,7 @@
  * Scans `apps/`, `packages/`, `scripts/`, `e2e/` and `evals/` for `{@link openspec/specs/<cap>/spec.md#<anchor>}`
  * and `@see openspec/specs/<cap>/spec.md` links. Anchors are GitHub heading slugs of a
  * `### Requirement:` or `#### Scenario:` heading. A citation resolves against the main
- * specs plus the ADDED/RENAMED headings of unarchived changes; only main-spec
+ * specs plus the ADDED/MODIFIED/RENAMED headings of unarchived changes; only main-spec
  * requirements must be proven. A test is any file with `.test.` or `__tests__/` in its
  * path, or anything under `e2e/`.
  *
@@ -84,17 +84,26 @@ function parseRequirements(text: string): Requirement[] {
   return requirements;
 }
 
-/** Anchors a change delta makes citable before archive: its ADDED requirements and scenarios, and RENAMED targets. */
-function deltaAnchors(text: string): string[] {
-  const anchors: string[] = [];
-  for (const section of text.split(/^(?=## )/m)) {
-    if (section.startsWith("## ADDED Requirements")) {
-      for (const r of parseRequirements(section.replace(/^## .*\n/, ""))) {
+/**
+ * Anchors a change delta makes citable before archive: its ADDED requirements and scenarios,
+ * RENAMED targets, and MODIFIED requirements and scenarios — a MODIFIED one only when its
+ * requirement already exists in the main spec (`existing`) or is renamed to in the same delta,
+ * since archive refuses any other.
+ */
+function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): string[] {
+  const sections = text.split(/^(?=## )/m);
+  const renamed = sections
+    .filter((s) => s.startsWith("## RENAMED Requirements"))
+    .flatMap((s) =>
+      [...s.matchAll(/TO: `### (Requirement: [^`]+)`/g)].map((m) => slugify(m[1] ?? "")),
+    );
+  const anchors: string[] = [...renamed];
+  for (const section of sections) {
+    const added = section.startsWith("## ADDED Requirements");
+    if (!added && !section.startsWith("## MODIFIED Requirements")) continue;
+    for (const r of parseRequirements(section.replace(/^## .*\n/, ""))) {
+      if (added || existing.has(r.anchor) || renamed.includes(r.anchor)) {
         anchors.push(r.anchor, ...r.scenarios);
-      }
-    } else if (section.startsWith("## RENAMED Requirements")) {
-      for (const m of section.matchAll(/TO: `### (Requirement: [^`]+)`/g)) {
-        if (m[1]) anchors.push(slugify(m[1]));
       }
     }
   }
@@ -192,8 +201,9 @@ function resolvableAnchors(specs: Map<string, Requirement[]>): Map<string, Set<s
     for (const cap of fs.readdirSync(deltas)) {
       const file = path.join(deltas, cap, "spec.md");
       if (!fs.existsSync(file)) continue;
+      const main = new Set(specs.get(cap)?.flatMap((r) => r.anchor) ?? []);
       const anchors = known.get(cap) ?? new Set<string>();
-      for (const a of deltaAnchors(fs.readFileSync(file, "utf-8"))) anchors.add(a);
+      for (const a of deltaAnchors(fs.readFileSync(file, "utf-8"), main)) anchors.add(a);
       known.set(cap, anchors);
     }
   }
@@ -346,23 +356,43 @@ describe("spec citation rules", () => {
     );
   });
 
-  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-test-written-during-an-unarchived-change} */
-  it("a change delta makes its ADDED and RENAMED headings citable, not its MODIFIED ones", () => {
+  /**
+   * {@link openspec/specs/spec-workflow/spec.md#scenario-a-test-written-during-an-unarchived-change}
+   * {@link openspec/specs/spec-workflow/spec.md#scenario-a-test-citing-a-scenario-a-change-adds-to-an-existing-requirement}
+   */
+  it("a change delta makes its ADDED, MODIFIED and RENAMED headings citable", () => {
     const delta = [
       "## ADDED Requirements",
       "### Requirement: New thing",
       "#### Scenario: It works",
       "## MODIFIED Requirements",
       "### Requirement: Old thing",
+      "#### Scenario: It still works",
+      "### Requirement: After",
+      "#### Scenario: Renamed and changed",
       "## RENAMED Requirements",
       "- FROM: `### Requirement: Before`",
       "- TO: `### Requirement: After`",
     ].join("\n");
-    expect(deltaAnchors(delta)).toEqual([
+    expect(deltaAnchors(delta, new Set(["requirement-old-thing"]))).toEqual([
+      "requirement-after",
       "requirement-new-thing",
       "scenario-it-works",
+      "requirement-old-thing",
+      "scenario-it-still-works",
       "requirement-after",
+      "scenario-renamed-and-changed",
     ]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-modified-requirement-that-matches-nothing} */
+  it("a MODIFIED requirement missing from the main spec makes nothing citable", () => {
+    const delta = [
+      "## MODIFIED Requirements",
+      "### Requirement: Typo thing",
+      "#### Scenario: Ghost",
+    ];
+    expect(deltaAnchors(delta.join("\n"), new Set(["requirement-old-thing"]))).toEqual([]);
   });
 
   it("a repeated scenario name within a capability is reported", () => {

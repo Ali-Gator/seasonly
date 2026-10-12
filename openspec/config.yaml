@@ -16,4 +16,5 @@ context: |
   PostHog (analytics + flags), Sentry, Vitest, Playwright, an eval set under evals/.
 
   Governance: openspec/specs/constitution/spec.md. A change name starts with its
-  Tracker ID, e.g. t4-analysis-core.
+  Tracker ID, e.g. t4-analysis-core; a batch of backlog fixes is backlog-<n>
+  and has no Tracker row.

@@ -102,7 +102,7 @@ describe("the spec mapping table", () => {
 });
 
 describe("change names", () => {
-  const NAME = /^t\d+-[a-z0-9]+(-[a-z0-9]+)*$/;
+  const NAME = /^(t\d+-[a-z0-9]+|backlog-\d+)(-[a-z0-9]+)*$/;
 
   function badNames(names: string[]): string[] {
     // Archived changes carry a date prefix: 2026-10-04-t0-foundation.
@@ -126,5 +126,12 @@ describe("change names", () => {
       "add-quiz",
       "T4-x",
     ]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-backlog-batch} */
+  it("accepts a backlog batch", () => {
+    expect(
+      badNames(["backlog-3", "backlog-3-photo-upload", "2026-10-12-backlog-1", "backlog-x"]),
+    ).toEqual(["backlog-x"]);
   });
 });
