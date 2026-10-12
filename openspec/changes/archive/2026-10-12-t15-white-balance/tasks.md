@@ -59,4 +59,4 @@
   - Note on Phase 3 item 1 (`t15-white-balance`) that it is parked behind BL-14, and paid promotion with it.
   - Remove the stale `t6-eval-set` "Carried in" item on result stability across one person's photos (`t6-eval-set` built the agreement metric).
   - Verify: the Tracker row and the Log line show.
-- [ ] 6.5 Push the branch, open a PR to `main` that names the BL ids added and removed, and turn on auto-merge with a merge commit (never squash). Verify: the PR shows auto-merge enabled.
+- [x] 6.5 Push the branch, open a PR to `main` that names the BL ids added and removed, and turn on auto-merge with a merge commit (never squash). Verify: the PR shows auto-merge enabled.
