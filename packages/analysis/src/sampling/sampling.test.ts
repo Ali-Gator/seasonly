@@ -22,7 +22,6 @@ import {
   type Traits,
 } from "./index.ts";
 import { EYE_OPENINGS } from "./regions.ts";
-import { EYE_WHITE_REFERENCE } from "./traits.ts";
 
 const SIZE = 400;
 const LM = face478();
@@ -310,7 +309,7 @@ describe("traits", () => {
   });
 });
 
-describe("white balance", () => {
+describe("eye white", () => {
   const SCLERA: RGB = [240, 237, 232];
   /** `face()` with both eye openings painted `sclera`, the irises painted again on top. */
   const withEyeWhites = (sclera: RGB, options: FaceOptions = {}): PhotoInput => {
@@ -326,29 +325,6 @@ describe("white balance", () => {
       ],
     });
   };
-  /** Every pixel through a mild warm cast, the eye white included. */
-  const warmCast = (input: PhotoInput): PhotoInput => {
-    const pixels = new Uint8ClampedArray(input.pixels);
-    for (let i = 0; i < pixels.length; i += 4) {
-      pixels[i + 1] = (pixels[i + 1] ?? 0) * 0.96;
-      pixels[i + 2] = (pixels[i + 2] ?? 0) * 0.88;
-    }
-    return { ...input, pixels };
-  };
-  const chroma = (c: { a: number; b: number }) => Math.hypot(c.a, c.b);
-
-  /** {@link openspec/specs/color-sampling/spec.md#scenario-a-warm-light-cast} */
-  it("moves temperature less under a warm cast than without the balance", () => {
-    const plain = samplePhoto(withEyeWhites(SCLERA));
-    const cast = samplePhoto(warmCast(withEyeWhites(SCLERA)));
-    // Below the photo check's tint limit, C*ab 22.
-    expect(chroma(cast.eyeWhite ?? { a: 99, b: 99 })).toBeLessThan(22);
-    const unbalanced = (s: typeof plain) => traitsOf(s.regions)?.temperature ?? NaN;
-    const balanced = (s: typeof plain) => s.traits?.temperature ?? NaN;
-    const raw = Math.abs(unbalanced(cast) - unbalanced(plain));
-    expect(raw).toBeGreaterThan(0);
-    expect(Math.abs(balanced(cast) - balanced(plain))).toBeLessThan(raw);
-  });
 
   /** {@link openspec/specs/color-sampling/spec.md#scenario-the-eye-white-is-reported} */
   it("reports the painted eye white with 468 landmarks", () => {
@@ -358,7 +334,7 @@ describe("white balance", () => {
   });
 
   /** {@link openspec/specs/color-sampling/spec.md#scenario-no-usable-eye-white} */
-  it("reports no eye white and unbalanced traits when the eye openings are closed", () => {
+  it("reports no eye white, and the same traits, when the eye openings are closed", () => {
     const closed = LM.map((p) => ({ ...p }));
     for (const ring of [...EYE_OPENINGS.right, ...EYE_OPENINGS.left])
       for (const i of ring) closed[i] = { ...(LM[ring[0] ?? 0] as Point) };
@@ -366,32 +342,6 @@ describe("white balance", () => {
     expect(sample.eyeWhite).toBeNull();
     expect(sample.traits).not.toBeNull();
     expect(sample.traits).toEqual(traitsOf(sample.regions));
-  });
-
-  /** {@link openspec/specs/color-sampling/spec.md#scenario-an-eye-white-at-the-reference} */
-  it("leaves traits unbalanced for an eye white at the reference, and only there", () => {
-    const { regions } = samplePhoto(face());
-    const unbalanced = traitsOf(regions);
-    expect(traitsOf(regions, { L: 70, ...EYE_WHITE_REFERENCE })).toEqual(unbalanced);
-    expect(traitsOf(regions, null)).toEqual(unbalanced);
-    const off = { L: 70, a: EYE_WHITE_REFERENCE.a - 6, b: EYE_WHITE_REFERENCE.b - 6 };
-    expect(traitsOf(regions, off)).not.toEqual(unbalanced);
-  });
-
-  /** {@link openspec/specs/color-sampling/spec.md#scenario-region-colors-stay-as-measured} */
-  it("keeps region colors as painted and balances only the traits", () => {
-    const sample = samplePhoto(withEyeWhites([200, 225, 250]));
-    expect(deltaE(sample.regions.skin ?? lab(BG), lab(SKIN))).toBeLessThan(2);
-    expect(deltaE(sample.regions.lips ?? lab(BG), lab(LIPS))).toBeLessThan(2);
-    expect(deltaE(sample.regions.eyes ?? lab(BG), lab(EYES))).toBeLessThan(2);
-    expect(deltaE(sample.regions.hair ?? lab(BG), lab(HAIR))).toBeLessThan(2);
-    expect(sample.traits).not.toEqual(traitsOf(sample.regions));
-  });
-
-  /** {@link openspec/specs/color-sampling/spec.md#scenario-warmer-skin-under-the-same-light} */
-  it("rises in temperature as the skin turns more yellow under one eye white", () => {
-    const at = (skin: RGB) => samplePhoto(withEyeWhites(SCLERA, { skin })).traits?.temperature;
-    expect(at([222, 178, 136]) ?? NaN).toBeGreaterThan(at([222, 172, 160]) ?? NaN);
   });
 });
 

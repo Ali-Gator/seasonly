@@ -1,3 +1,5 @@
+> **Rescoped on 2026-10-12 after measurement (tasks 4.2–4.5).** Neither balance beat agreement 0.6021 under the design's rules, so the user chose to park it until the eval set is bigger (BL-14). This change now ships only the eye-white move: sampling reports the eye white and photo-check reads it there. Traits, results and every baseline are unchanged. The balance code is in commit `1d28b3d` for the re-run. The rest of this proposal is the original plan.
+
 ## Why
 
 One person's photos in different light still give different seasons: eval agreement is 0.6021 and exact-season accuracy 0.1806 (`t6-eval-set`, 2026-10-09). BL-13 traced most of it to temperature. Skin hue moves with the color of the light, so one person's temperature spreads 0.3–0.6 across photos. Constants cannot fix it: `t6-eval-set` tried retuning them. The plan puts `t15-white-balance` (T15) first in Phase 3, and no paid promotion starts before it (decided 2026-10-09).

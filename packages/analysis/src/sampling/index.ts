@@ -68,8 +68,8 @@ function check({ pixels, width, height, landmarks, hairMask }: PhotoInput): void
 }
 
 /**
- * Samples skin, eyes, lips, hair and the eye white, and reduces the colors, balanced against the
- * eye white, to traits. Reads its input, never writes it.
+ * Samples skin, eyes, lips and hair, reduces them to traits, and measures the eye white.
+ * Reads its input, never writes it.
  */
 export function samplePhoto(input: PhotoInput): Sample {
   check(input);
@@ -101,6 +101,5 @@ export function samplePhoto(input: PhotoInput): Sample {
     lips: color(inside(REGIONS.lips).filter(notHair)),
     hair: hairMask ? color(hair) : null,
   };
-  const eyeWhite = eyeWhiteOf(input);
-  return { regions, eyeWhite, traits: traitsOf(regions, eyeWhite) };
+  return { regions, eyeWhite: eyeWhiteOf(input), traits: traitsOf(regions) };
 }

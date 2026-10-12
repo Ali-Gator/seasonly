@@ -27,11 +27,6 @@ export interface Traits {
   clarity: number;
 }
 
-/** The eye white a\*b\* that needs no balance. Provisional until measured on the eval set. */
-export const EYE_WHITE_REFERENCE = { a: 7.6, b: 6.2 } as const;
-/** Share of the eye white's offset from the reference taken off skin, hair and eyes, 0 to 1. */
-export const BALANCE_STRENGTH = 0.5;
-
 /** `[mid, half]`: the input that maps to 0, and the distance from it that maps to ±1. */
 const SKIN_HUE = [55, 15] as const;
 const HAIR_HUE = [60, 20] as const;
@@ -78,25 +73,9 @@ function mean(terms: ([number, number] | null)[]): number {
   return total ? round3(present.reduce((s, [v, w]) => s + v * w, 0) / total) : 0;
 }
 
-/** `c` less the eye white's a\*b\* offset from the reference, scaled; L\* unchanged. As is without one. */
-const balance = (c: Lab, eyeWhite: Lab | null | undefined): Lab =>
-  eyeWhite
-    ? {
-        L: c.L,
-        a: c.a - BALANCE_STRENGTH * (eyeWhite.a - EYE_WHITE_REFERENCE.a),
-        b: c.b - BALANCE_STRENGTH * (eyeWhite.b - EYE_WHITE_REFERENCE.b),
-      }
-    : c;
-
-/**
- * Null without skin: there is nothing to measure against. Skin, hair and eyes are first balanced
- * against `eyeWhite`; without one they are taken as measured.
- */
-export function traitsOf(regions: RegionColors, eyeWhite?: Lab | null): Traits | null {
-  if (!regions.skin) return null;
-  const skin = balance(regions.skin, eyeWhite);
-  const eyes = regions.eyes && balance(regions.eyes, eyeWhite);
-  const hair = regions.hair && balance(regions.hair, eyeWhite);
+/** Null without skin: there is nothing to measure against. */
+export function traitsOf({ skin, eyes, hair }: RegionColors): Traits | null {
+  if (!skin) return null;
   // Signed, so darker hair or eyes never lower the contrast.
   const gaps = [hair, eyes].flatMap((c) => (c ? [skin.L - c.L] : []));
   return {

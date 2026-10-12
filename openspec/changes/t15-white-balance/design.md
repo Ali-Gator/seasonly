@@ -1,3 +1,5 @@
+> **Rescoped on 2026-10-12.** D1 shipped. D2–D4 were built and measured, then parked: no setting beat agreement 0.6021 (tasks 4.2–4.5). D2's optional argument was removed with the balance. They stay here for the re-run after BL-14.
+
 ## Context
 
 - `samplePhoto` (sampling) returns raw region colors and `traitsOf(regions)`. `checkPhoto` (photo-check) calls `samplePhoto`, then measures the eye white itself with a private `eyeWhiteOf`: the brightest 40% of both eye openings, through `robustCenter`. Photo-check imports from sampling; sampling imports nothing from photo-check.
