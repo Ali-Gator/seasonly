@@ -31,6 +31,17 @@ export const REGIONS = {
   leftIris: [[474, 475, 476, 477]],
 } as const satisfies Record<string, Rings>;
 
+/**
+ * The eye openings: the closed loops of FACEMESH_RIGHT_EYE and FACEMESH_LEFT_EYE, chained from the
+ * edge sets in the same file and commit: the lower lid from the outer corner to the inner one,
+ * then the upper lid back. They stay out of REGIONS: an eye opening contains the iris, and
+ * sampling regions never overlap.
+ */
+export const EYE_OPENINGS = {
+  right: [[33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246]],
+  left: [[263, 249, 390, 373, 374, 380, 381, 382, 362, 398, 384, 385, 386, 387, 388, 466]],
+} as const satisfies Record<string, Rings>;
+
 interface Point {
   x: number;
   y: number;
