@@ -7,6 +7,6 @@
 
 ## 2. Review and archive
 
-- [ ] 2.1 `pnpm fix`, `pnpm test`.
-- [ ] 2.2 Phase review in a fresh subagent, fix findings, log the rest in `docs/backlog.md`.
-- [ ] 2.3 Archive, PR with auto-merge (merge commit).
+- [x] 2.1 `pnpm fix`, `pnpm test`.
+- [x] 2.2 Phase review in a fresh subagent, fix findings, log the rest in `docs/backlog.md`.
+- [x] 2.3 Archive, PR with auto-merge (merge commit).
