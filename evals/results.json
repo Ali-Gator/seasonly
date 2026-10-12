@@ -1,5 +1,5 @@
 {
-  "inputsHash": "09febda5b3cff21da20b7cc2786bf4ba152fd58c332ca32682721eac6f9c9b54",
+  "inputsHash": "7c1d1ea565a2133de4090db601d11255bfd13c536a873e5e8682cd3dc3a11f2f",
   "mediapipe": "1.0.1",
   "counts": { "photos": 93, "people": 16, "variants": 177 },
   "metrics": {
@@ -11,12 +11,15 @@
     "falseRejects": { "no-face": 0, "dark": 6, "tint": 4, "filter": 2, "several-faces": 1 },
     "expectedProblemRate": 0.5238,
     "catchRate": 0.887,
-    "passRate": 0.6667
+    "passRate": 0.6667,
+    "traitSpread": { "temperature": 0.3384, "value": 0.2538, "clarity": 0.1881 }
   },
+  "holdout": null,
   "people": [
     {
       "person": "p01",
       "label": "light-spring",
+      "holdout": false,
       "measured": true,
       "season": "true-spring",
       "agreement": 0.25,
@@ -69,6 +72,7 @@
     {
       "person": "p02",
       "label": "true-spring",
+      "holdout": false,
       "measured": true,
       "season": "light-summer",
       "agreement": 0.5,
@@ -121,6 +125,7 @@
     {
       "person": "p03",
       "label": "bright-spring",
+      "holdout": false,
       "measured": true,
       "season": "light-summer",
       "agreement": 0.5,
@@ -173,6 +178,7 @@
     {
       "person": "p04",
       "label": "light-summer",
+      "holdout": false,
       "measured": true,
       "season": "light-summer",
       "agreement": 0.4,
@@ -225,6 +231,7 @@
     {
       "person": "p05",
       "label": "light-summer",
+      "holdout": false,
       "measured": true,
       "season": "true-summer",
       "agreement": 1,
@@ -263,6 +270,7 @@
     {
       "person": "p06",
       "label": "true-summer",
+      "holdout": false,
       "measured": true,
       "season": "true-summer",
       "agreement": 0.5,
@@ -315,6 +323,7 @@
     {
       "person": "p07",
       "label": "soft-summer",
+      "holdout": false,
       "measured": true,
       "season": "light-spring",
       "agreement": 0.5,
@@ -367,6 +376,7 @@
     {
       "person": "p08",
       "label": "soft-autumn",
+      "holdout": false,
       "measured": true,
       "season": "bright-winter",
       "agreement": 0.5,
@@ -419,6 +429,7 @@
     {
       "person": "p09",
       "label": "true-autumn",
+      "holdout": false,
       "measured": true,
       "season": "light-summer",
       "agreement": 0.5,
@@ -471,6 +482,7 @@
     {
       "person": "p10",
       "label": "deep-autumn",
+      "holdout": false,
       "measured": true,
       "season": "deep-autumn",
       "agreement": 0.6667,
@@ -523,6 +535,7 @@
     {
       "person": "p11",
       "label": "deep-autumn",
+      "holdout": false,
       "measured": true,
       "season": "deep-winter",
       "agreement": 0.75,
@@ -575,6 +588,7 @@
     {
       "person": "p12",
       "label": "deep-autumn",
+      "holdout": false,
       "measured": true,
       "season": "deep-winter",
       "agreement": 1,
@@ -620,6 +634,7 @@
     {
       "person": "p13",
       "label": "deep-winter",
+      "holdout": false,
       "measured": true,
       "season": "deep-winter",
       "agreement": 0.6667,
@@ -672,6 +687,7 @@
     {
       "person": "p14",
       "label": "deep-winter",
+      "holdout": false,
       "measured": true,
       "season": "true-summer",
       "agreement": 0.5,
@@ -724,6 +740,7 @@
     {
       "person": "p15",
       "label": "true-winter",
+      "holdout": false,
       "measured": true,
       "season": "true-winter",
       "agreement": 1,
@@ -776,6 +793,7 @@
     {
       "person": "p16",
       "label": "bright-winter",
+      "holdout": false,
       "measured": true,
       "season": "bright-winter",
       "agreement": 0.4,

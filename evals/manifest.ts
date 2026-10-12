@@ -29,6 +29,8 @@ export type EvalPhoto = {
   author?: string;
   /** Absent: `pass`. */
   expect?: Expect;
+  /** Held out of tuning: reported apart, never ratcheted. The same on every photo of a person. */
+  holdout?: true;
 };
 
 export const expectOf = (photo: EvalPhoto): Expect => photo.expect ?? "pass";
@@ -42,6 +44,7 @@ export function manifestProblems(value: unknown): string[] {
     return ["expected { version: 1, photos: [] }"];
   const problems: string[] = [];
   const seasonOf = new Map<string, string>();
+  const heldOf = new Map<string, boolean>();
   const files = new Set<string>();
   m.photos.forEach((p, i) => {
     const at = `photos[${i}]`;
@@ -73,6 +76,12 @@ export function manifestProblems(value: unknown): string[] {
     if (prior && prior !== p.season)
       problems.push(`${at}: ${p.person} labeled both ${prior} and ${p.season}`);
     if (p?.person) seasonOf.set(p.person, p.season);
+    if (p?.holdout !== undefined && p.holdout !== true)
+      problems.push(`${at}.holdout: expected true`);
+    const held = p?.holdout === true;
+    if (p?.person && heldOf.has(p.person) && heldOf.get(p.person) !== held)
+      problems.push(`${at}: ${p.person} is held out on some photos and not others`);
+    if (p?.person) heldOf.set(p.person, held);
   });
   return problems;
 }

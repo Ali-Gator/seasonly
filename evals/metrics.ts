@@ -8,6 +8,7 @@ import {
   type PhotoProblem,
   SEASON_SLUGS,
   seasonFamily,
+  type Traits,
 } from "../packages/analysis/src/index.ts";
 import { type EvalPhoto, expectOf, type Season } from "./manifest.ts";
 
@@ -34,6 +35,8 @@ export interface PhotoOutcome {
   season: Season | null;
   /** Run only for a usable photo that passes. */
   variants: VariantOutcome[];
+  /** Set only for a pass; feeds trait spread and is never written to results.json. */
+  traits?: Traits;
 }
 
 export interface Metrics {
@@ -47,6 +50,8 @@ export interface Metrics {
   expectedProblemRate: number | null;
   catchRate: number | null;
   passRate: number | null;
+  /** Mean over measured people of each trait's within-person population SD. Not ratcheted. */
+  traitSpread: Traits | null;
 }
 
 export interface PersonRow {
@@ -75,6 +80,23 @@ function mode<T>(values: readonly T[], label: T, order: readonly T[]): T {
   const top = Math.max(...counts.values());
   if (counts.get(label) === top) return label;
   return order.find((v) => counts.get(v) === top) as T;
+}
+
+const TRAITS = ["temperature", "value", "clarity"] as const;
+
+/** Population standard deviation. */
+function sd(values: readonly number[]): number {
+  const m = values.reduce((s, v) => s + v, 0) / values.length;
+  return Math.sqrt(values.reduce((s, v) => s + (v - m) ** 2, 0) / values.length);
+}
+
+/** Per measured person, each trait's SD over their passing photos with traits; then the mean. */
+function traitSpreadOf(byPerson: readonly (readonly Traits[])[]): Traits | null {
+  const measured = byPerson.filter((t) => t.length >= 2);
+  if (!measured.length) return null;
+  return Object.fromEntries(
+    TRAITS.map((k) => [k, mean(measured.map((t) => sd(t.map((x) => x[k]))))]),
+  ) as unknown as Traits;
 }
 
 const isUsable = (o: PhotoOutcome) => expectOf(o.photo) === "pass";
@@ -138,6 +160,13 @@ export function metricsOf(outcomes: readonly PhotoOutcome[]): {
       ),
       catchRate: share(variants.filter((v) => v.problem === v.expected).length, variants.length),
       passRate: share(outcomes.filter((o) => !o.problem).length, outcomes.length),
+      traitSpread: traitSpreadOf(
+        people.map((p) =>
+          passing
+            .filter((o) => o.photo.person === p.person && o.traits)
+            .map((o) => o.traits as Traits),
+        ),
+      ),
     },
     people,
   };

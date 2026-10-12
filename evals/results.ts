@@ -20,10 +20,14 @@ export interface Results {
   inputsHash: string;
   mediapipe: string;
   counts: { photos: number; people: number; variants: number };
+  /** The tuning set: everyone not held out. The gate holds these to the baseline. */
   metrics: Metrics;
+  /** The held-out people; null when nobody is held out. Never ratcheted. */
+  holdout: Metrics | null;
   people: {
     person: string;
     label: string;
+    holdout: boolean;
     measured: boolean;
     season: string | null;
     agreement: number | null;
@@ -48,7 +52,9 @@ export function resultsOf(
   const missing = photos.filter((p) => !byFile.has(p.file)).map((p) => p.file);
   if (missing.length) throw new Error(`no outcome for ${missing.join(", ")}`);
   const ordered = photos.map((p) => byFile.get(p.file) as PhotoOutcome);
-  const { metrics, people } = metricsOf(ordered);
+  const held = ordered.filter((o) => o.photo.holdout);
+  const { metrics } = metricsOf(ordered.filter((o) => !o.photo.holdout));
+  const { people } = metricsOf(ordered);
   return {
     ...meta,
     counts: {
@@ -57,8 +63,15 @@ export function resultsOf(
       variants: ordered.reduce((n, o) => n + o.variants.length, 0),
     },
     metrics,
+    holdout: held.length ? metricsOf(held).metrics : null,
     people: people.map(({ photos: rows, ...person }) => ({
-      ...person,
+      person: person.person,
+      label: person.label,
+      holdout: rows.some((o) => o.photo.holdout),
+      measured: person.measured,
+      season: person.season,
+      agreement: person.agreement,
+      familyAgreement: person.familyAgreement,
       photos: rows.map((o) => ({
         file: o.photo.file,
         light: o.photo.light,

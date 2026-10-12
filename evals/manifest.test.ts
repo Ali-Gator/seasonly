@@ -56,3 +56,20 @@ describe("manifest provenance fields", () => {
     expect(expectOf(OLD)).toBe("pass");
   });
 });
+
+describe("manifest holdout", () => {
+  /** {@link openspec/specs/analysis-eval/spec.md#requirement-a-holdout-set-judges-what-the-rest-tuned} */
+  it("accepts holdout: true on every photo of a person, and rejects any other value", () => {
+    expect(
+      problems({ ...OLD, holdout: true }, { ...OLD, file: "p01/b.jpg", holdout: true }),
+    ).toEqual([]);
+    expect(problems({ ...OLD, holdout: "yes" })).toEqual(["photos[0].holdout: expected true"]);
+  });
+
+  /** {@link openspec/specs/analysis-eval/spec.md#scenario-a-person-split-across-both-sets} */
+  it("reports a person split across both sets", () => {
+    expect(problems({ ...OLD, holdout: true }, { ...OLD, file: "p01/b.jpg" })).toEqual([
+      "photos[1]: p01 is held out on some photos and not others",
+    ]);
+  });
+});
