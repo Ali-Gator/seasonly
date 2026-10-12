@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Measures a person's coloring from one photo, inside the analysis core. It turns raw pixels, face landmarks and an optional hair mask into skin, eye, lip and hair colors, and reduces those to the three traits the season classifier reads: temperature, value and clarity.
+Measures a person's coloring from one photo, inside the analysis core. It turns raw pixels, face landmarks and an optional hair mask into skin, eye, lip and hair colors, and reduces those to the three traits the season classifier reads: temperature, value and clarity. It also measures the eye white, which the photo check judges the light by.
 
 ## Public Interface
 
@@ -33,10 +33,12 @@ export interface Traits {
 } // each −1..1, 3 decimals
 export interface Sample {
   regions: RegionColors;
+  eyeWhite: Lab | null; // brightest share of both eye openings; null below MIN_REGION_PIXELS
   traits: Traits | null;
 }
 export const MIN_REGION_PIXELS = 50;
 export const REGIONS: { forehead; rightCheek; leftCheek; lips; rightIris; leftIris }; // landmark index rings
+export const EYE_OPENINGS: { right; left }; // landmark index rings, kept out of REGIONS
 export function samplePhoto(input: PhotoInput): Sample;
 export function traitsOf(regions: RegionColors): Traits | null;
 export function srgbToLab(r: number, g: number, b: number): Lab; // D65
@@ -51,6 +53,8 @@ A region's color is its pixels sorted by L* (ties by position), the top and bott
 
 Traits are weighted means of normalized terms (`sampling/traits.ts`; the skin chroma midpoint, 26, is the labeled eval set's mean, and the other constants were checked against the set and kept): temperature from skin and hair hue, each hue's weight scaled down below chroma 10; value from skin, hair and eye lightness; clarity from skin and eye chroma and how much darker the hair or eyes are than the skin. Absent regions drop out of each mean.
 
+The eye white is the pixels inside both eye openings (MediaPipe's `FACEMESH_RIGHT_EYE` and `FACEMESH_LEFT_EYE`, cited in `sampling/regions.ts`), the brightest 40% by L*, then the same robust center. The openings stay out of `REGIONS` because they contain the irises. The hair mask is not applied. The eye white changes neither the region colors nor the traits: a white balance against it was measured and parked (`t15-white-balance`, 2026-10-12; BL-13).
+
 ## Edge Cases
 
 - No skin region (face too small or outside the frame): `traits` is null; the caller falls back to the quiz.
@@ -58,6 +62,7 @@ Traits are weighted means of normalized terms (`sampling/traits.ts`; the skin ch
 - Hair lighter than the skin: adds no contrast, so clarity reads soft.
 - Landmarks outside the image: clipped; only in-frame pixels count.
 - Wrong buffer, landmark or mask length: `RangeError` naming the number.
+- Eyes closed or the eye openings outside the frame: `eyeWhite` is null; the traits are unaffected.
 
 ## Requirements
 
@@ -154,3 +159,17 @@ Sampling SHALL NOT modify the pixel buffer, the landmarks or the hair mask it is
 
 - **WHEN** an image is sampled
 - **THEN** its pixel buffer, landmarks and hair mask are byte-for-byte what they were before
+
+### Requirement: Sampling reports the eye white
+
+Sampling SHALL measure the eye white from the brightest part of both eye openings, the same measure the photo check uses, with 468 or 478 landmarks. It SHALL report the eye white beside the region colors, or report it as absent when the eye openings hold fewer than 50 pixels inside the image. The eye white SHALL NOT change the region colors or the traits.
+
+#### Scenario: The eye white is reported
+
+- **WHEN** a synthetic face paints its eye openings a known light color and is sampled with 468 landmarks
+- **THEN** the reported eye white is within ΔE 2 of the color painted there
+
+#### Scenario: No usable eye white
+
+- **WHEN** the eye openings hold fewer than 50 pixels inside the image
+- **THEN** the eye white is reported as absent and the traits are those of the region colors

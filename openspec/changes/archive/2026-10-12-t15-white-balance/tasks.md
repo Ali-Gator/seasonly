@@ -48,12 +48,12 @@
   - Note (2026-10-12), `/code-review high` in a fresh subagent: no correctness bugs; photo-check outputs, traits and the public surface confirmed unchanged. Fixed: (1) no test proved the eye white leaves regions and traits alone, now one sampling two sclera colors; (2) 6.3 extended to the photo-check spec and the color-sampling Purpose; (3) stale proposal Capabilities and Impact lines; (4) a 478-landmark eye-white case; (6) the moved comment's source and the sampling header; (7) "usable" dropped from the delta, since the eye white ignores the hair mask. Logged, not fixed: (5) the web flow samples each passing photo twice (inside `checkPhoto` and again in `photo.ts`), now with the eye white too.
 - [x] 6.2 Backlog: keep BL-13 (not fixed) and rewrite it with this change's finding, status gated on BL-14. Add to BL-14 that the eval should report within-person trait spread, so a change of this size can be judged. Log the warm/cool skin-hue gap (3°) as BL-39, and every unfixed review finding after it. Name the ids in the PR. Verify: `_Next id:_` is bumped for each new item.
   - Note (2026-10-12): BL-13 rewritten (gated — BL-14); BL-14 gains the trait-spread report; BL-39 (skin-hue gap) and BL-40 (double sampling, review finding 5) added; next id BL-41.
-- [ ] 6.3 After `/opsx:archive`:
+- [x] 6.3 After `/opsx:archive`:
   - In `openspec/specs/color-sampling/spec.md`, mention the eye white in the Purpose and Behavior, and update the Public Interface (`Sample.eyeWhite`, `EYE_OPENINGS`) and the Edge Cases (no usable eye white).
   - In `openspec/specs/photo-check/spec.md`, point the eye-opening citation at `sampling/regions.ts`, and say photo-check reads the eye white from sampling.
   - `openspec/specs/analysis-eval/spec.md` keeps its numbers: they do not change.
   - Verify: `openspec validate --specs` passes.
-- [ ] 6.4 Plan (Claude Docs concept, https://claude.ai/code/artifact/23434923-c1ff-47d6-8ce6-7c86fd14856c):
+- [x] 6.4 Plan (Claude Docs concept, https://claude.ai/code/artifact/23434923-c1ff-47d6-8ce6-7c86fd14856c):
   - Set T15 to Blocked in the Tracker: the balance waits on a bigger eval set (BL-14).
   - Add a Tracker Log line naming the result and the BL ids, in plain words.
   - Note on Phase 3 item 1 (`t15-white-balance`) that it is parked behind BL-14, and paid promotion with it.
