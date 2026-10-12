@@ -33,7 +33,7 @@ export const REGIONS = {
 
 /**
  * The eye openings: the closed loops of FACEMESH_RIGHT_EYE and FACEMESH_LEFT_EYE, chained from the
- * edge sets in the same file and commit: the lower lid from the outer corner to the inner one,
+ * edge sets in face_mesh_connections.py (commit b453bf8, linked above): the lower lid from the outer corner to the inner one,
  * then the upper lid back. They stay out of REGIONS: an eye opening contains the iris, and
  * sampling regions never overlap.
  */

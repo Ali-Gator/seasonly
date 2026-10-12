@@ -2,7 +2,7 @@
 
 ### Requirement: Sampling reports the eye white
 
-Sampling SHALL measure the eye white from the brightest part of both eye openings, the same measure the photo check uses, with 468 or 478 landmarks. It SHALL report the eye white beside the region colors, or report it as absent when the eye openings hold fewer than 50 usable pixels. The eye white SHALL NOT change the region colors or the traits.
+Sampling SHALL measure the eye white from the brightest part of both eye openings, the same measure the photo check uses, with 468 or 478 landmarks. It SHALL report the eye white beside the region colors, or report it as absent when the eye openings hold fewer than 50 pixels inside the image. The eye white SHALL NOT change the region colors or the traits.
 
 #### Scenario: The eye white is reported
 

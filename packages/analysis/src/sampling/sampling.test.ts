@@ -333,6 +333,16 @@ describe("eye white", () => {
     expect(deltaE(eyeWhite ?? lab(BG), lab(SCLERA))).toBeLessThan(2);
   });
 
+  /** {@link openspec/specs/color-sampling/spec.md#requirement-sampling-reports-the-eye-white} */
+  it("reports the eye white with 478 landmarks and leaves regions and traits alone", () => {
+    const white = samplePhoto(withEyeWhites(SCLERA));
+    const blue = samplePhoto(withEyeWhites([200, 225, 250]));
+    expect(deltaE(white.eyeWhite ?? lab(BG), lab(SCLERA))).toBeLessThan(2);
+    expect(deltaE(blue.eyeWhite ?? lab(BG), lab([200, 225, 250]))).toBeLessThan(2);
+    expect(blue.regions).toEqual(white.regions);
+    expect(blue.traits).toEqual(white.traits);
+  });
+
   /** {@link openspec/specs/color-sampling/spec.md#scenario-no-usable-eye-white} */
   it("reports no eye white, and the same traits, when the eye openings are closed", () => {
     const closed = LM.map((p) => ({ ...p }));

@@ -1,5 +1,6 @@
 /**
- * Color sampling: pixels, face landmarks and an optional hair mask → region colors → traits.
+ * Color sampling: pixels, face landmarks and an optional hair mask → region colors → traits,
+ * plus the eye white.
  *
  * @see openspec/specs/color-sampling/spec.md
  */

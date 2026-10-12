@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-39**
+_Next id:_ **BL-41**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -28,18 +28,28 @@ fold items in.
 
 ## Analysis
 
-- **[BL-13] Temperature reads cool and moves with the light** — on the eval set, warm-labeled
-  people average cool (skin hue 47° against a midpoint of 55°), and one person's temperature
-  spreads 0.3–0.6 across photos, so label accuracy is 0.18. Constants cannot fix it (`t6-eval-set`
-  tried); white-balance skin and hair against the measured eye white before computing traits,
-  then re-tune on the set.
-  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/specs/color-sampling/spec.md`,
-  `evals/README.md` · _Status:_ open — found in `t6-eval-set`, 2026-10-09
+- **[BL-13] Temperature reads cool and moves with the light** — warm-labeled people average
+  cool (skin hue 47° against a midpoint of 55°), and one person's temperature spreads 0.3–0.6
+  across photos. `t15-white-balance` built a balance against the eye white (Lab offset and von
+  Kries): it steadies temperature (spread 0.338 to 0.283) and raises family agreement, but lowers
+  exact-season agreement on 16 people, so it was parked. Re-run its sweep (tasks 4.2–4.5 of that
+  change; code in commit `1d28b3d`) once the bigger set can judge it.
+  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/changes/archive/*-t15-white-balance/`
+  · _Status:_ gated — BL-14
+
+- **[BL-39] Skin hue barely separates warm and cool labels** — on the eval set, warm-labeled
+  people average skin hue 47.1° and cool-labeled 44.0°, a 3° gap inside an 11° spread, so
+  temperature cannot carry label accuracy (0.18) whatever the white balance does. Look for
+  another warm/cool cue (hair, eyes, lips, or the quiz) before tuning temperature further.
+  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `evals/README.md` · _Status:_ open — found
+  in `t15-white-balance`, 2026-10-12
 
 - **[BL-14] The eval set leans light-skinned and has no holdout** — 10 of 16 people are light,
   3 medium, 3 deep, and the same 72 usable photos tuned the limits they now score. Add medium
   and deep people (and the user's own selfies, which need no `source`), and keep a holdout once
-  the set passes about 30 people.
+  the set passes about 30 people. Also report each trait's within-person spread in
+  `results.json`: on 16 people one photo moves exact agreement about 0.03, too coarse to judge a
+  change like BL-13's balance.
   _Refs:_ `evals/manifest.json`, `openspec/specs/analysis-eval/spec.md` · _Status:_ open — found
   in `t6-eval-set`, 2026-10-09
 
@@ -103,6 +113,13 @@ fold items in.
   crop to a `file` part with `mediaType: "image/jpeg"` before the SDK drops it.
   _Refs:_ `apps/web/src/lib/report-text/index.ts`, `openspec/specs/report-text/spec.md` ·
   _Status:_ open — found in `t6-eval-set`, 2026-10-09
+
+- **[BL-40] The web flow samples each passing photo twice** — `checkImage` calls `checkPhoto`,
+  which runs `samplePhoto`, then calls `samplePhoto` again for the traits; since
+  `t15-white-balance` each run also measures the eye white. Have `checkPhoto` return its sample (or
+  traits) and reuse it.
+  _Refs:_ `apps/web/src/lib/capture/photo.ts`, `packages/analysis/src/photo-check/index.ts` ·
+  _Status:_ open — phase review of `t15-white-balance`, 2026-10-12
 
 ## Testing
 

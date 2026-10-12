@@ -30,9 +30,11 @@ None.
 
 ### Modified Capabilities
 
-- `color-sampling`: adds a requirement. Sampling measures the eye white, and traits are computed from skin, hair and eye colors white-balanced against it, falling back to unbalanced colors when there is no usable eye white.
+- `color-sampling`: adds a requirement. Sampling measures the eye white and reports it beside the region colors; it changes neither the region colors nor the traits. (The balance requirement first planned here is parked; see the note at the top.)
 
 ## Impact
+
+As first planned. After the rescope only the `sampling/` and `photo-check/` moves and the `results.json` hash ship; `traits.ts`, `baseline.json` and BL-13 stay as they are.
 
 - `packages/analysis/src/sampling/`: `index.ts` (`Sample` gains `eyeWhite`), `traits.ts` (`traitsOf` takes an optional eye white; reference, strength and retuned midpoints), and a new home for the eye-opening rings and the eye-white measure.
 - `packages/analysis/src/photo-check/index.ts`: reads the eye white from sampling. Its behavior and its `PhotoMeasures` shape are unchanged.
