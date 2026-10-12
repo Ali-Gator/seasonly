@@ -42,6 +42,11 @@ For each of skin, hair and eyes: `a' = a − k·(eye.a − REF.a)`, `b' = b − 
 - **Why `k` and not full correction:** at `k = 1` the first probe pushed single photos to implausible skin hues (above 100°). Skin reflects differently from sclera, so an exact cancel overshoots. `k` trades stability against those outliers. Low-chroma results are already damped by `HUE_FULL_CHROMA`.
 - **Why the eyes too:** the iris sits in the same light. Balancing skin and hair alone would let a cast move clarity through iris chroma.
 - **Alternative: von Kries diagonal scaling in linear RGB.** It is more principled for a multiplicative light cast, but it needs the region colors back in linear RGB (an inverse Lab conversion or per-pixel balancing) and adds code. Tried only if the Lab offset cannot beat the 0.6021 baseline with every other ratchet held. If it is adopted, this design is updated before the code lands.
+- **The von Kries trial (tasks 4.5, 2026-10-12).** The Lab offset failed D4: the sweep picks `k = 0`, and its best exploratory setting fails D4.4. The alternative is tried in the offline harness with the formula fixed before any run:
+  - Convert each region center and the eye white from Lab to linear sRGB (an exact inverse of `srgbToLab`, no clamp).
+  - Chromaticity is a color's linear RGB divided by its luminance Y. `REF` becomes the mean eye-white chromaticity of the usable passing photos, measured fresh in linear RGB.
+  - Per channel, gain = (REF chromaticity ÷ eye-white chromaticity)^k. Each region's linear RGB is multiplied by the gains, converted back to Lab, and keeps its original L\*.
+  - Same protocol as D4: `k ∈ {0, 0.25, 0.5, 0.75, 1}` at current midpoints; then one midpoint at a time at that `k`'s centers; then both overfit checks. No finer grid and no joint search. If it is adopted, it replaces the Lab offset in `traits.ts`, and the spec's "offset" wording is updated to match.
 - **No clamp on the offset:** a passing photo's eye-white chroma is at most 22, and `n()` already clamps each trait term to ±1. Add a clamp only if the sweep shows an outlier the chroma weighting does not damp.
 
 ### D4. How `REF`, `k` and the midpoints are chosen

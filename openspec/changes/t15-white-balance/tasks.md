@@ -14,10 +14,24 @@
 
 ## 4. Measure on the eval set (design D4)
 
-- [ ] 4.1 Measure `REF` (mean eye-white a\*, b\* of the usable photos that pass) from a fresh `pnpm eval:run` report, to one decimal, and set it in `traits.ts`. Verify: the value and its photo count are recorded in this task's note.
-- [ ] 4.2 Sweep `k ∈ {0, 0.25, 0.5, 0.75, 1}` with one-off runs (`EVAL_MANIFEST=evals/manifest.json EVAL_RESULTS=<scratchpad>/k-<k>.json pnpm eval:run`). Record agreement, accuracy, false-reject rate and catch rate per `k` in a table in this task's note. Pick `k` by D4's rule; a pick of `k = 0` counts as the 4.5 failure path (the warm-cast scenario needs a real shift). Verify: the table is in the note, and the false-reject rate and catch rate are identical across `k`.
+- [x] 4.1 Measure `REF` (mean eye-white a\*, b\* of the usable photos that pass) from a fresh `pnpm eval:run` report, to one decimal, and set it in `traits.ts`. Verify: the value and its photo count are recorded in this task's note.
+  - Note (2026-10-12): REF = (a\* 7.6, b\* 6.2), the mean eye white of 59 usable passing photos (16 people); no passing photo lacks an eye white. Unchanged from the probe.
+- [x] 4.2 Sweep `k ∈ {0, 0.25, 0.5, 0.75, 1}` with one-off runs (`EVAL_MANIFEST=evals/manifest.json EVAL_RESULTS=<scratchpad>/k-<k>.json pnpm eval:run`). Record agreement, accuracy, false-reject rate and catch rate per `k` in a table in this task's note. Pick `k` by D4's rule; a pick of `k = 0` counts as the 4.5 failure path (the warm-cast scenario needs a real shift). Verify: the table is in the note, and the false-reject rate and catch rate are identical across `k`.
+  - Note (2026-10-12), Lab offset, current midpoints:
+
+    | k    | agreement | family agreement | accuracy | false-reject rate | catch rate | temperature SD | clarity SD |
+    | ---- | --------- | ---------------- | -------- | ----------------- | ---------- | -------------- | ---------- |
+    | 0    | 0.6021    | 0.7177           | 0.1806   | 0.1806            | 0.887      | 0.338          | 0.188      |
+    | 0.25 | 0.5708    | 0.7333           | 0.1528   | 0.1806            | 0.887      | 0.291          | 0.175      |
+    | 0.5  | 0.5729    | 0.7698           | 0.1250   | 0.1806            | 0.887      | 0.283          | 0.164      |
+    | 0.75 | 0.5625    | 0.8219           | 0.1111   | 0.1806            | 0.887      | 0.279          | 0.160      |
+    | 1    | 0.5052    | 0.7385           | 0.1111   | 0.1806            | 0.887      | 0.276          | 0.161      |
+
+    SD = mean within-person standard deviation of the trait. False-reject and catch rates are identical across k. D4's rule picks k = 0: the 4.5 failure path. The balance does steady temperature and clarity and raises family agreement, but exact-season agreement falls.
 - [ ] 4.3 With that `k`, re-check the `SKIN_HUE`, `HAIR_HUE` and `SKIN_C` midpoints at the corrected set's centers, one at a time. Keep each only if agreement rises and no other ratchet falls. Verify: a sweep row per midpoint tried is in the note.
+  - Note (2026-10-12): n/a under D4, since k = 0. Balanced centers: skin hue 46.6° (k 0) to 47.8° (k 1); skin C\*ab 26.3 to 25.9, so SKIN_C stays; hair hue 47.0° (k 0), 41.7° (k 0.25), 39.4° (k 0.5). Rows tried (agreement at k 0 / 0.25 / 0.5 / 0.75 / 1): SKIN_HUE 47: 0.5344 / 0.5469 / 0.5521 / 0.5125 / 0.4844. HAIR_HUE 39: 0.5396 / 0.6302 / 0.5677 / 0.5542 / 0.4896. Exploratory, beyond D4's one-at-a-time rule: both moved, 0.55 / 0.5313 / 0.5208 / 0.4844 / 0.4719; HAIR_HUE 36–45 at k 0.25 all give 0.6271–0.6302 (accuracy 0.1389–0.1528). A finer k grid (0.15–0.35) was looked at after the fact and is not used.
 - [ ] 4.4 Overfit check (D4.4). Record the per-person agreement change against the committed `results.json`, and reject the setting if two or fewer people carry the gain. Record the largest shift in `REF` when each person is left out, and whether it changes any person's season. Verify: both numbers are in the note and in the `traits.ts` comment beside the constants, the way `SKIN_C`'s measurement is recorded today.
+  - Note (2026-10-12), for the exploratory best (k 0.25, HAIR_HUE 42, agreement 0.6302): per-person change against results.json: p02 +0.25, p04 +0.2, p11 +0.25, p08 −0.25, the other 12 unchanged (3 gainers, passes the "more than two" rule narrowly). Largest REF shift with one person left out: 0.66 (a\*b\* units). Leaving p05 out moves p09's season, so D4.4 rejects the setting (next smaller k is 0).
 - [ ] 4.5 If no setting beats agreement 0.6021 with the false-reject rate and catch rate at or above baseline: try D3's von Kries alternative (update design.md first). If that also fails, stop and report the sweep tables to the user. Do not lower any baseline other than accuracy without their approval, recorded here. Verify: either 4.6 holds, or the user's decision is recorded in this task.
 - [ ] 4.6 `pnpm fix`, then `pnpm eval:run` with the final constants. Raise `evals/baseline.json` to the new numbers. Accuracy is the one exception: if it fell, lower its baseline to the new result. The user approved trading accuracy for agreement on 2026-10-12, in the proposal conversation. Commit `results.json` and `baseline.json` with the code. Verify: `pnpm test:eval` passes, and agreement in `results.json` is above 0.6021.
 
