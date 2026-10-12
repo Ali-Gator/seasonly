@@ -21,7 +21,7 @@ The eval set has 16 people (10 light, 3 medium, 3 deep), 93 photos, 72 usable. `
 
 ### D1. Candidates: Commons, as in `t6-eval-set` design decision 5
 
-Public figures with three to six free-licensed Commons photos in clearly different light (daylight, indoor, flash, stage, red carpet), each face at least about a tenth of the photo's long side, because the app scales to 1280 px and `MIN_FACE_WIDTH` is 120. Prefer event photos and candids to studio portraits. Seasons are proposed with a one-line reason and cover all four families. The user approves people, photos, labels and `expect` on a private review page that links each Commons file page. Hashes are computed only after approval.
+Public figures with three to six free-licensed Commons photos in clearly different light (daylight, indoor, flash, stage, red carpet), each face at least about a tenth of the photo's long side, because the app scales to 1280 px and `MIN_FACE_WIDTH` is 120. Prefer event photos and candids to studio portraits. Seasons are proposed with a one-line reason, as these people are usually typed; all four families appear, autumn most. The user approves people, photos, labels and `expect` on a private review page that links each Commons file page. Hashes are computed only after approval.
 
 Deep-skin photos are vetted by eye for exposure. The `dark` check produced most false rejects in `t6-eval-set`. If it rejects deep skin more than light skin on the grown set, that is a finding for the backlog. It is not tuned here.
 
@@ -45,7 +45,7 @@ The first untuned run of the grown set's tuning set becomes `baseline.json`, wit
 
 ### D6. The white-balance re-run
 
-Check out the balance from `1d28b3d` into a scratch worktree, never onto this branch. Sweep `k ∈ {0, 0.25, 0.5, 0.75, 1}` on the tuning set with one-off runs (`EVAL_MANIFEST`/`EVAL_RESULTS`). A setting earns a follow-up change only if, on the tuning set, agreement rises by at least two photos' worth (2 × 0.29 / measured people) and temperature spread falls, with the false-reject and catch rates unchanged, and if on the holdout agreement does not fall and temperature spread falls. The tables go into the tasks and into BL-13.
+Check out the balance from `1d28b3d` into a scratch worktree, never onto this branch. Sweep `k ∈ {0, 0.25, 0.5, 0.75, 1}` on the tuning set with one-off runs (`EVAL_MANIFEST`/`EVAL_RESULTS`). A setting earns a follow-up change only if, on the tuning set, agreement rises by at least two photos' worth (2 × 0.29 / measured people) and temperature spread falls, with the false-reject and catch rates unchanged, and if on the holdout temperature spread falls and agreement falls by no more than one photo's worth (0.29 / measured holdout people, about 0.036 on 8). The holdout is too small for a stricter agreement test. The tables go into the tasks and into BL-13.
 
 ## Risks / Trade-offs
 
