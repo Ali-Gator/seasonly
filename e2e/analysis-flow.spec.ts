@@ -54,7 +54,6 @@ test("goes from the landing to the reveal in under 30 s, spending nothing", asyn
   const upload = page.getByLabel("Upload a photo");
   await expect(upload).toBeEnabled();
   await upload.setInputFiles(FACE);
-  await page.getByRole("button", { name: "Agree and upload" }).click();
 
   const answers = ["Green or olive", "Gold", "Tans easily, rarely burns", "Medium or light brown"];
   for (const [i, label] of answers.entries()) {
@@ -101,17 +100,24 @@ test("asks for a retake of a photo with no face, sending nothing", async ({ page
 /**
  * {@link openspec/specs/capture-flow/spec.md#scenario-back-inside-the-quiz}
  * {@link openspec/specs/capture-flow/spec.md#scenario-reload}
+ * {@link openspec/specs/capture-flow/spec.md#scenario-a-good-photo}
+ * {@link openspec/specs/capture-flow/spec.md#scenario-leaving-during-the-quiz}
  */
 test("Back stays inside the flow, also after a reload", async ({ page }) => {
   test.setTimeout(90_000);
+  const analyze: string[] = [];
+  page.on("request", (r) => {
+    if (r.url().includes("/api/analyze")) analyze.push(r.url());
+  });
   const upload = async () => {
     const input = page.getByLabel("Upload a photo");
     await expect(input).toBeEnabled();
     await input.setInputFiles(FACE);
-    await page.getByRole("button", { name: "Agree and upload" }).click();
   };
   await page.goto("/analyze");
   await upload();
+  await expect(page.getByText("Question 1 of 4")).toBeVisible();
+  expect(analyze).toEqual([]);
   await page.getByText("Green or olive", { exact: true }).click();
   await page.getByRole("button", { name: "Next", exact: true }).click();
   await expect(page.getByText("Question 2 of 4")).toBeVisible();
@@ -131,11 +137,10 @@ test("Back stays inside the flow, also after a reload", async ({ page }) => {
   await upload();
   await expect(page.getByText("Question 1 of 4")).toBeVisible();
   await page.goBack();
-  await expect(page.getByRole("heading", { name: "Before we upload" })).toBeVisible();
-  await page.goBack();
   await expect(
     page.getByRole("heading", { name: "Three things before your selfie" }),
   ).toBeVisible();
+  expect(analyze).toEqual([]);
   // The entries before the reload belong to the earlier visit: one more Back leaves the flow.
   await page.goBack();
   await expect(page).not.toHaveURL(/\/analyze/);

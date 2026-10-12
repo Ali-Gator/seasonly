@@ -18,8 +18,10 @@ const SECTIONS: [heading: string, body: ReactNode][] = [
   ],
   [
     "Your photo",
+    // The face-crop sentence approved 2026-10-12 (t11 task 1.2).
     <>
-      Upload only a photo of yourself. Do not upload a photo of anyone else. Our{" "}
+      Upload only a photo of yourself. Do not upload a photo of anyone else. When you take or upload
+      a photo, a crop of your face is sent for the analysis, as our privacy policy describes. Our{" "}
       <Link href="/privacy">privacy policy</Link> says what happens to your photo and your data.
     </>,
   ],
@@ -60,7 +62,7 @@ export default function Page() {
       <div className="flex flex-col gap-(--space-3) border-b border-(--line) pb-(--space-6)">
         <p className="overline">Legal</p>
         <h1 className="h1">Terms of use</h1>
-        <p className="caption text-(--ink-muted)">Last updated October 11, 2026</p>
+        <p className="caption text-(--ink-muted)">Last updated October 12, 2026</p>
         <p className="lead">By using Seasonly you agree to these terms. They are short.</p>
       </div>
       {SECTIONS.map(([heading, body]) => (

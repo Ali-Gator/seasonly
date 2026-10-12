@@ -4,6 +4,8 @@ import { renderReportEmail } from "./render";
 
 const ID = "k7m2qxAAAAAAAAAAAAAAAA";
 const LINK = `https://seasonly.me/r/${ID}`;
+const FOOTER =
+  "Your photo is deleted within 24 hours of your analysis. We keep your report until you ask us to delete it.";
 /** The visible words of the HTML part, entities decoded. */
 const words = (html: string) =>
   html
@@ -40,9 +42,7 @@ describe("renderReportEmail", () => {
     expect(photo.html.match(new RegExp(`href="${LINK}"`, "g"))).toHaveLength(2);
     expect(text).toContain("Open my report");
     expect(text).toContain(`Button not working? Paste this link: seasonly.me/r/${ID}`);
-    expect(text).toContain(
-      "Your photo is deleted within 24 hours of your analysis. We keep only your result.",
-    );
+    expect(text).toContain(FOOTER);
   });
 
   /** {@link openspec/specs/email-capture/spec.md#requirement-the-report-email-carries-the-report-link} */
@@ -51,8 +51,16 @@ describe("renderReportEmail", () => {
     expect(photo.text).toContain("You're a Soft Autumn: warm, soft and earthy.");
     expect(photo.text).toContain("Terracotta #B4694F");
     expect(photo.text).toContain(`Open my report: ${LINK}`);
-    expect(photo.text).toContain("Your photo is deleted within 24 hours");
+    expect(photo.text).toContain(FOOTER);
     expect(photo.text).not.toMatch(/<[a-z]/);
+  });
+
+  /** {@link openspec/specs/email-capture/spec.md#scenario-the-photo-footer} */
+  it("says the photo goes and the report stays, in both parts", () => {
+    for (const part of [words(photo.html), photo.text]) {
+      expect(part).toContain(FOOTER);
+      expect(part).not.toContain("We keep only your result");
+    }
   });
 
   /** {@link openspec/specs/email-capture/spec.md#scenario-a-quiz-only-report} */

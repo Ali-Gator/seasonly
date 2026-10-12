@@ -87,16 +87,27 @@ describe("/privacy", () => {
     expect(privacy).toMatch(/data protection authority/);
     expect(privacy).toMatch(/Last updated/);
   });
+
+  /** {@link openspec/specs/legal-pages/spec.md#scenario-the-basis-for-using-the-crop} */
+  it("bases the face crop on the analysis asked for, not on a consent screen", () => {
+    expect(privacy).toContain(
+      "We use your face crop and the rest of your data because we need them to give you the analysis and the report you asked for. You can have them deleted at any time, as above.",
+    );
+    expect(privacy).not.toMatch(/consent screen/i);
+  });
 });
 
 describe("/terms", () => {
   /** {@link openspec/specs/legal-pages/spec.md#scenario-reading-the-terms} */
-  it("states the estimate, the age, own photos, no warranty, the law and the contact", () => {
+  it("states the estimate, the age, own photos, the face crop, no warranty, the law and the contact", () => {
     expect(terms).toMatch(
       /A result is an estimate for choosing colors\. It is not professional, medical or any other advice/,
     );
     expect(terms).toContain("You must be 16 or older to use Seasonly.");
     expect(terms).toContain("Upload only a photo of yourself.");
+    expect(terms).toContain(
+      "When you take or upload a photo, a crop of your face is sent for the analysis, as our privacy policy describes.",
+    );
     expect(terms).toMatch(/provided as is, with no warranty/);
     expect(terms).toMatch(/not liable/);
     expect(terms).toMatch(

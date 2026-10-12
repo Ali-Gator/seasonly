@@ -63,7 +63,7 @@ export default function Page() {
       <div className="flex flex-col gap-(--space-3) border-b border-(--line) pb-(--space-6)">
         <p className="overline">Legal</p>
         <h1 className="h1">Privacy policy</h1>
-        <p className="caption text-(--ink-muted)">Last updated October 11, 2026</p>
+        <p className="caption text-(--ink-muted)">Last updated October 12, 2026</p>
         <p className="lead">
           Seasonly needs a crop of your face to find your colors. This page says what we keep, who
           else sees it, and how to have it deleted.
@@ -198,10 +198,11 @@ export default function Page() {
             stay, because an address alone does not show whose they are.
           </li>
         </ul>
+        {/* Approved 2026-10-12 (t11 task 1.2).
+            {@link openspec/specs/legal-pages/spec.md#scenario-the-basis-for-using-the-crop} */}
         <p>
-          We use your face crop because you agree to it on the consent screen, and the rest of your
-          data to give you the report you asked for. You can withdraw your consent at any time by
-          asking us to delete your data.
+          We use your face crop and the rest of your data because we need them to give you the
+          analysis and the report you asked for. You can have them deleted at any time, as above.
         </p>
         <p>
           You can also complain to a data protection authority: in Bulgaria, the Commission for

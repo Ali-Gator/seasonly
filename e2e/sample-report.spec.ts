@@ -9,7 +9,6 @@ import { expect, test } from "@playwright/test";
 import { posingAsAPhone, recordPostHog } from "./posthog";
 
 const CUSTOM = [
-  "consent_answered",
   "quiz_completed",
   "analysis_failed",
   "report_requested",

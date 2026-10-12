@@ -17,7 +17,6 @@ export type Step =
   /** `id` ties the check's result to the photo that started it. */
   | { name: "checking"; id: number }
   | { name: "retake"; problem: RetakeReason; offerQuizOnly: boolean; previewUrl: string | null }
-  | { name: "consent" }
   | { name: "quiz"; question: number }
   | { name: "analyzing" }
   | { name: "reveal"; result: Result }
@@ -26,7 +25,7 @@ export type Step =
   | { name: "no-result"; reason: "no-answers" | "answers-cancel" }
   | { name: "error" };
 
-/** A photo that passed the check: what is sent after consent. */
+/** A photo that passed the check: what is sent once the quiz is finished. */
 export interface PassedPhoto {
   traits: Traits;
   crop: Blob;
@@ -50,7 +49,6 @@ export interface FlowState {
   quizOnly: boolean;
   /** Failed checks in a row. */
   failures: number;
-  consented: boolean;
   /** The last request sent, re-sent by Try again. */
   request: AnalysisRequest | null;
   /** Bumped on every send, so the component sends once per bump. */
@@ -70,8 +68,6 @@ export type FlowEvent =
       photo: PassedPhoto | null;
       previewUrl: string | null;
     }
-  | { type: "agree" }
-  | { type: "decline" }
   | { type: "retake" }
   | { type: "quiz-only" }
   | { type: "answer"; question: Question; value: string }
@@ -92,7 +88,6 @@ export function initialState(): FlowState {
     quizDone: false,
     quizOnly: false,
     failures: 0,
-    consented: false,
     request: null,
     attempt: 0,
   };
@@ -108,8 +103,7 @@ const replace = (s: FlowState, step: Step): FlowState => ({ ...s, step });
 /** Sends the request, as a new entry from the last question or in place of a spinner. */
 const analyze = (s: FlowState, to: typeof push): FlowState => ({
   ...to(s, { name: "analyzing" }),
-  // Never a photo the person has not agreed to send.
-  request: { answers: s.answers, photo: s.consented ? s.photo : null },
+  request: { answers: s.answers, photo: s.photo },
   attempt: s.attempt + 1,
 });
 
@@ -139,20 +133,9 @@ export function reduce(s: FlowState, e: FlowEvent): FlowState {
           },
         );
       }
-      const next = { ...s, failures: 0, photo: e.photo };
-      // Quiz-only ends only once the photo is kept, not when it might still be declined.
-      return next.consented
-        ? afterPhoto({ ...next, quizOnly: false }, replace)
-        : replace(next, { name: "consent" });
+      // Replaced, so Back from the quiz skips the spinner. A passing photo ends quiz-only.
+      return afterPhoto({ ...s, failures: 0, photo: e.photo, quizOnly: false }, replace);
     }
-    case "agree":
-      return step.name === "consent"
-        ? afterPhoto({ ...s, consented: true, quizOnly: false }, push)
-        : s;
-    case "decline":
-      // The person said no: the photo is dropped and the next pass asks again. Replaced, so
-      // Back does not land on the consent it just left.
-      return replace({ ...s, photo: null, consented: false }, { name: "capture" });
     case "retake":
       return push(s, { name: "capture" });
     case "quiz-only":
@@ -194,11 +177,7 @@ export function reduce(s: FlowState, e: FlowEvent): FlowState {
     case "back": {
       const previous = s.trail.at(-1);
       if (!previous) return s;
-      // Leaving consent unanswered keeps no photo, as declining would.
-      const photo = step.name === "consent" && !s.consented ? null : s.photo;
-      // Consent for a photo that was since dropped has nothing to show: take a new one.
-      const to: Step = previous.name === "consent" && !photo ? { name: "capture" } : previous;
-      return { ...s, photo, step: to, trail: s.trail.slice(0, -1) };
+      return { ...s, step: previous, trail: s.trail.slice(0, -1) };
     }
   }
 }

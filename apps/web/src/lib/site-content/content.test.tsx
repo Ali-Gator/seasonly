@@ -243,6 +243,17 @@ describe("/how-it-works", () => {
     for (const href of ["/sample-report", "/privacy", "/color-analysis-gpt-alternative"])
       expect(out).toContain(`href="${href}"`);
   });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-when-the-crop-is-uploaded} */
+  it("says the crop is uploaded after the check and the quiz, with no agreement step", () => {
+    expect(text(out)).toContain(
+      "Only a crop of your face is uploaded, after the photo passes the check and you finish the quiz.",
+    );
+    expect(text(out)).toContain(
+      "Nothing is uploaded until the photo passes the check and you finish the quiz.",
+    );
+    expect(text(out)).not.toMatch(/you agree/i);
+  });
 });
 
 describe("/sample-report", () => {
