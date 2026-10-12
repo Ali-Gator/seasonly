@@ -14,7 +14,7 @@ The balance's effect on agreement (−0.03 to +0.03 across its sweep) is then tw
 
 ## What Changes
 
-- **18 new people, 9 medium and 9 deep.** Public figures on Wikimedia Commons, three to six photos each (90 in all) in clearly different light, as in `t6-eval-set`. Seasons spread across all four families, not only deep autumn and deep winter. The user approves every person, photo, label and expected outcome before any download. The set grows to 34 people: 10 light, 12 medium and 12 deep.
+- **18 new people, 9 medium and 9 deep.** Public figures on Wikimedia Commons, three to six photos each (88 in all) in clearly different light, as in `t6-eval-set`. Proposed seasons follow how these people are usually typed: 10 autumn, 6 winter, 1 summer, 1 spring. Agreement and trait spread do not use the label, so the skew does not bias them. The user approves every person, photo, label and expected outcome before any download. The set grows to 34 people: 10 light, 12 medium and 12 deep.
 - **A holdout.** Every second new person in each skin band, sorted by surname, gets `holdout: true` (8 people). The rule is fixed before the first run. The 16 original people never join the holdout: they tuned today's limits. `metrics`, which CI holds to `baseline.json`, covers the other 26 people. The holdout's metrics are reported and never ratcheted.
 - **Trait spread.** `results.json` reports the mean within-person standard deviation of temperature, value and clarity, for the tuning set and the holdout. It is reported, not ratcheted. No single photo's trait is written.
 - **A new baseline.** The grown set's first untuned run becomes `baseline.json`. It will almost certainly score below today's 0.6021: harder photos and more varied skin. Lowering the baseline needs the user's approval, asked with the photo list.
@@ -39,7 +39,7 @@ None.
 ## Impact
 
 - `evals/manifest.ts` (`holdout`), `evals/metrics.ts` (trait spread; `PhotoOutcome` carries traits), `evals/pipeline.ts` (passes traits through), `evals/results.ts` (tuning and holdout metrics; traits never serialized).
-- `evals/manifest.json` (18 people, 90 photos), `evals/results.json`, `evals/baseline.json`.
+- `evals/manifest.json` (18 people, 88 photos), `evals/results.json`, `evals/baseline.json`.
 - `evals/README.md`: holdout and trait spread under "Reading the results".
 - Tests: new cases in `manifest.test.ts`, `metrics.test.ts` and `results.test.ts`. Existing tests should not change. Any that must is listed for the user's approval.
 - No app code, no new dependencies, no paid run. `pnpm eval:run` is local and free.
