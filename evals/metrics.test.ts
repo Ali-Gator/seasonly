@@ -181,8 +181,39 @@ describe("an empty set", () => {
         expectedProblemRate: null,
         catchRate: null,
         passRate: null,
+        traitSpread: null,
       },
       people: [],
     });
+  });
+});
+
+describe("trait spread", () => {
+  const traits = (temperature: number, value: number, clarity: number) => ({
+    traits: { temperature, value, clarity },
+  });
+
+  /** {@link openspec/specs/analysis-eval/spec.md#scenario-two-photos} */
+  it("is the population standard deviation of each trait, over a person's passing photos", () => {
+    const out = metricsOf([
+      { ...photo("p01", "true-autumn", "true-autumn"), ...traits(0.2, 0, 0.1) },
+      { ...photo("p01", "true-autumn", "soft-autumn"), ...traits(0.6, 0, 0.1) },
+    ]);
+    expect(out.metrics.traitSpread).toEqual({ temperature: 0.2, value: 0, clarity: 0 });
+  });
+
+  /** {@link openspec/specs/analysis-eval/spec.md#scenario-one-passing-photo-has-no-spread} */
+  it("leaves out a person with one passing photo, and is null with nobody measured", () => {
+    const one = [
+      { ...photo("p02", "true-winter", "true-winter"), ...traits(0.9, 0.9, 0.9) },
+      photo("p02", "true-winter", "dark"),
+    ];
+    expect(metricsOf(one).metrics.traitSpread).toBeNull();
+    const out = metricsOf([
+      ...one,
+      { ...photo("p01", "true-autumn", "true-autumn"), ...traits(0, 0, 0) },
+      { ...photo("p01", "true-autumn", "true-autumn"), ...traits(0.4, 0.2, 0) },
+    ]);
+    expect(out.metrics.traitSpread).toEqual({ temperature: 0.2, value: 0.1, clarity: 0 });
   });
 });

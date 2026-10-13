@@ -12,12 +12,15 @@ export const EXPECTS: readonly ["pass", "no-face", "dark", "tint", "filter", "se
 export type EvalPhoto = {
   file: string; person: string; season: SeasonSlug; light: string; // as before
   source?: string; sha256?: string; license?: string; author?: string; expect?: Expect;
+  holdout?: true; // the same on every photo of a person
 };
 export function manifestProblems(value: unknown): string[];
 export const expectOf: (photo: EvalPhoto) => Expect; // "pass" when absent
 
 // evals/metrics.ts — pure
 export function metricsOf(outcomes: readonly PhotoOutcome[]): { metrics: Metrics; people: PersonRow[] };
+// PhotoOutcome.traits?: Traits (set for a pass, never written); Metrics.traitSpread: Traits | null
+// evals/results.ts: Results.metrics (tuning set, gated), Results.holdout (Metrics | null, reported)
 
 // evals/gate.ts
 export function inputFiles(root: string): string[]; // git-tracked hashed files, sorted
@@ -46,7 +49,7 @@ Committed: `evals/manifest.json`, `results.json`, `baseline.json`, `vision-resul
 
 The input hash covers the core's sampling, photo-check, classifier and palettes sources and its index, the app's `faces.ts`, `photo.ts` and `mediapipe.ts`, `evals/*.ts` (not tests), `manifest.json`, and the pinned MediaPipe version. Only git-tracked files count. The gate compares agreement, accuracy and the catch rate (higher is better) and the false-reject rate (lower is better) with the baseline at tolerance 0.
 
-Measured on 2026-10-09 (16 people, 93 photos): agreement 0.6021, label accuracy 0.1806, false-reject rate 0.1806, catch rate 0.8870, up from the untuned 0.4911, 0.1389, 0.2361 and 0.8606.
+Measured on 2026-10-13 (34 people, 180 photos: 10 light, 12 medium, 12 deep; 8 new people held out by every second person per skin band, sorted by surname). Tuning set (26 people): agreement 0.5687, label accuracy 0.1345, false-reject rate 0.2689, catch rate 0.8812, trait spread temperature 0.3241, value 0.2389, clarity 0.1929. Holdout: agreement 0.5312, accuracy 0.0882, false-reject rate 0.3235. The baseline was reset to these with the user's approval when the set grew; the 16-person set had measured 0.6021, 0.1806, 0.1806 and 0.8870 on 2026-10-09.
 
 ## Edge Cases
 
@@ -189,22 +192,59 @@ Loosening a limit therefore cannot lower false rejects without the cost showing 
 
 `eval:run` SHALL write `evals/results.json`. The file SHALL hold:
 
-- the set's metrics;
-- a table per person: person, label, and each photo's outcome and season;
+- the tuning set's metrics (`metrics`) and the holdout's metrics (`holdout`, null without a holdout), each with its trait spread;
+- a table per person: person, label, whether they are held out, and each photo's outcome and season;
 - the counts of photos, people and variants;
 - a hash of every input the results depend on: the core's checking, sampling, classifying and palette source, the app's face-choice code, the eval's own code, the manifest and the MediaPipe version.
 
-It SHALL hold no pixels, landmarks, masks, crops or color measurements of any photo. A run SHALL fail, and write nothing, if any listed photo is missing after fetching.
+It SHALL hold no pixels, landmarks, masks, crops or color measurements of any photo, and no trait of any single photo. A run SHALL fail, and write nothing, if any listed photo is missing after fetching.
 
 #### Scenario: A run on the full set
 
 - **WHEN** `eval:run` completes
-- **THEN** `results.json` holds the metrics, the per-person table and the input hash, and no pixel, landmark or color value
+- **THEN** `results.json` holds the metrics, the holdout metrics, the per-person table and the input hash, and no pixel, landmark, color value or single photo's trait
 
 #### Scenario: A photo cannot be had
 
 - **WHEN** a listed photo is absent and its fetch fails
 - **THEN** `eval:run` fails naming it and `results.json` is unchanged
+
+### Requirement: A holdout set judges what the rest tuned
+
+A manifest entry MAY carry `holdout: true`. Every photo of one person SHALL carry the same `holdout` value. An entry whose `holdout` is anything but `true` or absent SHALL be reported by the manifest check.
+
+`eval:run` SHALL compute the metrics twice: once over the people without `holdout` (the tuning set) and once over the holdout people. The tuning set's metrics SHALL be the ones `results.json` records as `metrics` and the ones CI holds to the baseline. The holdout's metrics SHALL be recorded as `holdout`, reported only and never ratcheted, so no change is tuned against them. With no holdout people, `holdout` SHALL be null.
+
+A person SHALL be put in the holdout when they join the set, by a rule fixed before their photos are first run, and SHALL never be moved out of it because of a result.
+
+#### Scenario: Two people, one held out
+
+- **WHEN** person `p17` has `holdout: true` on every photo and `p18` has none
+- **THEN** `metrics` is computed from `p18`'s photos alone and `holdout` from `p17`'s alone
+
+#### Scenario: A person split across both sets
+
+- **WHEN** one of `p17`'s photos has `holdout: true` and another has none
+- **THEN** the manifest check reports `p17`'s `holdout` as inconsistent
+
+#### Scenario: No holdout
+
+- **WHEN** no entry has `holdout`
+- **THEN** `metrics` covers every person and `holdout` is null
+
+### Requirement: Trait spread is measured across one person's photos
+
+For each person with at least two usable photos that pass the check, the eval SHALL compute the population standard deviation of each trait (temperature, value, clarity) across those photos. The set's trait spread SHALL be the mean of each over those people, rounded to four decimals, and null when no person is measured. It SHALL be recorded beside the other metrics, in `metrics` and in `holdout`. It is reported only and not ratcheted. No per-photo trait SHALL be written to `results.json`.
+
+#### Scenario: Two photos
+
+- **WHEN** a person's two passing photos have temperature 0.2 and 0.6, value 0 and 0, and clarity 0.1 and 0.1
+- **THEN** that person's spread is temperature 0.2, value 0 and clarity 0
+
+#### Scenario: One passing photo has no spread
+
+- **WHEN** only one of a person's photos passes the check
+- **THEN** that person does not move the set's trait spread
 
 ### Requirement: CI fails a stale or worse result
 

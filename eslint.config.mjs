@@ -7,7 +7,16 @@ import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["**/.next/", "**/node_modules/", ".agents/", "playwright-report/", "test-results/"] },
+  {
+    ignores: [
+      "**/.next/",
+      "**/node_modules/",
+      ".agents/",
+      ".claude/",
+      "playwright-report/",
+      "test-results/",
+    ],
+  },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {

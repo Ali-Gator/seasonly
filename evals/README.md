@@ -54,8 +54,22 @@ Run it only after the user approves the spend.
   problem.
 - **catchRate**: each passing usable photo's dark, warm and grayscale variants that get `dark`,
   `tint` and `filter` in turn.
+- **traitSpread**: for each person with two or more passing usable photos, the standard deviation
+  of temperature, value and clarity across them; the mean over those people. Continuous, so it
+  sees a stability change that moves too few photos to show in agreement. Reported, not ratcheted.
 - Family agreement and accuracy, the expected-problem rate and the pass rate are reported, not
   ratcheted.
+
+## The holdout
+
+People whose photos carry `holdout: true` are held out of tuning. `metrics`, which CI holds to
+`baseline.json`, covers everyone else; `holdout` reports the same metrics for the held-out people
+and is never ratcheted. Tune on `metrics`, then check the holdout did not get worse. A person is
+held out when they join, by a rule fixed before their first run (every other new person per skin
+band, in `t15-eval-growth`), and never moved out because of a result.
+
+The baseline was reset once, with the user's approval, to the grown set's first untuned run
+(`t15-eval-growth`, 2026-10-13); it ratchets as before from there.
 
 ## Changing the analysis
 
