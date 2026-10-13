@@ -10,7 +10,7 @@ import { loadVision } from "@/lib/capture/mediapipe";
 import { checkImage } from "@/lib/capture/photo";
 import { familyName } from "@/lib/site/routes";
 
-import { Capture, Checking, Consent, Guide, Retake } from "./_capture/steps";
+import { Capture, Checking, Guide, Retake } from "./_capture/steps";
 import { EmailStep } from "./_email/step";
 import { QuizStep } from "./_quiz/quiz";
 import { AnalysisError, Analyzing, NoResult, Reveal } from "./_reveal/steps";
@@ -32,7 +32,7 @@ const TIMEOUT_MS = 45_000;
  * never from a render.
  *
  * @see openspec/specs/capture-flow/spec.md
- * {@link openspec/specs/analytics/spec.md#requirement-the-flows-new-events-carry-only-their-outcome}
+ * {@link openspec/specs/analytics/spec.md#requirement-the-flows-events-carry-only-their-outcome}
  */
 export function Flow() {
   const [state, dispatch] = useReducer(reduce, undefined, initialState);
@@ -201,19 +201,6 @@ export function Flow() {
           onRetake={retake}
           onPhoto={onPhoto}
           onQuizOnly={() => dispatch({ type: "quiz-only" })}
-        />
-      )}
-      {step.name === "consent" && state.photo && (
-        <Consent
-          cropUrl={state.photo.cropUrl}
-          onAgree={() => {
-            track("consent_answered", { agreed: true });
-            dispatch({ type: "agree" });
-          }}
-          onDecline={() => {
-            track("consent_answered", { agreed: false });
-            dispatch({ type: "decline" });
-          }}
         />
       )}
       {step.name === "quiz" && (

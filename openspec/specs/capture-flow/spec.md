@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Takes a person from the photo guide to a usable face crop on `/analyze`. The capability runs the photo check on the device, asks for a retake with the right tip, and offers a quiz-only path when photos keep failing. It uploads nothing until the person agrees on the consent step.
+Takes a person from the photo guide to a usable face crop on `/analyze`. The capability runs the photo check on the device, asks for a retake with the right tip, and offers a quiz-only path when photos keep failing. It uploads nothing until the quiz is finished.
 
 ## Public Interface
 
@@ -13,7 +13,6 @@ type Step =
   | { name: "capture" }
   | { name: "checking"; id: number }
   | { name: "retake"; problem: RetakeReason; offerQuizOnly: boolean; previewUrl: string | null }
-  | { name: "consent" }
   | { name: "quiz"; question: number }
   | { name: "analyzing" }
   | { name: "reveal"; result: Result }
@@ -51,7 +50,6 @@ function photoCheckedProps(o: {
 
 - `Flow` (`flow.tsx`) is the only client component with state. It maps the reducer's trail onto browser history: one `pushState({ depth })` per trail entry, numbered from the entry it mounted on. A popstate below the shown depth dispatches `back` once per level; Forward is undone with `history.go`; an entry below the mount's base belongs to an earlier visit, so Back onto it leaves the flow. With no page before that entry the browser stays, and the flow re-bases on the guide.
 - The check and the analysis replace their spinner with the outcome, so Back never lands on a spinner. Each check carries an id; a result whose id is not the shown `checking` step is dropped and not reported.
-- Leaving an unanswered consent by Back keeps no photo, as declining does; the request never carries a photo without consent.
 - The camera frame is taken before `checking` unmounts the camera. The photo is checked at ≤ 1280 px on its longer side; the crop is the face box plus 30 % per side, ≤ 512 px, JPEG 0.85.
 - MediaPipe's wasm comes from jsDelivr at the exact installed `@mediapipe/tasks-vision` version, the models from Google's versioned paths; both start loading on the guide.
 - A check that throws (an undecodable file, models that failed to load) shows the no-face retake and goes to Sentry.
@@ -87,9 +85,19 @@ Every step of the analysis flow SHALL render at `/analyze` without changing the 
 
 ### Requirement: The photo guide and capture follow the canvas
 
-The flow SHALL open on the photo guide: the heading "Three things before your selfie", the three tip cards and two actions, "Take a selfie" and "Upload a photo". This is the copy of canvas artboard 02. Each tip card SHALL show its good and its bad example as a photo with alt text, never as a labeled placeholder. The capture step SHALL show the front camera's live view in the camera frame, with the caption "Fit your face in the oval, at eye level. Hold still." It SHALL offer "Take photo" and "Upload a photo instead". When the camera cannot be opened, the capture step SHALL keep the upload action and show "Camera blocked or not working? Upload a selfie you took in daylight."
+The flow SHALL open on the photo guide: the heading "Three things before your selfie", the three tip cards and two actions, "Take a selfie" and "Upload a photo". This is the copy of canvas artboard 02. Each tip card SHALL show its good and its bad example as a photo with alt text, never as a labeled placeholder.
 
-**Unenforced:** the live camera needs a camera device, which CI's browser lacks. Task 8.3's manual check on a phone covers it; the upload path is covered by E2E.
+Under the two actions, the guide SHALL show the upload notice in the canvas's words. The notice SHALL say:
+
+- only a crop of the face is sent, and only once the quiz is finished;
+- an AI model from Google, reached through Vercel, reads its colors and does not train on it;
+- the crop is deleted within 24 hours.
+
+It SHALL link to `/privacy`.
+
+The capture step SHALL show the front camera's live view in the camera frame, with the caption "Fit your face in the oval, at eye level. Hold still." It SHALL offer "Take photo" and "Upload a photo instead". When the camera cannot be opened, the capture step SHALL keep the upload action and show "Camera blocked or not working? Upload a selfie you took in daylight."
+
+**Unenforced:** the live camera needs a camera device, which CI's browser lacks. The upload path is covered by E2E.
 
 #### Scenario: The guide
 
@@ -101,6 +109,11 @@ The flow SHALL open on the photo guide: the heading "Three things before your se
 - **WHEN** `/analyze` opens
 - **THEN** each of the three tip cards shows two images, each with non-empty alt text, and no placeholder label
 
+#### Scenario: The guide names who reads the crop
+
+- **WHEN** the photo guide is shown
+- **THEN** below the two actions it says only a face crop is sent, once the quiz is finished. It also says an AI model from Google, through Vercel, reads it and does not train on it, and that the crop is deleted within 24 hours. It links to `/privacy`.
+
 #### Scenario: No camera
 
 - **WHEN** the camera cannot be opened
@@ -111,7 +124,7 @@ The flow SHALL open on the photo guide: the heading "Three things before your se
 A taken or uploaded photo SHALL be checked in the browser: face landmarks, the face count, and the core photo check. Exactly one outcome SHALL follow:
 
 - **Fails:** a retake screen with the heading "Let's retake this one", the photo as taken, the problem's title and message as a danger note, its retake tip as a note with the tip's icon, and two actions: "Retake photo" and "Upload a different photo".
-- **Passes:** the consent step.
+- **Passes:** the quiz's first question. If every question was already answered in this visit, the analysis starts instead. No step asks the person to agree before the quiz.
 
 #### Scenario: A photo with no face
 
@@ -121,7 +134,12 @@ A taken or uploaded photo SHALL be checked in the browser: face landmarks, the f
 #### Scenario: A good photo
 
 - **WHEN** a well-lit single-face photo is uploaded
-- **THEN** the consent step is shown with the photo's face crop
+- **THEN** the quiz's first question is shown, and no request has gone to the analyze route
+
+#### Scenario: A good retake after the quiz
+
+- **WHEN** a person who has answered every question takes a new photo that passes
+- **THEN** the analysis starts with that photo's crop, without showing the quiz again
 
 ### Requirement: Two measurable faces ask for a retake
 
@@ -139,25 +157,6 @@ The threshold is measured on the labeled eval set (`analysis-eval`, 2026-10-09):
 - **WHEN** a photo holds a 400 px face and a 60 px face
 - **THEN** only the 400 px face is checked
 
-### Requirement: Nothing leaves the device before consent
-
-The photo, its face crop and its traits SHALL NOT be sent anywhere before the person chooses "Agree and upload" on the consent step. The consent step SHALL show the face crop that will be sent and the canvas copy of artboard 05: what is uploaded and why, who reads it, and that it is deleted within 24 hours. "Who reads it" means an AI model from Google, reached through Vercel, that does not train on the crop. "Not now, go back" SHALL return to capture and send nothing. Consent SHALL be asked once per visit: a later photo that passes in the same visit goes on without asking again.
-
-#### Scenario: Consent declined
-
-- **WHEN** a person whose photo passed chooses "Not now, go back"
-- **THEN** the capture step is shown and no request was made to the analyze route
-
-#### Scenario: Consent given
-
-- **WHEN** the person chooses "Agree and upload"
-- **THEN** the quiz starts, and the face crop is first sent only when the quiz is finished
-
-#### Scenario: The consent step names who reads the crop
-
-- **WHEN** the consent step is shown
-- **THEN** it says an AI model from Google, through Vercel, reads the crop and does not train on it, and it links to `/privacy`
-
 ### Requirement: Only a face crop is uploaded
 
 The upload SHALL hold only a crop of the face, never the whole photo. The crop SHALL be the face landmarks' bounding box widened by a margin on every side and clamped to the image. It SHALL be scaled down to at most 512 px on its longer side and encoded as JPEG. The traits SHALL be measured from the full photo the check passed, before cropping.
@@ -169,7 +168,7 @@ The upload SHALL hold only a crop of the face, never the whole photo. The crop S
 
 ### Requirement: Repeated failures offer a quiz-only result
 
-After the second failed check in a row, the retake screen SHALL also offer to continue without a photo. That path SHALL skip consent and the upload and go to the quiz. Its result SHALL come from the quiz alone. A photo that passes SHALL reset the count.
+After the second failed check in a row, the retake screen SHALL also offer to continue without a photo. That path SHALL send no crop and no traits, and SHALL go to the quiz. Its result SHALL come from the quiz alone. A photo that passes SHALL reset the count.
 
 #### Scenario: First failure
 
@@ -203,3 +202,17 @@ It SHALL NOT carry pixels, the image, the landmarks or the crop. With PostHog of
 
 - **WHEN** a dark photo is checked on the first attempt
 - **THEN** one `photo_checked` event is sent with problem `dark`, the face width and the eye-white color, and no image data
+
+### Requirement: Nothing leaves the device before the quiz is finished
+
+The photo, its face crop and its traits SHALL NOT be sent anywhere before the person answers the quiz's last question. They SHALL be sent only with the analyze request. A person who leaves the flow before that sends nothing, whether by Back, by closing the page or by reloading it. The full photo SHALL never be sent.
+
+#### Scenario: Leaving during the quiz
+
+- **WHEN** a person whose photo passed answers two questions and then goes Back to the photo guide
+- **THEN** no request has gone to the analyze route
+
+#### Scenario: The quiz is finished
+
+- **WHEN** the person answers the last question
+- **THEN** one analyze request carries the answers, the traits and the face crop

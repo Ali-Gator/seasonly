@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-42**
+_Next id:_ **BL-49**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -28,14 +28,27 @@ fold items in.
 
 ## Analysis
 
-- **[BL-13] Temperature reads cool and moves with the light** — warm-labeled people average
-  cool (skin hue 47° against a midpoint of 55°), and one person's temperature spreads 0.3–0.6
-  across photos. `t15-white-balance` built a balance against the eye white (Lab offset and von
-  Kries): it steadies temperature (spread 0.338 to 0.283) and raises family agreement, but lowers
-  exact-season agreement on 16 people, so it was parked. Re-run its sweep (tasks 4.2–4.5 of that
-  change; code in commit `1d28b3d`) once the bigger set can judge it.
-  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/changes/archive/*-t15-white-balance/`
-  · _Status:_ gated — BL-14
+- **[BL-13] Temperature reads cool and moves with the light** — skin hue moves with the light, so
+  one person's temperature spreads across photos. The eye-white balance (Lab offset, commit
+  `1d28b3d`) was re-run on the grown set in `t15-eval-growth` (2026-10-13): on the tuning set it
+  cuts temperature spread 0.324 to 0.271 and lifts family agreement 0.70 to 0.78, but exact
+  agreement rises only 0.015 (two photos is 0.023), and on the holdout temperature spread rises at
+  every strength. Parked again: the eye white is not a reliable white reference across people.
+  Look for a reference that holds on the holdout, after BL-45 lets more deep-skin photos pass.
+  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/changes/archive/*-t15-eval-growth/tasks.md` · _Status:_ gated — BL-45
+
+- **[BL-48] A few eval people have two photos from one shoot** — p22/4 and p22/5 (one concert),
+  and p26/1 and p26/2 (one event). Same-shoot
+  pairs push that person's agreement up and trait spread down. Replace one of each pair with a
+  photo in different light the next time the set grows, before that run.
+  _Refs:_ `evals/manifest.json`, `openspec/changes/archive/*-t15-eval-growth/design.md` · _Status:_ open — found in `t15-eval-growth` phase review, 2026-10-13
+
+- **[BL-45] The dark check rejects deep skin more often** — on the grown eval set, 9 of 41 usable
+  photos of new deep-skinned people get `dark` (22%), against 4 of 45 medium (9%) and 6 of 72 in
+  the original set (8%). The check reads overall brightness, so it penalizes deep skin. Measure
+  exposure on something skin-independent (the eye white or the background) and tune it on the
+  tuning set only, holding the catch rate.
+  _Refs:_ `packages/analysis/src/photo-check/index.ts`, `openspec/changes/archive/*-t15-eval-growth/tasks.md` · _Status:_ open — found in `t15-eval-growth`, 2026-10-13
 
 - **[BL-39] Skin hue barely separates warm and cool labels** — on the eval set, warm-labeled
   people average skin hue 47.1° and cool-labeled 44.0°, a 3° gap inside an 11° spread, so
@@ -43,15 +56,6 @@ fold items in.
   another warm/cool cue (hair, eyes, lips, or the quiz) before tuning temperature further.
   _Refs:_ `packages/analysis/src/sampling/traits.ts`, `evals/README.md` · _Status:_ open — found
   in `t15-white-balance`, 2026-10-12
-
-- **[BL-14] The eval set leans light-skinned and has no holdout** — 10 of 16 people are light,
-  3 medium, 3 deep, and the same 72 usable photos tuned the limits they now score. Add medium
-  and deep people (and the user's own selfies, which need no `source`), and keep a holdout once
-  the set passes about 30 people. Also report each trait's within-person spread in
-  `results.json`: on 16 people one photo moves exact agreement about 0.03, too coarse to judge a
-  change like BL-13's balance.
-  _Refs:_ `evals/manifest.json`, `openspec/specs/analysis-eval/spec.md` · _Status:_ open — found
-  in `t6-eval-set`, 2026-10-09
 
 - **[BL-15] CI checks a committed eval result, not the photos** — only a machine with the
   photos can refresh `results.json`. Run `eval:fetch` and `eval:run` in CI (Playwright's
@@ -80,14 +84,21 @@ fold items in.
   _Refs:_ `apps/web/src/lib/observability/posthog.ts`, `openspec/specs/analytics/spec.md` ·
   _Status:_ deferred — before paid promotion or a complaint; the user's choice, 2026-10-09
 
-- **[BL-20] The consent screen undersells what is kept and where the crop goes** — "We keep only
-  your result: your season and your colors" leaves out the measured traits, quiz answers and
-  personal text the report stores, and the screen does not say Google may keep the crop up to
-  90 days for abuse checks, though `/privacy` cites this screen as the basis for using the crop.
-  The report email footer repeats the line. Needs a canvas line first.
-  _Refs:_ `apps/web/src/app/(flow)/analyze/_capture/steps.tsx`, `apps/web/src/lib/email/render.ts`,
-  `openspec/specs/capture-flow/spec.md` · _Status:_ open — phase review of `t8-photo-privacy`,
-  2026-10-10
+- **[BL-43] The guide notice does not say Google may keep the crop** — the photo guide names
+  Google as the reader, then says "We delete it within 24 hours", while `/privacy` says Google may
+  keep the crop up to 90 days for abuse checks. The notice links to `/privacy`, but a reader of the
+  notice alone thinks every copy is gone in a day. Needs a canvas line (board 02) first.
+  _Refs:_ `apps/web/src/app/(flow)/analyze/_capture/steps.tsx` (`Guide`),
+  `openspec/specs/capture-flow/spec.md` · _Status:_ open — phase review of `t11-no-consent-step`,
+  2026-10-12 (carried from BL-20)
+
+- **[BL-44] Three site pages still say "We keep your result"** — `/how-it-works` ("Deleted within
+  24 hours" note), the landing and `/color-analysis-gpt-alternative` say only the result is kept,
+  though the report also holds the measured traits, quiz answers and personal text (the email
+  footer and the how-it-works FAQ now say "your report"). Needs a canvas line first.
+  _Refs:_ `apps/web/src/app/(site)/how-it-works/page.tsx`, `apps/web/src/app/(site)/page.tsx`,
+  `apps/web/src/app/(site)/color-analysis-gpt-alternative/page.tsx` · _Status:_ open — phase
+  review of `t11-no-consent-step`, 2026-10-12
 
 - **[BL-30] Sentry error reports can carry request bodies** — Sentry 10.75 attaches an incoming
   request's body (up to about 10 KB) to an error event by default, even with default PII off, so a
@@ -123,6 +134,13 @@ fold items in.
 
 ## Testing
 
+- **[BL-47] One E2E test fails in the local phase gate** — `report-delivery.spec.ts` "answers a
+  report it cannot read with 500" expects `cache-control: private, no-store`, but local
+  `pnpm test` serves E2E with `pnpm dev`, which sends `no-cache, must-revalidate`; CI's prebuilt
+  server passes. Either set the header explicitly on that route or run that assertion only against
+  a production build, so `pnpm test` is green locally.
+  _Refs:_ `e2e/report-delivery.spec.ts:112`, `playwright.config.ts` · _Status:_ open — found in `t15-eval-growth`, 2026-10-13
+
 - **[BL-21] Two e2e cases fail on a Mac** — run locally, `/seasons/Soft-Autumn` answers 200
   (the case-insensitive disk serves the prerendered `soft-autumn` page) and, on the dev server
   (no `CI=1`), the report-500 page carries `no-cache, must-revalidate` instead of
@@ -136,6 +154,15 @@ fold items in.
   can see an error.
   _Refs:_ `apps/web/src/app/(report)/`, `openspec/specs/report-page/spec.md` · _Status:_ open —
   network capture of `t8-photo-privacy`, 2026-10-10
+
+- **[BL-42] The citation gate ignores an open change's REMOVED requirements** — the gate reads
+  the main specs, so a requirement an unarchived change removes must still be cited until
+  archive. Moving its citations to the new anchors (as the change's tasks ask) fails `test:unit`
+  and the pre-commit hook until archive. Skip requirements listed under `## REMOVED Requirements`
+  in `openspec/changes/*/specs/` (not `archive/`), as the gate already does for ADDED headings.
+  It is an edit to an existing test, so it waits for the user's approval.
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — found in
+  `t11-no-consent-step`, 2026-10-12
 
 - **[BL-17] Two analysis-eval scenarios are proven one level down** — "A photo cannot be had"
   is tested on the results writer, not on `eval:run` failing after a failed fetch, and "A usable

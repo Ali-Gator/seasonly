@@ -15,7 +15,7 @@ Both use `pageMetadata` from `lib/site/routes.ts` (`ready: true`) and the layout
 
 ## Behavior
 
-The text was drafted from the migrations, the vision call (`lib/report-text/index.ts`), `lib/capture/mediapipe.ts`, a recorded network capture of a photo analysis, the email step and a report page on a preview (2026-10-10), and each service's own retention docs, and approved by the user on 2026-10-10 (draft: https://claude.ai/artifact/Hio6CA23jzRxKPr9q83uLH). The operator is "an individual in Bulgaria"; the governing law is Bulgaria's; the contact is `care@seasonly.me`; the minimum age is 16. The legal check was the user's own review (no outside reviewer, recorded 2026-10-10).
+The text was drafted from the migrations, the vision call (`lib/report-text/index.ts`), `lib/capture/mediapipe.ts`, a recorded network capture of a photo analysis, the email step and a report page on a preview (2026-10-10), and each service's own retention docs, and approved by the user on 2026-10-10 (draft: https://claude.ai/artifact/Hio6CA23jzRxKPr9q83uLH). The operator is "an individual in Bulgaria"; the governing law is Bulgaria's; the contact is `care@seasonly.me`; the minimum age is 16. The legal check was the user's own review (no outside reviewer, recorded 2026-10-10). On 2026-10-12 (`t11-no-consent-step`) the user approved the new basis for the face crop on `/privacy` (the analysis asked for, not a consent screen) and the face-crop sentence in `/terms`; both pages' "Last updated" became October 12, 2026.
 
 Retention stated per service: Vercel request logs 1 hour (Hobby); AI Gateway keeps nothing, Google up to 90 days for abuse checks (Vertex's documented maximum; the Gemini API says "a limited period"); Resend 30 days; PostHog up to 7 years; Sentry 30 days (free plan); jsDelivr aggregated within hours; Google Cloud Storage and the MediaPipe usage log under Google's privacy policy.
 
@@ -25,7 +25,6 @@ Retention stated per service: Vercel request logs 1 hour (Hobby); AI Gateway kee
 - Resend click and open tracking stay on (the user's choice, 2026-10-10): report links pass through `l.seasonly.me`, and the Resend row says so.
 - `vercel.live` appears only on previews (the feedback toolbar) and is not listed.
 - A change of plan, provider or retention (Vercel Pro and ZDR, a Sentry Team plan, Resend tracking off) changes the page: update the text and its "Last updated" date.
-- The consent screen still says "We keep only your result" and does not mention Google's abuse-monitoring window (BL-20).
 
 ## Requirements
 
@@ -85,10 +84,17 @@ A service that receives data and is missing from the list is a defect in the pag
 
 `/privacy` SHALL give the operator's name and country and a contact email address. It SHALL say that a person can ask for a copy of their data, for its correction or for its deletion. It SHALL say that a request is answered within 30 days. It SHALL say what to send: the report link, or the email address. It SHALL say the person may complain to their data protection authority. It SHALL show the date it was last updated.
 
+It SHALL state the basis for using the face crop and the rest of the data: they are needed to give the person the analysis and the report they asked for. It SHALL NOT name a consent screen as that basis, since the flow has none. The wording of the basis SHALL be approved by the user before it ships.
+
 #### Scenario: Asking for deletion
 
 - **WHEN** a person reads `/privacy`
 - **THEN** it gives the contact address, says to send the report link or the email address, and says the request is answered within 30 days
+
+#### Scenario: The basis for using the crop
+
+- **WHEN** a person reads `/privacy`
+- **THEN** it says the face crop is used because it is needed for the analysis the person asked for, and it does not mention a consent screen
 
 ### Requirement: The terms state what the service is and its limits
 
@@ -97,6 +103,7 @@ A service that receives data and is missing from the list is a defect in the pag
 - that a result is an estimate for choosing colors, not professional, medical or other advice;
 - the minimum age for using the service;
 - that a person may upload only a photo of themselves;
+- that taking or uploading a photo sends a crop of the face for the analysis, as the privacy policy describes;
 - that the service is provided as is, with no warranty, and the limits of liability;
 - that the terms may change, and how changes are announced;
 - the governing law, and the operator's contact address.
@@ -106,7 +113,7 @@ It SHALL link to `/privacy` and show the date it was last updated.
 #### Scenario: Reading the terms
 
 - **WHEN** a person reads `/terms`
-- **THEN** it states the result is an estimate, the minimum age, own photos only, no warranty, the governing law and the contact address, and links to `/privacy`
+- **THEN** it states the result is an estimate, the minimum age, own photos only, that a photo sends a face crop for the analysis, no warranty, the governing law and the contact address, and links to `/privacy`
 
 ### Requirement: The legal pages are live and indexed
 
