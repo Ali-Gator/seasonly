@@ -17,7 +17,8 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new test cases
 
 ## 3. The grown set
 
-- [ ] 3.1 Download the approved photos, compute SHA-256, and write the manifest entries (`p17`…), with `holdout: true` per D2 in the same commit. Done when `pnpm eval:fetch` reports nothing missing and the manifest test passes.
+- [x] 3.1 Download the approved photos, compute SHA-256, and write the manifest entries (`p17`…), with `holdout: true` per D2 in the same commit. Done when `pnpm eval:fetch` reports nothing missing and the manifest test passes.
+  - Done 2026-10-13: 87 photos, p17–p34, 8 people held out. Vetted at full size before any run: every photo shows the right person. Dropped `p33/4` (Pressley), a second crop of the same moment as `p33/2`, so the set has 87 of the 88 approved. A download bug wrote a previous photo's bytes when Commons throttled past every retry; 7 such files were caught by hash and re-fetched before the manifest was written.
 - [ ] 3.2 `pnpm eval:run`. Record the tuning and holdout metrics and trait spread, the false rejects by problem and by skin band, and any person left unmeasured. Write `baseline.json` from the tuning set's metrics (approved in 1.2). Done when `pnpm test:eval` passes.
 - [ ] 3.3 If `dark` false rejects fall mostly on deep skin, add a backlog item with the counts.
 
