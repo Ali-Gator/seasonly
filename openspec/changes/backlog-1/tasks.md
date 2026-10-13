@@ -34,7 +34,7 @@
 
 ## 3. Verify, delete, review, archive, ship
 
-- [ ] 3.1 `pnpm fix`, `pnpm test`
-- [ ] 3.2 delete shipped bullets BL-48, BL-29, BL-15 and (if 2.6 passed) BL-45 from `docs/backlog.md`; add the narrower BL-15 successor at the `_Next id:_` number and bump it ("Gate the eval on the CI run", deferred until four consecutive weekly runs fetch cleanly and match the committed metrics within the drift the spec allows another machine); if BL-45 shipped, flip BL-13's status to `open` (its gate is met)
+- [x] 3.1 `pnpm fix`, `pnpm test`
+- [x] 3.2 delete shipped bullets BL-48, BL-29, BL-15 and (if 2.6 passed) BL-45 from `docs/backlog.md`; add the narrower BL-15 successor at the `_Next id:_` number and bump it ("Gate the eval on the CI run", deferred until four consecutive weekly runs fetch cleanly and match the committed metrics within the drift the spec allows another machine); if BL-45 shipped, flip BL-13's status to `open` (its gate is met)
 - [ ] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
 - [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge

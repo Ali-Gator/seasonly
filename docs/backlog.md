@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-49**
+_Next id:_ **BL-50**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -34,21 +34,9 @@ fold items in.
   cuts temperature spread 0.324 to 0.271 and lifts family agreement 0.70 to 0.78, but exact
   agreement rises only 0.015 (two photos is 0.023), and on the holdout temperature spread rises at
   every strength. Parked again: the eye white is not a reliable white reference across people.
-  Look for a reference that holds on the holdout, after BL-45 lets more deep-skin photos pass.
-  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/changes/archive/*-t15-eval-growth/tasks.md` · _Status:_ gated — BL-45
-
-- **[BL-48] A few eval people have two photos from one shoot** — p22/4 and p22/5 (one concert),
-  and p26/1 and p26/2 (one event). Same-shoot
-  pairs push that person's agreement up and trait spread down. Replace one of each pair with a
-  photo in different light the next time the set grows, before that run.
-  _Refs:_ `evals/manifest.json`, `openspec/changes/archive/*-t15-eval-growth/design.md` · _Status:_ open — found in `t15-eval-growth` phase review, 2026-10-13
-
-- **[BL-45] The dark check rejects deep skin more often** — on the grown eval set, 9 of 41 usable
-  photos of new deep-skinned people get `dark` (22%), against 4 of 45 medium (9%) and 6 of 72 in
-  the original set (8%). The check reads overall brightness, so it penalizes deep skin. Measure
-  exposure on something skin-independent (the eye white or the background) and tune it on the
-  tuning set only, holding the catch rate.
-  _Refs:_ `packages/analysis/src/photo-check/index.ts`, `openspec/changes/archive/*-t15-eval-growth/tasks.md` · _Status:_ open — found in `t15-eval-growth`, 2026-10-13
+  Look for a reference that holds on the holdout, now that `backlog-1` lets more deep-skin photos
+  pass the `dark` check.
+  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/changes/archive/*-t15-eval-growth/tasks.md` · _Status:_ open — BL-45 shipped in `backlog-1`, 2026-10-13
 
 - **[BL-39] Skin hue barely separates warm and cool labels** — on the eval set, warm-labeled
   people average skin hue 47.1° and cool-labeled 44.0°, a 3° gap inside an 11° spread, so
@@ -59,18 +47,12 @@ fold items in.
   cue tried (iris, lips, hair, skin re-centring) moves exact metrics a photo or less (backlog-1
   triage, 2026-10-13)
 
-- **[BL-15] CI checks a committed eval result, not the photos** — only a machine with the
-  photos can refresh `results.json`. Run `eval:fetch` and `eval:run` in CI (Playwright's
-  Chromium is already there) once a Commons fetch from CI proves stable.
-  _Refs:_ `.github/workflows/ci.yml`, `evals/gate.ts` · _Status:_ deferred — until fetching about
-  100 Commons originals per CI run is judged stable
-
-- **[BL-29] The quiz alone never gives three seasons** — over all 750 answer combinations,
-  quiz-only classification reaches 10 seasons and never Soft Autumn, Soft Summer or Bright Spring,
-  on the web quiz-only path and in the chat plugin. Decide whether the quiz weights should move
-  clarity enough to reach them, or say in the season-classifier spec that a photo is needed for them.
-  _Refs:_ `packages/analysis/src/classifier/reference.ts`, `openspec/specs/season-classifier/spec.md`
-  · _Status:_ open — found in `t12-mcp-teaser`, 2026-10-11
+- **[BL-49] Gate the eval on the CI run** — the weekly `eval-weekly.yml` run only reports its
+  metrics beside the committed `results.json`. Once it has proved stable, make CI hold a change to
+  a fresh run instead of the committed result.
+  _Refs:_ `.github/workflows/eval-weekly.yml`, `evals/gate.ts` · _Status:_ deferred — until four
+  consecutive weekly runs fetch cleanly and match the committed metrics within the drift the
+  analysis-eval spec allows another machine
 
 ## Privacy
 
