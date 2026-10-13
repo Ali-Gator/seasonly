@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Button, Icon, ReportSection } from "@/components/ds";
-import { Colors, Group, SeasonTraits } from "@/lib/report/sections";
+import { Colors, Group, LEFT, RIGHT, SeasonTraits } from "@/lib/report/sections";
 import { SeasonLink } from "@/lib/site-content/season-link";
 import { FAMOUS_NOTE, famousIntro, SEASON_CONTENT } from "@/lib/site-content/seasons";
 import { familyName, pageMetadata, SEASON_SLUGS, SEASONS, seasonName } from "@/lib/site/routes";
@@ -52,7 +52,9 @@ export default async function Season({ params }: Props) {
   return (
     <>
       <div className="flex flex-col gap-(--space-12) lg:flow-root">
-        <section className="flex flex-col gap-(--space-4) lg:mb-(--space-5) lg:gap-(--space-5) lg:float-left lg:clear-left lg:w-[calc(100%/3_-_var(--space-6)*2/3)]">
+        <section
+          className={`flex flex-col gap-(--space-4) lg:mb-(--space-5) lg:gap-(--space-5) ${LEFT}`}
+        >
           <nav aria-label="Breadcrumb">
             <Link href="/seasons" className="caption sn-navlink text-(--ink-muted)">
               The 12 seasons
@@ -63,7 +65,7 @@ export default async function Season({ params }: Props) {
           <p className="quote text-(--ink-muted)">{copy.tagline}</p>
         </section>
 
-        <div className="lg:mb-(--space-12) lg:float-right lg:clear-right lg:w-[calc(100%*7/12_-_var(--space-6)*5/12)]">
+        <div className={`lg:mb-(--space-12) ${RIGHT}`}>
           <ReportSection
             overline="Palette"
             title={`The ${name} palette`}
@@ -73,7 +75,7 @@ export default async function Season({ params }: Props) {
           </ReportSection>
         </div>
 
-        <div className="flex flex-col gap-(--space-4) lg:gap-(--space-5) lg:float-left lg:clear-left lg:w-[calc(100%/3_-_var(--space-6)*2/3)]">
+        <div className={`flex flex-col gap-(--space-4) lg:gap-(--space-5) ${LEFT}`}>
           <p>{copy.summary}</p>
           {about.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
@@ -82,7 +84,7 @@ export default async function Season({ params }: Props) {
           <FindOut name={name} />
         </div>
 
-        <div className="flex flex-col gap-(--space-12) lg:float-right lg:clear-right lg:w-[calc(100%*7/12_-_var(--space-6)*5/12)]">
+        <div className={`flex flex-col gap-(--space-12) ${RIGHT}`}>
           <ReportSection
             overline="Avoid"
             title="Colors to avoid"

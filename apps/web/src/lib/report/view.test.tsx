@@ -175,9 +175,10 @@ describe("ReportView", () => {
   /** {@link openspec/specs/report-page/spec.md#scenario-a-desktop-window} */
   it("places the season and actions left of the sections from 1024 px", () => {
     expect(out).toMatch(
-      /<section[^>]*class="[^"]*lg:col-span-4[^"]*"[^>]*>\s*<p class="overline">Your season/,
+      /<section[^>]*class="[^"]*lg:float-left[^"]*"[^>]*>\s*<p class="overline">Your season/,
     );
-    expect(out).toMatch(/class="[^"]*lg:col-start-6[^"]*"/);
+    expect(out).toMatch(/class="[^"]*lg:float-right[^"]*"[^>]*><section class="sn-report"/);
+    expect(out).toMatch(/class="[^"]*lg:float-left[^"]*"[^>]*>.*Share my season/);
   });
 });
 

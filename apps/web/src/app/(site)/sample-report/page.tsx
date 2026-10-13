@@ -40,7 +40,7 @@ export default function Page() {
           </Button>
         </section>
 
-        <div className="flex flex-col gap-(--space-12) lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-(--space-6) lg:gap-y-(--space-5)">
+        <div className="flex flex-col gap-(--space-12) lg:flow-root">
           <ReportSections
             season="soft-autumn"
             agreement="agree"
