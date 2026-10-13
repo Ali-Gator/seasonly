@@ -33,7 +33,7 @@ export interface Traits {
 } // each −1..1, 3 decimals
 export interface Sample {
   regions: RegionColors;
-  eyeWhite: Lab | null; // brightest share of both eye openings; null below MIN_REGION_PIXELS
+  eyeWhite: Lab | null; // brightest share of both eye openings, irises left out with 478 landmarks; null below MIN_REGION_PIXELS
   traits: Traits | null;
 }
 export const MIN_REGION_PIXELS = 50;
@@ -53,7 +53,7 @@ A region's color is its pixels sorted by L* (ties by position), the top and bott
 
 Traits are weighted means of normalized terms (`sampling/traits.ts`; the skin chroma midpoint, 26, is the labeled eval set's mean, and the other constants were checked against the set and kept): temperature from skin and hair hue, each hue's weight scaled down below chroma 10; value from skin, hair and eye lightness; clarity from skin and eye chroma and how much darker the hair or eyes are than the skin. Absent regions drop out of each mean.
 
-The eye white is the pixels inside both eye openings (MediaPipe's `FACEMESH_RIGHT_EYE` and `FACEMESH_LEFT_EYE`, cited in `sampling/regions.ts`), the brightest 40% by L*, then the same robust center. The openings stay out of `REGIONS` because they contain the irises. The hair mask is not applied. The eye white changes neither the region colors nor the traits: a white balance against it was measured and parked (`t15-white-balance`, 2026-10-12; BL-13).
+The eye white is the pixels inside both eye openings (MediaPipe's `FACEMESH_RIGHT_EYE` and `FACEMESH_LEFT_EYE`, cited in `sampling/regions.ts`); with 478 landmarks the pixels inside each iris circle are left out (center landmark 468 / 473, radius the mean distance to its four ring landmarks 469–472 / 474–477); then the brightest 30% by L* and the same robust center. With 468 landmarks there is no iris to leave out. The openings stay out of `REGIONS` because they contain the irises. The hair mask is not applied. The eye white changes neither the region colors nor the traits: a white balance against it was measured and parked (`t15-white-balance`, 2026-10-12; BL-13).
 
 ## Edge Cases
 
@@ -62,7 +62,7 @@ The eye white is the pixels inside both eye openings (MediaPipe's `FACEMESH_RIGH
 - Hair lighter than the skin: adds no contrast, so clarity reads soft.
 - Landmarks outside the image: clipped; only in-frame pixels count.
 - Wrong buffer, landmark or mask length: `RangeError` naming the number.
-- Eyes closed or the eye openings outside the frame: `eyeWhite` is null; the traits are unaffected.
+- Eyes closed, the eye openings outside the frame, or (478 landmarks) fewer than 50 opening pixels left outside the iris circles: `eyeWhite` is null; the traits are unaffected.
 
 ## Requirements
 
@@ -162,7 +162,7 @@ Sampling SHALL NOT modify the pixel buffer, the landmarks or the hair mask it is
 
 ### Requirement: Sampling reports the eye white
 
-Sampling SHALL measure the eye white from the brightest part of both eye openings, the same measure the photo check uses, with 468 or 478 landmarks. It SHALL report the eye white beside the region colors, or report it as absent when the eye openings hold fewer than 50 pixels inside the image. The eye white SHALL NOT change the region colors or the traits.
+Sampling SHALL measure the eye white from the brightest part of both eye openings, leaving out the irises when the landmarks include them (478), the same measure the photo check uses, with 468 or 478 landmarks. It SHALL report the eye white beside the region colors, or report it as absent when fewer than 50 pixels of the eye openings, irises left out, lie inside the image. The eye white SHALL NOT change the region colors or the traits.
 
 #### Scenario: The eye white is reported
 
@@ -173,3 +173,13 @@ Sampling SHALL measure the eye white from the brightest part of both eye opening
 
 - **WHEN** the eye openings hold fewer than 50 pixels inside the image
 - **THEN** the eye white is reported as absent and the traits are those of the region colors
+
+#### Scenario: Irises and lids are left out
+
+- **WHEN** a synthetic face sampled with 478 landmarks paints its irises dark, a quarter of the rest of each eye opening a known light color and the remainder its skin color
+- **THEN** the reported eye white is within ΔE 2 of the light color
+
+#### Scenario: Irises fill the eye openings
+
+- **WHEN** a face sampled with 478 landmarks has eye openings whose pixels outside the iris circles number fewer than 50
+- **THEN** the eye white is reported as absent

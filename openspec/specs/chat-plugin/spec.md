@@ -30,7 +30,7 @@ An error in the tool or resource callback is reported to Sentry by `reported` be
 
 - **No answers, or answers that cancel out:** a normal result (`kind: "no-result"`), never `isError`.
 - **Unknown field or value:** the SDK refuses the call with `isError` and the message names the field (and, for a value, the allowed values); no season is returned.
-- **Unreachable subtypes:** the quiz alone never gives Soft Autumn, Soft Summer or Bright Spring (BL-29).
+- **Unreachable subtypes:** the quiz alone never gives Soft Autumn, Soft Summer or Bright Spring (see `season-classifier`, requirement "The quiz alone classifies").
 - **Host without UI:** the text alone is complete.
 - **Failed call:** Sentry's error report can include the request body, so the answers (disclosed in `/privacy#chat-plugin`; BL-30).
 

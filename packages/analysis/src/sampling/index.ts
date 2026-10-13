@@ -25,7 +25,10 @@ export interface PhotoInput {
 
 export interface Sample {
   regions: RegionColors;
-  /** The brightest share of both eye openings; null when they hold too few pixels. */
+  /**
+   * The brightest share of both eye openings, irises left out with 478 landmarks; null when too
+   * few opening pixels are left.
+   */
   eyeWhite: Lab | null;
   /** Null when the skin region is too small to sample. */
   traits: Traits | null;
@@ -37,16 +40,47 @@ export const MIN_REGION_PIXELS = 50;
 /** Pixels per region converted to Lab; larger regions are sampled at an even stride. */
 const MAX_REGION_SAMPLES = 20_000;
 
-/** Share of an eye opening, brightest first, taken as the sclera: above the iris, pupil and lashes. */
-const SCLERA_SHARE = 0.4;
+/**
+ * Share of the eye openings outside the irises, brightest first, taken as the sclera: above the
+ * lids and lashes.
+ */
+const SCLERA_SHARE = 0.3;
 
-/** The brightest share of both eye openings, centered; null below MIN_REGION_PIXELS. */
+/** Iris center landmark, then its four ring landmarks; 478 landmarks only. */
+const IRISES = [
+  [468, 469, 470, 471, 472],
+  [473, 474, 475, 476, 477],
+] as const;
+
+/**
+ * The brightest share of both eye openings, centered, leaving out the pixels inside each iris
+ * circle when the landmarks have irises; null below MIN_REGION_PIXELS pixels left.
+ */
 function eyeWhiteOf({ pixels, width, height, landmarks }: PhotoInput): Lab | null {
   const indices = [EYE_OPENINGS.right, EYE_OPENINGS.left].flatMap((r) =>
     regionPixels(r, landmarks, width, height),
   );
-  if (indices.length < MIN_REGION_PIXELS) return null;
-  const colors = indices
+  // In pixels, so the circle stays round on a photo that is not square.
+  const at = (i: number) => ({
+    x: (landmarks[i]?.x ?? 0) * width,
+    y: (landmarks[i]?.y ?? 0) * height,
+  });
+  const irises =
+    landmarks.length === 478
+      ? IRISES.map(([center, ...ring]) => {
+          const c = at(center);
+          const r =
+            ring.reduce((s, i) => s + Math.hypot(at(i).x - c.x, at(i).y - c.y), 0) / ring.length;
+          return { ...c, r };
+        })
+      : [];
+  const outside = (i: number) =>
+    irises.every(
+      (c) => Math.hypot((i % width) + 0.5 - c.x, Math.floor(i / width) + 0.5 - c.y) >= c.r,
+    );
+  const sclera = indices.filter(outside);
+  if (sclera.length < MIN_REGION_PIXELS) return null;
+  const colors = sclera
     .map((i) => srgbToLab(pixels[i * 4] ?? 0, pixels[i * 4 + 1] ?? 0, pixels[i * 4 + 2] ?? 0))
     .sort((p, q) => q.L - p.L);
   // robustCenter's top trim then drops the catchlight.

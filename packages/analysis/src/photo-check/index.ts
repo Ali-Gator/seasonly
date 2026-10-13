@@ -10,16 +10,19 @@ import { samplePhoto, type PhotoInput } from "../sampling/index.ts";
 export { EYE_OPENINGS } from "../sampling/regions.ts";
 export { RETAKE_TIPS, type RetakeReason, type RetakeTip } from "./tips.ts";
 
-// Eye-white L*, eye-white C*ab and the skin-hue floor are measured (t6-eval-set, 2026-10-09): on
+// Eye-white C*ab and the skin-hue floor are measured (t6-eval-set, 2026-10-09): on
 // the 72 usable photos of evals/manifest.json and their dark, warm and grayscale variants, they
 // give the fewest false rejects (0.18, from 0.24) that keep agreement, label accuracy and the
 // variant catch rate at the untuned run's level or better. Three usable daylight and flash photos
 // read skin hue −5° to 9°, so the floor sits below 0°. Real selfies (2026-10-06) read sclera C*ab 12-21
 // indoors, close under the cast limit. MIN_FACE_WIDTH and the skin chroma range are unchanged.
+// Eye-white L* is from backlog-1's sweep (irises dropped, sclera share 0.3): on the eval tuning
+// set, dark false rejects 14 → 4 and catch rate 0.8812 → 0.9167. The C*ab limit and the selfie
+// readings above predate that measure and were not re-swept on it (BL-50).
 /** Narrower than this, in pixels, and the face is too small to measure. */
 export const MIN_FACE_WIDTH = 120;
 /** Eye-white L* below this is too dark. */
-const MIN_EYE_WHITE_L = 22;
+const MIN_EYE_WHITE_L = 24;
 /** Eye-white C*ab above this is a color cast. */
 const MAX_EYE_WHITE_CHROMA = 22;
 /** Skin C*ab outside this range is a filter: grayscale below, oversaturated above. */

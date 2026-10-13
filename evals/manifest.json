@@ -1247,15 +1247,15 @@
       "author": "Raph_PH"
     },
     {
-      "file": "p22/5-stage-red.jpg",
+      "file": "p22/5-red-carpet.png",
       "person": "p22",
       "season": "true-spring",
-      "light": "stage-red",
+      "light": "red-carpet",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Beyonc%C3%A9_-_Tottenham_Hotspur_Stadium_-_1st_June_2023_%2871_of_118%29_%2852945301662%29_%28face_cropped%29.jpg",
-      "sha256": "70ca2cb443bd3fd2fadc98fa784b464683567579dfd681c691948d5b4d3b9af9",
-      "license": "CC BY 2.0",
-      "author": "Raph_PH"
+      "source": "https://upload.wikimedia.org/wikipedia/commons/1/17/Beyonc%C3%A9_at_The_Lion_King_European_Premiere_2019.png",
+      "sha256": "d79dfb3481e2586c0c923b8993a890f0ea04af626c5eff6739fed756b750551f",
+      "license": "CC BY 3.0",
+      "author": "Sassy"
     },
     {
       "file": "p23/1-flash-white.jpg",
@@ -1436,14 +1436,14 @@
       "author": "Gage Skidmore from Surprise, AZ, United States of America"
     },
     {
-      "file": "p26/2-stage-dark.jpg",
+      "file": "p26/2-indoor-warm.jpg",
       "person": "p26",
       "season": "soft-autumn",
-      "light": "stage-dark",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/4/46/Stacey_Abrams_by_Gage_Skidmore.jpg",
-      "sha256": "3a1ec60491f52225f829eeb407bc18bf186b12275963ba3ae325d4effa587e73",
-      "license": "CC BY-SA 3.0",
-      "author": "Gage Skidmore"
+      "light": "indoor-warm",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/99/Stacey_Abrams_in_2019_%28cropped%29.jpg",
+      "sha256": "6043b4afe49dc1416e216d4b6ee5efec2b1bb2f382d29a21dcc8b2441deefbb4",
+      "license": "Public domain",
+      "author": "Deb Haaland"
     },
     {
       "file": "p26/3-daylight.jpg",
