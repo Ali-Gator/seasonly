@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Button, Icon, ReportSection } from "@/components/ds";
-import { Colors, Group, SeasonTraits } from "@/lib/report/sections";
+import { Colors, Group, LEFT, RIGHT, SeasonTraits } from "@/lib/report/sections";
 import { SeasonLink } from "@/lib/site-content/season-link";
 import { FAMOUS_NOTE, famousIntro, SEASON_CONTENT } from "@/lib/site-content/seasons";
 import { familyName, pageMetadata, SEASON_SLUGS, SEASONS, seasonName } from "@/lib/site/routes";
@@ -33,7 +33,9 @@ function FindOut({ name, className }: { name: string; className?: string }) {
 
 /**
  * A season page, from canvas boards "Season" (375) and "Season-1280": the colors and the season
- * copy are the report's own; the description, neighbours and famous people are site content.
+ * copy are the report's own; the description, neighbours and famous people are site content. On a
+ * phone the palette comes straight after the head; from 1024 px the head and the copy float left
+ * and the sections right, so neither column waits for the other (t18-design-review decision 2).
  *
  * {@link openspec/specs/site-content/spec.md#requirement-a-season-page-shows-that-seasons-shared-palette-and-copy}
  * {@link openspec/specs/site-content/spec.md#requirement-famous-people-on-a-season-page-are-sourced-and-credited}
@@ -49,8 +51,10 @@ export default async function Season({ params }: Props) {
 
   return (
     <>
-      <div className="flex flex-col gap-(--space-12) lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-(--space-6)">
-        <section className="flex flex-col gap-(--space-4) lg:col-span-4 lg:gap-(--space-5)">
+      <div className="flex flex-col gap-(--space-12) lg:flow-root">
+        <section
+          className={`flex flex-col gap-(--space-4) lg:mb-(--space-5) lg:gap-(--space-5) ${LEFT}`}
+        >
           <nav aria-label="Breadcrumb">
             <Link href="/seasons" className="caption sn-navlink text-(--ink-muted)">
               The 12 seasons
@@ -59,15 +63,9 @@ export default async function Season({ params }: Props) {
           <p className="overline">{familyName(season)} family</p>
           <h1 className="display">{name}</h1>
           <p className="quote text-(--ink-muted)">{copy.tagline}</p>
-          <p>{copy.summary}</p>
-          {about.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-          <SeasonTraits season={season} />
-          <FindOut name={name} />
         </section>
 
-        <div className="flex flex-col gap-(--space-12) lg:col-span-7 lg:col-start-6">
+        <div className={`lg:mb-(--space-12) ${RIGHT}`}>
           <ReportSection
             overline="Palette"
             title={`The ${name} palette`}
@@ -75,6 +73,18 @@ export default async function Season({ params }: Props) {
           >
             <Colors colors={palette.best} columns={4} wide={6} label={`The ${name} palette`} />
           </ReportSection>
+        </div>
+
+        <div className={`flex flex-col gap-(--space-4) lg:gap-(--space-5) ${LEFT}`}>
+          <p>{copy.summary}</p>
+          {about.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+          <SeasonTraits season={season} />
+          <FindOut name={name} />
+        </div>
+
+        <div className={`flex flex-col gap-(--space-12) ${RIGHT}`}>
           <ReportSection
             overline="Avoid"
             title="Colors to avoid"

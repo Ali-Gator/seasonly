@@ -17,7 +17,7 @@ type Step =
   | { name: "analyzing" }
   | { name: "reveal"; result: Result }
   | { name: "no-result"; reason: "no-answers" | "answers-cancel" }
-  | { name: "error" };
+  | { name: "error"; blocked?: true }; // blocked: the route answered 403
 function initialState(): FlowState;
 function reduce(s: FlowState, e: FlowEvent): FlowState; // push = new history entry, replace = same entry, back = pop
 function stepProgress(step: Step): number | null; // Photo 0, Quiz 1, Result 2; none on the reveal
@@ -53,6 +53,9 @@ function photoCheckedProps(o: {
 - The camera frame is taken before `checking` unmounts the camera. The photo is checked at ≤ 1280 px on its longer side; the crop is the face box plus 30 % per side, ≤ 512 px, JPEG 0.85.
 - MediaPipe's wasm comes from jsDelivr at the exact installed `@mediapipe/tasks-vision` version, the models from Google's versioned paths; both start loading on the guide.
 - A check that throws (an undecodable file, models that failed to load) shows the no-face retake and goes to Sentry.
+- Each new step scrolls to the top and focuses its `main h1`. The effect skips while the step is the one it last handled, which is the opening guide on mount and on StrictMode's second run, so `/analyze` opens without moving focus; Back to the guide still moves it. `globals.css` draws no outline on `h1[tabindex="-1"]:focus`.
+- The retake screen takes the second-failure layout when `offerQuizOnly` is set: the photo as a 96 px thumbnail beside an `h1` styled `h2`, then the notes, then "Retake photo", "Continue with the quiz only" (secondary) and "Upload a different photo".
+- The guide shows one `PhotoTipCard` with the good reference and three bad examples; its actions stack `lg:flex-col-reverse` with `.sn-btn--lg-swap`, so upload is on top and primary from 1024 px while the DOM keeps "Take a selfie" first.
 
 ## Edge Cases
 
@@ -85,7 +88,7 @@ Every step of the analysis flow SHALL render at `/analyze` without changing the 
 
 ### Requirement: The photo guide and capture follow the canvas
 
-The flow SHALL open on the photo guide: the heading "Three things before your selfie", the three tip cards and two actions, "Take a selfie" and "Upload a photo". This is the copy of canvas artboard 02. Each tip card SHALL show its good and its bad example as a photo with alt text, never as a labeled placeholder.
+The flow SHALL open on the photo guide of canvas artboard 02: the heading "Three things before your selfie", one card with the three tips and two actions, "Take a selfie" and "Upload a photo". The card SHALL show one good reference photo and three bad examples, one per tip: under a ceiling lamp, foundation and bronzer, and a beauty filter. Each SHALL be a photo with alt text, never a labeled placeholder. On a 375 × 812 screen, both actions SHALL be visible without scrolling. Below 1024 px wide, "Take a selfie" SHALL be the primary action. From 1024 px, "Upload a photo" SHALL be the primary action and "Take a selfie" the secondary.
 
 Under the two actions, the guide SHALL show the upload notice in the canvas's words. The notice SHALL say:
 
@@ -97,7 +100,7 @@ It SHALL link to `/privacy`.
 
 The capture step SHALL show the front camera's live view in the camera frame, with the caption "Fit your face in the oval, at eye level. Hold still." It SHALL offer "Take photo" and "Upload a photo instead". When the camera cannot be opened, the capture step SHALL keep the upload action and show "Camera blocked or not working? Upload a selfie you took in daylight."
 
-**Unenforced:** the live camera needs a camera device, which CI's browser lacks. The upload path is covered by E2E.
+**Unenforced:** the live camera needs a camera device, which CI's browser lacks. Task 8.3's manual check on a phone covers it; the upload path is covered by E2E.
 
 #### Scenario: The guide
 
@@ -107,12 +110,22 @@ The capture step SHALL show the front camera's live view in the camera frame, wi
 #### Scenario: The guide's example photos
 
 - **WHEN** `/analyze` opens
-- **THEN** each of the three tip cards shows two images, each with non-empty alt text, and no placeholder label
+- **THEN** the guide shows one image marked "Good" and three marked "Avoid", each with non-empty alt text, and no placeholder label
+
+#### Scenario: The guide fits one phone screen
+
+- **WHEN** `/analyze` opens in a 375 × 812 window
+- **THEN** "Take a selfie" and "Upload a photo" are both inside the window without scrolling
 
 #### Scenario: The guide names who reads the crop
 
 - **WHEN** the photo guide is shown
 - **THEN** below the two actions it says only a face crop is sent, once the quiz is finished. It also says an AI model from Google, through Vercel, reads it and does not train on it, and that the crop is deleted within 24 hours. It links to `/privacy`.
+
+#### Scenario: A desktop window
+
+- **WHEN** `/analyze` opens 1280 px wide
+- **THEN** "Upload a photo" is the primary action and "Take a selfie" the secondary one
 
 #### Scenario: No camera
 
@@ -123,7 +136,7 @@ The capture step SHALL show the front camera's live view in the camera frame, wi
 
 A taken or uploaded photo SHALL be checked in the browser: face landmarks, the face count, and the core photo check. Exactly one outcome SHALL follow:
 
-- **Fails:** a retake screen with the heading "Let's retake this one", the photo as taken, the problem's title and message as a danger note, its retake tip as a note with the tip's icon, and two actions: "Retake photo" and "Upload a different photo".
+- **Fails:** a retake screen with the heading "Let’s retake this one", the photo as taken, the problem's title and message as a danger note, its retake tip as a note with the tip's icon, and two actions: "Retake photo" and "Upload a different photo".
 - **Passes:** the quiz's first question. If every question was already answered in this visit, the analysis starts instead. No step asks the person to agree before the quiz.
 
 #### Scenario: A photo with no face
@@ -168,21 +181,32 @@ The upload SHALL hold only a crop of the face, never the whole photo. The crop S
 
 ### Requirement: Repeated failures offer a quiz-only result
 
-After the second failed check in a row, the retake screen SHALL also offer to continue without a photo. That path SHALL send no crop and no traits, and SHALL go to the quiz. Its result SHALL come from the quiz alone. A photo that passes SHALL reset the count.
+After the second failed check in a row, the retake screen SHALL say that this is the second try and offer to continue without a photo, as on canvas artboard 04f:
+
+- the heading "Let’s try once more", with the line "That’s two tries. Try once more, or go on with the quiz alone.";
+- the photo as taken at thumbnail size beside the heading, then the problem's danger note and its retake tip;
+- the actions "Retake photo" (primary), "Continue with the quiz only" (secondary) and "Upload a different photo", in that order. On a 375 × 812 screen, "Continue with the quiz only" SHALL be visible without scrolling.
+
+That path SHALL send no crop and no traits, and SHALL go to the quiz. Its result SHALL come from the quiz alone. A photo that passes SHALL reset the count.
 
 #### Scenario: First failure
 
 - **WHEN** the first photo fails the check
-- **THEN** the retake screen offers only "Retake photo" and "Upload a different photo"
+- **THEN** the retake screen reads "Let’s retake this one" and offers only "Retake photo" and "Upload a different photo"
 
 #### Scenario: Second failure in a row
 
 - **WHEN** the second photo in a row fails the check
-- **THEN** the retake screen also offers to continue without a photo
+- **THEN** the retake screen reads "Let’s try once more" and "That’s two tries.", and offers "Continue with the quiz only" as a secondary action right after "Retake photo"
+
+#### Scenario: The way out is in view
+
+- **WHEN** the second photo in a row fails the check in a 375 × 812 window
+- **THEN** "Continue with the quiz only" is inside the window without scrolling
 
 #### Scenario: Continuing without a photo
 
-- **WHEN** the person chooses to continue without a photo and answers the quiz
+- **WHEN** the person chooses to continue with the quiz only and answers the quiz
 - **THEN** the analyze request carries the answers only, with no crop and no traits
 
 ### Requirement: Each photo check is reported without photo data
@@ -216,3 +240,17 @@ The photo, its face crop and its traits SHALL NOT be sent anywhere before the pe
 
 - **WHEN** the person answers the last question
 - **THEN** one analyze request carries the answers, the traits and the face crop
+
+### Requirement: A new step moves focus to its heading, the first screen does not
+
+When the flow moves to a new step, focus SHALL move to that step's main heading, so a screen reader announces the new screen. The guide, shown when `/analyze` opens, SHALL NOT take focus, so the page opens like any other. A heading that takes focus SHALL draw no focus outline, because it is not a control.
+
+#### Scenario: Opening the flow
+
+- **WHEN** `/analyze` opens
+- **THEN** no element inside the page has focus, and no outline is drawn around the heading
+
+#### Scenario: A new step
+
+- **WHEN** the person moves from the guide to the capture step
+- **THEN** focus is on the capture step's heading, and the heading draws no outline

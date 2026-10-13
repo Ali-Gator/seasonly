@@ -47,6 +47,7 @@ public.reports (id text pk, created_at, season, runner_up, confidence numeric(3,
 - `is_test` is `VERCEL_ENV !== "production"`, so previews, local runs and CI write test rows.
 - The personal summary and note are stored, not returned: the reveal shows the season family, its tagline and its reveal line only.
 - `checkBotId` runs with development mode wherever `VERCEL_ENV` is unset, since off Vercel it would throw for want of the OIDC token.
+- The flow dispatches `failed` with `blocked: true` for a 403, and the error step then renders `Blocked` (`_reveal/steps.tsx`): "Copy the link" writes `https://seasonly.me/analyze` and reads "Link copied"; when the clipboard is missing or refuses, a line says to press and hold the link, which is always shown as an `<a>`. `analysis_failed` fires as for any failure (BL-56).
 
 ## Edge Cases
 
@@ -166,12 +167,24 @@ While the request runs, the flow SHALL show the analyzing screen of canvas artbo
 - a progress bar;
 - the four step lines.
 
-When the request fails, the flow SHALL show the error screen, which offers to try again. A failure is a network error, a non-success answer, or no answer within 45 s. Trying again SHALL re-send the same request.
+When the request fails, the flow SHALL show the error screen of canvas artboard 08d, which offers to try again. A failure is a network error, a non-success answer other than 403, or no answer within 45 s. Trying again SHALL re-send the same request.
+
+When the analyze route answers 403, the browser was refused by the bot check, and sending again cannot succeed. The flow SHALL show the blocked screen of canvas artboard 08g instead: the heading "We couldn’t check this browser", the line "Some in-app browsers block our check. Open seasonly.me in Safari or Chrome to continue.", and an action "Copy the link" that copies `https://seasonly.me/analyze` and then reads "Link copied". It SHALL NOT offer "Try again".
+
+#### Scenario: The route fails
+
+- **WHEN** the analyze route answers 500
+- **THEN** the error screen is shown, and choosing to try again sends the same request
 
 #### Scenario: The route refuses the request
 
 - **WHEN** the analyze route answers 403
-- **THEN** the error screen is shown, and choosing to try again sends the same request
+- **THEN** the blocked screen reads "We couldn’t check this browser", offers "Copy the link", and offers no "Try again"
+
+#### Scenario: Copying the link
+
+- **WHEN** the person chooses "Copy the link" on the blocked screen
+- **THEN** `https://seasonly.me/analyze` is on the clipboard and the action reads "Link copied"
 
 ### Requirement: The reveal shows the season family
 

@@ -47,3 +47,38 @@ export function SwatchGrid({ colors, columns = 4, label, className }: SwatchGrid
     </ul>
   );
 }
+
+export interface SwatchStripProps {
+  colors: readonly Color[];
+  columns?: number;
+  /** The list's accessible name, such as "True Autumn colors". */
+  label: string;
+  className?: string;
+}
+
+/**
+ * Chips only, for a preview whose names are one tap away: each name is visually hidden text, so
+ * a screen reader still reads it. Ported from the design system's bundle.js.
+ *
+ * {@link openspec/specs/ui-components/spec.md#requirement-a-swatch-strip-shows-chips-and-names-them-to-screen-readers}
+ */
+export function SwatchStrip({ colors, columns = 4, label, className }: SwatchStripProps) {
+  return (
+    <ul
+      className={cx("sn-swatch-strip", className)}
+      style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+      aria-label={label}
+    >
+      {colors.map((c) => (
+        <li key={c.hex + c.name}>
+          <span
+            className="sn-swatch-strip__chip"
+            style={{ background: c.hex }}
+            aria-hidden="true"
+          />
+          <span className="sn-visually-hidden">{c.name}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}

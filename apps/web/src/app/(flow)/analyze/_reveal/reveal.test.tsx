@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import type { Result } from "../flow-state";
-import { Reveal } from "./steps";
+import { Blocked, Reveal } from "./steps";
 
 const result = (reportId: string | null, agreement: Result["agreement"] = "agree"): Result => ({
   kind: "result",
@@ -49,5 +49,19 @@ describe("Reveal", () => {
     const out = text(result("k7m2qxAAAAAAAAAAAAAAAA", "quiz-only"));
     expect(out).toContain("Get my full report");
     expect(out).toContain("Add a photo");
+  });
+});
+
+describe("Blocked", () => {
+  /** {@link openspec/specs/season-reveal/spec.md#scenario-the-route-refuses-the-request} */
+  it("asks to open seasonly.me in Safari or Chrome and offers to copy the link, not to try again", () => {
+    const out = renderToStaticMarkup(<Blocked />);
+    expect(out).toContain(">We couldn’t check this browser</h1>");
+    expect(out).toContain(
+      "Some in-app browsers block our check. Open seasonly.me in Safari or Chrome to continue.",
+    );
+    expect(out).toContain(">Copy the link</button>");
+    expect(out).toContain("seasonly.me/analyze");
+    expect(out).not.toContain("Try again");
   });
 });

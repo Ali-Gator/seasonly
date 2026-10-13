@@ -19,43 +19,44 @@ const { draping } = PALETTES["soft-autumn"];
 export default function Page() {
   return (
     <>
-      <section
-        aria-labelledby="sample-title"
-        className="sn-card flex flex-col gap-(--space-3) border-(--line-strong) lg:flex-row lg:items-center lg:justify-between lg:gap-(--space-6)"
-      >
-        <div className="flex flex-col gap-(--space-3)">
-          <p className="overline">Sample report</p>
-          <p className="h3" id="sample-title">
-            This is a sample Soft Autumn report
-          </p>
-          <p className="text-(--ink-muted)">
-            Yours is built from your own selfie and four questions. Free while we are in early
-            access.
-          </p>
-        </div>
-        <Button href="/analyze" block className="lg:w-auto">
-          <Icon name="camera" size={18} />
-          Find my colors
-        </Button>
-      </section>
+      {/* The banner sits close to the season, so the palette clears a phone's first screen. */}
+      <div className="flex flex-col gap-(--space-4) lg:gap-(--space-12)">
+        <section
+          aria-labelledby="sample-title"
+          className="sn-card flex flex-col gap-(--space-3) border-(--line-strong) lg:flex-row lg:items-center lg:justify-between lg:gap-(--space-6)"
+        >
+          <div className="flex flex-col gap-(--space-3)">
+            <p className="h3" id="sample-title">
+              This is a sample Soft Autumn report
+            </p>
+            <p className="text-(--ink-muted)">
+              Yours is built from your own selfie and four questions. Free while we are in early
+              access.
+            </p>
+          </div>
+          <Button href="/analyze" variant="secondary" block className="lg:w-auto">
+            <Icon name="camera" size={18} />
+            Find my colors
+          </Button>
+        </section>
 
-      <div className="flex flex-col gap-(--space-12) lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-(--space-6) lg:gap-y-(--space-5)">
-        <ReportSections
-          season="soft-autumn"
-          agreement="agree"
-          overline="Sample season"
-          subtitle="A sample color analysis report"
-          agreementNote="Green veins and gold jewelry point warm. Your soft brown hair and hazel eyes point muted."
-          draping={
-            <DrapingPair
-              best={draping.best}
-              worst={draping.worst}
-              faceSrc={SAMPLE_FACE.src}
-              faceAlt={SAMPLE_FACE.alt}
-              className="lg:max-w-[560px]"
-            />
-          }
-        />
+        <div className="flex flex-col gap-(--space-12) lg:flow-root">
+          <ReportSections
+            season="soft-autumn"
+            agreement="agree"
+            subtitle="A sample color analysis report"
+            agreementNote="Green veins and gold jewelry point warm. Your soft brown hair and hazel eyes point muted."
+            draping={
+              <DrapingPair
+                best={draping.best}
+                worst={draping.worst}
+                faceSrc={SAMPLE_FACE.src}
+                faceAlt={SAMPLE_FACE.alt}
+                className="lg:max-w-[560px]"
+              />
+            }
+          />
+        </div>
       </div>
 
       <Link href="/seasons/soft-autumn" className="label sn-navlink">

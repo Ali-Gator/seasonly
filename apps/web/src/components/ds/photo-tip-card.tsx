@@ -11,7 +11,8 @@ export interface PhotoTipCardProps {
   title: string;
   body?: string;
   good: TipExample;
-  bad: TipExample;
+  /** One example, or a list: the good reference on the left, the bad ones stacked small on the right. */
+  bad: TipExample | readonly TipExample[];
   className?: string;
 }
 
@@ -37,10 +38,11 @@ function Example({ kind, caption, src, alt }: TipExample & { kind: "good" | "bad
 }
 
 /**
- * One photo tip with a good and a bad example, each verdict in words and an icon. Ported from the
- * design system's bundle.js; an example without an image shows a labeled placeholder.
+ * One photo tip with a good and a bad example, or one good reference and several to avoid, each
+ * verdict in words and an icon. Ported from the design system's bundle.js; an example without an
+ * image shows a labeled placeholder.
  *
- * @see openspec/specs/ui-components/spec.md
+ * {@link openspec/specs/ui-components/spec.md#requirement-a-photo-tip-card-tells-good-from-bad-in-words}
  */
 export function PhotoTipCard({ title, body, good, bad, className }: PhotoTipCardProps) {
   return (
@@ -49,7 +51,15 @@ export function PhotoTipCard({ title, body, good, bad, className }: PhotoTipCard
       {body && <p className="sn-tip__body">{body}</p>}
       <div className="sn-tip__pair">
         <Example kind="good" {...good} />
-        <Example kind="bad" {...bad} />
+        {"caption" in bad ? (
+          <Example kind="bad" {...bad} />
+        ) : (
+          <div className="sn-tip__avoid">
+            {bad.map((b) => (
+              <Example key={b.caption} kind="bad" {...b} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
