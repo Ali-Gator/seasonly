@@ -32,19 +32,17 @@ jobs:
       # would restore stale and fail its hash.
       - uses: actions/cache@v4
         with:
-          path: |
-            evals/photos
-            !evals/photos/.cache
+          # The pNN folders only: a `!` exclusion of .cache does not stop tar recursing into it.
+          path: evals/photos/p*
           key: eval-photos-${{ hashFiles('evals/manifest.json') }}
-      # Each photo's MediaPipe output, named by photo sha256 + EXTRACTOR_VERSION, so an older
-      # entry is never stale: restore-keys reuse it and an extractor change only re-extracts. The
+      # Each photo's MediaPipe output, named by photo sha256 + EXTRACTOR_VERSION. No restore-keys:
+      # an older cache would carry entries no extractor reads again, growing with every change. The
       # core (check, classifier) always reruns in Node. Saved only on success: a cold run over
       # 30 minutes keeps every run cold.
       - uses: actions/cache@v4
         with:
           path: evals/photos/.cache
           key: eval-extract-${{ hashFiles('evals/manifest.json', 'evals/extract.ts', 'apps/web/src/lib/capture/mediapipe.ts', 'apps/web/src/lib/capture/photo.ts', 'apps/web/package.json') }}
-          restore-keys: eval-extract-
       - run: pnpm eval:fetch
       - run: pnpm eval:run
         env:
