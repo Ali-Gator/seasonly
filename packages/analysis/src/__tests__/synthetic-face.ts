@@ -73,3 +73,25 @@ export function paint(
   }
   return { pixels, hairMask };
 }
+
+/**
+ * A lid over an eye opening, in place: of the pixels inside `opening` and outside `iris`, the top
+ * `share` row by row is painted `lid`, the rest `sclera`.
+ */
+export function lidOver(
+  { pixels, width, height }: { pixels: Uint8ClampedArray; width: number; height: number },
+  opening: readonly (readonly Point[])[],
+  iris: readonly (readonly Point[])[],
+  { lid, sclera }: { lid: RGB; sclera: RGB },
+  share: number,
+): void {
+  const px = (rings: readonly (readonly Point[])[]) =>
+    rings.map((r) => r.map((pt) => ({ x: pt.x * width, y: pt.y * height })));
+  const [o, ir] = [px(opening), px(iris)];
+  const open: number[] = [];
+  for (let y = 0; y < height; y++)
+    for (let x = 0; x < width; x++)
+      if (inside(x + 0.5, y + 0.5, o) && !inside(x + 0.5, y + 0.5, ir)) open.push(y * width + x);
+  const top = Math.round(open.length * share);
+  open.forEach((i, k) => pixels.set([...(k < top ? lid : sclera), 255], i * 4));
+}

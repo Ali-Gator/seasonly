@@ -47,7 +47,7 @@ public.reports (id text pk, created_at, season, runner_up, confidence numeric(3,
 - `is_test` is `VERCEL_ENV !== "production"`, so previews, local runs and CI write test rows.
 - The personal summary and note are stored, not returned: the reveal shows the season family, its tagline and its reveal line only.
 - `checkBotId` runs with development mode wherever `VERCEL_ENV` is unset, since off Vercel it would throw for want of the OIDC token.
-- The flow dispatches `failed` with `blocked: true` for a 403, and the error step then renders `Blocked` (`_reveal/steps.tsx`): "Copy the link" writes `https://seasonly.me/analyze` and reads "Link copied"; when the clipboard is missing or refuses, a line says to press and hold the link, which is always shown as an `<a>`. `analysis_failed` fires as for any failure (BL-52).
+- The flow dispatches `failed` with `blocked: true` for a 403, and the error step then renders `Blocked` (`_reveal/steps.tsx`): "Copy the link" writes `https://seasonly.me/analyze` and reads "Link copied"; when the clipboard is missing or refuses, a line says to press and hold the link, which is always shown as an `<a>`. `analysis_failed` fires as for any failure (BL-56).
 
 ## Edge Cases
 

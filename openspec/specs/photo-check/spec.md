@@ -40,10 +40,10 @@ The check runs before sampling, on the same input. In order:
 1. No landmarks: the refusals that need none (width, height, buffer and hair-mask length, with sampling's messages), then `no-face` with every measurement null.
 2. `samplePhoto` validates the input and gives the skin color.
 3. `no-face` when a landmark is outside the image or not a number, the landmark bounding box is narrower than `MIN_FACE_WIDTH`, or sampling gives no traits.
-4. The eye white, as sampling reports it (`Sample.eyeWhite`): the pixels inside both eye openings (MediaPipe's `FACEMESH_RIGHT_EYE` and `FACEMESH_LEFT_EYE`, cited in `sampling/regions.ts`), the brightest 40% by L*, then sampling's robust center. Fewer than `MIN_REGION_PIXELS` pixels leaves it null and skips the next two checks. `dark` when its L* is below 22, then `tint` when its C*ab is above 22.
+4. The eye white, as sampling reports it (`Sample.eyeWhite`): the pixels inside both eye openings (MediaPipe's `FACEMESH_RIGHT_EYE` and `FACEMESH_LEFT_EYE`, cited in `sampling/regions.ts`), with 478 landmarks the pixels inside each iris circle left out (center landmark 468 / 473, radius the mean distance to its four ring landmarks), the brightest 30% of the rest by L*, then sampling's robust center. Fewer than `MIN_REGION_PIXELS` opening pixels left after the irises leaves it null and skips the next two checks. `dark` when its L* is below 24, then `tint` when its C*ab is above 22.
 5. `filter` when skin C*ab is below 2 or above 45, or, from C*ab 6 up, its hue is outside −10° to 100°.
 
-The first problem found is returned with the measurements gathered so far. The eye-white L* and C*ab limits and the hue floor are measured on the labeled eval set (`analysis-eval`, 2026-10-09): the fewest false rejects that keep agreement, label accuracy and the variant catch rate at the untuned level or better, a false-reject rate of 0.18 on 72 usable photos, down from 0.24. The skin chroma range is set against the Monk Skin Tone scale (C*ab 3.8 to 27.9, hue 49° to 89°) and was left as it was. `RETAKE_TIPS` holds the copy of the approved canvas screens `BadNoFace`, `BadDark`, `BadTint` and `BadFilter`; the shared heading and buttons belong to the web flow.
+The first problem found is returned with the measurements gathered so far. The eye-white L* and C*ab limits and the hue floor are measured on the labeled eval set (`analysis-eval`, 2026-10-09): the fewest false rejects that keep agreement, label accuracy and the variant catch rate at the untuned level or better, a false-reject rate of 0.18 on 72 usable photos, down from 0.24. The eye-white measure and its L* cut-off were retuned in `backlog-1` (2026-10-13), because the old brightest 40% of the whole opening was mostly lids, lashes and iris and so followed skin depth: with the irises left out, the brightest 30% and a cut-off of L* 24, the tuning set's `dark` false rejects fell from 14 to 4 (deep skin 6 of 24 usable photos to none) and its catch rate rose from 0.8812 to 0.9167, with agreement, label accuracy and the false-reject rate all better. The C*ab limit was not re-swept on the new measure, and the tuning set's `tint` false rejects rose from 8 to 12 (BL-50). The skin chroma range is set against the Monk Skin Tone scale (C*ab 3.8 to 27.9, hue 49° to 89°) and was left as it was. `RETAKE_TIPS` holds the copy of the approved canvas screens `BadNoFace`, `BadDark`, `BadTint` and `BadFilter`; the shared heading and buttons belong to the web flow.
 
 ## Edge Cases
 
@@ -100,7 +100,7 @@ When the check reports no problem, color sampling of the same pixels and landmar
 
 ### Requirement: Darkness is judged from the eye whites, not the skin
 
-The check SHALL report `dark` when the eye whites are darker than the minimum lightness. It SHALL NOT judge darkness from skin lightness, so deep skin in good light passes.
+The check SHALL report `dark` when the eye whites are darker than the minimum lightness. It SHALL NOT judge darkness from skin lightness, so deep skin in good light passes. Lid, lash and iris pixels inside the eye openings SHALL NOT pull the eye white down to the skin's depth.
 
 #### Scenario: A light-skinned face, underexposed
 
@@ -115,6 +115,11 @@ The check SHALL report `dark` when the eye whites are darker than the minimum li
 #### Scenario: A dim indoor selfie
 
 - **WHEN** a photo of a light-skinned face that passes is darkened to a third of its brightness, so its eye whites read L* 33 as in real indoor selfies
+- **THEN** no problem is reported
+
+#### Scenario: Deep skin with lids covering most of each eye opening
+
+- **WHEN** a face with the deepest Monk Skin Tone in good light is checked with 478 landmarks, its dark irises filling half of each eye opening and lid-colored skin covering three quarters of the rest, the remaining quarter bright neutral sclera
 - **THEN** no problem is reported
 
 ### Requirement: A color cast is judged from the eye whites

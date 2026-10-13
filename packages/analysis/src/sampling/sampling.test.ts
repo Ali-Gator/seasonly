@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   face478,
+  lidOver,
   paint,
   ringsOf,
   type Fill,
@@ -21,7 +22,7 @@ import {
   type PhotoInput,
   type Traits,
 } from "./index.ts";
-import { EYE_OPENINGS } from "./regions.ts";
+import { EYE_OPENINGS, regionPixels as openingPixels } from "./regions.ts";
 
 const SIZE = 400;
 const LM = face478();
@@ -352,6 +353,52 @@ describe("eye white", () => {
     expect(sample.eyeWhite).toBeNull();
     expect(sample.traits).not.toBeNull();
     expect(sample.traits).toEqual(traitsOf(sample.regions));
+  });
+
+  /** {@link openspec/specs/color-sampling/spec.md#scenario-irises-and-lids-are-left-out} */
+  it("leaves dark irises and lids over three quarters of each opening out of the eye white", () => {
+    const input = face({ eyes: [40, 30, 25] });
+    for (const [opening, iris] of [
+      [EYE_OPENINGS.right, REGIONS.rightIris],
+      [EYE_OPENINGS.left, REGIONS.leftIris],
+    ] as const)
+      lidOver(input, ringsOf(opening, LM), ringsOf(iris, LM), { lid: SKIN, sclera: SCLERA }, 0.75);
+    const { eyeWhite } = samplePhoto(input);
+    expect(deltaE(eyeWhite ?? lab(BG), lab(SCLERA))).toBeLessThan(2);
+  });
+
+  /** {@link openspec/specs/color-sampling/spec.md#scenario-irises-fill-the-eye-openings} */
+  it("reports no eye white when fewer than the minimum opening pixels lie outside the irises", () => {
+    // Iris circles of radius 0.06 leave a few dozen of about 1,400 opening pixels.
+    const R = 0.06;
+    const big = LM.map((p) => ({ ...p }));
+    for (const [center, ...ring] of [
+      [468, 469, 470, 471, 472],
+      [473, 474, 475, 476, 477],
+    ] as const) {
+      const c = LM[center] as Point;
+      ring.forEach((i, k) => {
+        big[i] = {
+          x: c.x + R * Math.cos((k * Math.PI) / 2),
+          y: c.y - R * Math.sin((k * Math.PI) / 2),
+        };
+      });
+    }
+    const open = [EYE_OPENINGS.right, EYE_OPENINGS.left].flatMap((r) =>
+      openingPixels(r, big, SIZE, SIZE),
+    );
+    const outside = open.filter((i) =>
+      [468, 473].every((c) => {
+        const { x, y } = big[c] as Point;
+        return (
+          Math.hypot((i % SIZE) + 0.5 - x * SIZE, Math.floor(i / SIZE) + 0.5 - y * SIZE) >= R * SIZE
+        );
+      }),
+    );
+    expect(open.length).toBeGreaterThanOrEqual(MIN_REGION_PIXELS);
+    expect(outside.length).toBeGreaterThan(0);
+    expect(outside.length).toBeLessThan(MIN_REGION_PIXELS);
+    expect(samplePhoto(withEyeWhites(SCLERA, { landmarks: big })).eyeWhite).toBeNull();
   });
 });
 
