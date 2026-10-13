@@ -68,7 +68,7 @@ fold items in.
   (C\*ab 22) was tuned on the old brightest-40% eye white; tuning `tint` false rejects are 12 of 27.
   Swept in `backlog-2` triage (2026-10-13), C\*ab 20–32 in 0.1 steps, tuning set: every limit
   above 22 lowers agreement (0.5733 → 0.5700 at 22.1, 0.5567 at 22.2–22.6, 0.5527 at 22.7–23.5),
-  and catch holds only to 22.6 with zero copies of margin (tint false rejects 12 → 9 there). No
+  and catch holds only to 22.7 with no copies of margin (tint false rejects 12 → 8 there). No
   limit keeps all four ratchets. Re-sweep when the set grows or the cast measure changes.
   _Refs:_ `packages/analysis/src/photo-check/index.ts`, `openspec/changes/archive/*-backlog-1/design.md` (Decision 4) · _Status:_ gated —
   more labeled photos, or a new cast measure; no limit holds agreement on today's set (backlog-2 triage, 2026-10-13)

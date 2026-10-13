@@ -2,7 +2,7 @@
 
 ### Requirement: Photos are fetched, verified and never committed
 
-`pnpm eval:fetch` SHALL download every entry whose file is missing under `evals/photos/` from its `source`, and SHALL keep it only if its SHA-256 matches the entry's `sha256`. Downloads SHALL run one at a time, with a pause between one download and the next. A download answered with HTTP 429 SHALL be retried a bounded number of times, each after the wait its `Retry-After` header asks for, capped, or after a growing backoff when it gives none; it counts as a failed download only once the retries run out. Any other failed status SHALL NOT be retried. A mismatch or a failed download SHALL fail the fetch, name the entry, and leave no file behind. Photos, and everything derived from their pixels, SHALL stay under the git-ignored `evals/photos/`.
+`pnpm eval:fetch` SHALL download every entry whose file is missing under `evals/photos/` from its `source`, and SHALL keep it only if its SHA-256 matches the entry's `sha256`. Downloads SHALL run one at a time, with a pause between one download and the next. A download answered with HTTP 429 SHALL be retried a bounded number of times, each after the wait its `Retry-After` header asks for, capped, or after a growing backoff when it gives none; it counts as a failed download only once the retries run out. Once one download has run out of its retries, later downloads answered with HTTP 429 SHALL fail without a retry, so a source that refuses everything ends the fetch quickly. Any other failed status SHALL NOT be retried. A mismatch or a failed download SHALL fail the fetch, name the entry, and leave no file behind. Photos, and everything derived from their pixels, SHALL stay under the git-ignored `evals/photos/`.
 
 #### Scenario: A missing photo
 
@@ -33,6 +33,11 @@
 
 - **WHEN** an entry's source answers HTTP 429 to every attempt
 - **THEN** the fetch gives up after its retries, fails naming that entry, and no file is written for it
+
+#### Scenario: The rate limit outlasts one entry
+
+- **WHEN** an entry's source answers HTTP 429 to every attempt and the next entry's source answers HTTP 429 too
+- **THEN** the next entry is requested once, and the fetch fails naming both
 
 #### Scenario: A photo that is gone is not retried
 

@@ -20,7 +20,7 @@ Three analysis items can ship now. The weekly eval run cannot fetch the photo se
 
 Investigated in this triage; status lines corrected in `docs/backlog.md`.
 
-- **BL-50** Re-sweep the eye-white tint limit — swept in triage (C\*ab 20–32): every limit above 22 lowers tuning agreement, and catch holds only to 22.6 with no margin. Gated on more labeled photos or a new cast measure.
+- **BL-50** Re-sweep the eye-white tint limit — swept in triage (C\*ab 20–32): every limit above 22 lowers tuning agreement, and catch holds only to 22.7 with no margin. Gated on more labeled photos or a new cast measure.
 - **BL-13** Temperature reads cool and moves with the light — t15's D6 re-run in triage on the current iris-free eye white: no strength passes. Gated on a new white reference or more labeled people.
 - **BL-51** A squint can pass the light checks unmeasured — 1 production `photo_checked` event since the backlog-1 deploy, 0 null. Deferred until about 50 reach the eye-white step; then lane C (new retake screen).
 - **BL-39** Skin hue barely separates warm and cool labels — gate unmet (still 26 tuning people, no quiz answers); numbers refreshed.

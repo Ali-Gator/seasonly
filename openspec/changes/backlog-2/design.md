@@ -52,7 +52,7 @@ Trade-off: A edits a paid file that cannot be run to check it (typecheck and lin
 
 ### Decision 2 — BL-52's numbers (technical, decided in triage)
 
-Pause 1 s between downloads (180 photos ≈ 3 min, inside the workflow's 30-minute job and `eval:run`'s 30-minute test timeout); 4 retries on 429; `Retry-After` capped at 60 s; backoff 5 s doubling without one. A photo refused every time costs up to 4 min, so a Commons that refuses everything ends at the job's 30-minute limit, a red run like today's. Constants sit beside `FETCH_TIMEOUT_MS`.
+Pause 1 s between downloads (180 photos ≈ 3 min, inside the workflow's 30-minute job and `eval:run`'s 30-minute test timeout); 4 retries on 429; `Retry-After` capped at 60 s; backoff 5 s doubling without one. One photo refused every time costs up to 4 min; after that, later 429s fail without retry (spec scenario "The rate limit outlasts one entry"), so a Commons that refuses everything fails in a few minutes with every refused entry named, not at the job's 30-minute limit with nothing printed. Constants sit beside `FETCH_TIMEOUT_MS`.
 
 ### Decision 3 — BL-40's shape (technical, decided in triage)
 
@@ -64,16 +64,17 @@ Pause 1 s between downloads (180 photos ≈ 3 min, inside the workflow's 30-minu
 
 Rule fixed before the run: all four ratchets at baseline or better, catch margin of three or more copies, fewer than 12 tuning `tint` false rejects.
 
-| C\*ab limit | Agreement | Catch (caught / needed) | FR rate | Tint FR | Holdout agreement |
+| C\*ab limit | Agreement | Catch (caught / copies) | FR rate | Tint FR | Holdout agreement |
 | ----------- | --------- | ----------------------- | ------- | ------- | ----------------- |
-| 22 (today)  | 0.5733    | 0.9167 (253 / 253)      | 0.2269  | 12      | 0.55              |
-| 22.1        | 0.5700    | 0.9176 (256 / 256)      | 0.2185  | 11      | 0.5375            |
-| 22.2–22.6   | 0.5567    | 0.9193 (262 / 262)      | 0.2017  | 9       | 0.5375            |
-| 22.7        | 0.5527    | 0.9167 (264 / 265)      | 0.1933  | 8       | 0.5375            |
+| 22 (today)  | 0.5733    | 0.9167 (253 / 276)      | 0.2269  | 12      | 0.55              |
+| 22.1        | 0.5700    | 0.9176 (256 / 279)      | 0.2185  | 11      | 0.5375            |
+| 22.2–22.6   | 0.5567    | 0.9193 (262 / 285)      | 0.2017  | 9       | 0.5375            |
+| 22.7        | 0.5527    | 0.9167 (264 / 288)      | 0.1933  | 8       | 0.5375            |
+| 22.8        | 0.5527    | 0.9132 (263 / 288)      | 0.1933  | 8       | 0.5375            |
 | 24          | 0.5460    | 0.8935                  | 0.1849  | 7       | 0.5375            |
 | 27          | 0.5387    | 0.8548                  | 0.1513  | 3       | 0.5375            |
 
-Every limit above 22 lowers agreement: the photos it lets through land off their person's mode season. None qualifies.
+Catch holds (rounded to the baseline's 0.9167) up to 22.7, with no copy to spare, and fails from 22.8. Every limit above 22 lowers agreement: the photos it lets through land off their person's mode season. None qualifies.
 
 ### BL-13 — t15 D6 re-run on the iris-free eye white (2026-10-13)
 
