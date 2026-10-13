@@ -16,8 +16,8 @@ export { RETAKE_TIPS, type RetakeReason, type RetakeTip } from "./tips.ts";
 // variant catch rate at the untuned run's level or better. Three usable daylight and flash photos
 // read skin hue −5° to 9°, so the floor sits below 0°. Real selfies (2026-10-06) read sclera C*ab 12-21
 // indoors, close under the cast limit. MIN_FACE_WIDTH and the skin chroma range are unchanged.
-// Eye-white L* is from backlog-1's offline sweep (irises dropped, sclera share 0.3): on the tuning
-// set, dark false rejects 13 → 4 and catch rate 0.8812 → 0.9167.
+// Eye-white L* is from backlog-1's sweep (irises dropped, sclera share 0.3): on the eval tuning
+// set, dark false rejects 14 → 4 and catch rate 0.8812 → 0.9167.
 /** Narrower than this, in pixels, and the face is too small to measure. */
 export const MIN_FACE_WIDTH = 120;
 /** Eye-white L* below this is too dark. */
