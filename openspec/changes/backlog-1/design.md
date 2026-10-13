@@ -44,6 +44,8 @@ Sweep on triage's reduced set (p22/5 and p26/2 left out), tuning set selection o
 
 The share-0.25 variant has the lowest tuning FR, but its usable cut-off window is 21–21.5, its catch margin is one darkened copy and its agreement margin is 0.0006. The chosen variant keeps about ten copies of catch margin, passes at both 23.5 and 24, and loses less catch on the holdout. It costs four more `tint` rejects (12 vs 8). The eye white feeds no trait, so agreement and accuracy move only because a different set of photos passes. All existing fixtures behave the same under it (checked in memory with `synthetic-face.ts`): the L* 19.5 and 18.6 `dark` cases, the order test, the L* 33 pass, the deepest Monk tone and the one-colour eye-opening sampling cases.
 
+Landmarks: the live check (`apps/web/src/lib/capture/mediapipe.ts`) and the eval extraction (`evals/extract.ts`) both use MediaPipe's `FaceLandmarker`, which returns 478 landmarks with irises, so the swept iris-dropped measure is what production runs. The 468 path exists only for synthetic inputs.
+
 Holdout caveat: deep holdout people's total rejects stay 6/15 for every variant (their `dark` rejects become `filter` or `tint`). The gain is shown on the tuning set only.
 
 ### BL-29 — the quiz's reach goes into the spec
@@ -77,7 +79,7 @@ New `.github/workflows/eval-weekly.yml`, on `schedule` (weekly) and `workflow_di
 Replacement rules, fixed now so the pick is not steered by results:
 
 - Same person (p22 Beyoncé, holdout, `true-spring`; p26 Stacey Abrams, tuning, `soft-autumn`); `season` and `holdout` copy from the person's other entries.
-- A different shoot and date from every other photo of that person (check each candidate's Commons metadata), and a light condition that person does not already have; prefer daylight, flash or indoor over another stage photo. Candid or event photos over studio portraits.
+- A different shoot and date from every other photo of that person (check each candidate's Commons metadata), and a light condition that person does not already have; prefer it not be another stage photo. p22 already has indoor-flash, indoor-warm, daylight and stage-blue; p26 has stage-dark, daylight and indoor. Acceptable new lights: red carpet, outdoor shade, overcast, mixed outdoor at night, flash (p26), or a second daylight or indoor photo in clearly different light from a different shoot when nothing else qualifies. Candid or event photos over studio portraits.
 - A free licence (CC0, PD, CC BY, CC BY-SA), face roughly a tenth of the long side or more, eyes open, no heavy filter (t15 Decision 1).
 - Pick from the Commons file page and the photo alone. Never run `checkPhoto` or the eval on a candidate before it is in the manifest.
 - Keep the file numbers: `p22/5-<light>.jpg`, `p26/2-<light>.jpg`, with `source`, `sha256`, `license`, `author` filled as for the other entries; `pnpm eval:fetch` verifies the hash.

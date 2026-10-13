@@ -21,5 +21,5 @@ The check SHALL report `dark` when the eye whites are darker than the minimum li
 
 #### Scenario: Deep skin with lids covering most of each eye opening
 
-- **WHEN** a face with the deepest Monk Skin Tone in good light is checked with 478 landmarks, its irises filling half of each eye opening and lid-colored skin covering two thirds of the rest, the remaining third bright neutral sclera
+- **WHEN** a face with the deepest Monk Skin Tone in good light is checked with 478 landmarks, its dark irises filling half of each eye opening and lid-colored skin covering three quarters of the rest, the remaining quarter bright neutral sclera
 - **THEN** no problem is reported

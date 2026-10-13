@@ -16,5 +16,5 @@ Sampling SHALL measure the eye white from the brightest part of both eye opening
 
 #### Scenario: Irises and lids are left out
 
-- **WHEN** a synthetic face sampled with 478 landmarks paints its irises dark, a third of the rest of each eye opening a known light color and the remainder its skin color
+- **WHEN** a synthetic face sampled with 478 landmarks paints its irises dark, a quarter of the rest of each eye opening a known light color and the remainder its skin color
 - **THEN** the reported eye white is within ΔE 2 of the light color
