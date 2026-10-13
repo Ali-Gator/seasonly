@@ -82,4 +82,5 @@
   - Archived 2026-10-13 (4 requirements added, 14 modified). Public Interface and Behavior updated for ui-components, capture-flow, quiz, season-reveal and site-content, and report-page's Behavior for the float layout. `openspec validate --specs`: 29 passed.
 - [x] 9.4 Plan: set T18 to Done in the Tracker with a plain-words Log line naming the BL ids. Update memory "MVP design canvas" with the canvas and design-system versions and what changed. Verify: the row, the Log line and the memory line show.
   - Done 2026-10-13: T18 set to Done with a Log line naming BL-25, BL-38, BL-41 and BL-53 to BL-58; memory "MVP design canvas" records canvas v51 and design system v30.
-- [ ] 9.5 Push the branch, open a PR to `main` that names the BL ids added and removed, and turn on auto-merge with a merge commit (never squash). Verify: the PR shows auto-merge enabled.
+- [x] 9.5 Push the branch, open a PR to `main` that names the BL ids added and removed, and turn on auto-merge with a merge commit (never squash). Verify: the PR shows auto-merge enabled.
+  - PR https://github.com/Ali-Gator/seasonly/pull/29, auto-merge on with a merge commit, 2026-10-13. Main had moved 16 commits and added its own BL-49 to BL-52, so this change's items were renumbered BL-53 to BL-58 in the merge.
