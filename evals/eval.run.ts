@@ -26,7 +26,6 @@ it("measures the labeled photo set", async () => {
     photosDir: PHOTOS_DIR,
     cacheDir: CACHE_DIR,
     resultsPath: process.env.EVAL_RESULTS ?? RESULTS_PATH,
-    fetchImpl: fetch,
     extractorVersion: EXTRACTOR_VERSION,
     createExtractor,
   });

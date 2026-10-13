@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-60**
+_Next id:_ **BL-61**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -144,6 +144,12 @@ fold items in.
   crop to a `file` part with `mediaType: "image/jpeg"` before the SDK drops it.
   _Refs:_ `apps/web/src/lib/report-text/index.ts`, `openspec/specs/report-text/spec.md` ·
   _Status:_ open — found in `t6-eval-set`, 2026-10-09
+
+- **[BL-60] A passing check's traits are optional in the type** — `PhotoCheck.traits?` lets a
+  stand-in `check` (eval `RunOptions.check`) pass with no traits, and `analyze` then records a pass
+  with no season instead of failing; `checkImage` and `analyze` both need `?? null`. Make
+  `PhotoCheck` a union whose pass case requires `traits`.
+  _Refs:_ `packages/analysis/src/photo-check/index.ts`, `evals/pipeline.ts`, `apps/web/src/lib/capture/photo.ts` · _Status:_ open — phase review of `backlog-2`, 2026-10-13
 
 ## Testing
 

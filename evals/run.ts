@@ -10,8 +10,9 @@ import path from "node:path";
 
 import { fetchMissing } from "./fetch.ts";
 import { currentInputsHash, mediapipeVersion } from "./gate.ts";
+import type { createExtractor } from "./extract.ts";
 import type { Manifest } from "./manifest.ts";
-import { runPhotos, type Extractor } from "./pipeline.ts";
+import { runPhotos } from "./pipeline.ts";
 import { writeResults, type Results } from "./results.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
@@ -24,7 +25,8 @@ export interface MeasureOptions {
   fetchImpl?: typeof fetch;
   fetchOptions?: Parameters<typeof fetchMissing>[3];
   extractorVersion: string;
-  createExtractor: () => { extract: Extractor; close(): Promise<void> };
+  /** extract.ts's factory, imported by type only, so Playwright is never loaded here. */
+  createExtractor: typeof createExtractor;
 }
 
 /** Fetches first, so a photo that cannot be had fails the run before any extraction or write. */

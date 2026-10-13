@@ -74,9 +74,13 @@ export async function fetchMissing(
         }
         await response.body?.cancel();
         const wait = retryAfterMs(response.headers.get("Retry-After")) ?? BACKOFF_MS * 2 ** attempt;
-        await sleep(Math.min(wait, MAX_RETRY_AFTER_MS));
+        // A Retry-After of 0 or a past date still waits a pause, so it cannot spend every retry at once.
+        await sleep(Math.min(Math.max(wait, FETCH_PAUSE_MS), MAX_RETRY_AFTER_MS));
       }
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) {
+        await response.body?.cancel();
+        throw new Error(`HTTP ${response.status}`);
+      }
       const bytes = new Uint8Array(await response.arrayBuffer());
       const hash = sha256(bytes);
       if (hash !== photo.sha256) throw new Error(`sha256 ${hash}, expected ${photo.sha256}`);

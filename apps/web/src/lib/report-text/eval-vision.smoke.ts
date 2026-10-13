@@ -16,7 +16,7 @@ import { PHOTOS_DIR, readManifest } from "../../../../../evals/fetch.ts";
 import { EXTRACTOR_VERSION } from "../../../../../evals/extract.ts";
 import { cropPath, runPhotos } from "../../../../../evals/pipeline.ts";
 import { formatJson } from "../../../../../evals/results.ts";
-import { tallyVerdicts } from "../../../../../evals/vision.ts";
+import { tallyVerdicts, type VisionVerdict } from "../../../../../evals/vision.ts";
 import { generateReportText, REPORT_TEXT_MODEL } from "./index";
 
 // Show why a call fell back; Sentry is not initialized here.
@@ -50,7 +50,7 @@ it(
     const missing = sent.filter((r) => !fs.existsSync(cropPath(CACHE_DIR, r.cacheKey)));
     expect(missing.map((r) => r.file)).toEqual([]);
 
-    const photos: { file: string; expect: string; verdict: string }[] = [];
+    const photos: VisionVerdict[] = [];
     for (const r of sent) {
       const result = await generateReportText({
         faceCrop: new Uint8Array(fs.readFileSync(cropPath(CACHE_DIR, r.cacheKey))),

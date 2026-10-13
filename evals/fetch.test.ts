@@ -139,9 +139,28 @@ describe("eval:fetch pacing", () => {
     await expect(fetchMissing(manifest(PHOTO), dir, fetch, { sleep })).rejects.toThrow(
       /p01\/a\.jpg: HTTP 429/,
     );
-    expect(fetch.mock.calls.length).toBeGreaterThan(1);
-    expect(sleeps).toHaveLength(fetch.mock.calls.length - 1);
+    expect(fetch).toHaveBeenCalledTimes(5);
+    expect(sleeps).toEqual([5000, 10000, 20000, 40000]);
     expect(files().filter((f) => f.includes("."))).toEqual([]);
+  });
+
+  /** {@link openspec/specs/analysis-eval/spec.md#requirement-photos-are-fetched-verified-and-never-committed} */
+  it("caps a long Retry-After, reads an HTTP date, and floors a zero one at the pause", async () => {
+    const { sleeps, sleep, answer } = pacing();
+    const inThirty = new Date(Date.now() + 30_000).toUTCString();
+    const fetch = answer(
+      () => tooMany({ "Retry-After": "120" }),
+      () => tooMany({ "Retry-After": inThirty }),
+      () => tooMany({ "Retry-After": "0" }),
+      ok,
+    );
+    await expect(fetchMissing(manifest(PHOTO), dir, fetch, { sleep })).resolves.toEqual([
+      "p01/a.jpg",
+    ]);
+    expect(sleeps[0]).toBe(60_000);
+    expect(sleeps[1]).toBeGreaterThan(28_000);
+    expect(sleeps[1]).toBeLessThanOrEqual(30_000);
+    expect(sleeps[2]).toBe(1_000);
   });
 
   /** {@link openspec/specs/analysis-eval/spec.md#scenario-the-rate-limit-outlasts-one-entry} */
