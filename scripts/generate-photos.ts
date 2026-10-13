@@ -3,10 +3,15 @@
  * Gateway. One fictional base portrait, then each "bad" twin as an edit of that same image, so a
  * tip's good and bad photos show one face. A paid run: never in CI, only after the user's yes.
  *
- *   node --env-file=apps/web/.env.local scripts/generate-photos.ts <out dir> [base|lamp|makeup|filter|all] [model]
+ *   node --env-file=apps/web/.env.local scripts/generate-photos.ts <out dir> [base|lamp|makeup|filter|all|quiz] [model]
  *
  * Writes `<name>.png` to the out dir and prints each call's Gateway cost. `all` reuses an
  * existing `base.png`, so a retried edit never regenerates the base.
+ *
+ * `quiz` (t18-design-review, design.md decision 8) makes the quiz's example photos: one base wrist,
+ * edited into three vein colours and three kinds of jewellery, and the base face from
+ * `apps/web/public/images/examples/base.webp`, edited into three more natural hair colours (the
+ * base's own light brown is the fourth). It reuses an existing `wrist.png` the same way.
  */
 import fs from "node:fs";
 import { createRequire } from "node:module";
@@ -42,6 +47,27 @@ cast on her skin, a whitened and brightened complexion, glossy pink lips, notice
 a slimmer V-shaped jaw and a dreamy soft glow over the whole picture.`,
 } as const;
 
+const WRIST = `Photorealistic close-up smartphone photo of the inner wrist and lower forearm of a
+fictional woman with warm-neutral medium-light skin, natural texture and a few freckles. Palm up,
+resting on a plain light grey surface, wrist centred in a square frame. Soft, even daylight from a
+window. No jewellery, no watch, no tattoos, no nail polish in view. The veins under the skin are
+faintly visible. Sharp focus, unretouched.`;
+
+const QUIZ_KEEP = `Edit this photo. Keep everything else the same: the same person, skin, freckles,
+pose, framing, light and background. Change only this:`;
+
+const QUIZ_EDITS = {
+  "veins-green": ["wrist", "the veins on her inner wrist. A few natural veins now show faintly through the skin with a green to olive tint, soft and realistic, as veins look in daylight, never drawn lines."],
+  "veins-blue": ["wrist", "the veins on her inner wrist. A few natural veins now show faintly through the skin with a blue to purple tint, soft and realistic, as veins look in daylight, never drawn lines."],
+  "veins-mix": ["wrist", "the veins on her inner wrist. Two or three natural veins now show softly through the skin just below the wrist crease: one has a clear green tint and one a clear blue tint. Soft and realistic, as veins look in daylight, never drawn lines."],
+  "jewelry-gold": ["wrist", "her jewellery. She now wears one thin polished yellow-gold chain bracelet on this wrist."],
+  "jewelry-silver": ["wrist", "her jewellery. She now wears one thin polished silver chain bracelet on this wrist."],
+  "jewelry-both": ["wrist", "her jewellery. She now wears two thin chain bracelets on this wrist, one yellow gold and one silver."],
+  "hair-dark": ["face", "her hair colour. Her natural hair is now very dark brown, nearly black, undyed."],
+  "hair-blonde": ["face", "her hair colour. Her natural hair is now golden blonde, undyed."],
+  "hair-red": ["face", "her hair colour. Her natural hair is now auburn red, undyed."],
+} as const;
+
 const [outDir = "", which = "all", model = "google/gemini-2.5-flash-image"] = process.argv.slice(2);
 if (!outDir) throw new Error("usage: generate-photos.ts <out dir> [step] [model]");
 fs.mkdirSync(outDir, { recursive: true });
@@ -55,6 +81,39 @@ async function save(name: string, result: Result) {
   console.log(
     `${name}: ${image.mediaType}, cost $${result.providerMetadata?.gateway?.cost ?? "?"}`,
   );
+}
+
+if (which === "quiz") {
+  const wristPath = path.join(outDir, "wrist.png");
+  const square = { google: { ...options.google, imageConfig: { aspectRatio: "1:1" } } };
+  if (!fs.existsSync(wristPath)) {
+    await save("wrist", await generateText({ model, prompt: WRIST, providerOptions: square }));
+  }
+  const sources = {
+    wrist: { data: fs.readFileSync(wristPath), mediaType: "image/png", options: square },
+    face: {
+      data: fs.readFileSync(new URL("../apps/web/public/images/examples/base.webp", import.meta.url)),
+      mediaType: "image/webp",
+      options,
+    },
+  };
+  for (const [name, [from, change]] of Object.entries(QUIZ_EDITS)) {
+    if (fs.existsSync(path.join(outDir, `${name}.png`))) continue;
+    const source = sources[from];
+    const content = [
+      { type: "file", data: source.data, mediaType: source.mediaType },
+      { type: "text", text: `${QUIZ_KEEP} ${change}` },
+    ];
+    await save(
+      name,
+      await generateText({
+        model,
+        messages: [{ role: "user", content }],
+        providerOptions: source.options,
+      }),
+    );
+  }
+  process.exit(0);
 }
 
 if (which === "base" || (which === "all" && !fs.existsSync(basePath))) {
