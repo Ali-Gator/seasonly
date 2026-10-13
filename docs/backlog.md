@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-47**
+_Next id:_ **BL-48**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -36,6 +36,13 @@ fold items in.
   every strength. Parked again: the eye white is not a reliable white reference across people.
   Look for a reference that holds on the holdout, after BL-45 lets more deep-skin photos pass.
   _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/changes/*-t15-eval-growth/tasks.md` · _Status:_ gated — BL-45
+
+- **[BL-47] One E2E test fails in the local phase gate** — `report-delivery.spec.ts` "answers a
+  report it cannot read with 500" expects `cache-control: private, no-store`, but local
+  `pnpm test` serves E2E with `pnpm dev`, which sends `no-cache, must-revalidate`; CI's prebuilt
+  server passes. Either set the header explicitly on that route or run that assertion only against
+  a production build, so `pnpm test` is green locally.
+  _Refs:_ `e2e/report-delivery.spec.ts:112`, `playwright.config.ts` · _Status:_ open — found in `t15-eval-growth`, 2026-10-13
 
 - **[BL-45] The dark check rejects deep skin more often** — on the grown eval set, 9 of 41 usable
   photos of new deep-skinned people get `dark` (22%), against 4 of 45 medium (9%) and 6 of 72 in

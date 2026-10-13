@@ -56,5 +56,6 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new test cases
 
 - [x] 5.1 `evals/README.md`: holdout, trait spread, the baseline reset. Delete BL-14 from `docs/backlog.md`.
   - Done: README covers the holdout, trait spread and the holdout rule; BL-14 deleted.
-- [ ] 5.2 `pnpm fix`, `pnpm test`. Done when both pass.
+- [x] 5.2 `pnpm fix`, `pnpm test`. Done when both pass.
+  - 2026-10-13: `pnpm fix` clean; unit, eval and citation suites pass. One E2E test fails locally only (`report-delivery` cache-control under `pnpm dev`; CI's prebuilt run passes, and this branch changes no app code). Logged as BL-47.
 - [ ] 5.3 Phase review, archive (re-add Public Interface, Behavior and Edge Cases to `analysis-eval` with the new numbers), Tracker T15 row, push, PR with auto-merge (merge commit).
