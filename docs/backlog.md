@@ -28,14 +28,14 @@ fold items in.
 
 ## Analysis
 
-- **[BL-13] Temperature reads cool and moves with the light** — warm-labeled people average
-  cool (skin hue 47° against a midpoint of 55°), and one person's temperature spreads 0.3–0.6
-  across photos. `t15-white-balance` built a balance against the eye white (Lab offset and von
-  Kries): it steadies temperature (spread 0.338 to 0.283) and raises family agreement, but lowers
-  exact-season agreement on 16 people, so it was parked. Re-run its sweep (tasks 4.2–4.5 of that
-  change; code in commit `1d28b3d`) once the bigger set can judge it.
-  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/changes/archive/*-t15-white-balance/`
-  · _Status:_ gated — BL-14
+- **[BL-13] Temperature reads cool and moves with the light** — skin hue moves with the light, so
+  one person's temperature spreads across photos. The eye-white balance (Lab offset, commit
+  `1d28b3d`) was re-run on the grown set in `t15-eval-growth` (2026-10-13): on the tuning set it
+  cuts temperature spread 0.324 to 0.271 and lifts family agreement 0.70 to 0.78, but exact
+  agreement rises only 0.015 (two photos is 0.023), and on the holdout temperature spread rises at
+  every strength. Parked again: the eye white is not a reliable white reference across people.
+  Look for a reference that holds on the holdout, after BL-45 lets more deep-skin photos pass.
+  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/changes/*-t15-eval-growth/tasks.md` · _Status:_ gated — BL-45
 
 - **[BL-45] The dark check rejects deep skin more often** — on the grown eval set, 9 of 41 usable
   photos of new deep-skinned people get `dark` (22%), against 4 of 45 medium (9%) and 6 of 72 in
@@ -56,15 +56,6 @@ fold items in.
   another warm/cool cue (hair, eyes, lips, or the quiz) before tuning temperature further.
   _Refs:_ `packages/analysis/src/sampling/traits.ts`, `evals/README.md` · _Status:_ open — found
   in `t15-white-balance`, 2026-10-12
-
-- **[BL-14] The eval set leans light-skinned and has no holdout** — 10 of 16 people are light,
-  3 medium, 3 deep, and the same 72 usable photos tuned the limits they now score. Add medium
-  and deep people (and the user's own selfies, which need no `source`), and keep a holdout once
-  the set passes about 30 people. Also report each trait's within-person spread in
-  `results.json`: on 16 people one photo moves exact agreement about 0.03, too coarse to judge a
-  change like BL-13's balance.
-  _Refs:_ `evals/manifest.json`, `openspec/specs/analysis-eval/spec.md` · _Status:_ open — found
-  in `t6-eval-set`, 2026-10-09
 
 - **[BL-15] CI checks a committed eval result, not the photos** — only a machine with the
   photos can refresh `results.json`. Run `eval:fetch` and `eval:run` in CI (Playwright's

@@ -26,11 +26,35 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new test cases
 
 ## 4. White-balance re-run (design D6)
 
-- [ ] 4.1 In a scratch worktree at `1d28b3d` with this branch's manifest and evals code, sweep `k` on the tuning set and on the holdout. Record agreement, family agreement, accuracy, false-reject rate, catch rate and trait spread per `k` in a table here.
-- [ ] 4.2 Apply D6's rule. Rewrite BL-13 with the tables and the verdict: either "ready for a follow-up change with `k` = …" or "parked again, because …". Done when BL-13 is updated.
+- [x] 4.1 In a scratch worktree at `1d28b3d` with this branch's manifest and evals code, sweep `k` on the tuning set and on the holdout. Record agreement, family agreement, accuracy, false-reject rate, catch rate and trait spread per `k` in a table here.
+  - Run 2026-10-13, Lab offset from `1d28b3d`, reference eye white re-measured on the tuning set's 87 passing usable photos: a\* 6.8, b\* 6.1 (the original 16 alone reproduce t15's 7.6, 6.2). `k = 0` reproduces the committed `results.json` exactly. False-reject and catch rates are identical across `k`.
+
+    Tuning set (26 people, 25 measured):
+
+    | k    | agreement | family agreement | accuracy | temperature SD | value SD | clarity SD |
+    | ---- | --------- | ---------------- | -------- | -------------- | -------- | ---------- |
+    | 0    | 0.5687    | 0.7027           | 0.1322   | 0.3241         | 0.2389   | 0.1929     |
+    | 0.25 | 0.5720    | 0.7660           | 0.1322   | 0.2829         | 0.2389   | 0.1815     |
+    | 0.5  | 0.5833    | 0.7793           | 0.1240   | 0.2709         | 0.2389   | 0.1710     |
+    | 0.75 | 0.5067    | 0.7760           | 0.1074   | 0.2680         | 0.2389   | 0.1661     |
+    | 1    | 0.5167    | 0.7560           | 0.1240   | 0.2761         | 0.2389   | 0.1626     |
+
+    Holdout (8 people):
+
+    | k    | agreement | family agreement | accuracy | temperature SD | value SD | clarity SD |
+    | ---- | --------- | ---------------- | -------- | -------------- | -------- | ---------- |
+    | 0    | 0.5312    | 0.6458           | 0.0811   | 0.1943         | 0.2466   | 0.1007     |
+    | 0.25 | 0.5000    | 0.7188           | 0.0541   | 0.2049         | 0.2466   | 0.0944     |
+    | 0.5  | 0.5000    | 0.6146           | 0.0270   | 0.2026         | 0.2466   | 0.1045     |
+    | 0.75 | 0.5417    | 0.7188           | 0.0811   | 0.2491         | 0.2466   | 0.1122     |
+    | 1    | 0.5104    | 0.6250           | 0.1081   | 0.2769         | 0.2466   | 0.1277     |
+
+- [x] 4.2 Apply D6's rule. Rewrite BL-13 with the tables and the verdict: either "ready for a follow-up change with `k` = …" or "parked again, because …". Done when BL-13 is updated.
+  - Parked again. No `k` raises tuning agreement by two photos (0.023 on 25 measured people; best +0.0146 at 0.5), and on the holdout temperature spread rises at every `k`, so the steadying seen on the tuning set does not carry to unseen people. BL-13 rewritten.
 
 ## 5. Docs and gate
 
-- [ ] 5.1 `evals/README.md`: holdout, trait spread, the baseline reset. Delete BL-14 from `docs/backlog.md`.
+- [x] 5.1 `evals/README.md`: holdout, trait spread, the baseline reset. Delete BL-14 from `docs/backlog.md`.
+  - Done: README covers the holdout, trait spread and the holdout rule; BL-14 deleted.
 - [ ] 5.2 `pnpm fix`, `pnpm test`. Done when both pass.
 - [ ] 5.3 Phase review, archive (re-add Public Interface, Behavior and Edge Cases to `analysis-eval` with the new numbers), Tracker T15 row, push, PR with auto-merge (merge commit).
