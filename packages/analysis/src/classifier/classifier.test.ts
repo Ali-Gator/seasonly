@@ -189,6 +189,18 @@ describe("quiz alone", () => {
       classify({ photo: at(0.3, 0, 0), answers: { veins: "green", jewelry: "silver" } }).season,
     ).not.toBeNull();
   });
+
+  /** {@link openspec/specs/season-classifier/spec.md#scenario-seasons-only-a-photo-gives} */
+  it("never gives Soft Autumn, Soft Summer or Bright Spring", () => {
+    // Every combination of the four answers, each value or missing: 5 × 5 × 5 × 6.
+    let all: QuizAnswers[] = [{}];
+    for (const [question, values] of Object.entries(QUIZ_VALUES))
+      all = all.flatMap((c) => [c, ...values.map((v) => ({ ...c, [question]: v }))]);
+    expect(all).toHaveLength(750);
+    const seasons = new Set(all.map((answers) => classify({ answers }).season));
+    for (const slug of ["soft-autumn", "soft-summer", "bright-spring"] as const)
+      expect(seasons).not.toContain(slug);
+  });
 });
 
 describe("quiz answer validation", () => {

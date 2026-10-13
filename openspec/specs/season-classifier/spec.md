@@ -45,6 +45,7 @@ A server route or the plugin parses client answers with `QuizAnswersSchema` befo
 - No photo and answers that cancel out on every axis (green veins with silver jewelry): `{ season: null, reason: "answers-cancel" }`. The web flow reports it to PostHog so the quiz can be re-evaluated.
 - With a photo there is always a result.
 - A photo near neutral temperature (under 0.15 from 0) never `differ`s from the quiz.
+- No photo: the quiz never gives Soft Autumn, Soft Summer or Bright Spring. Only dark hair touches clarity (+0.3), so quiz-only clarity is 0 or 0.3; those three seasons need a photo. The quiz alone reaches the other 9.
 
 ## Requirements
 
