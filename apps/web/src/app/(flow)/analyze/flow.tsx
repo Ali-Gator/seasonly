@@ -13,7 +13,7 @@ import { familyName } from "@/lib/site/routes";
 import { Capture, Checking, Guide, Retake } from "./_capture/steps";
 import { EmailStep } from "./_email/step";
 import { QuizStep } from "./_quiz/quiz";
-import { AnalysisError, Analyzing, NoResult, Reveal } from "./_reveal/steps";
+import { AnalysisError, Analyzing, Blocked, NoResult, Reveal } from "./_reveal/steps";
 import {
   initialState,
   type Question,
@@ -77,8 +77,12 @@ export function Flow() {
     return () => removeEventListener("popstate", onPop);
   }, []);
 
-  // Each new screen starts at the top, with focus on its heading.
+  // Each new screen starts at the top, with focus on its heading. The screen the flow opens on
+  // keeps focus where the page put it, StrictMode's second run included (BL-41).
+  const focused = useRef(step);
   useEffect(() => {
+    if (focused.current === step) return;
+    focused.current = step;
     scrollTo(0, 0);
     document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true });
   }, [step]);
@@ -146,8 +150,11 @@ export function Flow() {
     const controller = new AbortController();
     let left = false;
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    // Only the bot check answers 403; sending again cannot pass it.
+    let blocked = false;
     fetch("/api/analyze", { method: "POST", body: toFormData(request), signal: controller.signal })
       .then(async (res) => {
+        blocked = res.status === 403;
         if (!res.ok) throw new Error(`analyze: ${res.status}`);
         const response = (await res.json()) as AnalyzeResponse;
         if (response.kind === "result")
@@ -172,7 +179,7 @@ export function Flow() {
         // Back (and StrictMode's aborted first run) left the step: nothing failed.
         if (left) return;
         track("analysis_failed", { quiz_only: !request.photo });
-        dispatch({ type: "failed" });
+        dispatch({ type: "failed", blocked });
       })
       .finally(() => clearTimeout(timer));
     return () => {
@@ -187,7 +194,12 @@ export function Flow() {
 
   return (
     <main className="flex flex-col gap-(--space-6)">
-      {progress !== null && <StepProgress current={progress} />}
+      {progress !== null && (
+        <StepProgress
+          current={progress}
+          sub={step.name === "quiz" ? { index: step.question, count: QUESTIONS.length } : undefined}
+        />
+      )}
       {step.name === "guide" && (
         <Guide onCamera={() => dispatch({ type: "open-camera" })} onPhoto={onPhoto} />
       )}
@@ -241,7 +253,12 @@ export function Flow() {
       {step.name === "no-result" && (
         <NoResult onChange={() => dispatch({ type: "change-answers" })} onPhoto={retake} />
       )}
-      {step.name === "error" && <AnalysisError onRetry={() => dispatch({ type: "try-again" })} />}
+      {step.name === "error" &&
+        (step.blocked ? (
+          <Blocked />
+        ) : (
+          <AnalysisError onRetry={() => dispatch({ type: "try-again" })} />
+        ))}
     </main>
   );
 }

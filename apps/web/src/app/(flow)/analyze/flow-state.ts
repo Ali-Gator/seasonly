@@ -23,7 +23,8 @@ export type Step =
   /** The email step for a result with a report id. */
   | { name: "email"; result: Result }
   | { name: "no-result"; reason: "no-answers" | "answers-cancel" }
-  | { name: "error" };
+  /** `blocked`: the route answered 403, so sending again cannot work. */
+  | { name: "error"; blocked?: true };
 
 /** A photo that passed the check: what is sent once the quiz is finished. */
 export interface PassedPhoto {
@@ -74,7 +75,7 @@ export type FlowEvent =
   | { type: "next" }
   | { type: "change-answers" }
   | { type: "analyzed"; response: AnalyzeResponse }
-  | { type: "failed" }
+  | { type: "failed"; blocked?: boolean }
   | { type: "try-again" }
   | { type: "open-email" }
   | { type: "back" };
@@ -164,7 +165,8 @@ export function reduce(s: FlowState, e: FlowEvent): FlowState {
       );
     }
     case "failed":
-      return step.name === "analyzing" ? replace(s, { name: "error" }) : s;
+      if (step.name !== "analyzing") return s;
+      return replace(s, e.blocked ? { name: "error", blocked: true } : { name: "error" });
     case "try-again":
       // From the error screen, or from a reveal whose result was not saved.
       return step.name === "error" || (step.name === "reveal" && !step.result.reportId)

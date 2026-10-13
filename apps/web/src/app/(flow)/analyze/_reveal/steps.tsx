@@ -192,3 +192,46 @@ export function AnalysisError({ onRetry }: { onRetry: () => void }) {
     </>
   );
 }
+
+const FLOW_URL = "https://seasonly.me/analyze";
+
+/**
+ * The analyze route answered 403: the bot check refused this browser, often an in-app one, so
+ * the way on is another browser. The URL stays visible for when the clipboard is refused.
+ *
+ * {@link openspec/specs/season-reveal/spec.md#requirement-the-analyzing-step-follows-the-canvas-and-fails-visibly}
+ */
+export function Blocked() {
+  const [copy, setCopy] = useState<"idle" | "copied" | "failed">("idle");
+  return (
+    <>
+      <div className="flex flex-col gap-(--space-3) pt-(--space-8)">
+        <h1 className="h1" tabIndex={-1}>
+          We couldn’t check this browser
+        </h1>
+        <p className="lead text-(--ink-muted)">
+          Some in-app browsers block our check. Open seasonly.me in Safari or Chrome to continue.
+        </p>
+      </div>
+      <div className="sn-stack">
+        <Button
+          block
+          onClick={() =>
+            // In-app browsers often have no clipboard or refuse it: then say how to copy by hand.
+            (navigator.clipboard?.writeText(FLOW_URL) ?? Promise.reject(new Error("no clipboard")))
+              .then(() => setCopy("copied"))
+              .catch(() => setCopy("failed"))
+          }
+        >
+          {copy === "copied" ? "Link copied" : "Copy the link"}
+        </Button>
+        <p className="caption text-center text-(--ink-muted)" role="status">
+          {copy === "failed" && "Copying didn’t work. Press and hold the link to copy it. "}
+          <a href={FLOW_URL} className="text-(--ink) underline">
+            seasonly.me/analyze
+          </a>
+        </p>
+      </div>
+    </>
+  );
+}

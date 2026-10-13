@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-53**
+_Next id:_ **BL-59**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -75,6 +75,14 @@ fold items in.
 
 ## Privacy
 
+- **[BL-53] The draping preview shows the photo's own background** — the stored face crop keeps
+  the wall or window behind the face, which shows at the oval's edges on both colors. Remove the
+  background from the crop (the hair segmenter the photo check loads can make the mask), so only
+  the face sits on the color. It changes what is uploaded and stored, so a privacy review comes
+  first.
+  _Refs:_ `apps/web/src/lib/capture/photo.ts` (`cropBox`), `openspec/specs/draping-preview/spec.md`,
+  `t18-design-review` design.md (Non-Goals) · _Status:_ open — design review, 2026-10-12
+
 - **[BL-18] A crop can stay about 49 h while the pages say 24 h** — the retention job runs once a
   day (Vercel Hobby) with a 24 h cutoff, so a crop stored just after a run lasts until the run
   after next. Move to an hourly scheduler (Vercel Pro, or `pg_cron` + `pg_net` calling the same
@@ -113,6 +121,12 @@ fold items in.
 
 ## Code quality
 
+- **[BL-56] A refused request counts as an ordinary failure in analytics** — a 403 from the bot
+  check sends the same `analysis_failed` as a 500 or a timeout, so a spike of blocked in-app
+  browsers would not show. Add a `blocked` property (analytics spec first).
+  _Refs:_ `apps/web/src/app/(flow)/analyze/flow.tsx`, `openspec/specs/analytics/spec.md` ·
+  _Status:_ open — t18 phase review, 2026-10-13
+
 - **[BL-02] A hung crop upload is abandoned, not cancelled** — `upload()` in
   `@supabase/storage-js` 2.117 takes no abort signal, so after the 3 s timeout the request keeps
   running until the function's time limit ends it. It is harmless today because the response is
@@ -136,6 +150,13 @@ fold items in.
   _Status:_ open — phase review of `t15-white-balance`, 2026-10-12
 
 ## Testing
+
+- **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
+  403 now shows the blocked screen, but nobody has opened seasonly.me inside either app and run a
+  photo. Run it once on a phone after `t18-design-review` ships (one paid vision call), and if the
+  check refuses them, decide what the bot check lets through.
+  _Refs:_ `apps/web/src/app/api/analyze/route.ts` (`checkBotId`), `t18-design-review` tasks.md
+  8.3 · _Status:_ deferred — until t18 is on seasonly.me (the preview sits behind Vercel login)
 
 - **[BL-47] One E2E test fails in the local phase gate** — `report-delivery.spec.ts` "answers a
   report it cannot read with 500" expects `cache-control: private, no-store`, but local
@@ -207,22 +228,29 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
 
 ## Design / UX
 
-- **[BL-41] The first screen's heading opens with a focus ring** — landing on `/analyze` shows
-  the browser's blue outline around "Three things before your selfie". The step effect in
-  `flow.tsx` focuses `main h1` (`tabIndex={-1}`) on every step, including the first render, and
-  with no click yet the browser treats that programmatic focus as `:focus-visible`. Skip the
-  focus on first mount (keep it for step changes, where screen readers need it), and/or drop the
-  outline on `h1[tabindex="-1"]:focus`, since a heading is not a control.
-  _Refs:_ `apps/web/src/app/(flow)/analyze/flow.tsx` (step focus effect),
-  `apps/web/src/app/(flow)/analyze/_capture/steps.tsx` · _Status:_ open — seen on seasonly.me
-  mobile, 2026-10-12
+- **[BL-55] The wide report's actions wait for the palette's bottom** — from 1024 px the report
+  floats its copy left and its sections right; the left block with Share, Save, Premium and the
+  footer comes after sections 2–6 in the DOM, and a float cannot start above an earlier float, so
+  Share and Save start beside "Colors to avoid", up to about 200 px below the agreement note. Find
+  a layout that keeps the phone order and lets the left column run on (subgrid, or the actions
+  inside the season block on wide screens only).
+  _Refs:_ `apps/web/src/lib/report/view.tsx`, `apps/web/src/lib/report/sections.tsx` (`LEFT`,
+  `RIGHT`) · _Status:_ open — t18 phase review, 2026-10-13
 
-- **[BL-38] Swatch names break mid-word in narrow columns** — at six columns on a narrow
-  landing (about 800 px wide), "Mushroom" renders as "Mushroo / m" and "Dusty Rose" wraps, because
-  `.sn-swatch__name` sets `overflow-wrap: anywhere`. Break at word gaps only (drop that rule,
-  or show fewer columns below a width) so a name never splits inside a word.
-  _Refs:_ `apps/web/src/components/ds/ds.css`, design system `components/bundle.css` · _Status:_
-  open — found with the heading optical-size fix, 2026-10-12
+- **[BL-57] Ten-letter color names overflow narrow 4-column grids** — names now break only
+  between words, and "Watermelon" (75 px at 13 px) is wider than a 4-column cell below 390 px.
+  At 360–375 px it runs into the 12 px gap; below about 340 px it reaches the next cell. Shrink
+  names in 4-column grids below 360 px, or drop to 3 columns there.
+  _Refs:_ `apps/web/src/components/ds/ds.css` (`.sn-swatch__name`) · _Status:_ open — t18 phase
+  review, 2026-10-13
+
+- **[BL-58] A line is drawn above every overline** — the `overline` class the design system uses
+  for kickers ("SEASONAL COLOR ANALYSIS", "STEP 1 OF 3") is also Tailwind's
+  `text-decoration-line: overline` utility, which wins over the component rule, so each kicker has
+  a thin line above it on every page. Rename the class or reset the decoration in the utilities
+  layer.
+  _Refs:_ `apps/web/src/app/globals.css` (`.overline`) · _Status:_ open — found in the t18 browser
+  check, 2026-10-13
 
 - **[BL-04] The design system's ShareCard overflows on long names** — the approved
   `bundle.css` sets post-card names at 0.75 em, and "Bright Turquoise" needs about 379 px of a
@@ -240,12 +268,6 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   `alt=""` with the name as the caption (a `figure`/`figcaption`), or describe the photo instead;
   the approved alt texts are the names (`t9-site-content` content.json).
   _Refs:_ `apps/web/src/app/(site)/seasons/[season]/page.tsx`, `apps/web/src/lib/site-content/seasons.ts`
-  · _Status:_ open — t9 phase review, 2026-10-10
-
-- **[BL-25] Season names in the strips are not headings** — on the landing, `/seasons` and a
-  season page's neighbours, each season's name is a `span.h3` inside its link, as the boards draw
-  it, so heading navigation skips the 12 seasons. Make them `h3`s if the boards agree.
-  _Refs:_ `apps/web/src/lib/site-content/season-link.tsx`, MVP canvas boards Main, Seasons, Season
   · _Status:_ open — t9 phase review, 2026-10-10
 
 - **[BL-26] The famous photos bypass `Slot`** — the season page builds its own `sn-slot` and

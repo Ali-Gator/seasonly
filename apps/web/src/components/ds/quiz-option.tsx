@@ -1,22 +1,34 @@
 import type { InputHTMLAttributes } from "react";
 
 import { cx } from "./icon";
+import { Slot } from "./slot";
 
 export interface QuizOptionProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
   label: string;
   description?: string;
+  /** An example photo's source; with none, no image slot. */
+  image?: string;
+  imageAlt?: string;
 }
 
 /**
- * A native radio inside its label; every other prop passes through to the input. Ported from the
- * design system's bundle.js, without the image slot the quiz does not use.
+ * A native radio inside its label, with an example photo when given one; every other prop passes
+ * through to the input. Ported from the design system's bundle.js (`image`, `imageAlt`).
  *
- * @see openspec/specs/ui-components/spec.md
+ * {@link openspec/specs/ui-components/spec.md#requirement-a-quiz-option-is-a-native-radio-inside-its-label}
  */
-export function QuizOption({ label, description, className, ...input }: QuizOptionProps) {
+export function QuizOption({
+  label,
+  description,
+  image,
+  imageAlt,
+  className,
+  ...input
+}: QuizOptionProps) {
   return (
-    <label className={cx("sn-quiz", className)}>
+    <label className={cx("sn-quiz", image && "sn-quiz--image", className)}>
       <input type="radio" className="sn-quiz__input" {...input} />
+      {image && <Slot src={image} alt={imageAlt} className="sn-quiz__slot" />}
       <span className="sn-quiz__text">
         <span className="sn-quiz__label">{label}</span>
         {description && <span className="sn-quiz__desc">{description}</span>}

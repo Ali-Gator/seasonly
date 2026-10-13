@@ -59,7 +59,6 @@ test("goes from the landing to the reveal in under 30 s, spending nothing", asyn
   for (const [i, label] of answers.entries()) {
     await expect(page.getByText(`Question ${i + 1} of 4`)).toBeVisible();
     await page.getByText(label, { exact: true }).click();
-    if (i < 3) await page.getByRole("button", { name: "Next", exact: true }).click();
   }
   const analyzed = page.waitForResponse(
     (r) => r.url().endsWith("/api/analyze") && r.request().method() === "POST",
@@ -89,7 +88,7 @@ test("asks for a retake of a photo with no face, sending nothing", async ({ page
   const upload = page.getByLabel("Upload a photo");
   await expect(upload).toBeEnabled();
   await upload.setInputFiles({ name: "grey.png", mimeType: "image/png", buffer: greyPng() });
-  await expect(page.getByRole("heading", { name: "Let's retake this one" })).toBeVisible({
+  await expect(page.getByRole("heading", { name: "Let’s retake this one" })).toBeVisible({
     timeout: 30_000,
   });
   await expect(page.getByText("No face found")).toBeVisible();
@@ -118,11 +117,10 @@ test("Back stays inside the flow, also after a reload", async ({ page }) => {
   await upload();
   await expect(page.getByText("Question 1 of 4")).toBeVisible();
   expect(analyze).toEqual([]);
+  // A tap moves on by itself.
   await page.getByText("Green or olive", { exact: true }).click();
-  await page.getByRole("button", { name: "Next", exact: true }).click();
   await expect(page.getByText("Question 2 of 4")).toBeVisible();
   await page.getByText("Gold", { exact: true }).click();
-  await page.getByRole("button", { name: "Next", exact: true }).click();
   await expect(page.getByText("Question 3 of 4")).toBeVisible();
 
   await page.goBack();
@@ -150,13 +148,13 @@ test("Back stays inside the flow, also after a reload", async ({ page }) => {
  * {@link openspec/specs/capture-flow/spec.md#requirement-the-photo-guide-and-capture-follow-the-canvas}
  * (scenario "The guide's example photos")
  */
-test("the guide shows a loaded good and bad photo on each tip card", async ({ page }) => {
+test("the guide shows a loaded good photo and three bad ones on its tip card", async ({ page }) => {
   await page.goto("/analyze");
   const cards = page.locator(".sn-tip");
-  await expect(cards).toHaveCount(3);
+  await expect(cards).toHaveCount(1);
   for (const card of await cards.all()) {
     const photos = card.locator("img");
-    await expect(photos).toHaveCount(2);
+    await expect(photos).toHaveCount(4);
     for (const img of await photos.all()) {
       await expect(img).toHaveAttribute("alt", /\w/);
       await expect

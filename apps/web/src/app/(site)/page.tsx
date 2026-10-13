@@ -1,7 +1,7 @@
 import { type Family, SEASON_SLUGS, seasonFamily } from "@seasonly/analysis";
 import Link from "next/link";
 
-import { Button, Icon, Note, PhotoTipCard, SwatchGrid } from "@/components/ds";
+import { Button, Icon, Note, PhotoTipCard, SwatchGrid, SwatchStrip } from "@/components/ds";
 import { TIP_PHOTOS } from "@/lib/site-content/images";
 import { SeasonLink } from "@/lib/site-content/season-link";
 import { softAutumnColors } from "@/lib/site-content/sample";
@@ -56,16 +56,29 @@ export default function Page() {
         <div className="flex flex-col gap-(--space-4) lg:col-span-5">
           <p className="overline">Seasonal color analysis</p>
           <h1 className="h1">Find your colors from one selfie.</h1>
+          {/* Color in the first phone screen; the wide hero shows the palette beside it. */}
+          <figure className="m-0 flex flex-col gap-(--space-2) lg:hidden">
+            <div className="rounded-(--radius-lg) bg-(--surface) p-(--space-3)">
+              <SwatchStrip colors={SAMPLE} columns={6} label="Soft Autumn sample colors" />
+            </div>
+            <figcaption className="caption text-(--ink-muted)">
+              A Soft Autumn result: 12 of 30 colors.{" "}
+              <Link href="/sample-report" className="text-(--ink) underline">
+                See the full sample
+              </Link>
+            </figcaption>
+          </figure>
           <p className="lead text-(--ink-muted)">
             One daylight selfie and four quick questions. In under a minute you get your season and
             30 colors that work with you.
           </p>
           <div className="sn-stack mt-(--space-4) lg:flex-row">
-            <Button href="/analyze" block className="lg:w-auto">
+            {/* From 1024 px upload takes the primary fill (t18-design-review decision 6). */}
+            <Button href="/analyze" block className="sn-btn--lg-swap lg:w-auto">
               <Icon name="camera" size={18} />
               Take a selfie
             </Button>
-            <Button href="/analyze" variant="secondary" block className="lg:w-auto">
+            <Button href="/analyze" variant="secondary" block className="sn-btn--lg-swap lg:w-auto">
               <Icon name="upload" size={18} />
               Upload a photo
             </Button>
@@ -171,7 +184,7 @@ export default function Page() {
             <p className="overline">{capitalize(family)}</p>
             <div className="flex flex-col gap-(--space-3) lg:grid lg:grid-cols-3 lg:gap-(--space-6)">
               {SEASON_SLUGS.filter((s) => seasonFamily(s) === family).map((slug) => (
-                <SeasonLink key={slug} slug={slug} />
+                <SeasonLink key={slug} slug={slug} compact />
               ))}
             </div>
           </div>
@@ -181,7 +194,7 @@ export default function Page() {
 
       <section className="flex flex-col gap-(--space-4) border-t border-(--line) pt-(--space-6) lg:flex-row lg:items-center lg:justify-between lg:py-(--space-8)">
         <h2 className="h2">Ready when you are</h2>
-        <Button href="/analyze" variant="secondary" block className="lg:w-auto">
+        <Button href="/analyze" block className="lg:w-auto">
           Start with a selfie
         </Button>
       </section>

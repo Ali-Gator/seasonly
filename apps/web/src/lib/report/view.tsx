@@ -8,11 +8,12 @@ import { seasonName } from "@/lib/site/routes";
 import { SaveButton, ShareButton } from "./actions";
 import { ReportDraping } from "./draping";
 import type { StoredReport } from "./read";
-import { ReportSections } from "./sections";
+import { LEFT, ReportSections } from "./sections";
 
 /**
  * The full report of canvas artboards "10 Full report · 375" and "· 1280": one DOM in phone
- * reading order, which a 12-column grid rearranges from 1024 px (design.md decision 7).
+ * reading order, palette first; from 1024 px the copy and actions float left of the sections
+ * (t5-analysis-flow decision 7, t18-design-review decision 2).
  *
  * {@link openspec/specs/report-page/spec.md#requirement-a-stored-report-renders-the-canvas-report}
  * {@link openspec/specs/report-page/spec.md#requirement-the-report-has-a-wide-layout}
@@ -42,7 +43,7 @@ export function ReportView({ id, report }: { id: string; report: StoredReport })
         <p className="caption hidden text-(--ink-muted) lg:block">seasonly.me/r/{id}</p>
       </header>
 
-      <main className="flex flex-col gap-(--space-12) lg:grid lg:grid-cols-12 lg:grid-rows-[auto_auto_auto_auto_1fr] lg:items-start lg:gap-x-(--space-6) lg:gap-y-(--space-5)">
+      <main className="flex flex-col gap-(--space-12) lg:flow-root">
         <ReportSections
           season={season}
           agreement={agreement}
@@ -54,28 +55,31 @@ export function ReportView({ id, report }: { id: string; report: StoredReport })
           }
         />
 
-        <div className="lg:col-span-4 lg:col-start-1 lg:row-start-3">
-          <PremiumCard
-            reportId={id}
-            interested={report.interested}
-            // The address is in the page only once interest exists (design.md decision 3).
-            email={report.interested ? report.email : null}
-          />
-        </div>
+        {/* One left block from 1024 px, where the actions move above the Premium card. */}
+        <div className={`flex flex-col gap-(--space-12) lg:gap-(--space-5) ${LEFT}`}>
+          <div>
+            <PremiumCard
+              reportId={id}
+              interested={report.interested}
+              // The address is in the page only once interest exists (design.md decision 3).
+              email={report.interested ? report.email : null}
+            />
+          </div>
 
-        <div className="sn-stack lg:col-span-4 lg:col-start-1 lg:row-start-2">
-          <ShareButton slug={season} season={name} alts={alts} />
-          <SaveButton slug={season} />
-        </div>
+          <div className="sn-stack lg:order-first">
+            <ShareButton slug={season} season={name} alts={alts} />
+            <SaveButton slug={season} />
+          </div>
 
-        <footer className="caption flex flex-col gap-(--space-2) border-t border-(--line) pt-(--space-6) text-(--ink-muted) lg:col-span-4 lg:col-start-1 lg:row-start-4 lg:border-t-0 lg:pt-0">
-          {!quizOnly && <p>Your photo is deleted within 24 hours of your analysis.</p>}
-          <p>This report stays at seasonly.me/r/{id}.</p>
-          <p>
-            Seasons describe colors, not people. If a color you love isn&apos;t here, wear it away
-            from your face.
-          </p>
-        </footer>
+          <footer className="caption flex flex-col gap-(--space-2) border-t border-(--line) pt-(--space-6) text-(--ink-muted) lg:border-t-0 lg:pt-0">
+            {!quizOnly && <p>Your photo is deleted within 24 hours of your analysis.</p>}
+            <p>This report stays at seasonly.me/r/{id}.</p>
+            <p>
+              Seasons describe colors, not people. If a color you love isn&apos;t here, wear it away
+              from your face.
+            </p>
+          </footer>
+        </div>
       </main>
     </div>
   );

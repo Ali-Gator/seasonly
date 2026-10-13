@@ -27,10 +27,12 @@ const useHydrated = () =>
 export function UploadButton({
   onPhoto,
   variant,
+  className,
   children,
 }: {
   onPhoto: OnPhoto;
   variant: "secondary" | "ghost";
+  className?: string;
   children: string;
 }) {
   const hydrated = useHydrated();
@@ -40,7 +42,7 @@ export function UploadButton({
     if (file) onPhoto(file, "upload");
   };
   return (
-    <label className={`sn-btn sn-btn--${variant} sn-btn--block`}>
+    <label className={`sn-btn sn-btn--${variant} sn-btn--block ${className ?? ""}`.trim()}>
       <input
         type="file"
         accept="image/*"
@@ -67,30 +69,35 @@ export function Guide({ onCamera, onPhoto }: { onCamera: () => void; onPhoto: On
           Face a window, skip the makeup and the filter. Daylight shows your real undertone.
         </p>
       </div>
+      {/* One card, so both actions fit the first phone screen (t18-design-review decision 5). */}
       <PhotoTipCard
-        title="Face a window"
-        body="Natural daylight from the front. Lamps and screens tint your skin."
-        good={{ caption: "Facing a window", ...TIP_PHOTOS.light.good }}
-        bad={{ caption: "Under a ceiling lamp", ...TIP_PHOTOS.light.bad }}
+        title="Face a window, bare skin, no filter"
+        good={{ caption: "Window light, bare skin", ...TIP_PHOTOS.light.good }}
+        bad={[
+          {
+            caption: "Ceiling lamp",
+            src: TIP_PHOTOS.light.bad.src,
+            alt: `${TIP_PHOTOS.light.bad.alt}. Lamps and screens tint your skin.`,
+          },
+          {
+            caption: "Foundation",
+            src: TIP_PHOTOS.makeup.bad.src,
+            alt: `${TIP_PHOTOS.makeup.bad.alt}. Foundation and bronzer hide your undertone.`,
+          },
+          {
+            caption: "Beauty filter",
+            src: TIP_PHOTOS.filter.bad.src,
+            alt: `${TIP_PHOTOS.filter.bad.alt}. Filters shift skin tone.`,
+          },
+        ]}
       />
-      <PhotoTipCard
-        title="Skip the makeup"
-        body="Foundation and bronzer hide your undertone. Pull your hair back too."
-        good={{ caption: "Bare skin, hair back", ...TIP_PHOTOS.makeup.good }}
-        bad={{ caption: "Foundation, bronzer", ...TIP_PHOTOS.makeup.bad }}
-      />
-      <PhotoTipCard
-        title="No filter"
-        body="Filters and beauty mode shift skin tone. Use the plain camera."
-        good={{ caption: "Straight from the camera", ...TIP_PHOTOS.filter.good }}
-        bad={{ caption: "Beauty filter on", ...TIP_PHOTOS.filter.bad }}
-      />
-      <div className="sn-stack">
-        <Button block disabled={!hydrated} onClick={onCamera}>
+      {/* From 1024 px upload goes on top and takes the primary fill; the DOM keeps one set. */}
+      <div className="sn-stack lg:flex-col-reverse">
+        <Button block disabled={!hydrated} onClick={onCamera} className="sn-btn--lg-swap">
           <Icon name="camera" size={18} />
           Take a selfie
         </Button>
-        <UploadButton variant="secondary" onPhoto={onPhoto}>
+        <UploadButton variant="secondary" onPhoto={onPhoto} className="sn-btn--lg-swap">
           Upload a photo
         </UploadButton>
       </div>
@@ -206,17 +213,37 @@ export function Retake({
   onQuizOnly: () => void;
 }) {
   const tip = RETAKE_TIPS[problem];
+  const photo = (className: string) => (
+    <CameraFrame label="Your photo, as taken" guide={false} className={className}>
+      {previewUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element -- a local object URL
+        <img src={previewUrl} alt="Your photo, as taken" />
+      ) : undefined}
+    </CameraFrame>
+  );
   return (
     <>
-      <h1 className="h1" tabIndex={-1}>
-        Let&apos;s retake this one
-      </h1>
-      <CameraFrame label="Your photo, as taken" guide={false} className="w-[220px] self-center">
-        {previewUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- a local object URL
-          <img src={previewUrl} alt="Your photo, as taken" />
-        ) : undefined}
-      </CameraFrame>
+      {offerQuizOnly ? (
+        // The second failure in a row says so, with the photo as a thumbnail (canvas 04f).
+        <div className="flex items-start gap-(--space-4)">
+          {photo("w-24 flex-none")}
+          <div className="flex flex-col gap-(--space-2)">
+            <h1 className="h2" tabIndex={-1}>
+              Let’s try once more
+            </h1>
+            <p className="text-(--ink-muted)">
+              That’s two tries. Try once more, or go on with the quiz alone.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <>
+          <h1 className="h1" tabIndex={-1}>
+            Let’s retake this one
+          </h1>
+          {photo("w-[220px] self-center")}
+        </>
+      )}
       <Note tone="danger" title={tip.title}>
         {tip.message}
       </Note>
@@ -228,14 +255,14 @@ export function Retake({
           <Icon name="camera" size={18} />
           Retake photo
         </Button>
+        {offerQuizOnly && (
+          <Button variant="secondary" block onClick={onQuizOnly}>
+            Continue with the quiz only
+          </Button>
+        )}
         <UploadButton variant="ghost" onPhoto={onPhoto}>
           Upload a different photo
         </UploadButton>
-        {offerQuizOnly && (
-          <Button variant="ghost" block onClick={onQuizOnly}>
-            Continue without a photo
-          </Button>
-        )}
       </div>
       {offerQuizOnly && (
         <p className="caption text-center text-(--ink-muted)">

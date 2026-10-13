@@ -62,7 +62,7 @@ export default function ReportPage(props: {
 
 - `/r/[id]` lives in its own `(report)` route group with no layout chrome: the view draws its own header (the wordmark with a ghost "Share" on a phone, the wordmark with the report's address from 1024 px).
 - The page refuses an id that fails `REPORT_ID` with `notFound()` before any read. `readReport` makes one PostgREST select that embeds the latest `report_emails` row (ordered and limited on the embed) and `interest_clicks`, through `withTimeout` (3 s). A failure is captured and flushed, then thrown, so `error.tsx` answers 500.
-- One DOM in phone reading order: the season block, the sections, the Premium card, the actions and the footer. From `lg` a 12-column grid with rows `auto auto auto auto 1fr` puts the season block, actions, Premium card and footer in columns 1–4, and the sections in columns 6–12 across every row. Swatch grids go to 6 columns there.
+- One DOM in phone reading order: the season's head, section 1 (the palette), the rest of the season block, sections 2–6, then the Premium card, the actions and the footer. From `lg` the main is a flow root: the head, the rest and a last block with the Premium card, actions (`lg:order-first`) and footer float left at 4 of 12 columns; section 1 and sections 2–6 float right at 7 of 12 (`LEFT`, `RIGHT` in `sections.tsx`). Floats cannot start above an earlier float, so the left last block starts level with section 2 (BL-55). Swatch grids go to 6 columns there.
 - Personal text replaces the summary and the note body only when `textSource` is `personal`. The note's icon is a check for `agree`, info otherwise.
 - `ReportDraping` reads the rendered images in an effect: an image already failed before hydration (`complete && naturalWidth === 0`), or a later `error` event, switches to `DrapingView` with `deleted`.
 - The share and save buttons prefetch the story card and the palette PNG as Files on mount, so the tap calls `navigator.share` with its activation intact. Where `canShare({ files })` is false, Share opens the `<dialog>` panel of board 10e (both PNGs with `shareCardAlt` as alt text and download links), and Save clicks a hidden download link. An `AbortError` changes nothing.
@@ -82,11 +82,18 @@ export default function ReportPage(props: {
 
 `/r/<id>` for a stored report SHALL render canvas artboard "10 Full report · 375" for the record's season: the season block (name, tagline, summary, undertone, chroma, contrast and the agreement note), then six numbered sections (palette, colors to avoid, best neutrals, metals, makeup and hair, draping preview), then the Premium card, "Share my season", "Save my palette" and the footer. Every color SHALL show its name and hex code.
 
+Below 1024 px wide, section 1 (the palette) SHALL come straight after the season name and tagline, and the rest of the season block (summary, traits and agreement note) SHALL follow it, before section 2. From 1024 px, the season block SHALL stay whole in the left column, as the wide layout requires.
+
 #### Scenario: A Soft Autumn report
 
 - **WHEN** `/r/<id>` is opened for a stored Soft Autumn photo report
 - **THEN** it shows the overline "Your season", "Soft Autumn" and "Warm, soft and earthy."
 - **AND** the sections read "Section 1 of 6 · Your palette" (24 colors, Soft Coral `#D88E77` first), "Section 2 of 6 · Colors to avoid", "Section 3 of 6 · Your best neutrals" (6 colors, Espresso `#4A3A33` last), "Section 4 of 6 · Your metals" ("Wear" and "Go easy on"), "Section 5 of 6 · Makeup and hair" (lips, blush, eyes, the hair tip and hair) and "Section 6 of 6 · Draping preview", in that order
+
+#### Scenario: The palette comes first on a phone
+
+- **WHEN** a stored report is opened in a 375 × 812 window
+- **THEN** the first palette swatch is inside the window without scrolling, and the summary and the agreement note come after the palette and before "Section 2 of 6"
 
 ### Requirement: The report gives exactly the 30 promised colors
 

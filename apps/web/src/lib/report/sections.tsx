@@ -13,8 +13,10 @@ import { seasonName } from "@/lib/site/routes";
 
 /**
  * The report's season block and its sections 1 to 6, shared by a stored report and the sample
- * report. It renders the two children of the report's 12-column grid as a fragment, and nothing
- * that sends a request or an event: the draping pair comes in as a node.
+ * report, as a fragment of four blocks for a flow root: the season's head, section 1, the rest of
+ * the season block, then sections 2 to 6. That is the phone order, palette first; from 1024 px the
+ * head and the rest float left and the sections right (`LEFT`, `RIGHT`). Nothing here sends a
+ * request or an event: the draping pair comes in as a node.
  *
  * @see openspec/specs/report-page/spec.md
  */
@@ -26,6 +28,14 @@ export function Group({ title, children }: { title: string; children: ReactNode 
     </div>
   );
 }
+
+/**
+ * From 1024 px a report or a season page floats its copy left (4 of 12 columns) and its sections
+ * right (7 of 12), each side clearing only its own kind, so the two columns stack apart although
+ * the phone order interleaves them (t18-design-review decision 2). The parent is a flow root.
+ */
+export const LEFT = "lg:float-left lg:clear-left lg:w-[calc(100%/3_-_var(--space-6)*2/3)]";
+export const RIGHT = "lg:float-right lg:clear-right lg:w-[calc(100%*7/12_-_var(--space-6)*5/12)]";
 
 /** A grid of 3 or 4 on a phone and `wide` columns from 1024 px. */
 export function Colors({
@@ -73,8 +83,8 @@ export function SeasonTraits({ season }: { season: SeasonSlug }) {
 export interface ReportSectionsProps {
   season: SeasonSlug;
   agreement: Agreement;
-  /** Above the season name: "Your season" on a report. */
-  overline: string;
+  /** Above the season name: "Your season" on a report; none on the sample, whose banner says so. */
+  overline?: string;
   /** Replaces the season's summary when set. */
   summary?: string | null;
   /** Replaces the agreement's body when set. */
@@ -104,8 +114,10 @@ export function ReportSections({
 
   return (
     <>
-      <section className="flex flex-col gap-(--space-4) lg:col-span-4 lg:col-start-1 lg:row-start-1 lg:gap-(--space-5)">
-        <p className="overline">{seasonOverline}</p>
+      <section
+        className={`flex flex-col gap-(--space-4) lg:mb-(--space-5) lg:gap-(--space-5) ${LEFT}`}
+      >
+        {seasonOverline && <p className="overline">{seasonOverline}</p>}
         <h1 className="display">
           {name}
           {subtitle && (
@@ -116,14 +128,9 @@ export function ReportSections({
           )}
         </h1>
         <p className="quote text-(--ink-muted)">{copy.tagline}</p>
-        <p>{summary || copy.summary}</p>
-        <SeasonTraits season={season} />
-        <Note icon={agreement === "agree" ? "check" : "info"} title={note.title}>
-          {agreementNote || note.body}
-        </Note>
       </section>
 
-      <div className="flex flex-col gap-(--space-12) lg:col-span-7 lg:col-start-6 lg:row-span-5 lg:row-start-1">
+      <div className={`lg:mb-(--space-12) ${RIGHT}`}>
         <ReportSection
           overline={overline(1)}
           title="Your palette"
@@ -131,6 +138,17 @@ export function ReportSections({
         >
           <Colors colors={palette.best} columns={4} wide={6} label={`Your ${name} palette`} />
         </ReportSection>
+      </div>
+
+      <div className={`flex flex-col gap-(--space-4) lg:mb-(--space-5) lg:gap-(--space-5) ${LEFT}`}>
+        <p>{summary || copy.summary}</p>
+        <SeasonTraits season={season} />
+        <Note icon={agreement === "agree" ? "check" : "info"} title={note.title}>
+          {agreementNote || note.body}
+        </Note>
+      </div>
+
+      <div className={`flex flex-col gap-(--space-12) ${RIGHT}`}>
         <ReportSection
           overline={overline(2)}
           title="Colors to avoid"
