@@ -62,7 +62,7 @@ The eye white is the pixels inside both eye openings (MediaPipe's `FACEMESH_RIGH
 - Hair lighter than the skin: adds no contrast, so clarity reads soft.
 - Landmarks outside the image: clipped; only in-frame pixels count.
 - Wrong buffer, landmark or mask length: `RangeError` naming the number.
-- Eyes closed or the eye openings outside the frame: `eyeWhite` is null; the traits are unaffected.
+- Eyes closed, the eye openings outside the frame, or (478 landmarks) fewer than 50 opening pixels left outside the iris circles: `eyeWhite` is null; the traits are unaffected.
 
 ## Requirements
 

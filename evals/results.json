@@ -1,5 +1,5 @@
 {
-  "inputsHash": "c89818fcdb1c242c20d9aee00dbcc90069170fcdc3d62f80e1c14c7ce3513ac1",
+  "inputsHash": "f550c947087e94055909e6c49518c964c9f11bce353fcd7415ce61b6ac25cd49",
   "mediapipe": "1.0.1",
   "counts": { "photos": 180, "people": 34, "variants": 348 },
   "metrics": {
@@ -11,7 +11,7 @@
     "falseRejects": { "no-face": 1, "dark": 4, "tint": 12, "filter": 9, "several-faces": 1 },
     "expectedProblemRate": 0.5652,
     "catchRate": 0.9167,
-    "passRate": 0.669,
+    "passRate": 0.6761,
     "traitSpread": { "temperature": 0.3297, "value": 0.2303, "clarity": 0.1883 }
   },
   "holdout": {
@@ -379,8 +379,8 @@
           "file": "p07/6-stage-warm.jpg",
           "light": "stage-warm",
           "expect": "several-faces",
-          "problem": "dark",
-          "season": null
+          "problem": null,
+          "season": "deep-winter"
         }
       ]
     },
