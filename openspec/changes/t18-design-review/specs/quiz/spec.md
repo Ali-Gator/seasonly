@@ -56,7 +56,7 @@ When an option is chosen with a pointer (a tap or a click), the quiz SHALL move 
 
 ### Requirement: Questions answered by looking show example photos
 
-The veins, jewelry and hair questions SHALL show an example photo in each option except "Hard to tell": a wrist with that vein color, gold or silver jewelry on skin (both for "Both look fine"), and that hair color. The photos SHALL show the site's fictional example person or her wrist, never a real person. Each photo SHALL have alt text that names what it shows. The sun question SHALL have no photos.
+The veins, jewelry and hair questions SHALL show an example photo in each option except "Hard to tell": a wrist with that vein color, gold or silver jewelry (both metals for "Both look fine"), and that hair color. The vein and hair photos SHALL show the site's fictional example person or her wrist, never a real person; the jewelry photos show the metals alone. Each photo SHALL have alt text that names what it shows. The sun question SHALL have no photos.
 
 #### Scenario: The veins question
 

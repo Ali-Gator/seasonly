@@ -70,7 +70,7 @@ On the landing hero and the guide, the DOM keeps "Take a selfie" first. From 102
 
 ### 8. Quiz photos: one more paid batch through the existing script
 
-`scripts/generate-photos.ts` gains a `quiz` set. One base wrist is edited into three vein colors. The base face is edited into four natural hair colors. The base wrist is edited into gold, silver and both kinds of jewelry. That makes 10 images in one batch, about $0.04 each, so about $0.50 with retries and at most $1. The batch runs only after the user's yes. The user then approves every image on the canvas. Outputs are 1:1 WebP, at most about 40 KB, in `apps/web/public/images/quiz/`, with paths and alt text in `lib/site-content/images.ts`.
+`scripts/generate-photos.ts` gains a `quiz` set. One base wrist is edited into three vein colors. The base face is edited into four natural hair colors. A gold jewelry set on a plain surface is edited into silver and a mix, so the jewelry question shows the metals rather than a third wrist (the user's call on 2026-10-13, after the first wrist-and-bracelet set read too much like the veins question). That makes about 10 images in one batch, about $0.04 each, so about $0.50 with retries and at most $1. The batch runs only after the user's yes. The user then approves every image on the canvas. Outputs are 1:1 WebP, at most about 40 KB, in `apps/web/public/images/quiz/`, with paths and alt text in `lib/site-content/images.ts`.
 
 ### 9. Blocked request: a step of its own
 

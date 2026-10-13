@@ -9,7 +9,7 @@
  * existing `base.png`, so a retried edit never regenerates the base.
  *
  * `quiz` (t18-design-review, design.md decision 8) makes the quiz's example photos: one base wrist,
- * edited into three vein colours and three kinds of jewellery, and the base face from
+ * edited into three vein colours; a gold jewellery set, edited into silver and a mix; and the base face from
  * `apps/web/public/images/examples/base.webp`, edited into three more natural hair colours (the
  * base's own light brown is the fourth). It reuses an existing `wrist.png` the same way.
  */
@@ -53,6 +53,13 @@ resting on a plain light grey surface, wrist centred in a square frame. Soft, ev
 window. No jewellery, no watch, no tattoos, no nail polish in view. The veins under the skin are
 faintly visible. Sharp focus, unretouched.`;
 
+// The jewelry question shows the metals themselves (the user's call, 2026-10-13): the gold set is
+// the base, saved as jewelry-gold; silver and the mix are edits of it.
+const METAL = `Photorealistic close-up product photo of a small set of simple everyday jewelry: one
+thin chain necklace loosely coiled, two plain rings and one small hoop earring, all polished yellow
+gold, lying on a plain light grey linen surface. Soft, even daylight from a window, gentle
+shadows, square frame, sharp focus, no hands, no skin, no text.`;
+
 const QUIZ_KEEP = `Edit this photo. Keep everything else the same: the same person, skin, freckles,
 pose, framing, light and background. Change only this:`;
 
@@ -69,17 +76,13 @@ const QUIZ_EDITS = {
     "wrist",
     "the veins on her inner wrist. Two or three natural veins now show softly through the skin just below the wrist crease: one has a clear green tint and one a clear blue tint. Soft and realistic, as veins look in daylight, never drawn lines.",
   ],
-  "jewelry-gold": [
-    "wrist",
-    "her jewellery. She now wears one thin polished yellow-gold chain bracelet on this wrist.",
-  ],
   "jewelry-silver": [
-    "wrist",
-    "her jewellery. She now wears one thin polished silver chain bracelet on this wrist.",
+    "metal",
+    "the metal. Every piece is now polished sterling silver, the same shapes in the same places.",
   ],
   "jewelry-both": [
-    "wrist",
-    "her jewellery. She now wears two thin chain bracelets on this wrist, one yellow gold and one silver.",
+    "metal",
+    "the metal. Of the two interlocked rings, the front ring is now polished sterling silver and the back ring stays yellow gold, so one gold and one silver ring sit together. The chain is half gold and half silver links. The same shapes in the same places.",
   ],
   "hair-dark": [
     "face",
@@ -110,7 +113,15 @@ if (which === "quiz") {
   if (!fs.existsSync(wristPath)) {
     await save("wrist", await generateText({ model, prompt: WRIST, providerOptions: square }));
   }
+  const metalPath = path.join(outDir, "jewelry-gold.png");
+  if (!fs.existsSync(metalPath)) {
+    await save(
+      "jewelry-gold",
+      await generateText({ model, prompt: METAL, providerOptions: square }),
+    );
+  }
   const sources = {
+    metal: { data: fs.readFileSync(metalPath), mediaType: "image/png", options: square },
     wrist: { data: fs.readFileSync(wristPath), mediaType: "image/png", options: square },
     face: {
       data: fs.readFileSync(

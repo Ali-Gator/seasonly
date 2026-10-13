@@ -51,7 +51,7 @@ export const SAMPLE_FACE: Photo = {
 
 /**
  * The quiz's example photos (t18-design-review design.md decision 8): the same fictional woman's
- * wrist and face, edited per answer. Approved by the user on the canvas on 2026-10-13.
+ * wrist and face, edited per answer, and a gold jewelry set edited to silver and to a mix. Approved by the user on the canvas on 2026-10-13.
  *
  * {@link openspec/specs/quiz/spec.md#requirement-questions-answered-by-looking-show-example-photos}
  */
@@ -62,11 +62,11 @@ export const QUIZ_PHOTOS = {
     mix: { src: "/images/quiz/veins-mix.webp", alt: "A wrist with both green and blue veins" },
   },
   jewelry: {
-    gold: { src: "/images/quiz/jewelry-gold.webp", alt: "A thin gold bracelet on a wrist" },
-    silver: { src: "/images/quiz/jewelry-silver.webp", alt: "A thin silver bracelet on a wrist" },
+    gold: { src: "/images/quiz/jewelry-gold.webp", alt: "Two gold rings and a gold chain" },
+    silver: { src: "/images/quiz/jewelry-silver.webp", alt: "Two silver rings and a silver chain" },
     both: {
       src: "/images/quiz/jewelry-both.webp",
-      alt: "A gold and a silver bracelet on a wrist",
+      alt: "Two silver rings beside a gold chain",
     },
   },
   hair: {
