@@ -215,6 +215,7 @@ describe("quiz", () => {
       await wait(300);
     }
     expect(heading()).toBe(QUESTION_4);
+    expect(container.textContent).not.toContain("Tap an answer to go on.");
     await tap("Medium or light brown");
     await wait(1000);
     expect(heading()).toBe(QUESTION_4);

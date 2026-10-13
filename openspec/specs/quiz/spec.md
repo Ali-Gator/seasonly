@@ -59,7 +59,7 @@ Each option's label and description SHALL match the canvas. Each option's value 
 
 No option SHALL be selected when a question first shows. The step's primary action SHALL stay unavailable until an option is chosen.
 
-When an option is chosen with a pointer (a tap or a click), the quiz SHALL move to the next question on its own after a short pause that shows the choice, about 300 ms. On the last question it SHALL NOT move on: the person still chooses "See my result". A choice made with the keyboard SHALL NOT move on, because arrow keys move through the options; the person moves on with "Next". Above the options, the quiz SHALL say "Tap an answer to go on." so the move is never a surprise.
+When an option is chosen with a pointer (a tap or a click), the quiz SHALL move to the next question on its own after a short pause that shows the choice, about 300 ms. On the last question it SHALL NOT move on: the person still chooses "See my result". A choice made with the keyboard SHALL NOT move on, because arrow keys move through the options; the person moves on with "Next". Above the options of every question but the last, the quiz SHALL say "Tap an answer to go on." so the move is never a surprise; the last question, which does not move on, does not say it.
 
 #### Scenario: A fresh question
 
