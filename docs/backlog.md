@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-51**
+_Next id:_ **BL-52**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -59,6 +59,12 @@ fold items in.
   the limit, and tuning `tint` false rejects rose 8 to 12, now the largest cause (12 of 27). Sweep
   the limit on the tuning set only, holding the catch rate.
   _Refs:_ `packages/analysis/src/photo-check/index.ts`, `openspec/changes/archive/*-backlog-1/tasks.md` · _Status:_ open — `backlog-1` phase review, 2026-10-13
+
+- **[BL-51] A squint can pass the light checks unmeasured** — with 478 landmarks the eye white is
+  null when fewer than 50 opening pixels lie outside the irises, and `dark` and `tint` are then
+  skipped (`p07/6` moved from `dark` to a pass). Watch the null rate of `eye_white_lab` after the
+  deploy; if real squints pass unmeasured, add a retake rule for a null eye white.
+  _Refs:_ `packages/analysis/src/sampling/index.ts`, `openspec/changes/archive/*-backlog-1/design.md` · _Status:_ open — `backlog-1` phase re-review, 2026-10-13
 
 ## Privacy
 
