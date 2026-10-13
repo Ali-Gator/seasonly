@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   face478,
+  lidOver,
   paint,
   ringsOf,
   type Fill,
@@ -352,6 +353,18 @@ describe("eye white", () => {
     expect(sample.eyeWhite).toBeNull();
     expect(sample.traits).not.toBeNull();
     expect(sample.traits).toEqual(traitsOf(sample.regions));
+  });
+
+  /** {@link openspec/specs/color-sampling/spec.md#scenario-irises-and-lids-are-left-out} */
+  it("leaves dark irises and lids over three quarters of each opening out of the eye white", () => {
+    const input = face({ eyes: [40, 30, 25] });
+    for (const [opening, iris] of [
+      [EYE_OPENINGS.right, REGIONS.rightIris],
+      [EYE_OPENINGS.left, REGIONS.leftIris],
+    ] as const)
+      lidOver(input, ringsOf(opening, LM), ringsOf(iris, LM), { lid: SKIN, sclera: SCLERA }, 0.75);
+    const { eyeWhite } = samplePhoto(input);
+    expect(deltaE(eyeWhite ?? lab(BG), lab(SCLERA))).toBeLessThan(2);
   });
 });
 

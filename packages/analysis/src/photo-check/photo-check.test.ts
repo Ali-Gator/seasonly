@@ -3,7 +3,14 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { face478, paint, ringsOf, type Point, type RGB } from "../__tests__/synthetic-face.ts";
+import {
+  face478,
+  lidOver,
+  paint,
+  ringsOf,
+  type Point,
+  type RGB,
+} from "../__tests__/synthetic-face.ts";
 import { REGIONS, samplePhoto, type PhotoInput } from "../sampling/index.ts";
 import {
   checkPhoto,
@@ -231,6 +238,26 @@ describe("checkPhoto", () => {
     /** {@link openspec/specs/photo-check/spec.md#scenario-a-dim-indoor-selfie} */
     it("passes a face at a third of its brightness, eye white L* 33 as indoors", () => {
       expect(problem(edit(face(), ([r, g, b]) => [r * 0.33, g * 0.33, b * 0.33]))).toBeNull();
+    });
+
+    /** {@link openspec/specs/photo-check/spec.md#scenario-deep-skin-with-lids-covering-most-of-each-eye-opening} */
+    it("passes the deepest Monk Skin Tone with lids over three quarters of each opening", () => {
+      const dark: RGB = [40, 30, 25];
+      const photo = edit(face({ skin: DEEPEST }), (rgb) =>
+        rgb.every((v, i) => v === IRIS[i]) ? dark : rgb,
+      );
+      for (const [opening, iris] of [
+        [EYE_OPENINGS.right, REGIONS.rightIris],
+        [EYE_OPENINGS.left, REGIONS.leftIris],
+      ] as const)
+        lidOver(
+          photo,
+          ringsOf(opening, LM),
+          ringsOf(iris, LM),
+          { lid: DEEPEST, sclera: SCLERA },
+          0.75,
+        );
+      expect(problem(photo)).toBeNull();
     });
   });
 
