@@ -1,7 +1,7 @@
 {
-  "inputsHash": "fcb1eee47d6d1a68cf313efea475833c66073a69550ef63c1686ccc9250f8075",
+  "inputsHash": "3bb18ceaf648aa808030114ff6f8c384901aa763fe3e1e98f3e544f240c71e8e",
   "mediapipe": "1.0.1",
-  "counts": { "photos": 180, "people": 34, "variants": 330 },
+  "counts": { "photos": 180, "people": 34, "variants": 333 },
   "metrics": {
     "agreement": 0.5687,
     "familyAgreement": 0.7027,
@@ -15,16 +15,16 @@
     "traitSpread": { "temperature": 0.3241, "value": 0.2389, "clarity": 0.1929 }
   },
   "holdout": {
-    "agreement": 0.5312,
-    "familyAgreement": 0.6458,
+    "agreement": 0.5187,
+    "familyAgreement": 0.6333,
     "accuracy": 0.0882,
     "familyAccuracy": 0.2353,
-    "falseRejectRate": 0.3235,
-    "falseRejects": { "no-face": 1, "dark": 5, "tint": 4, "filter": 1, "several-faces": 0 },
+    "falseRejectRate": 0.2941,
+    "falseRejects": { "no-face": 1, "dark": 5, "tint": 3, "filter": 1, "several-faces": 0 },
     "expectedProblemRate": 1,
-    "catchRate": 0.8841,
-    "passRate": 0.6053,
-    "traitSpread": { "temperature": 0.1943, "value": 0.2466, "clarity": 0.1007 }
+    "catchRate": 0.875,
+    "passRate": 0.6316,
+    "traitSpread": { "temperature": 0.2202, "value": 0.2429, "clarity": 0.1037 }
   },
   "people": [
     {
@@ -1083,8 +1083,8 @@
       "holdout": true,
       "measured": true,
       "season": "light-spring",
-      "agreement": 0.5,
-      "familyAgreement": 0.5,
+      "agreement": 0.4,
+      "familyAgreement": 0.4,
       "photos": [
         {
           "file": "p22/1-indoor-flash.jpg",
@@ -1115,11 +1115,11 @@
           "season": "light-spring"
         },
         {
-          "file": "p22/5-stage-red.jpg",
-          "light": "stage-red",
+          "file": "p22/5-red-carpet.png",
+          "light": "red-carpet",
           "expect": "pass",
-          "problem": "tint",
-          "season": null
+          "problem": null,
+          "season": "true-winter"
         }
       ]
     },
@@ -1285,8 +1285,8 @@
           "season": "true-winter"
         },
         {
-          "file": "p26/2-stage-dark.jpg",
-          "light": "stage-dark",
+          "file": "p26/2-indoor-warm.jpg",
+          "light": "indoor-warm",
           "expect": "pass",
           "problem": "dark",
           "season": null
