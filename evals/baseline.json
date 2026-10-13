@@ -1,8 +1,8 @@
 {
   "metrics": {
-    "agreement": 0.6021,
-    "accuracy": 0.1806,
-    "falseRejectRate": 0.1806,
-    "catchRate": 0.887
+    "agreement": 0.5687,
+    "accuracy": 0.1322,
+    "falseRejectRate": 0.281,
+    "catchRate": 0.8812
   }
 }

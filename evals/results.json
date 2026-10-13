@@ -1,20 +1,31 @@
 {
-  "inputsHash": "7c1d1ea565a2133de4090db601d11255bfd13c536a873e5e8682cd3dc3a11f2f",
+  "inputsHash": "e87703b70f585b5f298a31610b0083230f4dbe9071e2cfed8cee76d33f591be0",
   "mediapipe": "1.0.1",
-  "counts": { "photos": 93, "people": 16, "variants": 177 },
+  "counts": { "photos": 180, "people": 34, "variants": 330 },
   "metrics": {
-    "agreement": 0.6021,
-    "familyAgreement": 0.7177,
-    "accuracy": 0.1806,
-    "familyAccuracy": 0.2778,
-    "falseRejectRate": 0.1806,
-    "falseRejects": { "no-face": 0, "dark": 6, "tint": 4, "filter": 2, "several-faces": 1 },
+    "agreement": 0.5687,
+    "familyAgreement": 0.7027,
+    "accuracy": 0.1322,
+    "familyAccuracy": 0.2479,
+    "falseRejectRate": 0.281,
+    "falseRejects": { "no-face": 1, "dark": 14, "tint": 8, "filter": 8, "several-faces": 3 },
     "expectedProblemRate": 0.5238,
-    "catchRate": 0.887,
-    "passRate": 0.6667,
-    "traitSpread": { "temperature": 0.3384, "value": 0.2538, "clarity": 0.1881 }
+    "catchRate": 0.8812,
+    "passRate": 0.6338,
+    "traitSpread": { "temperature": 0.3241, "value": 0.2389, "clarity": 0.1929 }
   },
-  "holdout": null,
+  "holdout": {
+    "agreement": 0.5312,
+    "familyAgreement": 0.6458,
+    "accuracy": 0.0811,
+    "familyAccuracy": 0.2162,
+    "falseRejectRate": 0.3784,
+    "falseRejects": { "no-face": 1, "dark": 5, "tint": 4, "filter": 1, "several-faces": 3 },
+    "expectedProblemRate": 0,
+    "catchRate": 0.8841,
+    "passRate": 0.6053,
+    "traitSpread": { "temperature": 0.1943, "value": 0.2466, "clarity": 0.1007 }
+  },
   "people": [
     {
       "person": "p01",
@@ -840,6 +851,813 @@
           "expect": "several-faces",
           "problem": "several-faces",
           "season": null
+        }
+      ]
+    },
+    {
+      "person": "p17",
+      "label": "soft-autumn",
+      "holdout": false,
+      "measured": true,
+      "season": "deep-winter",
+      "agreement": 0.6667,
+      "familyAgreement": 0.6667,
+      "photos": [
+        {
+          "file": "p17/1-indoor-warm.jpg",
+          "light": "indoor-warm",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-autumn"
+        },
+        {
+          "file": "p17/2-flash-dark.jpg",
+          "light": "flash-dark",
+          "expect": "pass",
+          "problem": "filter",
+          "season": null
+        },
+        {
+          "file": "p17/3-panel-stage.jpg",
+          "light": "panel-stage",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        },
+        {
+          "file": "p17/4-warm-promo.jpg",
+          "light": "warm-promo",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        },
+        {
+          "file": "p17/5-flash-event.jpg",
+          "light": "flash-event",
+          "expect": "pass",
+          "problem": "filter",
+          "season": null
+        },
+        {
+          "file": "p17/6-daylight.jpg",
+          "light": "daylight",
+          "expect": "pass",
+          "problem": "dark",
+          "season": null
+        }
+      ]
+    },
+    {
+      "person": "p18",
+      "label": "soft-summer",
+      "holdout": true,
+      "measured": true,
+      "season": "true-autumn",
+      "agreement": 0.3333,
+      "familyAgreement": 0.6667,
+      "photos": [
+        {
+          "file": "p18/1-panel-white.jpg",
+          "light": "panel-white",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-autumn"
+        },
+        {
+          "file": "p18/2-studio-blue.jpg",
+          "light": "studio-blue",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        },
+        {
+          "file": "p18/3-red-carpet.jpg",
+          "light": "red-carpet",
+          "expect": "pass",
+          "problem": "no-face",
+          "season": null
+        },
+        {
+          "file": "p18/4-yellow-backdrop.jpg",
+          "light": "yellow-backdrop",
+          "expect": "pass",
+          "problem": null,
+          "season": "bright-winter"
+        }
+      ]
+    },
+    {
+      "person": "p19",
+      "label": "true-autumn",
+      "holdout": false,
+      "measured": false,
+      "season": null,
+      "agreement": null,
+      "familyAgreement": null,
+      "photos": [
+        {
+          "file": "p19/1-stage-flag.jpg",
+          "light": "stage-flag",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-spring"
+        },
+        {
+          "file": "p19/2-outdoor-shade.jpg",
+          "light": "outdoor-shade",
+          "expect": "pass",
+          "problem": "several-faces",
+          "season": null
+        },
+        {
+          "file": "p19/3-daylight.jpg",
+          "light": "daylight",
+          "expect": "pass",
+          "problem": "no-face",
+          "season": null
+        }
+      ]
+    },
+    {
+      "person": "p20",
+      "label": "deep-autumn",
+      "holdout": true,
+      "measured": true,
+      "season": "true-spring",
+      "agreement": 0.3333,
+      "familyAgreement": 0.6667,
+      "photos": [
+        {
+          "file": "p20/1-flash-dark.jpg",
+          "light": "flash-dark",
+          "expect": "pass",
+          "problem": null,
+          "season": "bright-spring"
+        },
+        {
+          "file": "p20/2-daylight-indoor.jpg",
+          "light": "daylight-indoor",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-spring"
+        },
+        {
+          "file": "p20/3-indoor-warm.jpg",
+          "light": "indoor-warm",
+          "expect": "pass",
+          "problem": "dark",
+          "season": null
+        },
+        {
+          "file": "p20/4-red-carpet.jpg",
+          "light": "red-carpet",
+          "expect": "pass",
+          "problem": "dark",
+          "season": null
+        },
+        {
+          "file": "p20/5-panel-stage.jpg",
+          "light": "panel-stage",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        }
+      ]
+    },
+    {
+      "person": "p21",
+      "label": "deep-winter",
+      "holdout": false,
+      "measured": true,
+      "season": "bright-spring",
+      "agreement": 0.5,
+      "familyAgreement": 0.5,
+      "photos": [
+        {
+          "file": "p21/1-flash-night.jpg",
+          "light": "flash-night",
+          "expect": "pass",
+          "problem": null,
+          "season": "bright-winter"
+        },
+        {
+          "file": "p21/2-indoor-white.jpg",
+          "light": "indoor-white",
+          "expect": "pass",
+          "problem": null,
+          "season": "bright-winter"
+        },
+        {
+          "file": "p21/3-indoor-bright.jpg",
+          "light": "indoor-bright",
+          "expect": "pass",
+          "problem": "tint",
+          "season": null
+        },
+        {
+          "file": "p21/4-flash-white.jpg",
+          "light": "flash-white",
+          "expect": "pass",
+          "problem": null,
+          "season": "bright-spring"
+        },
+        {
+          "file": "p21/5-flash-dark.jpg",
+          "light": "flash-dark",
+          "expect": "pass",
+          "problem": "filter",
+          "season": null
+        },
+        {
+          "file": "p21/6-indoor-warm.jpg",
+          "light": "indoor-warm",
+          "expect": "pass",
+          "problem": null,
+          "season": "bright-spring"
+        }
+      ]
+    },
+    {
+      "person": "p22",
+      "label": "true-spring",
+      "holdout": true,
+      "measured": true,
+      "season": "light-spring",
+      "agreement": 0.5,
+      "familyAgreement": 0.5,
+      "photos": [
+        {
+          "file": "p22/1-indoor-flash.jpg",
+          "light": "indoor-flash",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        },
+        {
+          "file": "p22/2-indoor-warm.jpg",
+          "light": "indoor-warm",
+          "expect": "pass",
+          "problem": null,
+          "season": "light-spring"
+        },
+        {
+          "file": "p22/3-daylight.jpg",
+          "light": "daylight",
+          "expect": "pass",
+          "problem": null,
+          "season": "soft-summer"
+        },
+        {
+          "file": "p22/4-stage-blue.jpg",
+          "light": "stage-blue",
+          "expect": "pass",
+          "problem": null,
+          "season": "light-spring"
+        },
+        {
+          "file": "p22/5-stage-red.jpg",
+          "light": "stage-red",
+          "expect": "pass",
+          "problem": "tint",
+          "season": null
+        }
+      ]
+    },
+    {
+      "person": "p23",
+      "label": "deep-autumn",
+      "holdout": false,
+      "measured": true,
+      "season": "deep-winter",
+      "agreement": 0.3333,
+      "familyAgreement": 1,
+      "photos": [
+        {
+          "file": "p23/1-flash-white.jpg",
+          "light": "flash-white",
+          "expect": "pass",
+          "problem": null,
+          "season": "bright-winter"
+        },
+        {
+          "file": "p23/2-outdoor-warm.jpg",
+          "light": "outdoor-warm",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-winter"
+        },
+        {
+          "file": "p23/3-stage-dark.jpg",
+          "light": "stage-dark",
+          "expect": "pass",
+          "problem": "dark",
+          "season": null
+        },
+        {
+          "file": "p23/4-stage-blue.jpg",
+          "light": "stage-blue",
+          "expect": "pass",
+          "problem": "filter",
+          "season": null
+        },
+        {
+          "file": "p23/5-flash-dark.jpg",
+          "light": "flash-dark",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        },
+        {
+          "file": "p23/6-flash-event.jpg",
+          "light": "flash-event",
+          "expect": "pass",
+          "problem": "several-faces",
+          "season": null
+        }
+      ]
+    },
+    {
+      "person": "p24",
+      "label": "true-winter",
+      "holdout": true,
+      "measured": true,
+      "season": "true-winter",
+      "agreement": 0.25,
+      "familyAgreement": 0.5,
+      "photos": [
+        {
+          "file": "p24/1-indoor-warm.jpg",
+          "light": "indoor-warm",
+          "expect": "pass",
+          "problem": null,
+          "season": "bright-winter"
+        },
+        {
+          "file": "p24/2-indoor-daylight.jpg",
+          "light": "indoor-daylight",
+          "expect": "pass",
+          "problem": "several-faces",
+          "season": null
+        },
+        {
+          "file": "p24/3-stage-blue.jpg",
+          "light": "stage-blue",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-winter"
+        },
+        {
+          "file": "p24/4-night-red-carpet.jpg",
+          "light": "night-red-carpet",
+          "expect": "pass",
+          "problem": "tint",
+          "season": null
+        },
+        {
+          "file": "p24/5-indoor-daylight.jpg",
+          "light": "indoor-daylight",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-summer"
+        },
+        {
+          "file": "p24/6-stage-blue.jpg",
+          "light": "stage-blue",
+          "expect": "pass",
+          "problem": null,
+          "season": "soft-summer"
+        }
+      ]
+    },
+    {
+      "person": "p25",
+      "label": "deep-autumn",
+      "holdout": false,
+      "measured": true,
+      "season": "true-autumn",
+      "agreement": 0.3333,
+      "familyAgreement": 0.6667,
+      "photos": [
+        {
+          "file": "p25/1-stage-blue.jpg",
+          "light": "stage-blue",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-autumn"
+        },
+        {
+          "file": "p25/2-panel-white.jpg",
+          "light": "panel-white",
+          "expect": "pass",
+          "problem": "tint",
+          "season": null
+        },
+        {
+          "file": "p25/3-flash-dark.jpg",
+          "light": "flash-dark",
+          "expect": "pass",
+          "problem": null,
+          "season": "bright-winter"
+        },
+        {
+          "file": "p25/4-daylight-shade.jpg",
+          "light": "daylight-shade",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        }
+      ]
+    },
+    {
+      "person": "p26",
+      "label": "soft-autumn",
+      "holdout": false,
+      "measured": true,
+      "season": "true-summer",
+      "agreement": 0.5,
+      "familyAgreement": 0.5,
+      "photos": [
+        {
+          "file": "p26/1-stage-dark.jpg",
+          "light": "stage-dark",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-winter"
+        },
+        {
+          "file": "p26/2-stage-dark.jpg",
+          "light": "stage-dark",
+          "expect": "pass",
+          "problem": "dark",
+          "season": null
+        },
+        {
+          "file": "p26/3-daylight.jpg",
+          "light": "daylight",
+          "expect": "pass",
+          "problem": "dark",
+          "season": null
+        },
+        {
+          "file": "p26/4-indoor.jpg",
+          "light": "indoor",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-summer"
+        }
+      ]
+    },
+    {
+      "person": "p27",
+      "label": "deep-winter",
+      "holdout": true,
+      "measured": true,
+      "season": "true-winter",
+      "agreement": 1,
+      "familyAgreement": 1,
+      "photos": [
+        {
+          "file": "p27/1-flash-white.jpg",
+          "light": "flash-white",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-winter"
+        },
+        {
+          "file": "p27/2-indoor-stage.jpg",
+          "light": "indoor-stage",
+          "expect": "pass",
+          "problem": "dark",
+          "season": null
+        },
+        {
+          "file": "p27/3-indoor-warm.jpg",
+          "light": "indoor-warm",
+          "expect": "pass",
+          "problem": "filter",
+          "season": null
+        },
+        {
+          "file": "p27/4-panel-stage.jpg",
+          "light": "panel-stage",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-winter"
+        }
+      ]
+    },
+    {
+      "person": "p28",
+      "label": "deep-winter",
+      "holdout": false,
+      "measured": true,
+      "season": "deep-winter",
+      "agreement": 0.6667,
+      "familyAgreement": 0.6667,
+      "photos": [
+        {
+          "file": "p28/1-panel-stage.jpg",
+          "light": "panel-stage",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        },
+        {
+          "file": "p28/2-panel-stage.jpg",
+          "light": "panel-stage",
+          "expect": "pass",
+          "problem": "tint",
+          "season": null
+        },
+        {
+          "file": "p28/3-flash-white.jpg",
+          "light": "flash-white",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-autumn"
+        },
+        {
+          "file": "p28/4-panel-stage.jpg",
+          "light": "panel-stage",
+          "expect": "pass",
+          "problem": "dark",
+          "season": null
+        },
+        {
+          "file": "p28/5-panel-dark.jpg",
+          "light": "panel-dark",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        }
+      ]
+    },
+    {
+      "person": "p29",
+      "label": "true-autumn",
+      "holdout": true,
+      "measured": true,
+      "season": "true-autumn",
+      "agreement": 0.5,
+      "familyAgreement": 0.5,
+      "photos": [
+        {
+          "file": "p29/1-stage-blue.jpg",
+          "light": "stage-blue",
+          "expect": "pass",
+          "problem": "tint",
+          "season": null
+        },
+        {
+          "file": "p29/2-runway-red.jpg",
+          "light": "runway-red",
+          "expect": "pass",
+          "problem": "several-faces",
+          "season": null
+        },
+        {
+          "file": "p29/3-panel-stage.jpg",
+          "light": "panel-stage",
+          "expect": "pass",
+          "problem": "tint",
+          "season": null
+        },
+        {
+          "file": "p29/4-studio-white.jpg",
+          "light": "studio-white",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-spring"
+        },
+        {
+          "file": "p29/5-flash-event.jpg",
+          "light": "flash-event",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-autumn"
+        }
+      ]
+    },
+    {
+      "person": "p30",
+      "label": "true-autumn",
+      "holdout": false,
+      "measured": true,
+      "season": "deep-winter",
+      "agreement": 0.5,
+      "familyAgreement": 1,
+      "photos": [
+        {
+          "file": "p30/1-red-backdrop.jpg",
+          "light": "red-backdrop",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-winter"
+        },
+        {
+          "file": "p30/2-indoor-flash.jpg",
+          "light": "indoor-flash",
+          "expect": "pass",
+          "problem": "filter",
+          "season": null
+        },
+        {
+          "file": "p30/3-daylight.jpg",
+          "light": "daylight",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        },
+        {
+          "file": "p30/4-panel-stage.jpg",
+          "light": "panel-stage",
+          "expect": "pass",
+          "problem": "dark",
+          "season": null
+        }
+      ]
+    },
+    {
+      "person": "p31",
+      "label": "bright-winter",
+      "holdout": true,
+      "measured": true,
+      "season": "bright-winter",
+      "agreement": 0.3333,
+      "familyAgreement": 0.3333,
+      "photos": [
+        {
+          "file": "p31/1-stage-blue.jpg",
+          "light": "stage-blue",
+          "expect": "pass",
+          "problem": "dark",
+          "season": null
+        },
+        {
+          "file": "p31/2-stage-blue.jpg",
+          "light": "stage-blue",
+          "expect": "pass",
+          "problem": "dark",
+          "season": null
+        },
+        {
+          "file": "p31/3-flash-white.jpg",
+          "light": "flash-white",
+          "expect": "pass",
+          "problem": null,
+          "season": "bright-winter"
+        },
+        {
+          "file": "p31/4-stage-green.jpg",
+          "light": "stage-green",
+          "expect": "pass",
+          "problem": null,
+          "season": "bright-spring"
+        },
+        {
+          "file": "p31/5-stage-orange.jpg",
+          "light": "stage-orange",
+          "expect": "tint",
+          "problem": "no-face",
+          "season": null
+        },
+        {
+          "file": "p31/6-flash-event.jpg",
+          "light": "flash-event",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-autumn"
+        }
+      ]
+    },
+    {
+      "person": "p32",
+      "label": "true-winter",
+      "holdout": false,
+      "measured": true,
+      "season": "deep-winter",
+      "agreement": 0.75,
+      "familyAgreement": 0.75,
+      "photos": [
+        {
+          "file": "p32/1-stage-blue.jpg",
+          "light": "stage-blue",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        },
+        {
+          "file": "p32/2-indoor-event.jpg",
+          "light": "indoor-event",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-autumn"
+        },
+        {
+          "file": "p32/3-studio.jpg",
+          "light": "studio",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        },
+        {
+          "file": "p32/4-rally-indoor.jpg",
+          "light": "rally-indoor",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        },
+        {
+          "file": "p32/5-stage.jpg",
+          "light": "stage",
+          "expect": "pass",
+          "problem": "filter",
+          "season": null
+        },
+        {
+          "file": "p32/6-outdoor-warm.jpg",
+          "light": "outdoor-warm",
+          "expect": "pass",
+          "problem": "dark",
+          "season": null
+        }
+      ]
+    },
+    {
+      "person": "p33",
+      "label": "deep-autumn",
+      "holdout": true,
+      "measured": true,
+      "season": "deep-winter",
+      "agreement": 1,
+      "familyAgreement": 1,
+      "photos": [
+        {
+          "file": "p33/1-studio-flag.jpg",
+          "light": "studio-flag",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        },
+        {
+          "file": "p33/2-indoor-rally.jpg",
+          "light": "indoor-rally",
+          "expect": "pass",
+          "problem": "several-faces",
+          "season": null
+        },
+        {
+          "file": "p33/3-indoor-rally.jpg",
+          "light": "indoor-rally",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        }
+      ]
+    },
+    {
+      "person": "p34",
+      "label": "deep-autumn",
+      "holdout": false,
+      "measured": true,
+      "season": "deep-autumn",
+      "agreement": 0.3333,
+      "familyAgreement": 0.3333,
+      "photos": [
+        {
+          "file": "p34/1-indoor-press.jpg",
+          "light": "indoor-press",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-autumn"
+        },
+        {
+          "file": "p34/2-daylight.jpg",
+          "light": "daylight",
+          "expect": "pass",
+          "problem": "dark",
+          "season": null
+        },
+        {
+          "file": "p34/3-daylight-court.jpg",
+          "light": "daylight-court",
+          "expect": "pass",
+          "problem": "tint",
+          "season": null
+        },
+        {
+          "file": "p34/4-flash-night.jpg",
+          "light": "flash-night",
+          "expect": "pass",
+          "problem": null,
+          "season": "deep-winter"
+        },
+        {
+          "file": "p34/5-indoor.jpg",
+          "light": "indoor",
+          "expect": "pass",
+          "problem": null,
+          "season": "true-spring"
         }
       ]
     }

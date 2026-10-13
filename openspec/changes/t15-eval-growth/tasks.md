@@ -19,8 +19,10 @@ Cite scenarios at `openspec/specs/analysis-eval/spec.md#…`. Add new test cases
 
 - [x] 3.1 Download the approved photos, compute SHA-256, and write the manifest entries (`p17`…), with `holdout: true` per D2 in the same commit. Done when `pnpm eval:fetch` reports nothing missing and the manifest test passes.
   - Done 2026-10-13: 87 photos, p17–p34, 8 people held out. Vetted at full size before any run: every photo shows the right person. Dropped `p33/4` (Pressley), a second crop of the same moment as `p33/2`, so the set has 87 of the 88 approved. A download bug wrote a previous photo's bytes when Commons throttled past every retry; 7 such files were caught by hash and re-fetched before the manifest was written.
-- [ ] 3.2 `pnpm eval:run`. Record the tuning and holdout metrics and trait spread, the false rejects by problem and by skin band, and any person left unmeasured. Write `baseline.json` from the tuning set's metrics (approved in 1.2). Done when `pnpm test:eval` passes.
-- [ ] 3.3 If `dark` false rejects fall mostly on deep skin, add a backlog item with the counts.
+- [x] 3.2 `pnpm eval:run`. Record the tuning and holdout metrics and trait spread, the false rejects by problem and by skin band, and any person left unmeasured. Write `baseline.json` from the tuning set's metrics (approved in 1.2). Done when `pnpm test:eval` passes.
+  - Run 2026-10-13 (34 people, 180 photos, 330 variants). Tuning set (26 people): agreement 0.5687, family agreement 0.7027, accuracy 0.1322, false-reject rate 0.281 (dark 14, tint 8, filter 8, several-faces 3, no-face 1), catch rate 0.8812; trait spread temperature 0.3241, value 0.2389, clarity 0.1929. Holdout (8 people): agreement 0.5312, family agreement 0.6458, accuracy 0.0811, false-reject rate 0.3784, catch rate 0.8841; trait spread temperature 0.1943, value 0.2466, clarity 0.1007. Unmeasured: p19 (one passing photo). False rejects by band, usable photos: original 13 of 72, medium new 17 of 45, deep new 18 of 41. `baseline.json` reset to the tuning set's numbers, as approved on 2026-10-12.
+- [x] 3.3 If `dark` false rejects fall mostly on deep skin, add a backlog item with the counts.
+  - Yes: 22% of new deep photos against 8–9% elsewhere. Logged as BL-45; unexpected several-faces on 5 vetted photos as BL-46.
 
 ## 4. White-balance re-run (design D6)
 

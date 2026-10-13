@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-45**
+_Next id:_ **BL-47**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -36,6 +36,19 @@ fold items in.
   change; code in commit `1d28b3d`) once the bigger set can judge it.
   _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/changes/archive/*-t15-white-balance/`
   · _Status:_ gated — BL-14
+
+- **[BL-45] The dark check rejects deep skin more often** — on the grown eval set, 9 of 41 usable
+  photos of new deep-skinned people get `dark` (22%), against 4 of 45 medium (9%) and 6 of 72 in
+  the original set (8%). The check reads overall brightness, so it penalizes deep skin. Measure
+  exposure on something skin-independent (the eye white or the background) and tune it on the
+  tuning set only, holding the catch rate.
+  _Refs:_ `packages/analysis/src/photo-check/index.ts`, `openspec/changes/*-t15-eval-growth/tasks.md` · _Status:_ open — found in `t15-eval-growth`, 2026-10-13
+
+- **[BL-46] Several-faces fires on photos with no visible second face** — 5 new photos, checked
+  by eye at full size before the run, got `several-faces`, likely from small or partial faces in
+  the background. Look at the cached face boxes and decide whether the width rule should ignore
+  faces far smaller than the main one.
+  _Refs:_ `apps/web/src/lib/capture/faces.ts`, `evals/photos/.cache/report.json` · _Status:_ open — found in `t15-eval-growth`, 2026-10-13
 
 - **[BL-39] Skin hue barely separates warm and cool labels** — on the eval set, warm-labeled
   people average skin hue 47.1° and cool-labeled 44.0°, a 3° gap inside an 11° spread, so
