@@ -202,7 +202,7 @@ const FLOW_URL = "https://seasonly.me/analyze";
  * {@link openspec/specs/season-reveal/spec.md#requirement-the-analyzing-step-follows-the-canvas-and-fails-visibly}
  */
 export function Blocked() {
-  const [copied, setCopied] = useState(false);
+  const [copy, setCopy] = useState<"idle" | "copied" | "failed">("idle");
   return (
     <>
       <div className="flex flex-col gap-(--space-3) pt-(--space-8)">
@@ -217,15 +217,20 @@ export function Blocked() {
         <Button
           block
           onClick={() =>
-            navigator.clipboard
-              ?.writeText(FLOW_URL)
-              .then(() => setCopied(true))
-              .catch(() => {})
+            // In-app browsers often have no clipboard or refuse it: then say how to copy by hand.
+            (navigator.clipboard?.writeText(FLOW_URL) ?? Promise.reject(new Error("no clipboard")))
+              .then(() => setCopy("copied"))
+              .catch(() => setCopy("failed"))
           }
         >
-          {copied ? "Link copied" : "Copy the link"}
+          {copy === "copied" ? "Link copied" : "Copy the link"}
         </Button>
-        <p className="caption text-center text-(--ink-muted)">seasonly.me/analyze</p>
+        <p className="caption text-center text-(--ink-muted)" role="status">
+          {copy === "failed" && "Copying didn’t work. Press and hold the link to copy it. "}
+          <a href={FLOW_URL} className="text-(--ink) underline">
+            seasonly.me/analyze
+          </a>
+        </p>
       </div>
     </>
   );

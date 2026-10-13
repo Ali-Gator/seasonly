@@ -10,7 +10,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import type { ReactNode } from "react";
-import { act } from "react";
+import { act, StrictMode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -55,7 +55,14 @@ beforeEach(async () => {
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
-  await act(async () => root.render(<Flow />));
+  // StrictMode runs each effect twice on mount, as `next dev` does: the focus guard must hold.
+  await act(async () =>
+    root.render(
+      <StrictMode>
+        <Flow />
+      </StrictMode>,
+    ),
+  );
 });
 
 afterEach(() => {
@@ -190,6 +197,16 @@ describe("quiz", () => {
     expect(container.querySelector("fieldset img")).toBeNull();
   });
 
+  /** {@link openspec/specs/quiz/spec.md#scenario-a-tap-moves-on} */
+  it("moves on once when Next is pressed before a tap's pause ends", async () => {
+    vi.useFakeTimers();
+    await tap("Green or olive");
+    await act(async () => button("Next")?.click());
+    expect(heading()).toBe(QUESTION_2);
+    await wait(1000);
+    expect(heading()).toBe(QUESTION_2);
+  });
+
   /** {@link openspec/specs/quiz/spec.md#scenario-the-last-question-waits} */
   it("waits on the last question for See my result", async () => {
     vi.useFakeTimers();
@@ -243,6 +260,19 @@ describe("a refused request", () => {
     await act(async () => button("Copy the link")?.click());
     expect(writeText).toHaveBeenCalledWith("https://seasonly.me/analyze");
     expect(button("Link copied")).toBeDefined();
+  });
+
+  /** {@link openspec/specs/season-reveal/spec.md#requirement-the-analyzing-step-follows-the-canvas-and-fails-visibly} */
+  it("says how to copy by hand when the clipboard refuses, with the link to press", async () => {
+    const writeText = vi.fn(() => Promise.reject(new Error("denied")));
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    await analyze(403);
+    await act(async () => button("Copy the link")?.click());
+    expect(container.textContent).toContain(
+      "Copying didn’t work. Press and hold the link to copy it.",
+    );
+    expect(container.querySelector('a[href="https://seasonly.me/analyze"]')).not.toBeNull();
+    expect(button("Link copied")).toBeUndefined();
   });
 
   /** {@link openspec/specs/season-reveal/spec.md#scenario-the-route-fails} */

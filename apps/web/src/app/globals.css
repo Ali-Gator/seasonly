@@ -227,23 +227,24 @@ body {
     color: var(--ink);
   }
   /* From 1024 px the landing hero and the photo guide put upload first: the two fills swap and
-     the DOM keeps one set of buttons (t18-design-review decision 6). */
+     the DOM keeps one set of buttons (t18-design-review decision 6). A disabled button keeps its
+     disabled look. */
   @media (min-width: 1024px) {
-    .sn-btn--primary.sn-btn--lg-swap,
-    .sn-btn--primary.sn-btn--lg-swap:hover {
+    .sn-btn--primary.sn-btn--lg-swap:not(:disabled):not([aria-disabled="true"]),
+    .sn-btn--primary.sn-btn--lg-swap:not(:disabled):not([aria-disabled="true"]):hover {
       background: var(--surface);
       color: var(--ink);
       border-color: var(--line-strong);
     }
-    .sn-btn--primary.sn-btn--lg-swap:hover {
+    .sn-btn--primary.sn-btn--lg-swap:not(:disabled):not([aria-disabled="true"]):hover {
       border-color: var(--ink);
     }
-    .sn-btn--secondary.sn-btn--lg-swap {
+    .sn-btn--secondary.sn-btn--lg-swap:not(:disabled):not([aria-disabled="true"]) {
       background: var(--accent);
       color: var(--on-accent);
       border-color: transparent;
     }
-    .sn-btn--secondary.sn-btn--lg-swap:hover {
+    .sn-btn--secondary.sn-btn--lg-swap:not(:disabled):not([aria-disabled="true"]):hover {
       background: var(--accent-strong);
       color: var(--on-accent);
     }
