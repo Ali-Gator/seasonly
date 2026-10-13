@@ -37,7 +37,7 @@ The flag lives on each manifest entry (`holdout: true`), checked for consistency
 
 ### D4. Trait spread
 
-`PhotoOutcome` gains `traits: Traits | null`, set for a pass. `metricsOf` adds `traitSpread: { temperature, value, clarity } | null`: per measured person, the population standard deviation of each trait over their passing usable photos; then the mean over those people, rounded to four decimals. Population SD (divide by n) matches the "temperature SD" column in `t15-white-balance` task 4.2. `results.ts` never copies `traits` into the person table, so no single photo's trait reaches `results.json`.
+`PhotoOutcome` gains an optional `traits`, set for every pass. `metricsOf` adds `traitSpread: { temperature, value, clarity } | null`: per measured person, the population standard deviation of each trait over their passing usable photos; then the mean over those people, rounded to four decimals. Population SD (divide by n) matches the "temperature SD" column in `t15-white-balance` task 4.2. `results.ts` never copies `traits` into the person table, so no single photo's trait reaches `results.json`.
 
 ### D5. Baseline reset
 

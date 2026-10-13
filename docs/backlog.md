@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-48**
+_Next id:_ **BL-49**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -35,27 +35,20 @@ fold items in.
   agreement rises only 0.015 (two photos is 0.023), and on the holdout temperature spread rises at
   every strength. Parked again: the eye white is not a reliable white reference across people.
   Look for a reference that holds on the holdout, after BL-45 lets more deep-skin photos pass.
-  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/changes/*-t15-eval-growth/tasks.md` · _Status:_ gated — BL-45
+  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/changes/archive/*-t15-eval-growth/tasks.md` · _Status:_ gated — BL-45
 
-- **[BL-47] One E2E test fails in the local phase gate** — `report-delivery.spec.ts` "answers a
-  report it cannot read with 500" expects `cache-control: private, no-store`, but local
-  `pnpm test` serves E2E with `pnpm dev`, which sends `no-cache, must-revalidate`; CI's prebuilt
-  server passes. Either set the header explicitly on that route or run that assertion only against
-  a production build, so `pnpm test` is green locally.
-  _Refs:_ `e2e/report-delivery.spec.ts:112`, `playwright.config.ts` · _Status:_ open — found in `t15-eval-growth`, 2026-10-13
+- **[BL-48] A few eval people have two photos from one shoot** — p22/4 and p22/5 (one concert),
+  and p26/1 and p26/2 (one event). Same-shoot
+  pairs push that person's agreement up and trait spread down. Replace one of each pair with a
+  photo in different light the next time the set grows, before that run.
+  _Refs:_ `evals/manifest.json`, `openspec/changes/archive/*-t15-eval-growth/design.md` · _Status:_ open — found in `t15-eval-growth` phase review, 2026-10-13
 
 - **[BL-45] The dark check rejects deep skin more often** — on the grown eval set, 9 of 41 usable
   photos of new deep-skinned people get `dark` (22%), against 4 of 45 medium (9%) and 6 of 72 in
   the original set (8%). The check reads overall brightness, so it penalizes deep skin. Measure
   exposure on something skin-independent (the eye white or the background) and tune it on the
   tuning set only, holding the catch rate.
-  _Refs:_ `packages/analysis/src/photo-check/index.ts`, `openspec/changes/*-t15-eval-growth/tasks.md` · _Status:_ open — found in `t15-eval-growth`, 2026-10-13
-
-- **[BL-46] Several-faces fires on photos with no visible second face** — 5 new photos, checked
-  by eye at full size before the run, got `several-faces`, likely from small or partial faces in
-  the background. Look at the cached face boxes and decide whether the width rule should ignore
-  faces far smaller than the main one.
-  _Refs:_ `apps/web/src/lib/capture/faces.ts`, `evals/photos/.cache/report.json` · _Status:_ open — found in `t15-eval-growth`, 2026-10-13
+  _Refs:_ `packages/analysis/src/photo-check/index.ts`, `openspec/changes/archive/*-t15-eval-growth/tasks.md` · _Status:_ open — found in `t15-eval-growth`, 2026-10-13
 
 - **[BL-39] Skin hue barely separates warm and cool labels** — on the eval set, warm-labeled
   people average skin hue 47.1° and cool-labeled 44.0°, a 3° gap inside an 11° spread, so
@@ -140,6 +133,13 @@ fold items in.
   _Status:_ open — phase review of `t15-white-balance`, 2026-10-12
 
 ## Testing
+
+- **[BL-47] One E2E test fails in the local phase gate** — `report-delivery.spec.ts` "answers a
+  report it cannot read with 500" expects `cache-control: private, no-store`, but local
+  `pnpm test` serves E2E with `pnpm dev`, which sends `no-cache, must-revalidate`; CI's prebuilt
+  server passes. Either set the header explicitly on that route or run that assertion only against
+  a production build, so `pnpm test` is green locally.
+  _Refs:_ `e2e/report-delivery.spec.ts:112`, `playwright.config.ts` · _Status:_ open — found in `t15-eval-growth`, 2026-10-13
 
 - **[BL-21] Two e2e cases fail on a Mac** — run locally, `/seasons/Soft-Autumn` answers 200
   (the case-insensitive disk serves the prerendered `soft-autumn` page) and, on the dev server

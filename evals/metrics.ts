@@ -82,21 +82,17 @@ function mode<T>(values: readonly T[], label: T, order: readonly T[]): T {
   return order.find((v) => counts.get(v) === top) as T;
 }
 
-const TRAITS = ["temperature", "value", "clarity"] as const;
-
 /** Population standard deviation. */
 function sd(values: readonly number[]): number {
   const m = values.reduce((s, v) => s + v, 0) / values.length;
   return Math.sqrt(values.reduce((s, v) => s + (v - m) ** 2, 0) / values.length);
 }
 
-/** Per measured person, each trait's SD over their passing photos with traits; then the mean. */
+/** Each trait's SD over every measured person's passing photos, then the mean over those people. */
 function traitSpreadOf(byPerson: readonly (readonly Traits[])[]): Traits | null {
-  const measured = byPerson.filter((t) => t.length >= 2);
-  if (!measured.length) return null;
-  return Object.fromEntries(
-    TRAITS.map((k) => [k, mean(measured.map((t) => sd(t.map((x) => x[k]))))]),
-  ) as unknown as Traits;
+  if (!byPerson.length) return null;
+  const spread = (k: keyof Traits) => mean(byPerson.map((t) => sd(t.map((x) => x[k])))) as number;
+  return { temperature: spread("temperature"), value: spread("value"), clarity: spread("clarity") };
 }
 
 const isUsable = (o: PhotoOutcome) => expectOf(o.photo) === "pass";
@@ -161,11 +157,14 @@ export function metricsOf(outcomes: readonly PhotoOutcome[]): {
       catchRate: share(variants.filter((v) => v.problem === v.expected).length, variants.length),
       passRate: share(outcomes.filter((o) => !o.problem).length, outcomes.length),
       traitSpread: traitSpreadOf(
-        people.map((p) =>
-          passing
-            .filter((o) => o.photo.person === p.person && o.traits)
-            .map((o) => o.traits as Traits),
-        ),
+        measured
+          .map((p) =>
+            passing
+              .filter((o) => o.photo.person === p.person && o.traits)
+              .map((o) => o.traits as Traits),
+          )
+          // The pipeline sets traits on every pass; an outcome built without them is not measured.
+          .filter((t) => t.length >= 2),
       ),
     },
     people,

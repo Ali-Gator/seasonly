@@ -68,6 +68,9 @@ and is never ratcheted. Tune on `metrics`, then check the holdout did not get wo
 held out when they join, by a rule fixed before their first run (every other new person per skin
 band, in `t15-eval-growth`), and never moved out because of a result.
 
+The baseline was reset once, with the user's approval, to the grown set's first untuned run
+(`t15-eval-growth`, 2026-10-13); it ratchets as before from there.
+
 ## Changing the analysis
 
 Any edit to a hashed file (the core's sampling, photo-check, classifier and palettes, the

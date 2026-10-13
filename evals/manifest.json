@@ -957,7 +957,7 @@
       "person": "p17",
       "season": "soft-autumn",
       "light": "indoor-warm",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Halle_Berry_10.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Halle_Berry_10.jpg",
       "sha256": "16c0b630c1ce97cfb8212dfd5a59ee28021f45fc01ad37a75ee4e46855cac2fd",
       "license": "CC BY 3.0",
       "author": "German Marin at https://www.flickr.com/photos/marinnyc"
@@ -967,7 +967,7 @@
       "person": "p17",
       "season": "soft-autumn",
       "light": "flash-dark",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Halle_Berry_1997.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Halle_Berry_1997.jpg",
       "sha256": "677966c7dc743fad9279a063aed9a0bf025a397f98fb58e49d0b2d77f181e001",
       "license": "CC BY-SA 2.0",
       "author": "Kingkongphoto & www.celebrity-photos.com from Laurel Maryland, USA"
@@ -977,7 +977,7 @@
       "person": "p17",
       "season": "soft-autumn",
       "light": "panel-stage",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/5/56/Halle_Berry_by_Gage_Skidmore_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/5/56/Halle_Berry_by_Gage_Skidmore_2.jpg",
       "sha256": "f9bf1b65570ccd5940b56716c0c62f19c27025e6a78870a3f6d2fd0eb16cd3c9",
       "license": "CC BY-SA 3.0",
       "author": "Gage Skidmore"
@@ -987,7 +987,7 @@
       "person": "p17",
       "season": "soft-autumn",
       "light": "warm-promo",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Halle_Berry_in_2013.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Halle_Berry_in_2013.jpg",
       "sha256": "a496182ed9ea6023156ddfea1666ba923e911e9293c5db966351a6b839f52648",
       "license": "CC BY 3.0",
       "author": "Looking Glass Films"
@@ -997,7 +997,7 @@
       "person": "p17",
       "season": "soft-autumn",
       "light": "flash-event",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Halle_Berry_in_gown_Essence_awards_%2848591893161%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Halle_Berry_in_gown_Essence_awards_%2848591893161%29.jpg",
       "sha256": "e88c2c38b7666f31006378188f4339ea5ab9367d4f5522b83a9771e249e3c564",
       "license": "CC BY-SA 2.0",
       "author": "John Mathew Smith & www.celebrity-photos.com from Laurel Maryland, USA"
@@ -1007,7 +1007,7 @@
       "person": "p17",
       "season": "soft-autumn",
       "light": "daylight",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/6/63/Halle_Berry_at_the_2025_Cannes_Film_Festival.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/6/63/Halle_Berry_at_the_2025_Cannes_Film_Festival.jpg",
       "sha256": "108024eda2c7f8f0f6902fc4598bb401ed0597f73fb28b1e66d8ba36de2f12f8",
       "license": "CC BY-SA 4.0",
       "author": "Gabriel Hutchinson"
@@ -1018,7 +1018,7 @@
       "season": "soft-summer",
       "light": "panel-white",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Rosario_Dawson_by_Gage_Skidmore_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Rosario_Dawson_by_Gage_Skidmore_2.jpg",
       "sha256": "aec2daa7418ef9a4c5a12ac0d589a7515ad306f247891b7b04d69751564cf2cc",
       "license": "CC BY-SA 3.0",
       "author": "Gage Skidmore"
@@ -1029,7 +1029,7 @@
       "season": "soft-summer",
       "light": "studio-blue",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Rosario_Dawson_%2852549531671%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Rosario_Dawson_%2852549531671%29.jpg",
       "sha256": "3101fe0848e28b7dc5f3bb19a4b79c537345a7f5beb702ce7fbad845b2f24331",
       "license": "CC BY 2.0",
       "author": "Super Festivals from Ft. Lauderdale, USA"
@@ -1040,7 +1040,7 @@
       "season": "soft-summer",
       "light": "red-carpet",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/c/ca/Rosario_Dawson_Briarpatch_%2848734458058%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/c/ca/Rosario_Dawson_Briarpatch_%2848734458058%29_%28cropped%29.jpg",
       "sha256": "8a9ce06e70fa53e2d0345692f6c03f01349ef9bc04b3585701ecce766a2f0822",
       "license": "CC BY-SA 2.0",
       "author": "GabboT"
@@ -1051,7 +1051,7 @@
       "season": "soft-summer",
       "light": "yellow-backdrop",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Rosario_Dawson_SXSW_2022_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Rosario_Dawson_SXSW_2022_%28cropped%29.jpg",
       "sha256": "de8e861a34a6fd2f1c76c434fe17bd5a4072763d3b003e7cc180bdb6c5312973",
       "license": "CC BY 2.0",
       "author": "Roblox Corp."
@@ -1061,7 +1061,7 @@
       "person": "p19",
       "season": "true-autumn",
       "light": "stage-flag",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Kamala_Harris_vice_president_candidacy_announcement_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Kamala_Harris_vice_president_candidacy_announcement_%28cropped%29.jpg",
       "sha256": "afbfae92f5b64c19e29234544452877f764b7f2159a1b6d48399a016af6212ed",
       "license": "Public domain",
       "author": "The White House"
@@ -1071,7 +1071,8 @@
       "person": "p19",
       "season": "true-autumn",
       "light": "outdoor-shade",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Kamala_Harris_%2848508180347%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Kamala_Harris_%2848508180347%29_%28cropped%29.jpg",
       "sha256": "96fd0eb7e858f86375ce3f8741910d1bc28e59a2fb6de34d533842f5a71a8569",
       "license": "CC BY 2.0",
       "author": "Phil Roeder from Des Moines, IA, USA"
@@ -1081,7 +1082,7 @@
       "person": "p19",
       "season": "true-autumn",
       "light": "daylight",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/a/ad/U.S._Sen._Kamala_Harris_speaks_at_L.A.%27s_Families_Belong_Together_March_02_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/a/ad/U.S._Sen._Kamala_Harris_speaks_at_L.A.%27s_Families_Belong_Together_March_02_%28cropped%29.jpg",
       "sha256": "e722721974f34c0ea5ea5e624aadfffb1f04c17a2a7713c50aa577c277ce9fa1",
       "license": "CC0",
       "author": "Luke Harold"
@@ -1092,7 +1093,7 @@
       "season": "deep-autumn",
       "light": "flash-dark",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/9/9e/MKr383631_Salma_Hayek_%28Women_In_Motion%2C_Cannes_2025%29_crop_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/9e/MKr383631_Salma_Hayek_%28Women_In_Motion%2C_Cannes_2025%29_crop_%28cropped%29.jpg",
       "sha256": "72a327d7c7011afbb813ecb9b791fccda51d9edbe661b219c6b951310aacee15",
       "license": "CC BY-SA 4.0",
       "author": "Martin Kraft"
@@ -1103,7 +1104,7 @@
       "season": "deep-autumn",
       "light": "daylight-indoor",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/4/44/Salma_Hayek-9749.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/44/Salma_Hayek-9749.jpg",
       "sha256": "2309292dea4e6266c02c57b4b8c9555892175d4b992171458aae8578fe9cc99f",
       "license": "CC BY-SA 3.0",
       "author": "Harald Krichel"
@@ -1114,7 +1115,7 @@
       "season": "deep-autumn",
       "light": "indoor-warm",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Salma_Hayek_TIFF_2011%2C_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Salma_Hayek_TIFF_2011%2C_2.jpg",
       "sha256": "2d9ecdd888365b5a3bd2ddc5496a65cd7be282bdf780f6721004f00327e34c4d",
       "license": "CC BY 2.0",
       "author": "Naomi Lipowski"
@@ -1125,7 +1126,7 @@
       "season": "deep-autumn",
       "light": "red-carpet",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Salma_Hayek_TIFF_2018.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Salma_Hayek_TIFF_2018.jpg",
       "sha256": "cf6ee49ca285f641d7231b791bd1cc639ece543a5ab36edecf505404c3395d0a",
       "license": "CC BY-SA 2.0",
       "author": "GabboT"
@@ -1136,7 +1137,7 @@
       "season": "deep-autumn",
       "light": "panel-stage",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/9/92/Salma_Hayek_by_Gage_Skidmore.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/92/Salma_Hayek_by_Gage_Skidmore.jpg",
       "sha256": "e7b96b14beb24ead7d5270ea75abe4fdab2c1bdf64a597c32e846c67a6200974",
       "license": "CC BY-SA 3.0",
       "author": "Gage Skidmore"
@@ -1146,7 +1147,7 @@
       "person": "p21",
       "season": "deep-winter",
       "light": "flash-night",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/9/95/Kim_Kardashian_2%2C_2012.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/95/Kim_Kardashian_2%2C_2012.jpg",
       "sha256": "43eed8bb8de134263fb2144d472f84d4c84be5cb7b51bc936b8fadd6b8cd1809",
       "license": "CC BY-SA 2.0",
       "author": "Eva Rinaldi"
@@ -1156,7 +1157,7 @@
       "person": "p21",
       "season": "deep-winter",
       "light": "indoor-white",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Kim_Kardashian_Tribeca_portrait_2009_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Kim_Kardashian_Tribeca_portrait_2009_%28cropped%29.jpg",
       "sha256": "d5a3bc5186b63fa10ae4e1ee95e8a12ebafedbacd322477ffe10c523dce9bdaf",
       "license": "CC BY 3.0",
       "author": "David Shankbone"
@@ -1166,7 +1167,7 @@
       "person": "p21",
       "season": "deep-winter",
       "light": "indoor-bright",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/5/56/Kim_Kardashian_West%2C_Parramatta_Westfield_Sydney_Australia_-_15199013796.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/5/56/Kim_Kardashian_West%2C_Parramatta_Westfield_Sydney_Australia_-_15199013796.jpg",
       "sha256": "4d84df98d05d89b1185939cd69c202e71536f72811135bc1a342a6d393853a4a",
       "license": "CC BY-SA 2.0",
       "author": "Eva Rinaldi"
@@ -1176,7 +1177,7 @@
       "person": "p21",
       "season": "deep-winter",
       "light": "flash-white",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Kim_Kardashian_portrait_2009.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Kim_Kardashian_portrait_2009.jpg",
       "sha256": "456cd8f8ef7ca982a2a8ca702089f7db02a90494e88bea7ca82a09558a1e778e",
       "license": "CC BY 3.0",
       "author": "David Shankbone"
@@ -1186,7 +1187,7 @@
       "person": "p21",
       "season": "deep-winter",
       "light": "flash-dark",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Kim_Kardashian_2009.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Kim_Kardashian_2009.jpg",
       "sha256": "389a24e316dcefca69950453206a68e8e831772bf313aeabc2bda5bad6336f44",
       "license": "CC BY-SA 3.0",
       "author": "Toglenn"
@@ -1196,7 +1197,7 @@
       "person": "p21",
       "season": "deep-winter",
       "light": "indoor-warm",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/4/44/Kim_Kardashian_2011.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/44/Kim_Kardashian_2011.jpg",
       "sha256": "685fed7bfbd94623e0fe79eaef10ff407ffb1ea9e40568d042ab8ea6aeb51108",
       "license": "CC BY-SA 3.0",
       "author": "Toglenn"
@@ -1207,7 +1208,7 @@
       "season": "true-spring",
       "light": "indoor-flash",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Beyonc%C3%A9_Army.mil_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Beyonc%C3%A9_Army.mil_%28cropped%29.jpg",
       "sha256": "fb2034a8b8c4129e1e3e38df486fd4fa8aaf3dc53ccf47ab5b6ca1d7ec13da2f",
       "license": "Public domain",
       "author": "Jennette F. Everett"
@@ -1218,7 +1219,7 @@
       "season": "true-spring",
       "light": "indoor-warm",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Beyonc%C3%A9_in_2008-2_cropped.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Beyonc%C3%A9_in_2008-2_cropped.jpg",
       "sha256": "f95d31b0321409d97e5f3e41a1b70b013058a3d47acace1797638883b91321fa",
       "license": "CC BY 3.0",
       "author": "Jennifer-Meg; derivative work: Truu"
@@ -1229,7 +1230,7 @@
       "season": "true-spring",
       "light": "daylight",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Beyonc%C3%A9_Knowles_GMA_2011_cropped.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Beyonc%C3%A9_Knowles_GMA_2011_cropped.jpg",
       "sha256": "3d3b7440dd683141e81d2d4ef3bbd24f0a3ebc0795ccb6189d161f8a82cb2f96",
       "license": "CC BY-SA 2.0",
       "author": "Asterio Tecson; derivative work: Danny toons"
@@ -1240,7 +1241,7 @@
       "season": "true-spring",
       "light": "stage-blue",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Beyonc%C3%A9_-_Tottenham_Hotspur_Stadium_-_1st_June_2023_%2813_of_118%29_%2852945303842%29_%28face_cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Beyonc%C3%A9_-_Tottenham_Hotspur_Stadium_-_1st_June_2023_%2813_of_118%29_%2852945303842%29_%28face_cropped%29.jpg",
       "sha256": "6feecf77cf1e34e978ce8abe4c008fe3eaf3c0165a542dd4cfb453ac0a1b066e",
       "license": "CC BY 2.0",
       "author": "Raph_PH"
@@ -1251,7 +1252,7 @@
       "season": "true-spring",
       "light": "stage-red",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Beyonc%C3%A9_-_Tottenham_Hotspur_Stadium_-_1st_June_2023_%2871_of_118%29_%2852945301662%29_%28face_cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Beyonc%C3%A9_-_Tottenham_Hotspur_Stadium_-_1st_June_2023_%2871_of_118%29_%2852945301662%29_%28face_cropped%29.jpg",
       "sha256": "70ca2cb443bd3fd2fadc98fa784b464683567579dfd681c691948d5b4d3b9af9",
       "license": "CC BY 2.0",
       "author": "Raph_PH"
@@ -1261,7 +1262,7 @@
       "person": "p23",
       "season": "deep-autumn",
       "light": "flash-white",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/6/64/Eva_Longoria_2012.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/6/64/Eva_Longoria_2012.jpg",
       "sha256": "63bbcb1f01981171f39613a9749dbe3f54a2f67b89a6f3b5ab66861b47407ccb",
       "license": "CC BY-SA 2.0",
       "author": "Hispanic Lifestyle"
@@ -1271,7 +1272,7 @@
       "person": "p23",
       "season": "deep-autumn",
       "light": "outdoor-warm",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/1/13/Eva_Longoria_2025_%28facecrop%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/1/13/Eva_Longoria_2025_%28facecrop%29.jpg",
       "sha256": "7048236351072cf3e5dc62f882516a47ea823b8bcaff19bed22275e09c241355",
       "license": "CC BY-SA 4.0",
       "author": "Harald Krichel"
@@ -1281,7 +1282,7 @@
       "person": "p23",
       "season": "deep-autumn",
       "light": "stage-dark",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Eva_Longoria_SZ9_1250_%2852477391298%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Eva_Longoria_SZ9_1250_%2852477391298%29_%28cropped%29.jpg",
       "sha256": "2e1bd55a1343d5b26298a5857ba0784756fab612b415a7d2c988db2496378c80",
       "license": "CC BY 2.0",
       "author": "Web Summit"
@@ -1291,7 +1292,7 @@
       "person": "p23",
       "season": "deep-autumn",
       "light": "stage-blue",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/9/95/Eva_Longoria%2C_2011.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/95/Eva_Longoria%2C_2011.jpg",
       "sha256": "d7c6c6e2cc1753db553f59e9c31354d731889ac6dd7a9a6186ce2590e125a10f",
       "license": "CC BY 2.0",
       "author": "ImagineCup"
@@ -1301,7 +1302,7 @@
       "person": "p23",
       "season": "deep-autumn",
       "light": "flash-dark",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Eva_Longoria_%40_Festival_Internacional_de_Cine_en_Guadalajara_07.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Eva_Longoria_%40_Festival_Internacional_de_Cine_en_Guadalajara_07.jpg",
       "sha256": "a7e0ceea298a924abe354b98c644680567a0a2c842965ecda38bb46869704d2c",
       "license": "CC BY 2.0",
       "author": "Festival Internacional de Cine en Guadalajara"
@@ -1311,7 +1312,8 @@
       "person": "p23",
       "season": "deep-autumn",
       "light": "flash-event",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Eva_Longoria_6%2C_2011.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "expect": "several-faces",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Eva_Longoria_6%2C_2011.jpg",
       "sha256": "154b3c8a49a6596488ecf2653a22220e15a6a66809026d9a89e6fbc41077370d",
       "license": "CC BY-SA 2.0",
       "author": "Hispanic Lifestyle"
@@ -1322,7 +1324,7 @@
       "season": "true-winter",
       "light": "indoor-warm",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/7/77/Deepika_Padukone_at_Kalki_2898_AD_pre_release_event_in_Mumbai_%281%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/77/Deepika_Padukone_at_Kalki_2898_AD_pre_release_event_in_Mumbai_%281%29_%28cropped%29.jpg",
       "sha256": "7cfccf7116059fb635b3fd96ffa5f3f550b31df3f994e5c56df60950ece4b7cf",
       "license": "CC BY-SA 4.0",
       "author": "Verghese TK"
@@ -1332,8 +1334,9 @@
       "person": "p24",
       "season": "true-winter",
       "light": "indoor-daylight",
+      "expect": "several-faces",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/8/80/Deepika_Padukone_at_Yonex_Sunrise_India_Open_2018_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/8/80/Deepika_Padukone_at_Yonex_Sunrise_India_Open_2018_%28cropped%29.jpg",
       "sha256": "eb9bf3333d3c35c27dfa8407152e0c28a8d1e18c96506c8f4a32ff9fc37422d6",
       "license": "CC BY 3.0",
       "author": "Bollywood Hungama"
@@ -1344,7 +1347,7 @@
       "season": "true-winter",
       "light": "stage-blue",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/5/5a/Deepika_Padukone_at_the_Live%2C_Laugh%2C_Love_Foundation.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/5/5a/Deepika_Padukone_at_the_Live%2C_Laugh%2C_Love_Foundation.jpg",
       "sha256": "eab81ee980d19deb1d5fe9f7044fedb6dc5b4713c1091ff2d8fa246f1ded96f9",
       "license": "CC BY 3.0",
       "author": "NEWSTAK India"
@@ -1355,7 +1358,7 @@
       "season": "true-winter",
       "light": "night-red-carpet",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Deepika_Padukone_at_3rd_Annual_Academy_Museum_Gala_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Deepika_Padukone_at_3rd_Annual_Academy_Museum_Gala_%28cropped%29.jpg",
       "sha256": "582af5b93d27472db3d8dfb0a504b9586ea5ed0f69953c886e6c9c529bccad41",
       "license": "CC BY-SA 4.0",
       "author": "Danisamuel"
@@ -1366,7 +1369,7 @@
       "season": "true-winter",
       "light": "indoor-daylight",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Deepika_Padukone_at_Twitter_HQ_%2815374482446%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Deepika_Padukone_at_Twitter_HQ_%2815374482446%29.jpg",
       "sha256": "5b5d415781ddf96937f334904c5d5e8dbda3889bc691c9ce87bd8523dd73f4c7",
       "license": "CC BY 2.0",
       "author": "Piyush Kumar"
@@ -1377,7 +1380,7 @@
       "season": "true-winter",
       "light": "stage-blue",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Deepika_Padukone_SLAMtheTour_20Sep2014_%28312%29_%2815330224755%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Deepika_Padukone_SLAMtheTour_20Sep2014_%28312%29_%2815330224755%29_%28cropped%29.jpg",
       "sha256": "43c546f239bfd6366c1b2b8fe1de4f3af177a1918fa4c907f29d3126d1ca85e1",
       "license": "CC BY 2.0",
       "author": "Laura Lee Dooley from Arlington, VA, USA"
@@ -1387,7 +1390,7 @@
       "person": "p25",
       "season": "deep-autumn",
       "light": "stage-blue",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Avatar_The_Way_of_Water_Tokyo_Press_Conference_Zoe_Salda%C3%B1a_%2852563432050%29_%28cropped2%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Avatar_The_Way_of_Water_Tokyo_Press_Conference_Zoe_Salda%C3%B1a_%2852563432050%29_%28cropped2%29.jpg",
       "sha256": "1d4cc4c51be4037b67c9543ab1db1cf498b54e68838ce9e1ec932efd5e8dc9be",
       "license": "CC BY 2.0",
       "author": "Dick Thomas Johnson from Tokyo, Japan"
@@ -1397,7 +1400,7 @@
       "person": "p25",
       "season": "deep-autumn",
       "light": "panel-white",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/7/73/Zoe_Salda%C3%B1a%2C_Comic-Con_2009.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/73/Zoe_Salda%C3%B1a%2C_Comic-Con_2009.jpg",
       "sha256": "028b740d92d510810f161ee861a77d8b7efa7884bed3efc3839f9c2213e86655",
       "license": "CC BY 2.0",
       "author": "Ewen Roberts from San Diego, CA, United States"
@@ -1407,7 +1410,7 @@
       "person": "p25",
       "season": "deep-autumn",
       "light": "flash-dark",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Zoe_Salda%C3%B1a_at_the_2024_Toronto_International_Film_Festival_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Zoe_Salda%C3%B1a_at_the_2024_Toronto_International_Film_Festival_%28cropped%29.jpg",
       "sha256": "fa585fff5a4270b1d2903fd5214769639adf923ffc137e8eceeb033e2173d9f7",
       "license": "CC BY-SA 4.0",
       "author": "Kevin Payravi"
@@ -1417,7 +1420,7 @@
       "person": "p25",
       "season": "deep-autumn",
       "light": "daylight-shade",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/9/98/Zoe_Salda%C3%B1a_gives_a_talk_at_the_2026_Locarno_Film_Festival_02.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/98/Zoe_Salda%C3%B1a_gives_a_talk_at_the_2026_Locarno_Film_Festival_02.jpg",
       "sha256": "70f53d537a5b3cfdb49837216aa99614c36832bc081b17bcdcecd8f35c9dbfa0",
       "license": "CC BY-SA 4.0",
       "author": "Quejaytee"
@@ -1427,7 +1430,7 @@
       "person": "p26",
       "season": "soft-autumn",
       "light": "stage-dark",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/4/49/Stacey_Abrams_%2851584070384%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/49/Stacey_Abrams_%2851584070384%29_%28cropped%29.jpg",
       "sha256": "751b4d5c1b2ba2d871e8eac6d2add9614b76f82dc83a62c7f6766eb2024d0725",
       "license": "CC BY-SA 2.0",
       "author": "Gage Skidmore from Surprise, AZ, United States of America"
@@ -1437,7 +1440,7 @@
       "person": "p26",
       "season": "soft-autumn",
       "light": "stage-dark",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/4/46/Stacey_Abrams_by_Gage_Skidmore.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/46/Stacey_Abrams_by_Gage_Skidmore.jpg",
       "sha256": "3a1ec60491f52225f829eeb407bc18bf186b12275963ba3ae325d4effa587e73",
       "license": "CC BY-SA 3.0",
       "author": "Gage Skidmore"
@@ -1447,7 +1450,7 @@
       "person": "p26",
       "season": "soft-autumn",
       "light": "daylight",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Stacey_Abrams_speaking_at_Atlanta%27s_Power_to_the_Polls_Rally_on_January_20%2C_2018.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Stacey_Abrams_speaking_at_Atlanta%27s_Power_to_the_Polls_Rally_on_January_20%2C_2018.jpg",
       "sha256": "2e296dad1b5e2b42049a27e51821f713a034ad7eb6bb50d2c0dcde0f3d5dcf8f",
       "license": "CC BY-SA 4.0",
       "author": "Marc Merlin"
@@ -1457,7 +1460,7 @@
       "person": "p26",
       "season": "soft-autumn",
       "light": "indoor",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/7/71/Stacey_Abrams_2012.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/71/Stacey_Abrams_2012.jpg",
       "sha256": "dab052773bc432e30d157fef42aa9eab48d6264676c0a72dd7a72a1865496224",
       "license": "CC BY-SA 2.0",
       "author": "Kerri Battles for LBJ School aka Lyndon B. Johnson School of Public Affairs"
@@ -1468,7 +1471,7 @@
       "season": "deep-winter",
       "light": "flash-white",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Angela_Bassett.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Angela_Bassett.jpg",
       "sha256": "6ffc20ca715868021df276e254ec0df6ac6ab98da8b5d5476889e75401fe5ef6",
       "license": "CC BY-SA 2.0",
       "author": "Kingkongphoto & www.celebrity-photos.com from Laurel Maryland, USA"
@@ -1479,7 +1482,7 @@
       "season": "deep-winter",
       "light": "indoor-stage",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/0/00/Angela_Bassett_at_PaleyFest_2014_-_13491748704.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/0/00/Angela_Bassett_at_PaleyFest_2014_-_13491748704.jpg",
       "sha256": "04e201578c16bc43a04ab20ffdd51a177dc3ab9a9c5eef3f1e06ac68dbff429a",
       "license": "CC BY-SA 2.0",
       "author": "iDominick"
@@ -1490,7 +1493,7 @@
       "season": "deep-winter",
       "light": "indoor-warm",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Angela_Bassett_by_David_Shankbone.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Angela_Bassett_by_David_Shankbone.jpg",
       "sha256": "df14b75aadd2bebe16dbb39acbab20f5a2f08e153673d8c4dea91118c25e99a5",
       "license": "CC BY 2.5",
       "author": "David Shankbone"
@@ -1501,7 +1504,7 @@
       "season": "deep-winter",
       "light": "panel-stage",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/1/12/SDCC_2015_-_Angela_Bassett_%2819158612193%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/1/12/SDCC_2015_-_Angela_Bassett_%2819158612193%29_%28cropped%29.jpg",
       "sha256": "24f1b20fe9a348a90a4fec1b4ef27bfa9beaab06b7d4f6dcc1c07f8a42a671df",
       "license": "CC BY-SA 2.0",
       "author": "Gage Skidmore from Peoria, AZ, United States of America"
@@ -1511,7 +1514,7 @@
       "person": "p28",
       "season": "deep-winter",
       "light": "panel-stage",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/5/59/Danai_Gurira_%2848411570387%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/5/59/Danai_Gurira_%2848411570387%29_%28cropped%29.jpg",
       "sha256": "d42b8fc2c9838ddb2d0b416691b1f40400bde5db7f2733ad35bce3096254f612",
       "license": "CC BY-SA 2.0",
       "author": "Gage Skidmore from Peoria, AZ, United States of America"
@@ -1521,7 +1524,7 @@
       "person": "p28",
       "season": "deep-winter",
       "light": "panel-stage",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Danai_Gurira_%28Michonne%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Danai_Gurira_%28Michonne%29.jpg",
       "sha256": "c0e298c352e7c6f4712cc443c00eb37905ad32f33f512c68a4005f3f624bb465",
       "license": "CC BY-SA 2.0",
       "author": "Thibault; derivative work: Puramyun31"
@@ -1531,7 +1534,7 @@
       "person": "p28",
       "season": "deep-winter",
       "light": "flash-white",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Danai_Gurira_05_%2814947566729%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Danai_Gurira_05_%2814947566729%29.jpg",
       "sha256": "0a7258e721488e049264057afe5e2fbc0d0fd66de7a27a287e3d1c2fce690342",
       "license": "CC BY-SA 2.0",
       "author": "GabboT"
@@ -1541,7 +1544,7 @@
       "person": "p28",
       "season": "deep-winter",
       "light": "panel-stage",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Danai_Gurira_2017.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Danai_Gurira_2017.jpg",
       "sha256": "a538c5d4e009afab00e27087269f5005e2b572bf699067c537c1b8089fdfaf66",
       "license": "CC BY-SA 3.0",
       "author": "Gage Skidmore"
@@ -1551,7 +1554,7 @@
       "person": "p28",
       "season": "deep-winter",
       "light": "panel-dark",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Danai_Gurira_by_Gage_Skidmore.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Danai_Gurira_by_Gage_Skidmore.jpg",
       "sha256": "f20da7820bc1f5316cb73525d79ab3c576462732db4547eaea154dfdd86cfd22",
       "license": "CC BY-SA 3.0",
       "author": "Gage Skidmore"
@@ -1562,7 +1565,7 @@
       "season": "true-autumn",
       "light": "stage-blue",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/0/00/Taraji_P._Henson.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/0/00/Taraji_P._Henson.JPG",
       "sha256": "9b13036eeb2fbc86167edfc932986d76eaad8330261336c21e4515e6e72516f4",
       "license": "Public domain",
       "author": "Kim Shiflett"
@@ -1572,8 +1575,9 @@
       "person": "p29",
       "season": "true-autumn",
       "light": "runway-red",
+      "expect": "several-faces",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Taraji_P._Henson_2011.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Taraji_P._Henson_2011.jpg",
       "sha256": "23465ed48152e681ebf7bb37766c8f543d829f7d4005a84e81d3f51b2d7d2089",
       "license": "Public domain",
       "author": "The Heart Truth"
@@ -1584,7 +1588,7 @@
       "season": "true-autumn",
       "light": "panel-stage",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Taraji_P._Henson_2012.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Taraji_P._Henson_2012.jpg",
       "sha256": "d91dfecf7549281649371ebaef1ec04a4d57ff5efec9c856a363002381656219",
       "license": "CC BY 2.0",
       "author": "Genevieve"
@@ -1595,7 +1599,7 @@
       "season": "true-autumn",
       "light": "studio-white",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Taraji_P._Henson_2016.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Taraji_P._Henson_2016.jpg",
       "sha256": "13c7537dd18f518e0f9b8ead407b28443c901d5ccff7f61cb31738e5a211eba7",
       "license": "Public domain",
       "author": "Joel Kowsky"
@@ -1606,7 +1610,7 @@
       "season": "true-autumn",
       "light": "flash-event",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/7/7f/Taraji_P._Henson_at_2010_Independent_Spirit_Awards.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/7f/Taraji_P._Henson_at_2010_Independent_Spirit_Awards.jpg",
       "sha256": "b5c7ebdb26752943af23f20d68710c84e6f2fe35e3301f6d75e72df7537142a1",
       "license": "CC BY-SA 3.0",
       "author": "Tomdog"
@@ -1616,7 +1620,7 @@
       "person": "p30",
       "season": "true-autumn",
       "light": "red-backdrop",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Regina_King%2C_May_2013_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Regina_King%2C_May_2013_%28cropped%29.jpg",
       "sha256": "6455f61a589660c067c4087eceb6c15f4c4c67f6c6fc7749f8d21e9a7a686718",
       "license": "CC BY 2.0",
       "author": "Peabody Awards"
@@ -1626,7 +1630,7 @@
       "person": "p30",
       "season": "true-autumn",
       "light": "indoor-flash",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/5/56/Regina_King_2010.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/5/56/Regina_King_2010.jpg",
       "sha256": "7dfaa0a6e85b38266d4d85addfd4ba5e7834fff274423b81223449263551b8fe",
       "license": "CC BY-SA 3.0",
       "author": "Toglenn"
@@ -1636,7 +1640,7 @@
       "person": "p30",
       "season": "true-autumn",
       "light": "daylight",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Regina_King_2010_Independent_Spirit_Awards_%28squared-trim%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Regina_King_2010_Independent_Spirit_Awards_%28squared-trim%29.jpg",
       "sha256": "648da2f6f4bb1e13d0aaed1fcce749d44fa37da212c213112c13fd9424f7f3fc",
       "license": "CC BY-SA 3.0",
       "author": "Tomdog"
@@ -1646,7 +1650,7 @@
       "person": "p30",
       "season": "true-autumn",
       "light": "panel-stage",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Regina_King_by_Gage_Skidmore.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Regina_King_by_Gage_Skidmore.jpg",
       "sha256": "a992261096037dbd7669cbf08ee2b4b96b860605acedc3679bb91ac97fefebbb",
       "license": "CC BY-SA 3.0",
       "author": "Gage Skidmore"
@@ -1657,7 +1661,7 @@
       "season": "bright-winter",
       "light": "stage-blue",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Janelle_Mon%C3%A1e_03.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Janelle_Mon%C3%A1e_03.jpg",
       "sha256": "0d03f5a5ae7fef5545960617b390027ceb909fc7b032cdc2b1df6e558038c514",
       "license": "CC BY-SA 3.0",
       "author": "Joe Mabel"
@@ -1668,7 +1672,7 @@
       "season": "bright-winter",
       "light": "stage-blue",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Janelle_Mon%C3%A1e_10.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Janelle_Mon%C3%A1e_10.jpg",
       "sha256": "35b4de91b4103e8702e7125aaebde22199a9ead3806e972d3b2d03785414e984",
       "license": "CC BY-SA 3.0",
       "author": "Joe Mabel"
@@ -1679,7 +1683,7 @@
       "season": "bright-winter",
       "light": "flash-white",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Janelle_Mon%C3%A1e_2016.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Janelle_Mon%C3%A1e_2016.jpg",
       "sha256": "ee985538c4d36597e63b6dda3d2ffb5a981a8300b168820e972683383470c51f",
       "license": "Public domain",
       "author": "Bill Ingalls"
@@ -1690,7 +1694,7 @@
       "season": "bright-winter",
       "light": "stage-green",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Janelle_Mon%C3%A1e_Dirty_Computer_Tour_2018.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Janelle_Mon%C3%A1e_Dirty_Computer_Tour_2018.jpg",
       "sha256": "50e58486f90bfb0aa6bf5a6e65aeca0877dec6ff7862562b60efb9dfcdba1d9c",
       "license": "CC BY 2.0",
       "author": "Raph_PH"
@@ -1700,9 +1704,9 @@
       "person": "p31",
       "season": "bright-winter",
       "light": "stage-orange",
-      "expect": "tint",
+      "expect": "no-face",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/2/21/Janelle_Mon%C3%A1e_performing_in_Atlanta_3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/21/Janelle_Mon%C3%A1e_performing_in_Atlanta_3.jpg",
       "sha256": "136e867f017d50de2173f8316db6bdc0957b21eab335e32f3b7b3437cd254035",
       "license": "CC BY 2.0",
       "author": "Dom Brady from Atlanta, Georgia, United States"
@@ -1713,7 +1717,7 @@
       "season": "bright-winter",
       "light": "flash-event",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Janelle_Mon%C3%A1e_in_2016.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Janelle_Mon%C3%A1e_in_2016.jpg",
       "sha256": "630d3b208c1ad2356c73ff2cd1a99816460af313720ced86d6b7102c3d5b996f",
       "license": "Public domain",
       "author": "Joel Kowsky"
@@ -1723,7 +1727,7 @@
       "person": "p32",
       "season": "true-winter",
       "light": "stage-blue",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Michelle_Obama_%2829869568853%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Michelle_Obama_%2829869568853%29_%28cropped%29.jpg",
       "sha256": "49a61603971fe2aedb818eed08a8bd153b7adc6571079140e4f145c3a01d901a",
       "license": "CC BY 2.0",
       "author": "Tim Pierce from Berlin, MA, USA"
@@ -1733,7 +1737,7 @@
       "person": "p32",
       "season": "true-winter",
       "light": "indoor-event",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/2/29/Michelle_Obama_%2830423693696%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/29/Michelle_Obama_%2830423693696%29_%28cropped%29.jpg",
       "sha256": "7b7a81a46f15ad3e61982a3ad2cc51f859a4bf6c34573691fa15ccd10c16e2f0",
       "license": "CC BY-SA 2.0",
       "author": "Gage Skidmore from Peoria, AZ, United States of America"
@@ -1743,7 +1747,7 @@
       "person": "p32",
       "season": "true-winter",
       "light": "studio",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/3/38/Michelle_Obama_2013_official_portrait_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/38/Michelle_Obama_2013_official_portrait_%28cropped%29.jpg",
       "sha256": "748854d401b6aa05b24639ca55da2fc4d264172ee642a6001469da4249287a5b",
       "license": "Public domain",
       "author": "Official White House Photo by Chuck Kennedy"
@@ -1753,7 +1757,7 @@
       "person": "p32",
       "season": "true-winter",
       "light": "rally-indoor",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/8/80/Michelle_Obama_2008-10-22_%281%29_cropped.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/8/80/Michelle_Obama_2008-10-22_%281%29_cropped.jpg",
       "sha256": "b2ae835c34bbbeb9ae032982b20b9e32e2dd378262ffc245a436def50a2a1946",
       "license": "CC BY-SA 2.0",
       "author": "Craig ONeal"
@@ -1763,7 +1767,7 @@
       "person": "p32",
       "season": "true-winter",
       "light": "stage",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/8/81/Michelle_Obama_DNC_July_2016_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/8/81/Michelle_Obama_DNC_July_2016_%28cropped%29.jpg",
       "sha256": "abfa385e54649b0626fdd11ac03a03b875cc1f42450cc73a89e27d6e7c7c850a",
       "license": "Public domain",
       "author": "Ali Shaker/VOA"
@@ -1773,7 +1777,7 @@
       "person": "p32",
       "season": "true-winter",
       "light": "outdoor-warm",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Michelle_Obama_at_Martha%27s_Vineyard_2025_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Michelle_Obama_at_Martha%27s_Vineyard_2025_%28cropped%29.jpg",
       "sha256": "246dde0c74838ebfd2b658c308d8e419159fac84885556e566e2f40841c5ab8d",
       "license": "CC BY-SA 4.0",
       "author": "Kolby Ari"
@@ -1784,7 +1788,7 @@
       "season": "deep-autumn",
       "light": "studio-flag",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Ayanna_Pressley_Portrait.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Ayanna_Pressley_Portrait.jpg",
       "sha256": "5610885fc2e9fc8e5d6bffcae8cec2edc2eaf2b726e8f6098feb2a4e606c618f",
       "license": "Public domain",
       "author": "Franmarie Metzler"
@@ -1794,8 +1798,9 @@
       "person": "p33",
       "season": "deep-autumn",
       "light": "indoor-rally",
+      "expect": "several-faces",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Ayanna_Pressley_at_the_Unity_Rally_-_Cambridge%2C_MA_%2842974623360%29_%281%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Ayanna_Pressley_at_the_Unity_Rally_-_Cambridge%2C_MA_%2842974623360%29_%281%29.jpg",
       "sha256": "23d311ce4531c0ad7efd2ec32e700afd49026ea2ff414690ae4479aafebbfa6d",
       "license": "CC BY 2.0",
       "author": "ElizabethForMA"
@@ -1806,7 +1811,7 @@
       "season": "deep-autumn",
       "light": "indoor-rally",
       "holdout": true,
-      "source": "https://upload.wikimedia.org/wikipedia/commons/6/64/Ayanna_Pressley_at_the_Unity_Rally_-_Cambridge%2C_MA_%2842974624540%29_%281%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/6/64/Ayanna_Pressley_at_the_Unity_Rally_-_Cambridge%2C_MA_%2842974624540%29_%281%29.jpg",
       "sha256": "90bb31472beb53e4b4fc5c742749329897946119a249cf803485c13fe1e750be",
       "license": "CC BY 2.0",
       "author": "ElizabethForMA"
@@ -1816,7 +1821,7 @@
       "person": "p34",
       "season": "deep-autumn",
       "light": "indoor-press",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/0/0d/Serena_Williams_2013.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/0/0d/Serena_Williams_2013.jpg",
       "sha256": "8dfb14f2ba8cc6a3d0157782b5aadee94630e70cea933905736ea231f446691f",
       "license": "CC BY 2.0",
       "author": "Doha Stadium Plus Qatar from Doha, Qatar"
@@ -1826,7 +1831,7 @@
       "person": "p34",
       "season": "deep-autumn",
       "light": "daylight",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/3/36/Serena_Williams_Eastbourne_%282011%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/3/36/Serena_Williams_Eastbourne_%282011%29_%28cropped%29.jpg",
       "sha256": "e6fcc3072c74f20c50a48e798c9df35b87199b029cf7ae1cecbf3d7614364e60",
       "license": "CC BY 2.0",
       "author": "James Boyes from UK"
@@ -1836,7 +1841,7 @@
       "person": "p34",
       "season": "deep-autumn",
       "light": "daylight-court",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Serena_Williams_at_2013_US_Open.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Serena_Williams_at_2013_US_Open.jpg",
       "sha256": "a64172d9d75e6e2c356030f4cb87eecbdd32e7072a19127b667c6a4ee18ef6ec",
       "license": "CC BY 2.0",
       "author": "Edwin Martinez"
@@ -1846,7 +1851,7 @@
       "person": "p34",
       "season": "deep-autumn",
       "light": "flash-night",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/0/08/Serena_Williams_in_2000.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/0/08/Serena_Williams_in_2000.jpg",
       "sha256": "db18470848ed4617b522ea0168fb9a38c0793548b21482aefa0329e9f3d444b3",
       "license": "CC BY-SA 2.0",
       "author": "John Mathew Smith & www.celebrity-photos.com from Laurel Maryland, USA"
@@ -1856,7 +1861,7 @@
       "person": "p34",
       "season": "deep-autumn",
       "light": "indoor",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Serena_Williams_%287490520236%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Serena_Williams_%287490520236%29.jpg",
       "sha256": "8f10efb8a6c1c51592be27fdce4e8366302502ddedeb35f379f9df083b35f90e",
       "license": "CC BY 2.0",
       "author": "Andrew Campbell"

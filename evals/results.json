@@ -1,15 +1,15 @@
 {
-  "inputsHash": "e87703b70f585b5f298a31610b0083230f4dbe9071e2cfed8cee76d33f591be0",
+  "inputsHash": "fcb1eee47d6d1a68cf313efea475833c66073a69550ef63c1686ccc9250f8075",
   "mediapipe": "1.0.1",
   "counts": { "photos": 180, "people": 34, "variants": 330 },
   "metrics": {
     "agreement": 0.5687,
     "familyAgreement": 0.7027,
-    "accuracy": 0.1322,
-    "familyAccuracy": 0.2479,
-    "falseRejectRate": 0.281,
-    "falseRejects": { "no-face": 1, "dark": 14, "tint": 8, "filter": 8, "several-faces": 3 },
-    "expectedProblemRate": 0.5238,
+    "accuracy": 0.1345,
+    "familyAccuracy": 0.2521,
+    "falseRejectRate": 0.2689,
+    "falseRejects": { "no-face": 1, "dark": 14, "tint": 8, "filter": 8, "several-faces": 1 },
+    "expectedProblemRate": 0.5652,
     "catchRate": 0.8812,
     "passRate": 0.6338,
     "traitSpread": { "temperature": 0.3241, "value": 0.2389, "clarity": 0.1929 }
@@ -17,11 +17,11 @@
   "holdout": {
     "agreement": 0.5312,
     "familyAgreement": 0.6458,
-    "accuracy": 0.0811,
-    "familyAccuracy": 0.2162,
-    "falseRejectRate": 0.3784,
-    "falseRejects": { "no-face": 1, "dark": 5, "tint": 4, "filter": 1, "several-faces": 3 },
-    "expectedProblemRate": 0,
+    "accuracy": 0.0882,
+    "familyAccuracy": 0.2353,
+    "falseRejectRate": 0.3235,
+    "falseRejects": { "no-face": 1, "dark": 5, "tint": 4, "filter": 1, "several-faces": 0 },
+    "expectedProblemRate": 1,
     "catchRate": 0.8841,
     "passRate": 0.6053,
     "traitSpread": { "temperature": 0.1943, "value": 0.2466, "clarity": 0.1007 }
@@ -965,7 +965,7 @@
         {
           "file": "p19/2-outdoor-shade.jpg",
           "light": "outdoor-shade",
-          "expect": "pass",
+          "expect": "several-faces",
           "problem": "several-faces",
           "season": null
         },
@@ -1170,7 +1170,7 @@
         {
           "file": "p23/6-flash-event.jpg",
           "light": "flash-event",
-          "expect": "pass",
+          "expect": "several-faces",
           "problem": "several-faces",
           "season": null
         }
@@ -1195,7 +1195,7 @@
         {
           "file": "p24/2-indoor-daylight.jpg",
           "light": "indoor-daylight",
-          "expect": "pass",
+          "expect": "several-faces",
           "problem": "several-faces",
           "season": null
         },
@@ -1411,7 +1411,7 @@
         {
           "file": "p29/2-runway-red.jpg",
           "light": "runway-red",
-          "expect": "pass",
+          "expect": "several-faces",
           "problem": "several-faces",
           "season": null
         },
@@ -1517,7 +1517,7 @@
         {
           "file": "p31/5-stage-orange.jpg",
           "light": "stage-orange",
-          "expect": "tint",
+          "expect": "no-face",
           "problem": "no-face",
           "season": null
         },
@@ -1602,7 +1602,7 @@
         {
           "file": "p33/2-indoor-rally.jpg",
           "light": "indoor-rally",
-          "expect": "pass",
+          "expect": "several-faces",
           "problem": "several-faces",
           "season": null
         },
