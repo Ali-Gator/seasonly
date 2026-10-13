@@ -52,6 +52,8 @@ Committed: `evals/manifest.json`, `results.json`, `baseline.json`, `vision-resul
 
 ## Behavior
 
+`eval:fetch` (and `eval:run`'s fetch) pauses 1 s between downloads. A 429 waits its `Retry-After` (seconds or an HTTP date), capped at 60 s and never under the 1 s pause, or a 5 s backoff doubling per attempt without one, for up to 4 retries.
+
 `eval:run` fetches missing photos, then for each photo reads the cached MediaPipe output, keyed by the photo's SHA-256 and `EXTRACTOR_VERSION`, or extracts it in headless Chromium: decode with EXIF orientation, scale to the app's `MAX_SIDE`, detect up to two faces, segment the hair, and crop the largest face as the app does. Node then runs the app's `pickFace`, `checkPhoto`, and for a pass `classify` on the traits the check returned, with no answers. Each usable photo that passes is also checked darkened (× 0.35), warm-cast (R × 1.15, B × 0.7) and grayscale (Rec. 709 luma). Metrics are rounded to four decimals.
 
 The input hash covers the core's sampling, photo-check, classifier and palettes sources and its index, the app's `faces.ts`, `photo.ts` and `mediapipe.ts`, `evals/*.ts` (not tests), `manifest.json`, and the pinned MediaPipe version. Only git-tracked files count. The gate compares agreement, accuracy and the catch rate (higher is better) and the false-reject rate (lower is better) with the baseline at tolerance 0.
