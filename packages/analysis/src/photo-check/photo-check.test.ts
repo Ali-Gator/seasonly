@@ -220,6 +220,21 @@ describe("checkPhoto", () => {
       expect(problem(input)).toBeNull();
       expect(samplePhoto(input).traits).not.toBeNull();
     });
+
+    /** {@link openspec/specs/photo-check/spec.md#scenario-a-passed-photo-carries-its-traits} */
+    it.each(PASSING)("carries the traits of %s on a pass", (_, photo) => {
+      const input = photo();
+      const check = checkPhoto(input);
+      expect(check.problem).toBeNull();
+      expect(check.traits).toEqual(samplePhoto(input).traits);
+    });
+
+    /** {@link openspec/specs/photo-check/spec.md#scenario-a-rejected-photo-carries-no-traits} */
+    it("carries no traits for a dark photo", () => {
+      const check = checkPhoto(darken(face()));
+      expect(check.problem).toBe("dark");
+      expect(check.traits).toBeUndefined();
+    });
   });
 
   /** {@link openspec/specs/photo-check/spec.md#requirement-darkness-is-judged-from-the-eye-whites-not-the-skin} */

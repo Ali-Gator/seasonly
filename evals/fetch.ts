@@ -7,6 +7,7 @@
 import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { setTimeout } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 
 import { manifestProblems, type Manifest } from "./manifest.ts";
@@ -19,20 +20,38 @@ const USER_AGENT = "SeasonlyEval/1.0 (https://seasonly.me; labeled photo set fet
 
 /** A Commons original is a few MB; a stalled download fails instead of hanging the run. */
 const FETCH_TIMEOUT_MS = 120_000;
+/** Commons answers back-to-back downloads with 429s: a pause between them, and bounded retries. */
+const FETCH_PAUSE_MS = 1_000;
+const MAX_RETRIES = 4;
+const MAX_RETRY_AFTER_MS = 60_000;
+const BACKOFF_MS = 5_000;
+
+/** The wait a 429's `Retry-After` asks for (seconds, or an HTTP date), or null without a usable one. */
+function retryAfterMs(header: string | null): number | null {
+  if (!header?.trim()) return null;
+  if (/^\d+$/.test(header.trim())) return Number(header) * 1_000;
+  const date = Date.parse(header);
+  return Number.isNaN(date) ? null : Math.max(0, date - Date.now());
+}
 
 export const sha256 = (bytes: Uint8Array) => createHash("sha256").update(bytes).digest("hex");
 
 /**
- * Fetches each missing file in turn, and returns the ones fetched. Throws after trying them all,
- * naming every entry that failed; a failed entry leaves no file.
+ * Fetches each missing file in turn, pausing between downloads, and returns the ones fetched. A 429
+ * is retried after its `Retry-After` (capped) or a doubling backoff, until one entry runs out of
+ * retries; later 429s then fail at once. Throws after trying them all, naming every entry that
+ * failed; a failed entry leaves no file.
  */
 export async function fetchMissing(
   manifest: Manifest,
   dir: string,
   fetchImpl: typeof fetch = fetch,
+  { sleep = setTimeout }: { sleep?: (ms: number) => Promise<void> } = {},
 ): Promise<string[]> {
   const fetched: string[] = [];
   const failed: string[] = [];
+  let downloads = 0;
+  let rateLimited = false;
   for (const photo of manifest.photos) {
     const target = path.join(dir, photo.file);
     if (fs.existsSync(target)) continue;
@@ -40,12 +59,28 @@ export async function fetchMissing(
       failed.push(`${photo.file}: missing, and has no source`);
       continue;
     }
+    if (downloads++) await sleep(FETCH_PAUSE_MS);
     try {
-      const response = await fetchImpl(photo.source, {
-        headers: { "User-Agent": USER_AGENT },
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      let response: Response;
+      for (let attempt = 0; ; attempt++) {
+        response = await fetchImpl(photo.source, {
+          headers: { "User-Agent": USER_AGENT },
+          signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+        });
+        if (response.status !== 429 || rateLimited) break;
+        if (attempt === MAX_RETRIES) {
+          rateLimited = true;
+          break;
+        }
+        await response.body?.cancel();
+        const wait = retryAfterMs(response.headers.get("Retry-After")) ?? BACKOFF_MS * 2 ** attempt;
+        // A Retry-After of 0 or a past date still waits a pause, so it cannot spend every retry at once.
+        await sleep(Math.min(Math.max(wait, FETCH_PAUSE_MS), MAX_RETRY_AFTER_MS));
+      }
+      if (!response.ok) {
+        await response.body?.cancel();
+        throw new Error(`HTTP ${response.status}`);
+      }
       const bytes = new Uint8Array(await response.arrayBuffer());
       const hash = sha256(bytes);
       if (hash !== photo.sha256) throw new Error(`sha256 ${hash}, expected ${photo.sha256}`);

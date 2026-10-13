@@ -1,6 +1,6 @@
 /**
  * The eval's Node stage: each photo's MediaPipe output, from the cache or the browser extractor,
- * through the app's own face choice, then the core's check, sampling and classifier, with no quiz
+ * through the app's own face choice, then the core's check and classifier, with no quiz
  * answers, and the synthetic variants of each usable photo that passes.
  *
  * {@link openspec/specs/analysis-eval/spec.md#requirement-each-photo-goes-through-the-web-apps-own-steps}
@@ -14,7 +14,6 @@ import {
   checkPhoto,
   classify,
   type PhotoMeasures,
-  samplePhoto,
   type SeasonResult,
 } from "../packages/analysis/src/index.ts";
 import { sha256 } from "./fetch.ts";
@@ -111,7 +110,7 @@ function analyze(photo: EvalPhoto, e: Extraction, check: typeof checkPhoto) {
       variants: [],
     };
 
-  const traits = samplePhoto({ ...input, landmarks }).traits;
+  const traits = checked.traits ?? null;
   const result = classify({ photo: traits, answers: {} });
   const variants =
     expectOf(photo) === "pass"

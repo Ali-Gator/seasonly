@@ -32,6 +32,13 @@ export async function runPhotos(photos, { photosDir, cacheDir, version, extract,
 // evals/extract.ts — the browser stage
 export const EXTRACTOR_VERSION: string; // MediaPipe version + hash of the extractor and the app's constants
 export function createExtractor(): { extract: Extractor; close(): Promise<void> };
+// evals/run.ts — eval:run's body; never imports extract.ts
+export async function measure({ manifest, photosDir, cacheDir, resultsPath, fetchImpl?, fetchOptions?: { sleep? }, extractorVersion, createExtractor }): Promise<Results>;
+// fetches first; the extractor factory is called only after the fetch succeeds
+
+// evals/vision.ts — eval:vision's tally, pure
+export function tallyVerdicts(photos: { file; expect; verdict }[]): { sent: number; usable: Record<string, number>; severalFaces: Record<string, number> };
+// usable: expect "pass"; severalFaces: expect "several-faces"
 ```
 
 | Command            | Runs                                                   | Needs photos | Where                       |
@@ -45,7 +52,9 @@ Committed: `evals/manifest.json`, `results.json`, `baseline.json`, `vision-resul
 
 ## Behavior
 
-`eval:run` fetches missing photos, then for each photo reads the cached MediaPipe output, keyed by the photo's SHA-256 and `EXTRACTOR_VERSION`, or extracts it in headless Chromium: decode with EXIF orientation, scale to the app's `MAX_SIDE`, detect up to two faces, segment the hair, and crop the largest face as the app does. Node then runs the app's `pickFace`, `checkPhoto`, and for a pass `samplePhoto` and `classify` with no answers. Each usable photo that passes is also checked darkened (× 0.35), warm-cast (R × 1.15, B × 0.7) and grayscale (Rec. 709 luma). Metrics are rounded to four decimals.
+`eval:fetch` (and `eval:run`'s fetch) pauses 1 s between downloads. A 429 waits its `Retry-After` (seconds or an HTTP date), capped at 60 s and never under the 1 s pause, or a 5 s backoff doubling per attempt without one, for up to 4 retries.
+
+`eval:run` fetches missing photos, then for each photo reads the cached MediaPipe output, keyed by the photo's SHA-256 and `EXTRACTOR_VERSION`, or extracts it in headless Chromium: decode with EXIF orientation, scale to the app's `MAX_SIDE`, detect up to two faces, segment the hair, and crop the largest face as the app does. Node then runs the app's `pickFace`, `checkPhoto`, and for a pass `classify` on the traits the check returned, with no answers. Each usable photo that passes is also checked darkened (× 0.35), warm-cast (R × 1.15, B × 0.7) and grayscale (Rec. 709 luma). Metrics are rounded to four decimals.
 
 The input hash covers the core's sampling, photo-check, classifier and palettes sources and its index, the app's `faces.ts`, `photo.ts` and `mediapipe.ts`, `evals/*.ts` (not tests), `manifest.json`, and the pinned MediaPipe version. Only git-tracked files count. The gate compares agreement, accuracy and the catch rate (higher is better) and the false-reject rate (lower is better) with the baseline at tolerance 0.
 
@@ -91,7 +100,7 @@ An entry with a `source` SHALL also carry `sha256` and `license`. An entry witho
 
 ### Requirement: Photos are fetched, verified and never committed
 
-`pnpm eval:fetch` SHALL download every entry whose file is missing under `evals/photos/` from its `source`, and SHALL keep it only if its SHA-256 matches the entry's `sha256`. A mismatch or a failed download SHALL fail the fetch, name the entry, and leave no file behind. Photos, and everything derived from their pixels, SHALL stay under the git-ignored `evals/photos/`.
+`pnpm eval:fetch` SHALL download every entry whose file is missing under `evals/photos/` from its `source`, and SHALL keep it only if its SHA-256 matches the entry's `sha256`. Downloads SHALL run one at a time, with a pause between one download and the next. A download answered with HTTP 429 SHALL be retried a bounded number of times, each after the wait its `Retry-After` header asks for, capped, or after a growing backoff when it gives none; it counts as a failed download only once the retries run out. Once one download has run out of its retries, later downloads answered with HTTP 429 SHALL fail without a retry, so a source that refuses everything ends the fetch quickly. Any other failed status SHALL NOT be retried. A mismatch or a failed download SHALL fail the fetch, name the entry, and leave no file behind. Photos, and everything derived from their pixels, SHALL stay under the git-ignored `evals/photos/`.
 
 #### Scenario: A missing photo
 
@@ -108,6 +117,31 @@ An entry with a `source` SHALL also carry `sha256` and `license`. An entry witho
 - **WHEN** every listed file is already present
 - **THEN** the fetch downloads nothing
 
+#### Scenario: Two photos to fetch
+
+- **WHEN** two entries' files are absent
+- **THEN** the fetch pauses between the first download and the second, and not before the first
+
+#### Scenario: The source rate-limits the fetch
+
+- **WHEN** an entry's source answers HTTP 429 with `Retry-After: 2`, then serves the recorded bytes
+- **THEN** the fetch waits 2 seconds, retries, and writes the file
+
+#### Scenario: The rate limit persists
+
+- **WHEN** an entry's source answers HTTP 429 to every attempt
+- **THEN** the fetch gives up after its retries, fails naming that entry, and no file is written for it
+
+#### Scenario: The rate limit outlasts one entry
+
+- **WHEN** an entry's source answers HTTP 429 to every attempt and the next entry's source answers HTTP 429 too
+- **THEN** the next entry is requested once, and the fetch fails naming both
+
+#### Scenario: A photo that is gone is not retried
+
+- **WHEN** an entry's source answers HTTP 404
+- **THEN** the fetch requests it once and fails naming that entry
+
 ### Requirement: Each photo goes through the web app's own steps
 
 `pnpm eval:run` SHALL put each photo through the same steps the web app runs on an upload:
@@ -116,7 +150,7 @@ An entry with a `source` SHALL also carry `sha256` and `license`. An entry witho
 2. Detect up to two faces with the app's MediaPipe version and face model.
 3. Choose the face, or report `several-faces`, as the app does.
 4. Segment the hair, then run the core's `checkPhoto`.
-5. For a pass, run `samplePhoto` and `classify` with no quiz answers.
+5. For a pass, run `classify` on the traits the check returned, with no quiz answers.
 
 The MediaPipe steps SHALL run in a browser engine, because the app runs them there. The core's steps SHALL run the repository's current code. A photo's MediaPipe output MAY be cached under `evals/photos/`, keyed by the photo's hash and the MediaPipe version. A change to the core SHALL then be re-measured without re-running the browser.
 
@@ -197,7 +231,7 @@ Loosening a limit therefore cannot lower false rejects without the cost showing 
 - the counts of photos, people and variants;
 - a hash of every input the results depend on: the core's checking, sampling, classifying and palette source, the app's face-choice code, the eval's own code, the manifest and the MediaPipe version.
 
-It SHALL hold no pixels, landmarks, masks, crops or color measurements of any photo, and no trait of any single photo. A run SHALL fail, and write nothing, if any listed photo is missing after fetching.
+It SHALL hold no pixels, landmarks, masks, crops or color measurements of any photo, and no trait of any single photo. A run SHALL fetch before it extracts, and SHALL fail, before extracting any photo and writing anything, if any listed photo is missing after fetching.
 
 #### Scenario: A run on the full set
 
@@ -207,7 +241,7 @@ It SHALL hold no pixels, landmarks, masks, crops or color measurements of any ph
 #### Scenario: A photo cannot be had
 
 - **WHEN** a listed photo is absent and its fetch fails
-- **THEN** `eval:run` fails naming it and `results.json` is unchanged
+- **THEN** `eval:run` fails naming it before extracting any photo, and `results.json` is unchanged
 
 ### Requirement: A holdout set judges what the rest tuned
 

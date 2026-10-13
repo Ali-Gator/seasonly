@@ -5,7 +5,7 @@
  * @see openspec/specs/photo-check/spec.md
  */
 import type { Lab } from "../sampling/color.ts";
-import { samplePhoto, type PhotoInput } from "../sampling/index.ts";
+import { samplePhoto, type PhotoInput, type Traits } from "../sampling/index.ts";
 
 export { EYE_OPENINGS } from "../sampling/regions.ts";
 export { RETAKE_TIPS, type RetakeReason, type RetakeTip } from "./tips.ts";
@@ -17,8 +17,9 @@ export { RETAKE_TIPS, type RetakeReason, type RetakeTip } from "./tips.ts";
 // read skin hue −5° to 9°, so the floor sits below 0°. Real selfies (2026-10-06) read sclera C*ab 12-21
 // indoors, close under the cast limit. MIN_FACE_WIDTH and the skin chroma range are unchanged.
 // Eye-white L* is from backlog-1's sweep (irises dropped, sclera share 0.3): on the eval tuning
-// set, dark false rejects 14 → 4 and catch rate 0.8812 → 0.9167. The C*ab limit and the selfie
-// readings above predate that measure and were not re-swept on it (BL-50).
+// set, dark false rejects 14 → 4 and catch rate 0.8812 → 0.9167. The selfie readings above predate
+// that measure. The C*ab limit was re-swept on it in backlog-2 triage (C*ab 20–32): no limit kept
+// all four ratchets, so 22 stays (BL-50).
 /** Narrower than this, in pixels, and the face is too small to measure. */
 export const MIN_FACE_WIDTH = 120;
 /** Eye-white L* below this is too dark. */
@@ -45,6 +46,8 @@ export interface PhotoMeasures {
 export interface PhotoCheck {
   problem: PhotoProblem | null;
   measures: PhotoMeasures;
+  /** Color sampling's traits of the same input; set only on a pass. */
+  traits?: Traits;
 }
 
 /** `PhotoInput` whose landmarks are null when no face was detected. */
@@ -100,5 +103,6 @@ export function checkPhoto(input: PhotoCheckInput): PhotoCheck {
   if (eyeWhite && eyeWhite.L < MIN_EYE_WHITE_L) return result("dark");
   if (eyeWhite && chroma(eyeWhite) > MAX_EYE_WHITE_CHROMA) return result("tint");
 
-  return result(skin && isFiltered(skin) ? "filter" : null);
+  if (skin && isFiltered(skin)) return result("filter");
+  return { problem: null, measures, traits: sample.traits };
 }
