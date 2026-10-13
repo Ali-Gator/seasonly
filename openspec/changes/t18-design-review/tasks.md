@@ -1,0 +1,61 @@
+## 1. Plan, design system and canvas (design decision 1)
+
+- [x] 1.1 Tracker (Claude Docs concept, https://claude.ai/code/artifact/23434923-c1ff-47d6-8ce6-7c86fd14856c): add row T18 "Design review fixes (t18-design-review): color in the first screen, draping, guide, retake, quiz, landing, blocked browser", Code, Claude Code + Claude Design, In progress. Add a Log line, newest first, naming the review canvas and the user's approval of every finding on 2026-10-12. Verify: the row and the Log line show.
+- [ ] 1.2 Seasonly design system (https://claude.ai/code/artifact/69473bf0-748a-4814-892f-1cfe8b16ddac): in `components/bundle.js` and `bundle.css`, change DrapingPair (no ring, zoomed face, `::after` collar), Swatch (name two lines tall, breaks between words), StepProgress (`sub` prop, partial bar) and PhotoTipCard (`bad` as a list). Add `SwatchStrip` with its README and preview. Add the README line on where a chip-only strip is allowed. Publish as memory says: a bare `read` of the url first, and `design-system.json` in a separate, last call. Verify: each changed component's preview renders, and the new version id is noted here.
+- [ ] 1.3 MVP canvas (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3), edited in place after a bare `read`. Copy the new `bundle.js`/`bundle.css` into `ds/seasonly/components/` by hand. Change boards 01 Landing 375 and 1280 (hero strip below 1024, compact season strips with `h3` names, primary closing action, desktop upload-first), 02 Guide (one card), 04a–04e (heading "Let’s retake this one"), 04f (second failure, per the review's P3), 06 Quiz 1–4 (one progress row, "Tap an answer to go on.", image slots on veins, jewelry and hair; labeled placeholders until 1.5), 10 Full report 375, 16 Season 375 and 18 Sample report (palette first, sample banner action secondary). Add 08g Blocked browser beside 08d. Verify the boards in the built-in browser (canvas Play list, then Fill), not by arithmetic alone: on each 375 board, the color or actions the specs put in the first screen sit above 812 px. List the boards changed and the canvas version here.
+- [ ] 1.4 Ask the user to approve the changed boards (CLAUDE.md: the canvas before UI code). Verify: their approval and its date are recorded here. No task in groups 3–7 starts before it.
+- [ ] 1.5 Quiz photos (design decision 8). Ask the user's yes for one paid image batch: 10 images, about $0.50, at most $1. On yes, add the `quiz` set to `scripts/generate-photos.ts`, run it once, write 1:1 WebP files of at most about 40 KB to `apps/web/public/images/quiz/`, and put them on the canvas's Quiz boards in place of the placeholders. Ask the user to approve every image. Verify: the cost, the file list and the user's approval are recorded here. If the user says no, the image slots stay out and the quiz delta's image requirement moves to `docs/backlog.md` before archive.
+
+## 2. Approval for edits to existing tests
+
+- [ ] 2.1 Ask the user's approval for these edits to existing tests (CLAUDE.md), each listed with its reason, and record the answer here. Make no other edit to an existing test without asking again.
+  - `e2e/analysis-flow.spec.ts`: the heading "Let's retake this one" becomes "Let’s retake this one". The quiz loops stop clicking "Next" after a tapped option, because a tap now moves on by itself.
+  - `e2e/funnel.spec.ts` (`answerQuiz`) and `e2e/report-delivery.spec.ts`: the same quiz-loop change.
+  - `apps/web/src/lib/site-content/content.test.tsx`: the "links all 12 seasons" case reads each season's strip through `sn-swatch__name`. The compact strip has visually hidden names and no hex codes, so its parser reads the strip's names instead.
+  - `apps/web/src/components/ds/flow-components.test.tsx` and `draping-pair.test.tsx`: only if an existing assertion breaks on the new markup (for example a ring class), named here before editing.
+
+## 3. Tests first
+
+- [ ] 3.1 `ui-components`: new cases in `apps/web/src/components/ds/` tests, citing `{@link openspec/specs/ui-components/spec.md#...}` with each scenario anchor. Cover: hex codes line up and a name never splits (the CSS rules on `.sn-swatch__name`, read from `ds.css` the way the "every class has a style" test reads it), a swatch strip, step progress with a sub-step, a quiz option with an image, a tip card with one reference and three to avoid, and no ring around the face (no ring rule, a collar rule). Verify: each new case fails for the missing behavior, not for an import or syntax error.
+- [ ] 3.2 `capture-flow`: new cases in `_capture/guide.test.tsx` and a new `flow.dom.test.tsx` for the guide's one Good and three Avoid images, the desktop swap class, the second-failure copy and action order, and no focus on the guide at first render but focus on the capture heading after "Take a selfie". Verify: they fail for the missing behavior.
+- [ ] 3.3 `quiz`: new cases for the one progress row, a tap moving on after about 300 ms (fake timers, a click with `detail: 1`), an arrow-key choice staying, the last question waiting, a tap on an answered option, and the example images (alt text on veins, none on sun). Verify: they fail for the missing behavior.
+- [ ] 3.4 `season-reveal`: new cases in `_reveal/reveal.test.tsx` and `flow-state.test.ts` for a 403 giving the blocked screen with no "Try again", "Copy the link" writing `https://seasonly.me/analyze` and reading "Link copied", and a 500 still offering "Try again". Verify: they fail for the missing behavior.
+- [ ] 3.5 `site-content` and `report-page`: new cases in `content.test.tsx` and `lib/report/view.test.tsx` for the hero strip (12 chips, the caption, the link, `lg:hidden`), the season-name `h3`s, the primary closing action, the hero's desktop swap class, the palette before the description on a season page, the sample banner's secondary action, and the report's phone order (palette, then summary and note, then section 2). Verify: they fail for the missing behavior.
+- [ ] 3.6 E2E for the first-screen scenarios: a new `e2e/design-review.spec.ts` at 375 × 812, citing each scenario. It covers the guide's actions in view, the second failure's "Continue with the quiz only" in view, the landing strip in view, the first swatch in view on `/seasons/soft-autumn`, `/sample-report` and a stored report (routes mocked as `report-delivery.spec.ts` does), and the 403 blocked screen. Verify: the cases fail on the current build.
+
+## 4. Design-system port (spec: `ui-components`)
+
+- [ ] 4.1 Port 1.2's changes to `apps/web/src/components/ds/`: `draping-pair.tsx` and its CSS, `swatch.tsx` (+ `SwatchStrip`, exported from `index.ts`), `step-progress.tsx` (`sub`), `quiz-option.tsx` (image slot back, with `src`/`alt`), `photo-tip-card.tsx` (`bad` list), and the `ds.css` rules. Verify: 3.1's cases pass, and every existing `ds` test passes unedited.
+
+## 5. Flow (specs: `capture-flow`, `quiz`, `season-reveal`)
+
+- [ ] 5.1 Guide: one `PhotoTipCard` with the good reference and three bad examples (design decision 5); the desktop swap class and `lg:flex-col-reverse` on the actions (decision 6). Verify: 3.2's guide cases pass.
+- [ ] 5.2 Retake: the second-failure screen (heading, line, thumbnail, actions in order, "Continue with the quiz only" secondary). The first-failure heading becomes "Let’s retake this one". Verify: 3.2's retake cases pass.
+- [ ] 5.3 Focus: skip the step-focus effect on the guide's first render (decision 10). Verify: 3.2's focus cases pass.
+- [ ] 5.4 Quiz: the `StepProgress` sub-step from `flow.tsx`, the quiz's own overline removed, "Tap an answer to go on.", the pointer-only advance with its timer (decision 7), the apostrophe in "What’s your natural hair color, without dye?". Verify: 3.3's cases except the images pass.
+- [ ] 5.5 Blocked request: `failed` carries `blocked` for a 403, `flow-state.ts` keeps it on the error step, and `_reveal/steps.tsx` renders the blocked screen with "Copy the link" and the visible URL (decision 9). Verify: 3.4's cases pass.
+
+## 6. Site and report (specs: `site-content`, `report-page`)
+
+- [ ] 6.1 `ReportSections` split into head and rest, DOM order head, section 1, rest, sections 2–6, with the wide grid rows renumbered in `view.tsx` and the sample report's page (decision 2). Verify: 3.5's report-order cases pass, and `view.test.tsx` and the report E2E pass unedited.
+- [ ] 6.2 Season page: palette after the head below 1024 px, columns unchanged from 1024 px. Verify: 3.5's season-page case passes.
+- [ ] 6.3 Landing: the hero strip (`SwatchStrip`, `lg:hidden`), `SeasonLink`'s `compact` flag with `h3` names (BL-25), the primary closing action, the hero's desktop swap. The sample report's banner action becomes secondary. Verify: 3.5's landing and sample cases pass.
+
+## 7. Headings, swatch names and quiz photos
+
+- [ ] 7.1 `globals.css`: `h1[tabindex="-1"]:focus { outline: none }` and `text-wrap: balance` on `.display, .h1, .h2, .h3`. Swatch-name rules per decision 11 (BL-38), with six-column grids only from 1024 px. Verify: 3.1's swatch cases pass, and no `overflow-wrap: anywhere` is left on swatch names.
+- [ ] 7.2 Quiz images from 1.5 in `lib/site-content/images.ts` with alt text, passed to the veins, jewelry and hair options. Verify: 3.3's image cases pass. (If 1.5 got a no, skip this and log the backlog item named there.)
+
+## 8. Gate
+
+- [ ] 8.1 `pnpm fix`, then `pnpm test`, then `pnpm test:e2e`. Verify: all green locally, apart from the known Mac-only failures in `docs/backlog.md` (BL-12, BL-21, BL-31). CI runs `ci.yml`, `openspec.yml` and `e2e.yml` green on the PR.
+- [ ] 8.2 Built-in browser check at 375 × 812 and 1280 on `pnpm dev`: landing, guide, both retake screens (no-face image), quiz (tap advance, keyboard stay), blocked screen (403 mocked), season page, sample report, a report (mocked as in E2E). Compare each with its approved board. Verify: screenshots of each first screen are sent to the user.
+- [ ] 8.3 Manual run on a phone for the screens the review could not reach live: consent, analyzing, reveal, email, report and share. The user runs it in their Chrome (memory "manual photo tests"), and once in the TikTok and Instagram in-app browsers to see whether the bot check passes. Each photo analysis is one paid vision call: ask the user's yes first, with a budget of at most $1. Verify: the user's yes, the screens checked, the calls made and the in-app result are recorded here. A blocked in-app browser becomes a backlog item.
+
+## 9. Review, backlog, plan and archive
+
+- [ ] 9.1 Phase review in a fresh `general-purpose` subagent (`phase-review` skill, `/code-review high`), then fix its findings. Verify: the findings and fixes are listed here.
+- [ ] 9.2 Backlog: delete BL-25, BL-38 and BL-41 (shipped). Add the crop-background item ("remove the photo background from the stored face crop, so the draping preview shows only the face on the color; a privacy review first, since it changes what is uploaded"), the bot-check item from 8.3 if any, and every review finding left unfixed. Bump `_Next id:_` for each. Verify: the PR names the ids added and removed.
+- [ ] 9.3 `/opsx:archive`. Then, in `openspec/specs/`, update Public Interface and Behavior for `ui-components` (`SwatchStrip`, `StepProgress.sub`, `QuizOption` image, `PhotoTipCard` list, the draping collar), `capture-flow` (the focus guard, the second-failure screen), `quiz` (the advance timer), `season-reveal` (the blocked step) and `site-content` (`SeasonLink` `compact`). Verify: `openspec validate --specs` passes.
+- [ ] 9.4 Plan: set T18 to Done in the Tracker with a plain-words Log line naming the BL ids. Update memory "MVP design canvas" with the canvas and design-system versions and what changed. Verify: the row, the Log line and the memory line show.
+- [ ] 9.5 Push the branch, open a PR to `main` that names the BL ids added and removed, and turn on auto-merge with a merge commit (never squash). Verify: the PR shows auto-merge enabled.
