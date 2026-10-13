@@ -32,6 +32,13 @@ export async function runPhotos(photos, { photosDir, cacheDir, version, extract,
 // evals/extract.ts — the browser stage
 export const EXTRACTOR_VERSION: string; // MediaPipe version + hash of the extractor and the app's constants
 export function createExtractor(): { extract: Extractor; close(): Promise<void> };
+// evals/run.ts — eval:run's body; never imports extract.ts
+export async function measure({ manifest, photosDir, cacheDir, resultsPath, fetchImpl?, fetchOptions?: { sleep? }, extractorVersion, createExtractor }): Promise<Results>;
+// fetches first; the extractor factory is called only after the fetch succeeds
+
+// evals/vision.ts — eval:vision's tally, pure
+export function tallyVerdicts(photos: { file; expect; verdict }[]): { sent: number; usable: Record<string, number>; severalFaces: Record<string, number> };
+// usable: expect "pass"; severalFaces: expect "several-faces"
 ```
 
 | Command            | Runs                                                   | Needs photos | Where                       |

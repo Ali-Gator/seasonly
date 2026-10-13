@@ -16,6 +16,7 @@ import { PHOTOS_DIR, readManifest } from "../../../../../evals/fetch.ts";
 import { EXTRACTOR_VERSION } from "../../../../../evals/extract.ts";
 import { cropPath, runPhotos } from "../../../../../evals/pipeline.ts";
 import { formatJson } from "../../../../../evals/results.ts";
+import { tallyVerdicts } from "../../../../../evals/vision.ts";
 import { generateReportText, REPORT_TEXT_MODEL } from "./index";
 
 // Show why a call fell back; Sentry is not initialized here.
@@ -67,22 +68,9 @@ it(
       console.log(`${r.file} (${r.expect}): ${verdict}`);
     }
 
-    const tally = (expectations: string[]) =>
-      photos
-        .filter((p) => expectations.includes(p.expect))
-        .reduce<Record<string, number>>(
-          (t, p) => ({ ...t, [p.verdict]: (t[p.verdict] ?? 0) + 1 }),
-          {},
-        );
     fs.writeFileSync(
       OUTPUT,
-      await formatJson({
-        model: REPORT_TEXT_MODEL,
-        sent: photos.length,
-        usable: tally(["pass"]),
-        severalFaces: tally(["several-faces"]),
-        photos,
-      }),
+      await formatJson({ model: REPORT_TEXT_MODEL, ...tallyVerdicts(photos), photos }),
     );
     expect(photos).toHaveLength(sent.length);
   },
