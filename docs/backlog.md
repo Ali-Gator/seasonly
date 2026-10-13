@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-50**
+_Next id:_ **BL-51**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -53,6 +53,12 @@ fold items in.
   _Refs:_ `.github/workflows/eval-weekly.yml`, `evals/gate.ts` · _Status:_ deferred — until four
   consecutive weekly runs fetch cleanly and match the committed metrics within the drift the
   analysis-eval spec allows another machine
+
+- **[BL-50] Re-sweep the eye-white tint limit on the new measure** — `MAX_EYE_WHITE_CHROMA`
+  (C*ab 22) was tuned on the old brightest-40% eye white. `backlog-1` changed the measure and left
+  the limit, and tuning `tint` false rejects rose 8 to 12, now the largest cause (12 of 27). Sweep
+  the limit on the tuning set only, holding the catch rate.
+  _Refs:_ `packages/analysis/src/photo-check/index.ts`, `openspec/changes/archive/*-backlog-1/tasks.md` · _Status:_ open — `backlog-1` phase review, 2026-10-13
 
 ## Privacy
 

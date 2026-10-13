@@ -17,7 +17,8 @@ export { RETAKE_TIPS, type RetakeReason, type RetakeTip } from "./tips.ts";
 // read skin hue −5° to 9°, so the floor sits below 0°. Real selfies (2026-10-06) read sclera C*ab 12-21
 // indoors, close under the cast limit. MIN_FACE_WIDTH and the skin chroma range are unchanged.
 // Eye-white L* is from backlog-1's sweep (irises dropped, sclera share 0.3): on the eval tuning
-// set, dark false rejects 14 → 4 and catch rate 0.8812 → 0.9167.
+// set, dark false rejects 14 → 4 and catch rate 0.8812 → 0.9167. The C*ab limit and the selfie
+// readings above predate that measure and were not re-swept on it (BL-50).
 /** Narrower than this, in pixels, and the face is too small to measure. */
 export const MIN_FACE_WIDTH = 120;
 /** Eye-white L* below this is too dark. */
