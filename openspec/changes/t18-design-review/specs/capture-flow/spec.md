@@ -4,6 +4,14 @@
 
 The flow SHALL open on the photo guide of canvas artboard 02: the heading "Three things before your selfie", one card with the three tips and two actions, "Take a selfie" and "Upload a photo". The card SHALL show one good reference photo and three bad examples, one per tip: under a ceiling lamp, foundation and bronzer, and a beauty filter. Each SHALL be a photo with alt text, never a labeled placeholder. On a 375 × 812 screen, both actions SHALL be visible without scrolling. Below 1024 px wide, "Take a selfie" SHALL be the primary action. From 1024 px, "Upload a photo" SHALL be the primary action and "Take a selfie" the secondary.
 
+Under the two actions, the guide SHALL show the upload notice in the canvas's words. The notice SHALL say:
+
+- only a crop of the face is sent, and only once the quiz is finished;
+- an AI model from Google, reached through Vercel, reads its colors and does not train on it;
+- the crop is deleted within 24 hours.
+
+It SHALL link to `/privacy`.
+
 The capture step SHALL show the front camera's live view in the camera frame, with the caption "Fit your face in the oval, at eye level. Hold still." It SHALL offer "Take photo" and "Upload a photo instead". When the camera cannot be opened, the capture step SHALL keep the upload action and show "Camera blocked or not working? Upload a selfie you took in daylight."
 
 **Unenforced:** the live camera needs a camera device, which CI's browser lacks. Task 8.3's manual check on a phone covers it; the upload path is covered by E2E.
@@ -23,6 +31,11 @@ The capture step SHALL show the front camera's live view in the camera frame, wi
 - **WHEN** `/analyze` opens in a 375 × 812 window
 - **THEN** "Take a selfie" and "Upload a photo" are both inside the window without scrolling
 
+#### Scenario: The guide names who reads the crop
+
+- **WHEN** the photo guide is shown
+- **THEN** below the two actions it says only a face crop is sent, once the quiz is finished. It also says an AI model from Google, through Vercel, reads it and does not train on it, and that the crop is deleted within 24 hours. It links to `/privacy`.
+
 #### Scenario: A desktop window
 
 - **WHEN** `/analyze` opens 1280 px wide
@@ -38,7 +51,7 @@ The capture step SHALL show the front camera's live view in the camera frame, wi
 A taken or uploaded photo SHALL be checked in the browser: face landmarks, the face count, and the core photo check. Exactly one outcome SHALL follow:
 
 - **Fails:** a retake screen with the heading "Let’s retake this one", the photo as taken, the problem's title and message as a danger note, its retake tip as a note with the tip's icon, and two actions: "Retake photo" and "Upload a different photo".
-- **Passes:** the consent step.
+- **Passes:** the quiz's first question. If every question was already answered in this visit, the analysis starts instead. No step asks the person to agree before the quiz.
 
 #### Scenario: A photo with no face
 
@@ -48,7 +61,12 @@ A taken or uploaded photo SHALL be checked in the browser: face landmarks, the f
 #### Scenario: A good photo
 
 - **WHEN** a well-lit single-face photo is uploaded
-- **THEN** the consent step is shown with the photo's face crop
+- **THEN** the quiz's first question is shown, and no request has gone to the analyze route
+
+#### Scenario: A good retake after the quiz
+
+- **WHEN** a person who has answered every question takes a new photo that passes
+- **THEN** the analysis starts with that photo's crop, without showing the quiz again
 
 ### Requirement: Repeated failures offer a quiz-only result
 
@@ -58,7 +76,7 @@ After the second failed check in a row, the retake screen SHALL say that this is
 - the photo as taken at thumbnail size beside the heading, then the problem's danger note and its retake tip;
 - the actions "Retake photo" (primary), "Continue with the quiz only" (secondary) and "Upload a different photo", in that order. On a 375 × 812 screen, "Continue with the quiz only" SHALL be visible without scrolling.
 
-That path SHALL skip consent and the upload and go to the quiz. Its result SHALL come from the quiz alone. A photo that passes SHALL reset the count.
+That path SHALL send no crop and no traits, and SHALL go to the quiz. Its result SHALL come from the quiz alone. A photo that passes SHALL reset the count.
 
 #### Scenario: First failure
 

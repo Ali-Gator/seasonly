@@ -19,7 +19,7 @@ The design review of seasonly.me on 2026-10-12 (review canvas https://claude.ai/
 - **Folded in:** BL-25, BL-38 and BL-41, each deleted from `docs/backlog.md` when it ships.
 - **Not in scope:**
   - Background removal from the stored face crop. It changes what is uploaded and stored, so it needs its own privacy review. Logged as a new backlog item.
-  - Screens past the photo check that the review could not reach live: consent, analyzing, reveal, email and share. A manual run in the user's Chrome covers them in this change's checks.
+  - Screens past the photo check that the review could not reach live: analyzing, reveal, email and share. A manual run in the user's Chrome covers them in this change's checks.
   - Curly apostrophes in body copy, emails and share images. Instrument Sans renders the straight one cleanly.
 
 ## Capabilities
