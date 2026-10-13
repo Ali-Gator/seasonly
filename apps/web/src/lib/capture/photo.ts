@@ -1,10 +1,4 @@
-import {
-  checkPhoto,
-  type PhotoMeasures,
-  type RetakeReason,
-  samplePhoto,
-  type Traits,
-} from "@seasonly/analysis";
+import { checkPhoto, type PhotoMeasures, type RetakeReason, type Traits } from "@seasonly/analysis";
 
 import { cropBox, landmarkBox, pickFace } from "./faces";
 import { loadVision } from "./mediapipe";
@@ -79,7 +73,6 @@ export async function checkImage(source: Blob | ImageBitmap): Promise<CheckedPho
     return { ...outcome, problem: check.problem ?? "no-face", measures: check.measures };
   }
 
-  const traits = samplePhoto({ pixels, width, height, landmarks, hairMask }).traits;
   const box = cropBox(landmarkBox(landmarks, width, height), width, height);
   const out = canvasOf(box.outWidth, box.outHeight);
   out.context.drawImage(
@@ -97,7 +90,7 @@ export async function checkImage(source: Blob | ImageBitmap): Promise<CheckedPho
     ...outcome,
     problem: null,
     measures: check.measures,
-    traits,
+    traits: check.traits ?? null,
     crop: await jpeg(out.canvas),
   };
 }
