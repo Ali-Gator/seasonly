@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-59**
+_Next id:_ **BL-60**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -49,13 +49,6 @@ fold items in.
   cue tried (iris, lips, hair, skin re-centring) moves exact metrics a photo or less (backlog-1
   triage, 2026-10-13); still 26 tuning / 8 holdout people and no quiz answers in the manifest
   (backlog-2 triage, 2026-10-13)
-
-- **[BL-52] The weekly eval fetch gets HTTP 429 from Commons** — the first `eval-weekly.yml`
-  run (38420860039, 2026-10-13) fetched 26 photos, then got 429 on the other 154 within 3 s, so
-  no run or cache followed. `fetchMissing` fetches back to back and fails on the first 429. Honor
-  `Retry-After` (or back off) with a few retries and a short pause between downloads; BL-49 waits
-  on clean weekly runs.
-  _Refs:_ `evals/fetch.ts`, `.github/workflows/eval-weekly.yml` · _Status:_ open — first weekly run, 2026-10-13
 
 - **[BL-49] Gate the eval on the CI run** — the weekly `eval-weekly.yml` run only reports its
   metrics beside the committed `results.json`. Once it has proved stable, make CI hold a change to
@@ -152,13 +145,6 @@ fold items in.
   _Refs:_ `apps/web/src/lib/report-text/index.ts`, `openspec/specs/report-text/spec.md` ·
   _Status:_ open — found in `t6-eval-set`, 2026-10-09
 
-- **[BL-40] The web flow samples each passing photo twice** — `checkImage` calls `checkPhoto`,
-  which runs `samplePhoto`, then calls `samplePhoto` again for the traits; since
-  `t15-white-balance` each run also measures the eye white. Have `checkPhoto` return its sample (or
-  traits) and reuse it.
-  _Refs:_ `apps/web/src/lib/capture/photo.ts`, `packages/analysis/src/photo-check/index.ts` ·
-  _Status:_ open — phase review of `t15-white-balance`, 2026-10-12
-
 ## Testing
 
 - **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
@@ -174,6 +160,12 @@ fold items in.
   server passes. Either set the header explicitly on that route or run that assertion only against
   a production build, so `pnpm test` is green locally.
   _Refs:_ `e2e/report-delivery.spec.ts:112`, `playwright.config.ts` · _Status:_ open — found in `t15-eval-growth`, 2026-10-13
+
+- **[BL-59] Local E2E times out on a loaded Mac** — with load average ~9, a full local
+  `pnpm test:e2e` fails a different set of flow tests each run on their 30 s limits (funnel,
+  analysis-flow), on `main` too (3 failed, 6 flaky); alone, each passes in ~10 s, and CI is green.
+  Cap local workers or raise the dev-mode timeouts, so the local phase gate reads true.
+  _Refs:_ `playwright.config.ts`, `e2e/funnel.spec.ts`, `e2e/analysis-flow.spec.ts` · _Status:_ open — found in `backlog-2`, 2026-10-13
 
 - **[BL-21] Two e2e cases fail on a Mac** — run locally, `/seasons/Soft-Autumn` answers 200
   (the case-insensitive disk serves the prerendered `soft-autumn` page) and, on the dev server
@@ -197,15 +189,6 @@ fold items in.
   It is an edit to an existing test, so it waits for the user's approval.
   _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — found in
   `t11-no-consent-step`, 2026-10-12
-
-- **[BL-17] Two analysis-eval scenarios are proven one level down** — "A photo cannot be had"
-  is tested on the results writer, not on `eval:run` failing after a failed fetch, and "A usable
-  photo the model rejects" has no test because its tally sits inline in the paid file. Move the
-  tally into `evals/` with a unit test, and test the run's fetch-then-fail order with a stubbed
-  fetch.
-  _Refs:_ `evals/eval.run.ts`, `apps/web/src/lib/report-text/eval-vision.smoke.ts`,
-  `openspec/specs/analysis-eval/spec.md` · _Status:_ open — phase review of `t6-eval-set`,
-  2026-10-09
 
 - **[BL-08] Two concurrent email stores are never raced in a test** — the abuse-controls
   scenario "Two requests at once" rests on `store_report_email` locking the report row (`for
