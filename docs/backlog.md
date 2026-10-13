@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-52**
+_Next id:_ **BL-53**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -46,6 +46,13 @@ fold items in.
   labeled people, or quiz answers recorded for the eval people: on 119 tuning photos every local
   cue tried (iris, lips, hair, skin re-centring) moves exact metrics a photo or less (backlog-1
   triage, 2026-10-13)
+
+- **[BL-52] The weekly eval fetch gets HTTP 429 from Commons** — the first `eval-weekly.yml`
+  run (38420860039, 2026-10-13) fetched 26 photos, then got 429 on the other 154 within 3 s, so
+  no run or cache followed. `fetchMissing` fetches back to back and fails on the first 429. Honor
+  `Retry-After` (or back off) with a few retries and a short pause between downloads; BL-49 waits
+  on clean weekly runs.
+  _Refs:_ `evals/fetch.ts`, `.github/workflows/eval-weekly.yml` · _Status:_ open — first weekly run, 2026-10-13
 
 - **[BL-49] Gate the eval on the CI run** — the weekly `eval-weekly.yml` run only reports its
   metrics beside the committed `results.json`. Once it has proved stable, make CI hold a change to
