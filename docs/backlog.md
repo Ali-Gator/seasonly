@@ -54,8 +54,10 @@ fold items in.
   people average skin hue 47.1° and cool-labeled 44.0°, a 3° gap inside an 11° spread, so
   temperature cannot carry label accuracy (0.18) whatever the white balance does. Look for
   another warm/cool cue (hair, eyes, lips, or the quiz) before tuning temperature further.
-  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `evals/README.md` · _Status:_ open — found
-  in `t15-white-balance`, 2026-10-12
+  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `evals/README.md` · _Status:_ gated — more
+  labeled people, or quiz answers recorded for the eval people: on 119 tuning photos every local
+  cue tried (iris, lips, hair, skin re-centring) moves exact metrics a photo or less (backlog-1
+  triage, 2026-10-13)
 
 - **[BL-15] CI checks a committed eval result, not the photos** — only a machine with the
   photos can refresh `results.json`. Run `eval:fetch` and `eval:run` in CI (Playwright's

@@ -1,0 +1,24 @@
+## 1. Spec deltas
+
+- [x] 1.1 photo-check delta — written in triage
+- [x] 1.2 color-sampling delta — written in triage
+- [x] 1.3 season-classifier delta — written in triage
+
+## 2. Fixes — one subagent at a time, serially, in this order
+
+- [ ] 2.1 BL-48 — pick replacements for p22/5 and p26/2 by `design.md` Decision 2 (Commons metadata checked per candidate; no `checkPhoto` or eval on a candidate before it is in the manifest); update their entries in `evals/manifest.json` (file, light, source, sha256, license, author); `pnpm eval:fetch` verifies them. A person with no qualifying candidate gets the photo dropped instead.
+- [ ] 2.2 BL-48 — `pnpm eval:run` on the unchanged code; reset `evals/baseline.json` to its tuning metrics (Decision 3, approved); rewrite the "Measured on" paragraph in `openspec/specs/analysis-eval/spec.md` Behavior; record the run's tuning and holdout metrics and the per-band `dark` rejects (bands in `design.md` Context) in this task.
+- [ ] 2.3 BL-45 — failing test: deep skin with lids covering most of each opening is not `dark` ({@link openspec/specs/photo-check/spec.md#scenario-deep-skin-with-lids-covering-most-of-each-eye-opening}), in `packages/analysis/src/photo-check/photo-check.test.ts`; confirm it fails on today's code.
+- [ ] 2.4 BL-45 — failing test: irises and lids are left out of the eye white ({@link openspec/specs/color-sampling/spec.md#scenario-irises-and-lids-are-left-out}), in `packages/analysis/src/sampling/sampling.test.ts`; confirm it fails on today's code.
+- [ ] 2.5 BL-45 — `eyeWhiteOf` drops the iris circles with 478 landmarks and keeps the brightest 30% (`packages/analysis/src/sampling/index.ts`); `MIN_EYE_WHITE_L` 24 and its tuning comment (`packages/analysis/src/photo-check/index.ts`); until 2.3 and 2.4 pass and every existing test passes unedited.
+- [ ] 2.6 BL-45 — `pnpm eval:run`; check Decision 4's criteria against the 2.2 baseline on the tuning set; fall back per Decision 4 if they fail. On pass: raise `evals/baseline.json` to the new tuning metrics, update Behavior in `openspec/specs/photo-check/spec.md` (item 4, the tuning paragraph) and `openspec/specs/color-sampling/spec.md` (eye-white paragraph), the `Sample.eyeWhite` comment and the "Measured on" paragraph; record the numbers here. On no pass: revert 2.3–2.5, rewrite BL-45's bullet (real mechanism, sweep table, gated on more deep-skin photos) and keep it.
+- [ ] 2.7 BL-29 — new test: no quiz-only answer set gives Soft Autumn, Soft Summer or Bright Spring ({@link openspec/specs/season-classifier/spec.md#scenario-seasons-only-a-photo-gives}), in `packages/analysis/src/classifier/classifier.test.ts`, enumerating the 750 sets as `apps/web/src/lib/mcp/result.test.ts` does. It passes on today's code by design: it pins behavior, no code changes.
+- [ ] 2.8 BL-29 — doc edits: an Edge Cases line in `openspec/specs/season-classifier/spec.md`; repoint "Unreachable subtypes" in `openspec/specs/chat-plugin/spec.md` from "(BL-29)" to the season-classifier requirement.
+- [ ] 2.9 BL-15 — `.github/workflows/eval-weekly.yml` per `design.md` BL-15 (weekly + `workflow_dispatch`, Chromium, cached `evals/photos` keyed on the manifest hash, `eval:fetch`, `eval:run` with `EVAL_RESULTS` in `$RUNNER_TEMP`, metrics beside the committed `results.json` in the job summary, 30-minute timeout, report-only). Lint it with `actionlint` if installed; trigger it once with `gh workflow run` only after the PR merges (a workflow_dispatch needs the file on the default branch) — note this in the PR, do not wait for it.
+
+## 3. Verify, delete, review, archive, ship
+
+- [ ] 3.1 `pnpm fix`, `pnpm test`
+- [ ] 3.2 delete shipped bullets BL-48, BL-29, BL-15 and (if 2.6 passed) BL-45 from `docs/backlog.md`; add the narrower BL-15 successor at the `_Next id:_` number and bump it ("Gate the eval on the CI run", deferred until four consecutive weekly runs fetch cleanly and match the committed metrics within the drift the spec allows another machine); if BL-45 shipped, flip BL-13's status to `open` (its gate is met)
+- [ ] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
+- [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge
