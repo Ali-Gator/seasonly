@@ -29,23 +29,26 @@ fold items in.
 ## Analysis
 
 - **[BL-13] Temperature reads cool and moves with the light** — skin hue moves with the light, so
-  one person's temperature spreads across photos. The eye-white balance (Lab offset, commit
-  `1d28b3d`) was re-run on the grown set in `t15-eval-growth` (2026-10-13): on the tuning set it
-  cuts temperature spread 0.324 to 0.271 and lifts family agreement 0.70 to 0.78, but exact
-  agreement rises only 0.015 (two photos is 0.023), and on the holdout temperature spread rises at
-  every strength. Parked again: the eye white is not a reliable white reference across people.
-  Look for a reference that holds on the holdout, now that `backlog-1` lets more deep-skin photos
-  pass the `dark` check.
-  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/changes/archive/*-t15-eval-growth/tasks.md` · _Status:_ open — BL-45 shipped in `backlog-1`, 2026-10-13
+  one person's temperature spreads across photos. The eye-white Lab offset (commit `1d28b3d`) was
+  re-run in `backlog-2` triage (2026-10-13) on the current iris-free eye white (reference a\* 6.2,
+  b\* 5.8): tuning agreement 0.5733 / 0.5800 / 0.5613 / 0.5513 / 0.5320 and temperature spread
+  0.330 / 0.288 / 0.274 / 0.266 / 0.278 at k 0 / 0.25 / 0.5 / 0.75 / 1; holdout agreement 0.550 /
+  0.488 / 0.498 / 0.560 / 0.529. No k passes t15-eval-growth's D6 rule (needs tuning +0.023 and
+  holdout no worse than −0.036). Find a white reference that holds on the holdout (background,
+  teeth, gray-world are untried) or grow the set.
+  _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/changes/archive/*-t15-eval-growth/design.md` (D6) · _Status:_ gated —
+  a new white reference to try, or more labeled people; the eye white fails D6 on both measures (backlog-2 triage, 2026-10-13)
 
-- **[BL-39] Skin hue barely separates warm and cool labels** — on the eval set, warm-labeled
-  people average skin hue 47.1° and cool-labeled 44.0°, a 3° gap inside an 11° spread, so
-  temperature cannot carry label accuracy (0.18) whatever the white balance does. Look for
+- **[BL-39] Skin hue barely separates warm and cool labels** — on the 26 tuning people,
+  warm-labeled people average skin hue 49.2° and cool-labeled 46.9°, a 2.3° gap against a 9.2°
+  person SD, so temperature cannot carry label accuracy (0.1765 tuning, 0.0588 holdout) whatever
+  the white balance does. Look for
   another warm/cool cue (hair, eyes, lips, or the quiz) before tuning temperature further.
   _Refs:_ `packages/analysis/src/sampling/traits.ts`, `evals/README.md` · _Status:_ gated — more
   labeled people, or quiz answers recorded for the eval people: on 119 tuning photos every local
   cue tried (iris, lips, hair, skin re-centring) moves exact metrics a photo or less (backlog-1
-  triage, 2026-10-13)
+  triage, 2026-10-13); still 26 tuning / 8 holdout people and no quiz answers in the manifest
+  (backlog-2 triage, 2026-10-13)
 
 - **[BL-52] The weekly eval fetch gets HTTP 429 from Commons** — the first `eval-weekly.yml`
   run (38420860039, 2026-10-13) fetched 26 photos, then got 429 on the other 154 within 3 s, so
@@ -62,16 +65,23 @@ fold items in.
   analysis-eval spec allows another machine
 
 - **[BL-50] Re-sweep the eye-white tint limit on the new measure** — `MAX_EYE_WHITE_CHROMA`
-  (C*ab 22) was tuned on the old brightest-40% eye white. `backlog-1` changed the measure and left
-  the limit, and tuning `tint` false rejects rose 8 to 12, now the largest cause (12 of 27). Sweep
-  the limit on the tuning set only, holding the catch rate.
-  _Refs:_ `packages/analysis/src/photo-check/index.ts`, `openspec/changes/archive/*-backlog-1/tasks.md` · _Status:_ open — `backlog-1` phase review, 2026-10-13
+  (C\*ab 22) was tuned on the old brightest-40% eye white; tuning `tint` false rejects are 12 of 27.
+  Swept in `backlog-2` triage (2026-10-13), C\*ab 20–32 in 0.1 steps, tuning set: every limit
+  above 22 lowers agreement (0.5733 → 0.5700 at 22.1, 0.5567 at 22.2–22.6, 0.5527 at 22.7–23.5),
+  and catch holds only to 22.6 with zero copies of margin (tint false rejects 12 → 9 there). No
+  limit keeps all four ratchets. Re-sweep when the set grows or the cast measure changes.
+  _Refs:_ `packages/analysis/src/photo-check/index.ts`, `openspec/changes/archive/*-backlog-1/design.md` (Decision 4) · _Status:_ gated —
+  more labeled photos, or a new cast measure; no limit holds agreement on today's set (backlog-2 triage, 2026-10-13)
 
 - **[BL-51] A squint can pass the light checks unmeasured** — with 478 landmarks the eye white is
   null when fewer than 50 opening pixels lie outside the irises, and `dark` and `tint` are then
   skipped (`p07/6` moved from `dark` to a pass). Watch the null rate of `eye_white_lab` after the
   deploy; if real squints pass unmeasured, add a retake rule for a null eye white.
-  _Refs:_ `packages/analysis/src/sampling/index.ts`, `openspec/changes/archive/*-backlog-1/design.md` · _Status:_ open — `backlog-1` phase re-review, 2026-10-13
+  Once it fires, the fix needs a new retake screen on the MVP canvas and reverses the photo-check
+  requirement "Eye whites that cannot be measured do not reject a photo".
+  _Refs:_ `packages/analysis/src/sampling/index.ts`, `openspec/changes/archive/*-backlog-1/design.md` · _Status:_ deferred —
+  until about 50 production `photo_checked` events (PostHog, excluding preview hosts and Oleg's own
+  sessions) reach the eye-white step after the backlog-1 deploy; 1 so far, 0 null (backlog-2 triage, 2026-10-13)
 
 ## Privacy
 
