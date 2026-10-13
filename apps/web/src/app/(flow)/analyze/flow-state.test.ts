@@ -258,7 +258,7 @@ describe("quiz", () => {
 });
 
 describe("errors", () => {
-  /** {@link openspec/specs/season-reveal/spec.md#scenario-the-route-refuses-the-request} */
+  /** {@link openspec/specs/season-reveal/spec.md#scenario-the-route-fails} */
   it("shows the error screen on a failure, and Try again re-sends the same request", () => {
     const analyzing = run(toAnalyzing);
     const error = reduce(analyzing, { type: "failed" });
@@ -362,5 +362,19 @@ describe("report delivery", () => {
     expect(reduce(revealWith("k7m2qxAAAAAAAAAAAAAAAA"), { type: "try-again" }).step.name).toBe(
       "reveal",
     );
+  });
+});
+
+describe("a refused request", () => {
+  /** {@link openspec/specs/season-reveal/spec.md#scenario-the-route-refuses-the-request} */
+  it("keeps a 403 on the error step, marked blocked", () => {
+    const blocked = reduce(run(toAnalyzing), { type: "failed", blocked: true });
+    expect(blocked.step).toEqual({ name: "error", blocked: true });
+  });
+
+  /** {@link openspec/specs/season-reveal/spec.md#scenario-the-route-fails} */
+  it("leaves any other failure an ordinary error", () => {
+    const failed = reduce(run(toAnalyzing), { type: "failed", blocked: false });
+    expect(failed.step).toEqual({ name: "error" });
   });
 });

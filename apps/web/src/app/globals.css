@@ -149,6 +149,12 @@ body {
   .quote {
     color: var(--ink);
   }
+  .display,
+  .h1,
+  .h2,
+  .h3 {
+    text-wrap: balance;
+  }
 
   /* Ported from the design system's bundle.css: only what the site chrome uses. */
   a {
@@ -219,5 +225,31 @@ body {
   .sn-btn--secondary:hover {
     border-color: var(--ink);
     color: var(--ink);
+  }
+  /* From 1024 px the landing hero and the photo guide put upload first: the two fills swap and
+     the DOM keeps one set of buttons (t18-design-review decision 6). */
+  @media (min-width: 1024px) {
+    .sn-btn--primary.sn-btn--lg-swap,
+    .sn-btn--primary.sn-btn--lg-swap:hover {
+      background: var(--surface);
+      color: var(--ink);
+      border-color: var(--line-strong);
+    }
+    .sn-btn--primary.sn-btn--lg-swap:hover {
+      border-color: var(--ink);
+    }
+    .sn-btn--secondary.sn-btn--lg-swap {
+      background: var(--accent);
+      color: var(--on-accent);
+      border-color: transparent;
+    }
+    .sn-btn--secondary.sn-btn--lg-swap:hover {
+      background: var(--accent-strong);
+      color: var(--on-accent);
+    }
+  }
+  /* A flow heading takes focus for screen readers; it is not a control, so it draws no ring. */
+  h1[tabindex="-1"]:focus {
+    outline: none;
   }
 }

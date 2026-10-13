@@ -3,7 +3,14 @@ export { EmailInput, type EmailInputProps } from "./email-input";
 export { Icon, type IconName, type IconProps } from "./icon";
 export { Note, type NoteProps } from "./note";
 export { ReportSection, type ReportSectionProps } from "./report-section";
-export { Swatch, SwatchGrid, type SwatchGridProps, type SwatchProps } from "./swatch";
+export {
+  Swatch,
+  SwatchGrid,
+  type SwatchGridProps,
+  type SwatchProps,
+  SwatchStrip,
+  type SwatchStripProps,
+} from "./swatch";
 export { CameraFrame, type CameraFrameProps } from "./camera-frame";
 export { DrapingPair, type DrapingPairProps } from "./draping-pair";
 export { PhotoTipCard, type PhotoTipCardProps } from "./photo-tip-card";

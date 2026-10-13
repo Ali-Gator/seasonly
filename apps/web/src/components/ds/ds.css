@@ -130,11 +130,14 @@
     flex-direction: column;
     gap: 2px;
   }
+  /* Two lines' height, broken only between words, so every hex in a row starts on one line (BL-38). */
   .sn-swatch__name {
     font-size: 13px;
     line-height: 18px;
+    min-height: 36px;
     color: var(--ink);
-    overflow-wrap: anywhere;
+    overflow-wrap: normal;
+    word-break: normal;
   }
   .sn-swatch__hex {
     font-size: 12px;
@@ -152,6 +155,21 @@
     font-size: 15px;
     line-height: 20px;
     font-weight: 600;
+    min-height: 0;
+  }
+  /* Swatch strip: chips only, each name hidden for screen readers. */
+  .sn-swatch-strip {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sn-swatch-strip__chip {
+    display: block;
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    box-shadow: inset 0 0 0 1px var(--swatch-edge);
   }
   .sn-swatch-grid {
     display: grid;
@@ -259,9 +277,16 @@
     border-radius: 2px;
     background: var(--line);
   }
-  .sn-steps__step--done .sn-steps__bar,
-  .sn-steps__step--current .sn-steps__bar {
+  .sn-steps__step--done .sn-steps__bar {
     background: var(--ink);
+  }
+  /* The current bar fills by the sub-step's share (--sn-steps-fill), or whole without one. */
+  .sn-steps__step--current .sn-steps__bar {
+    background: linear-gradient(
+      to right,
+      var(--ink) var(--sn-steps-fill, 100%),
+      var(--line) var(--sn-steps-fill, 100%)
+    );
   }
   .sn-steps__label {
     display: inline-flex;
@@ -323,6 +348,22 @@
     line-height: 18px;
     color: var(--ink-muted);
   }
+  /* Several examples to avoid: stacked small beside the good reference. */
+  .sn-tip__avoid {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+  .sn-tip__avoid .sn-tip__example {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .sn-tip__avoid .sn-tip__slot {
+    width: 48px;
+    flex: none;
+  }
 
   /* Draping pair: the same face on the best color and the worst, each verdict in words. */
   .sn-draping {
@@ -337,20 +378,36 @@
     min-width: 0;
     margin: 0;
   }
+  /* No ring: the face fills its oval, and the frame's color rises over the oval's bottom like a
+     draped cloth (the collar inherits the frame's inline color). */
   .sn-drape__frame {
+    position: relative;
+    overflow: hidden;
     aspect-ratio: 3 / 4;
     border-radius: var(--radius-lg);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 14%;
     box-shadow: inset 0 0 0 1px var(--swatch-edge);
   }
   .sn-drape__face {
-    width: 62%;
-    aspect-ratio: 3 / 4;
-    border-radius: 50%;
-    box-shadow: 0 0 0 3px var(--surface);
+    position: absolute;
+    left: 14%;
+    right: 14%;
+    top: 8%;
+    height: 74%;
+    border-radius: 50% 50% 46% 46% / 42% 42% 58% 58%;
+  }
+  .sn-drape__face img {
+    object-position: 50% 40%;
+    transform: scale(1.15);
+  }
+  .sn-drape__frame::after {
+    content: "";
+    position: absolute;
+    left: -10%;
+    right: -10%;
+    bottom: 0;
+    height: 24%;
+    border-radius: 50% 50% 0 0 / 38% 38% 0 0;
+    background: inherit;
   }
   .sn-drape figcaption {
     display: flex;
@@ -429,6 +486,18 @@
   }
   .sn-quiz:has(:checked) .sn-quiz__mark {
     border: 6px solid var(--ink);
+  }
+  /* An option with an example photo: the 56 px image sits at the left edge. */
+  .sn-quiz--image {
+    padding-left: var(--space-2);
+  }
+  .sn-quiz--image:has(:checked) {
+    padding-left: calc(var(--space-2) - 1px);
+  }
+  .sn-quiz__slot {
+    width: 56px;
+    height: 56px;
+    flex: none;
   }
   .sn-quiz:has(:disabled) {
     cursor: not-allowed;

@@ -57,13 +57,34 @@ const QUIZ_KEEP = `Edit this photo. Keep everything else the same: the same pers
 pose, framing, light and background. Change only this:`;
 
 const QUIZ_EDITS = {
-  "veins-green": ["wrist", "the veins on her inner wrist. A few natural veins now show faintly through the skin with a green to olive tint, soft and realistic, as veins look in daylight, never drawn lines."],
-  "veins-blue": ["wrist", "the veins on her inner wrist. A few natural veins now show faintly through the skin with a blue to purple tint, soft and realistic, as veins look in daylight, never drawn lines."],
-  "veins-mix": ["wrist", "the veins on her inner wrist. Two or three natural veins now show softly through the skin just below the wrist crease: one has a clear green tint and one a clear blue tint. Soft and realistic, as veins look in daylight, never drawn lines."],
-  "jewelry-gold": ["wrist", "her jewellery. She now wears one thin polished yellow-gold chain bracelet on this wrist."],
-  "jewelry-silver": ["wrist", "her jewellery. She now wears one thin polished silver chain bracelet on this wrist."],
-  "jewelry-both": ["wrist", "her jewellery. She now wears two thin chain bracelets on this wrist, one yellow gold and one silver."],
-  "hair-dark": ["face", "her hair colour. Her natural hair is now very dark brown, nearly black, undyed."],
+  "veins-green": [
+    "wrist",
+    "the veins on her inner wrist. A few natural veins now show faintly through the skin with a green to olive tint, soft and realistic, as veins look in daylight, never drawn lines.",
+  ],
+  "veins-blue": [
+    "wrist",
+    "the veins on her inner wrist. A few natural veins now show faintly through the skin with a blue to purple tint, soft and realistic, as veins look in daylight, never drawn lines.",
+  ],
+  "veins-mix": [
+    "wrist",
+    "the veins on her inner wrist. Two or three natural veins now show softly through the skin just below the wrist crease: one has a clear green tint and one a clear blue tint. Soft and realistic, as veins look in daylight, never drawn lines.",
+  ],
+  "jewelry-gold": [
+    "wrist",
+    "her jewellery. She now wears one thin polished yellow-gold chain bracelet on this wrist.",
+  ],
+  "jewelry-silver": [
+    "wrist",
+    "her jewellery. She now wears one thin polished silver chain bracelet on this wrist.",
+  ],
+  "jewelry-both": [
+    "wrist",
+    "her jewellery. She now wears two thin chain bracelets on this wrist, one yellow gold and one silver.",
+  ],
+  "hair-dark": [
+    "face",
+    "her hair colour. Her natural hair is now very dark brown, nearly black, undyed.",
+  ],
   "hair-blonde": ["face", "her hair colour. Her natural hair is now golden blonde, undyed."],
   "hair-red": ["face", "her hair colour. Her natural hair is now auburn red, undyed."],
 } as const;
@@ -92,7 +113,9 @@ if (which === "quiz") {
   const sources = {
     wrist: { data: fs.readFileSync(wristPath), mediaType: "image/png", options: square },
     face: {
-      data: fs.readFileSync(new URL("../apps/web/public/images/examples/base.webp", import.meta.url)),
+      data: fs.readFileSync(
+        new URL("../apps/web/public/images/examples/base.webp", import.meta.url),
+      ),
       mediaType: "image/webp",
       options,
     },

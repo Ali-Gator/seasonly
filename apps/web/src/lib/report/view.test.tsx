@@ -214,3 +214,26 @@ describe("DrapingView", () => {
     expect(shown).not.toContain("has been deleted");
   });
 });
+
+describe("ReportView on a phone", () => {
+  /** {@link openspec/specs/report-page/spec.md#scenario-the-palette-comes-first-on-a-phone} */
+  it("puts the palette straight after the tagline, then the summary and note, then section 2", () => {
+    const out = html(PHOTO);
+    const at = (needle: string) => {
+      const i = out.indexOf(needle);
+      expect(i, needle).toBeGreaterThan(-1);
+      return i;
+    };
+    const tagline = at("Warm, soft and earthy.");
+    const palette = at('aria-label="Your Soft Autumn palette"');
+    const summary = at(SEASON_COPY["soft-autumn"].summary);
+    const note = at("Photo and quiz agree");
+    const section2 = at("Section 2 of 6");
+    expect(tagline).toBeLessThan(palette);
+    expect(palette).toBeLessThan(summary);
+    expect(summary).toBeLessThan(note);
+    expect(note).toBeLessThan(section2);
+    // Nothing but section 1's heading sits between the tagline and the palette.
+    expect(words(out.slice(tagline, palette))).not.toContain(SEASON_COPY["soft-autumn"].undertone);
+  });
+});

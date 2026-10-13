@@ -54,6 +54,17 @@ function grid(html: string, label: string): Swatch[] {
   );
 }
 
+/** The chips of the strip labeled `label`: each one's hidden name and its fill. */
+function strip(html: string, label: string): Swatch[] {
+  const list = new RegExp(`<ul[^>]*aria-label="${escape(label)}"[^>]*>(.*?)</ul>`).exec(html)?.[1];
+  if (list === undefined) throw new Error(`No swatch strip labeled "${label}"`);
+  return [
+    ...list.matchAll(
+      /style="background:([^"]*)"[^>]*><\/span><span class="sn-visually-hidden">([^<]*)</g,
+    ),
+  ].map(([, hex, name]) => ({ name: text(name ?? "").trim(), hex: hex ?? "" }));
+}
+
 const imgs = (html: string) =>
   [...html.matchAll(/<img ([^>]*)>/g)].map(([, attrs]) => ({
     src: /src="([^"]*)"/.exec(attrs ?? "")?.[1],
@@ -134,7 +145,7 @@ describe("/", () => {
   it("links all 12 seasons, each with its first four highlights", () => {
     for (const slug of SEASON_SLUGS) {
       expect(out).toContain(`href="/seasons/${slug}"`);
-      expect(grid(out, `${seasonName(slug)} colors`)).toEqual(
+      expect(strip(out, `${seasonName(slug)} colors`)).toEqual(
         PALETTES[slug].highlights.slice(0, 4),
       );
     }
@@ -298,5 +309,86 @@ describe("example photos", () => {
       expect(p.src).toMatch(/^\/images\/examples\/[a-z]+\.webp$/);
       expect(p.alt.trim().length, p.src).toBeGreaterThan(10);
     }
+  });
+});
+
+describe("/ after the design review", () => {
+  const out = html(<Landing />);
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-color-in-the-first-phone-screen} */
+  it("shows a 12-chip strip with its caption and link between the headline and the actions, hidden from 1024 px", () => {
+    const figure = /<figure class="([^"]*)">(.*?)<\/figure>/.exec(out);
+    expect(figure?.[1]).toContain("lg:hidden");
+    const inner = figure?.[2] ?? "";
+    expect(inner.match(/class="sn-swatch-strip__chip"/g)).toHaveLength(12);
+    expect(text(inner)).toContain("A Soft Autumn result: 12 of 30 colors.");
+    expect(inner).toContain('href="/sample-report"');
+    expect(inner).not.toContain("sn-swatch__hex");
+    const at = out.indexOf("<figure");
+    expect(out.indexOf("Find your colors from one selfie.")).toBeLessThan(at);
+    expect(at).toBeLessThan(out.indexOf("Take a selfie"));
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-every-season-linked} */
+  it("gives each season an h3 linking to its page and a chip strip with hidden names and no hex", () => {
+    for (const slug of SEASON_SLUGS) {
+      const name = seasonName(slug);
+      expect(out).toMatch(
+        new RegExp(`<h3 class="h3[^"]*"><a [^>]*href="/seasons/${slug}"[^>]*>${escape(name)}`),
+      );
+      const strip = new RegExp(
+        `<ul class="sn-swatch-strip"[^>]*aria-label="${escape(name)} colors"[^>]*>(.*?)</ul>`,
+      ).exec(out)?.[1];
+      const names = [...(strip ?? "").matchAll(/sn-visually-hidden">([^<]*)</g)].map((m) => m[1]);
+      expect(names, slug).toEqual(PALETTES[slug].highlights.slice(0, 4).map((c) => c.name));
+      expect(strip).not.toContain("sn-swatch__hex");
+    }
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-a-desktop-window} */
+  it("swaps the hero's fills from 1024 px, so upload is primary on a desktop", () => {
+    const hero = out.slice(0, out.indexOf("This is a Soft Autumn"));
+    const selfie = /<a [^>]*class="([^"]*)"[^>]*>(?:(?!<\/a>).)*Take a selfie<\/a>/.exec(hero)?.[1];
+    const upload = /<a [^>]*class="([^"]*)"[^>]*>(?:(?!<\/a>).)*Upload a photo<\/a>/.exec(
+      hero,
+    )?.[1];
+    expect(selfie).toContain("sn-btn--primary");
+    expect(selfie).toContain("sn-btn--lg-swap");
+    expect(upload).toContain("sn-btn--secondary");
+    expect(upload).toContain("sn-btn--lg-swap");
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-closing-action} */
+  it("ends on Start with a selfie as the primary action", () => {
+    const actions = [...out.matchAll(/<a [^>]*class="([^"]*sn-btn[^"]*)"[^>]*>(.*?)<\/a>/g)];
+    const last = actions.at(-1);
+    expect(text(last?.[2] ?? "").trim()).toBe("Start with a selfie");
+    expect(last?.[1]).toContain("sn-btn--primary");
+  });
+});
+
+describe("palette first on a phone", () => {
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-palette-comes-first-on-a-phone} */
+  it("puts a season page's palette after the tagline and before the summary and description", async () => {
+    const out = await seasonPage("soft-autumn");
+    const copy = SEASON_COPY["soft-autumn"];
+    const palette = out.indexOf('aria-label="The Soft Autumn palette"');
+    expect(out.indexOf(copy.tagline)).toBeLessThan(palette);
+    expect(palette).toBeLessThan(out.indexOf(copy.summary));
+    const about = SEASON_CONTENT["soft-autumn"].about[0] ?? "";
+    expect(palette).toBeLessThan(out.indexOf(about.slice(0, 20)));
+    expect(palette).toBeLessThan(out.indexOf("Undertone"));
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-sample-on-a-phone} */
+  it("puts the sample's palette after its tagline, below a banner whose action is secondary", () => {
+    const out = html(<SampleReport />);
+    const banner = out.slice(0, out.indexOf("<h1"));
+    const action = /<a [^>]*class="([^"]*)"[^>]*>(?:(?!<\/a>).)*Find my colors<\/a>/.exec(banner);
+    expect(action?.[1]).toContain("sn-btn--secondary");
+    expect(banner).not.toContain("sn-btn--primary");
+    const palette = out.indexOf('aria-label="Your Soft Autumn palette"');
+    expect(out.indexOf("Warm, soft and earthy.")).toBeLessThan(palette);
+    expect(palette).toBeLessThan(out.indexOf(SEASON_COPY["soft-autumn"].summary));
   });
 });

@@ -42,7 +42,7 @@ export function ReportView({ id, report }: { id: string; report: StoredReport })
         <p className="caption hidden text-(--ink-muted) lg:block">seasonly.me/r/{id}</p>
       </header>
 
-      <main className="flex flex-col gap-(--space-12) lg:grid lg:grid-cols-12 lg:grid-rows-[auto_auto_auto_auto_1fr] lg:items-start lg:gap-x-(--space-6) lg:gap-y-(--space-5)">
+      <main className="flex flex-col gap-(--space-12) lg:grid lg:grid-cols-12 lg:grid-rows-[auto_auto_auto_auto_auto_1fr] lg:items-start lg:gap-x-(--space-6) lg:gap-y-(--space-5)">
         <ReportSections
           season={season}
           agreement={agreement}
@@ -54,7 +54,7 @@ export function ReportView({ id, report }: { id: string; report: StoredReport })
           }
         />
 
-        <div className="lg:col-span-4 lg:col-start-1 lg:row-start-3">
+        <div className="lg:col-span-4 lg:col-start-1 lg:row-start-4">
           <PremiumCard
             reportId={id}
             interested={report.interested}
@@ -63,12 +63,12 @@ export function ReportView({ id, report }: { id: string; report: StoredReport })
           />
         </div>
 
-        <div className="sn-stack lg:col-span-4 lg:col-start-1 lg:row-start-2">
+        <div className="sn-stack lg:col-span-4 lg:col-start-1 lg:row-start-3">
           <ShareButton slug={season} season={name} alts={alts} />
           <SaveButton slug={season} />
         </div>
 
-        <footer className="caption flex flex-col gap-(--space-2) border-t border-(--line) pt-(--space-6) text-(--ink-muted) lg:col-span-4 lg:col-start-1 lg:row-start-4 lg:border-t-0 lg:pt-0">
+        <footer className="caption flex flex-col gap-(--space-2) border-t border-(--line) pt-(--space-6) text-(--ink-muted) lg:col-span-4 lg:col-start-1 lg:row-start-5 lg:border-t-0 lg:pt-0">
           {!quizOnly && <p>Your photo is deleted within 24 hours of your analysis.</p>}
           <p>This report stays at seasonly.me/r/{id}.</p>
           <p>

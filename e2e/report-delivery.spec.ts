@@ -42,7 +42,6 @@ async function toReveal(page: Page, reportId: string | null) {
   for (const [i, label] of answers.entries()) {
     await expect(page.getByText(`Question ${i + 1} of 4`)).toBeVisible();
     await page.getByText(label, { exact: true }).click();
-    if (i < 3) await page.getByRole("button", { name: "Next", exact: true }).click();
   }
   await page.getByRole("button", { name: "See my result" }).click();
   await expect(page.getByText("Your season family")).toBeVisible();

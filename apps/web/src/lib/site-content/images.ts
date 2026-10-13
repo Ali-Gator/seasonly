@@ -48,3 +48,34 @@ export const SAMPLE_FACE: Photo = {
   src: "/images/examples/face.webp",
   alt: "Sample face: a fictional woman with light brown hair and hazel eyes",
 };
+
+/**
+ * The quiz's example photos (t18-design-review design.md decision 8): the same fictional woman's
+ * wrist and face, edited per answer. Approved by the user on the canvas on 2026-10-13.
+ *
+ * {@link openspec/specs/quiz/spec.md#requirement-questions-answered-by-looking-show-example-photos}
+ */
+export const QUIZ_PHOTOS = {
+  veins: {
+    green: { src: "/images/quiz/veins-green.webp", alt: "A wrist with green to olive veins" },
+    blue: { src: "/images/quiz/veins-blue.webp", alt: "A wrist with blue to purple veins" },
+    mix: { src: "/images/quiz/veins-mix.webp", alt: "A wrist with both green and blue veins" },
+  },
+  jewelry: {
+    gold: { src: "/images/quiz/jewelry-gold.webp", alt: "A thin gold bracelet on a wrist" },
+    silver: { src: "/images/quiz/jewelry-silver.webp", alt: "A thin silver bracelet on a wrist" },
+    both: {
+      src: "/images/quiz/jewelry-both.webp",
+      alt: "A gold and a silver bracelet on a wrist",
+    },
+  },
+  hair: {
+    dark: { src: "/images/quiz/hair-dark.webp", alt: "The example woman with dark brown hair" },
+    medium: {
+      src: "/images/quiz/hair-medium.webp",
+      alt: "The example woman with light brown hair",
+    },
+    blonde: { src: "/images/quiz/hair-blonde.webp", alt: "The example woman with blonde hair" },
+    red: { src: "/images/quiz/hair-red.webp", alt: "The example woman with auburn hair" },
+  },
+} satisfies Record<string, Record<string, Photo>>;

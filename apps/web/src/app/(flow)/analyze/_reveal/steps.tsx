@@ -192,3 +192,41 @@ export function AnalysisError({ onRetry }: { onRetry: () => void }) {
     </>
   );
 }
+
+const FLOW_URL = "https://seasonly.me/analyze";
+
+/**
+ * The analyze route answered 403: the bot check refused this browser, often an in-app one, so
+ * the way on is another browser. The URL stays visible for when the clipboard is refused.
+ *
+ * {@link openspec/specs/season-reveal/spec.md#requirement-the-analyzing-step-follows-the-canvas-and-fails-visibly}
+ */
+export function Blocked() {
+  const [copied, setCopied] = useState(false);
+  return (
+    <>
+      <div className="flex flex-col gap-(--space-3) pt-(--space-8)">
+        <h1 className="h1" tabIndex={-1}>
+          We couldn’t check this browser
+        </h1>
+        <p className="lead text-(--ink-muted)">
+          Some in-app browsers block our check. Open seasonly.me in Safari or Chrome to continue.
+        </p>
+      </div>
+      <div className="sn-stack">
+        <Button
+          block
+          onClick={() =>
+            navigator.clipboard
+              ?.writeText(FLOW_URL)
+              .then(() => setCopied(true))
+              .catch(() => {})
+          }
+        >
+          {copied ? "Link copied" : "Copy the link"}
+        </Button>
+        <p className="caption text-center text-(--ink-muted)">seasonly.me/analyze</p>
+      </div>
+    </>
+  );
+}
