@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 import { SEASON_ALIASES, SEASON_SLUGS } from "../apps/web/src/lib/site/routes";
 
@@ -124,5 +124,46 @@ test.describe("design tokens", () => {
     await page.goto("/");
     const kicker = page.locator(".overline", { hasText: "Seasonal color analysis" });
     await expect(kicker).toHaveCSS("text-decoration-line", "none");
+  });
+});
+
+test.describe("swatch grids on narrow phones", () => {
+  /** The number of column tracks a grid lays out in. */
+  const columns = (grid: Locator) =>
+    grid.evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length);
+
+  async function open(page: Page, path: string, width: number, height: number) {
+    await page.setViewportSize({ width, height });
+    await page.goto(path, { waitUntil: "networkidle" });
+    // Names are measured in the page's own font, not the fallback.
+    await page.evaluate(() => document.fonts.ready);
+  }
+
+  /** {@link openspec/specs/ui-components/spec.md#scenario-a-4-column-grid-on-a-narrow-phone} */
+  test("a 4-column grid lays out in 3 at 360 px and every name fits its cell", async ({ page }) => {
+    await open(page, "/seasons/light-spring", 360, 800);
+    const grid = page.getByRole("list", { name: "The Light Spring palette" });
+    const names = grid.locator(".sn-swatch__name");
+    await expect(names).toHaveCount(24);
+    await expect(names.filter({ hasText: /^Watermelon$/ })).toHaveCount(1);
+    expect.soft(await columns(grid)).toBe(3);
+    const overflowing = await names.evaluateAll((els) =>
+      els.filter((el) => el.scrollWidth > el.clientWidth).map((el) => el.textContent),
+    );
+    expect(overflowing).toEqual([]);
+  });
+
+  /** {@link openspec/specs/ui-components/spec.md#scenario-a-4-column-grid-at-375-px} */
+  test("a 4-column grid keeps 4 columns at 375 px", async ({ page }) => {
+    await open(page, "/seasons/light-spring", 375, 812);
+    expect(await columns(page.getByRole("list", { name: "The Light Spring palette" }))).toBe(4);
+  });
+
+  /** {@link openspec/specs/ui-components/spec.md#scenario-a-season-preview-on-a-narrow-phone} */
+  test("every season preview keeps 4 columns at 360 px", async ({ page }) => {
+    await open(page, "/seasons", 360, 800);
+    const previews = await page.getByRole("list", { name: / colors$/ }).all();
+    expect(previews.length).toBeGreaterThan(0);
+    for (const preview of previews) expect(await columns(preview)).toBe(4);
   });
 });

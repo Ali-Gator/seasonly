@@ -139,6 +139,8 @@ Since `t18-design-review` (design system version 30):
 - The step progress's current bar is a gradient that stops at `--sn-steps-fill`, which StepProgress sets inline from `sub`; without one it fills whole.
 - `.sn-btn--lg-swap`, in `globals.css` and not in the bundle, swaps the primary and secondary fills from 1024 px on buttons that are not disabled. It stays out of the design system because a viewport query would also swap the canvas's phone boards.
 
+Since `backlog-3` (BL-57): SwatchGrid keeps its inline column count and marks it as `data-columns`. Below 375 px, a `ds.css` rule with `!important` lays a grid marked `4` out in 3 columns, so "Watermelon" fits its cell. `keepColumns` drops the marker; `SeasonLink`'s 4-color season previews use it and keep 4 columns. The `bundle.css` on the canvas keeps 4, since no board is narrower than 375. From 375 to ~399 px "Watermelon" still runs a few pixels into the gap (BL-61).
+
 ## Edge Cases
 
 - Lowercase hex: shown uppercase; the chip's background uses the hex as given.

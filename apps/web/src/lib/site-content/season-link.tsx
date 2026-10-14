@@ -52,6 +52,7 @@ export function SeasonLink({
       <SwatchGrid
         colors={wide ? highlights : highlights.slice(0, 4)}
         columns={4}
+        keepColumns
         label={`${name} colors`}
         className={wide ? "max-lg:[&>li:nth-child(n+5)]:hidden lg:grid-cols-3!" : undefined}
       />

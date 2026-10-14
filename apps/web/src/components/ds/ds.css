@@ -180,6 +180,13 @@
     background: var(--surface);
     border-radius: var(--radius-lg);
   }
+  /* Below 375 px a 4-column grid takes 3, so a name like Watermelon fits its cell (BL-57).
+     !important beats the inline column count; grids with keepColumns carry no marker. */
+  @media (max-width: 374.98px) {
+    .sn-swatch-grid[data-columns="4"] {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+  }
 
   /* Card */
   .sn-card {
