@@ -167,7 +167,7 @@ export async function generateReportText({
           role: "user",
           content: [
             { type: "text", text },
-            { type: "image", image: faceCrop, mediaType: "image/jpeg" },
+            { type: "file", data: faceCrop, mediaType: "image/jpeg" },
           ],
         },
       ],
