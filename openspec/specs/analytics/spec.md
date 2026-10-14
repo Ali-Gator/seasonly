@@ -18,16 +18,16 @@ export const maskReportIds: BeforeSendFn; // posthog-js before_send; null passes
 export function ShareButton(props: { /* … */ place?: "header" | "actions" }): JSX.Element; // default "actions"
 ```
 
-| Event                   | Fired from                                         | Properties                                                     |
-| ----------------------- | -------------------------------------------------- | -------------------------------------------------------------- |
-| `quiz_completed`        | `flow.tsx`, Next on the last question, answered    | `quiz_only` (`state.quizOnly`)                                 |
-| `analysis_failed`       | `flow.tsx`, the analyze request's `.catch`         | `quiz_only` (`!request.photo`); not when `left` (Back)         |
-| `report_requested`      | `flow.tsx`, "Get my full report" with a report id  | `quiz_only` (`agreement === "quiz-only"`)                      |
-| `email_submitted`       | `_email/step.tsx`, on `open`, before `router.push` | none                                                           |
-| `share_tapped`          | `ShareButton`, after `shareSeason`                 | `place`, `outcome` (`shared`, `panel`, `cancelled` for idle)   |
-| `share_card_downloaded` | the share panel's Download links                   | `ratio` (`story`, `post`)                                      |
-| `palette_saved`         | `SaveButton`, on `saved`                           | `method` (`download` when the closure ran, else `share-sheet`) |
-| `premium_tapped`        | `PremiumCard`, on `clicked`                        | none                                                           |
+| Event                   | Fired from                                         | Properties                                                                                                   |
+| ----------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `quiz_completed`        | `flow.tsx`, Next on the last question, answered    | `quiz_only` (`state.quizOnly`)                                                                               |
+| `analysis_failed`       | `flow.tsx`, the analyze request's `.catch`         | `quiz_only` (`!request.photo`), `blocked` (true when the analyze route answered 403); not when `left` (Back) |
+| `report_requested`      | `flow.tsx`, "Get my full report" with a report id  | `quiz_only` (`agreement === "quiz-only"`)                                                                    |
+| `email_submitted`       | `_email/step.tsx`, on `open`, before `router.push` | none                                                                                                         |
+| `share_tapped`          | `ShareButton`, after `shareSeason`                 | `place`, `outcome` (`shared`, `panel`, `cancelled` for idle)                                                 |
+| `share_card_downloaded` | the share panel's Download links                   | `ratio` (`story`, `post`)                                                                                    |
+| `palette_saved`         | `SaveButton`, on `saved`                           | `method` (`download` when the closure ran, else `share-sheet`)                                               |
+| `premium_tapped`        | `PremiumCard`, on `clicked`                        | none                                                                                                         |
 
 ## Behavior
 

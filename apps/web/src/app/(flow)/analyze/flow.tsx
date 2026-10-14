@@ -178,7 +178,7 @@ export function Flow() {
       .catch(() => {
         // Back (and StrictMode's aborted first run) left the step: nothing failed.
         if (left) return;
-        track("analysis_failed", { quiz_only: !request.photo });
+        track("analysis_failed", { quiz_only: !request.photo, blocked });
         dispatch({ type: "failed", blocked });
       })
       .finally(() => clearTimeout(timer));

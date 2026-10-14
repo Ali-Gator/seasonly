@@ -98,10 +98,10 @@ async function recordPostHog(page: Page) {
   return { bodies, events, errors, named, find };
 }
 
-/** The analyze route answers a result with `ID`, a 500, or never (`hold`). */
-async function answerAnalyze(page: Page, answer: "result" | 500 | "hold") {
+/** The analyze route answers a result with `ID`, a 403 (the bot check), a 500, or never (`hold`). */
+async function answerAnalyze(page: Page, answer: "result" | 403 | 500 | "hold") {
   await page.route("**/api/analyze", (route) => {
-    if (answer === 500) return route.fulfill({ status: 500, body: "" });
+    if (answer === 403 || answer === 500) return route.fulfill({ status: answer, body: "" });
     if (answer === "hold") return;
     return route.fulfill({
       json: {
@@ -247,6 +247,46 @@ test("sends one analysis_failed when the analysis fails", async ({ page }) => {
   await expect.poll(posthog.named, POLL).toContain("analysis_failed");
   expect(posthog.find("analysis_failed")).toHaveLength(1);
   expect(posthog.find("analysis_failed")[0]?.properties).toMatchObject({ quiz_only: false });
+});
+
+/** {@link openspec/specs/analytics/spec.md#scenario-a-refused-browser} */
+test("sends one analysis_failed with blocked: true when the bot check refuses", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  const posthog = await recordPostHog(page);
+  await answerAnalyze(page, 403);
+
+  await page.goto("/analyze");
+  await uploadFace(page);
+  await answerQuiz(page);
+  await expect(page.getByRole("button", { name: "Copy the link" })).toBeVisible();
+
+  await expect.poll(posthog.named, POLL).toContain("analysis_failed");
+  expect(posthog.find("analysis_failed")).toHaveLength(1);
+  expect(posthog.find("analysis_failed")[0]?.properties).toMatchObject({
+    quiz_only: false,
+    blocked: true,
+  });
+});
+
+/** {@link openspec/specs/analytics/spec.md#scenario-a-server-error-is-not-a-refusal} */
+test("sends one analysis_failed with blocked: false on a server error", async ({ page }) => {
+  test.setTimeout(90_000);
+  const posthog = await recordPostHog(page);
+  await answerAnalyze(page, 500);
+
+  await page.goto("/analyze");
+  await uploadFace(page);
+  await answerQuiz(page);
+  await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
+
+  await expect.poll(posthog.named, POLL).toContain("analysis_failed");
+  expect(posthog.find("analysis_failed")).toHaveLength(1);
+  expect(posthog.find("analysis_failed")[0]?.properties).toMatchObject({
+    quiz_only: false,
+    blocked: false,
+  });
 });
 
 /** {@link openspec/specs/analytics/spec.md#scenario-the-analysis-times-out} */
