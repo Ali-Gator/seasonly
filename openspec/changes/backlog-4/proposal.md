@@ -38,6 +38,7 @@ Fixable but left untouched in `docs/backlog.md` for the next batch:
 ## Approved test edits
 
 - `apps/web/src/lib/report/view.test.tsx:103` — the footer string becomes the canvas v55 line (design.md Decision 1, Oleg, 2026-10-14).
+- `apps/web/src/lib/report/view.test.tsx:172` — the photo footer's marker `/photo/` becomes `/face crop/` (design.md Decision 5, Oleg, 2026-10-14).
 - `apps/web/src/lib/email/render.test.ts:8` — the `FOOTER` constant becomes the canvas v55 line (design.md Decision 1, Oleg, 2026-10-14).
 - `apps/web/src/lib/site-content/content.test.tsx:97` — the every-image-has-alt check exempts only an image inside a `figure` whose `figcaption` is not empty (design.md Decision 3, delegated by Oleg, 2026-10-14).
 - `apps/web/src/lib/site-content/content.test.tsx:213` — a famous photo is expected with `alt: ""` and a `figcaption` holding the name (design.md Decision 3, delegated by Oleg, 2026-10-14).

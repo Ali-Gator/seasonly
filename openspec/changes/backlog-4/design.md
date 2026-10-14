@@ -32,7 +32,7 @@ See proposal.md for why. Triage ran on `backlog-3` at `f1a6461`, in a separate w
 - `apps/web/src/lib/email/render.ts:68` (photo reports only; one `footer` array feeds both the HTML and the plain-text part): "Your photo is deleted within 24 hours of your analysis. We keep your report until you ask us to delete it." → "We delete our copy of your face crop within 24 hours of your analysis. Google may keep one up to 90 days for abuse checks. We keep your report until you ask us to delete it." The quiz-only test (`render.test.ts`, `not.toMatch(/selfie|photo/i)`) still holds: the line stays out of the quiz-only branch, and quiz-only sends Google nothing.
 - `apps/web/src/app/(site)/how-it-works/page.tsx:24`, FAQ "What happens to my photo?": "…It is deleted within 24 hours. We keep your report, not your photo." → "Only a crop of your face is uploaded, after the photo passes the check and you finish the quiz. We delete our copy within 24 hours. Google may keep one up to 90 days for abuse checks. We keep your report, not your photo."
 
-Tests: `view.test.tsx:103` and `render.test.ts:8` take the new strings (Decision 1); new `it` in `view.test.tsx` that a photo report's footer does not hold "Your photo is deleted within 24 hours"; new `it` in `content.test.tsx` for the FAQ. Prose: `report-page` Edge Cases line "The footer says the photo is deleted within 24 hours…" becomes "The footer says our copy of the crop is deleted within 24 hours and Google may keep one up to 90 days…", keeping the BL-18 worst case. Files: `view.tsx`, `render.ts`, `how-it-works/page.tsx`, `view.test.tsx`, `render.test.ts`, `content.test.tsx`, `openspec/specs/report-page/spec.md`.
+Tests: `view.test.tsx:103` and `render.test.ts:8` take the new strings (Decision 1); `view.test.tsx:172`'s photo-footer marker `/photo/` becomes `/face crop/` (Decision 5); new `it` in `view.test.tsx` that a photo report's footer does not hold "Your photo is deleted within 24 hours"; new `it` in `content.test.tsx` for the FAQ. Prose: `report-page` Edge Cases line "The footer says the photo is deleted within 24 hours…" becomes "The footer says our copy of the crop is deleted within 24 hours and Google may keep one up to 90 days…", keeping the BL-18 worst case. Files: `view.tsx`, `render.ts`, `how-it-works/page.tsx`, `view.test.tsx`, `render.test.ts`, `content.test.tsx`, `openspec/specs/report-page/spec.md`.
 
 "90 days" is the figure `/privacy` and the guide notice already carry; `legal-pages` records it as Vertex's documented maximum for abuse monitoring.
 
@@ -96,6 +96,12 @@ Options: (a) agent edits the canvas in place; (b) Oleg draws.
 - Board HowItWorks (`HowItWorks.dc.html`): FAQ "What happens to my photo?" as in BL-62 above. The board still said "only after you agree" and "We keep your result" (the v54 sync had not landed), and its crop note said "…and you agree"; both now match the live page ("…and you finish the quiz.") — canvas sync only, no code change.
 
 **Approved:** Oleg, 2026-10-14.
+
+### Decision 5 — BL-62 defeats a third existing test
+
+`apps/web/src/lib/report/view.test.tsx:172` ("has no photo line in a quiz-only footer") checks the photo report's footer with `toMatch(/photo/)` as its control; the v55 line says "face crop". Options: (a) change the marker to `/face crop/`; (b) keep "photo" in the copy and redraw board 10.
+Recommendation: (a).
+**Answer:** (a), approved (Oleg, 2026-10-14).
 
 ## Risks / Trade-offs
 
