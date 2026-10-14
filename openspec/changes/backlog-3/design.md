@@ -47,7 +47,7 @@ New test in `apps/web/src/lib/site-content/content.test.tsx` (new `it`, no edit)
 
 ### BL-57 — 3 columns below 375 px
 
-`SwatchGrid` (`apps/web/src/components/ds/swatch.tsx:34-50`) sets `grid-template-columns` inline, and the inline style beats a stylesheet media query (the wide overrides already need `lg:grid-cols-6!`). Keep the inline style, so `ds.test.tsx:68-79` stays green, and mark the grid's asked-for count (e.g. a `data-columns` attribute); `ds.css` adds `@media (max-width: 374.98px) { .sn-swatch-grid[data-columns="4"] { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }`. Every 4-column grid takes it: report and season-page best colors (24 → 8 rows of 3), metals (3 + 1), metals to go easy on (2), landing sample (12 → 4 × 3), GPT-alternative sample (3 + 3 + 2), and `SeasonLink`'s 4 highlights (3 + 1). Tests: a new `ds.test.tsx` case that a 4-column grid carries the marker and `ds.css` has the narrow rule; a new e2e case at 360 × 800 on `/seasons/light-spring` (Watermelon is among its best colors) asserting 3 columns and that every name's text fits its cell (`scrollWidth <= clientWidth`), and at 375 asserting 4 columns. Files: `swatch.tsx`, `ds.css`, `ds.test.tsx` (new `it`s), one e2e spec. The design system's `bundle.css` on the canvas keeps 4 columns: widths below 375 are not drawn.
+`SwatchGrid` (`apps/web/src/components/ds/swatch.tsx:34-50`) sets `grid-template-columns` inline, and the inline style beats a stylesheet media query (the wide overrides already need `lg:grid-cols-6!`). Keep the inline style, so `ds.test.tsx:68-79` stays green, and mark the grid's asked-for count (e.g. a `data-columns` attribute); `ds.css` adds `@media (max-width: 374.98px) { .sn-swatch-grid[data-columns="4"] { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }`. Every 4-column grid takes it: report and season-page best colors (24 → 8 rows of 3), metals (3 + 1), metals to go easy on (2), landing sample (12 → 4 × 3), GPT-alternative sample (3 + 3 + 2), but not `SeasonLink`'s 4-color preview, which keeps 4 columns (Oleg, 2026-10-14; its widest name, Terracotta, fits to ~349 px): `SwatchGrid` gets an opt-out that skips the narrow marker, and `SeasonLink` (`apps/web/src/lib/site-content/season-link.tsx:52-57`) uses it. Tests: a new `ds.test.tsx` case that a 4-column grid carries the marker and `ds.css` has the narrow rule; a new e2e case at 360 × 800 on `/seasons/light-spring` (Watermelon is among its best colors) asserting 3 columns and that every name's text fits its cell (`scrollWidth <= clientWidth`), and at 375 asserting 4 columns. Files: `swatch.tsx`, `ds.css`, `ds.test.tsx` (new `it`s), one e2e spec. The design system's `bundle.css` on the canvas keeps 4 columns: widths below 375 are not drawn.
 
 ## Decisions
 
@@ -86,10 +86,10 @@ Options: (a) agent edits the canvas in place; (b) Oleg draws it.
 Options: (a) 3 columns below 375 px; (b) 3 columns below 360 px; (c) shrink names below the breakpoint; (d) leave as is.
 Trade-off: (a) covers 360 px Android (names ~2 px apart there today); widths below 375 are undrawn on the canvas; cost is uneven last rows (metals 3 + 1). (b) leaves 360 touching. (c) a 12 px Watermelon (~69 px) still overflows a 65 px cell. (d) collisions below ~352 px.
 Recommendation: (a).
-**Answer:** (a), 3 columns below 375 px (Oleg, 2026-10-14).
+**Answer:** (a), 3 columns below 375 px (Oleg, 2026-10-14). Follow-up: the season previews (`SeasonLink`) keep 4 across (Oleg, 2026-10-14).
 
 ## Risks / Trade-offs
 
 - BL-30 removes request bodies from every server error report; debugging a bad analyze request relies on the stack, `withTimeout`'s `extra` and the route's own logs.
-- BL-57's uneven rows below 375 px (metals 3 + 1, `SeasonLink` 3 + 1) are accepted with Decision 5.
+- BL-57's uneven rows below 375 px (metals 3 + 1) are accepted with Decision 5; `SeasonLink` keeps 4 columns.
 - BL-58's `@source not inline` is a Tailwind 4 directive; a Tailwind upgrade that drops it would bring the line back silently, which the new e2e check catches.

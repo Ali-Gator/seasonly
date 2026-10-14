@@ -2,7 +2,7 @@
 
 ### Requirement: A swatch grid shows every color of a list in order
 
-A swatch grid SHALL render one swatch per color, in the order given, as a list that carries the grid's accessible label. It SHALL lay the swatches out in the number of columns asked for, and in 4 columns when none is given. In a window narrower than 375 px, a grid that would lay out in 4 columns SHALL lay out in 3 instead, so a ten-letter name such as "Watermelon" never reaches the next swatch's name.
+A swatch grid SHALL render one swatch per color, in the order given, as a list that carries the grid's accessible label. It SHALL lay the swatches out in the number of columns asked for, and in 4 columns when none is given. In a window narrower than 375 px, a grid that would lay out in 4 columns SHALL lay out in 3 instead, so a ten-letter name such as "Watermelon" never reaches the next swatch's name. A grid MAY be asked to keep its 4 columns on narrow phones; the 4-color season previews on `/seasons` and on a season page's neighbours do, since their names fit.
 
 #### Scenario: A season's palette renders as a grid
 
@@ -23,3 +23,8 @@ A swatch grid SHALL render one swatch per color, in the order given, as a list t
 
 - **WHEN** a 4-column swatch grid is shown in a window 375 px wide
 - **THEN** it lays out in 4 columns
+
+#### Scenario: A season preview on a narrow phone
+
+- **WHEN** `/seasons` is shown in a window 360 px wide
+- **THEN** each season's 4-color preview lays out in 4 columns
