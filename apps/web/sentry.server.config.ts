@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 
 import { baseSentryOptions } from "@/lib/observability/sentry";
+import { serverSentryOptions } from "@/lib/observability/sentry-server";
 
 /**
  * Sends events with plain `fetch`. Under Turbopack production builds the default Node
@@ -25,4 +26,4 @@ function makeFetchTransport(options: Parameters<typeof Sentry.makeNodeTransport>
   });
 }
 
-Sentry.init({ ...baseSentryOptions(), transport: makeFetchTransport });
+Sentry.init({ ...baseSentryOptions(), ...serverSentryOptions(), transport: makeFetchTransport });

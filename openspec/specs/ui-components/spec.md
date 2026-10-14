@@ -139,6 +139,8 @@ Since `t18-design-review` (design system version 30):
 - The step progress's current bar is a gradient that stops at `--sn-steps-fill`, which StepProgress sets inline from `sub`; without one it fills whole.
 - `.sn-btn--lg-swap`, in `globals.css` and not in the bundle, swaps the primary and secondary fills from 1024 px on buttons that are not disabled. It stays out of the design system because a viewport query would also swap the canvas's phone boards.
 
+Since `backlog-3` (BL-57): SwatchGrid keeps its inline column count and marks it as `data-columns`. Below 375 px, a `ds.css` rule with `!important` lays a grid marked `4` out in 3 columns, so "Watermelon" fits its cell. `keepColumns` drops the marker; `SeasonLink`'s 4-color season previews use it and keep 4 columns. The `bundle.css` on the canvas keeps 4, since no board is narrower than 375. From 375 to ~399 px "Watermelon" still runs a few pixels into the gap (BL-61).
+
 ## Edge Cases
 
 - Lowercase hex: shown uppercase; the chip's background uses the hex as given.
@@ -178,7 +180,7 @@ The name SHALL always take the height of two lines and SHALL break only between 
 
 ### Requirement: A swatch grid shows every color of a list in order
 
-A swatch grid SHALL render one swatch per color, in the order given, as a list that carries the grid's accessible label. It SHALL lay the swatches out in the number of columns asked for, and in 4 columns when none is given.
+A swatch grid SHALL render one swatch per color, in the order given, as a list that carries the grid's accessible label. It SHALL lay the swatches out in the number of columns asked for, and in 4 columns when none is given. In a window narrower than 375 px, a grid that would lay out in 4 columns SHALL lay out in 3 instead, so a ten-letter name such as "Watermelon" never reaches the next swatch's name. A grid MAY be asked to keep its 4 columns on narrow phones; the 4-color season previews on `/seasons` and on a season page's neighbours do, since their names fit.
 
 #### Scenario: A season's palette renders as a grid
 
@@ -189,6 +191,21 @@ A swatch grid SHALL render one swatch per color, in the order given, as a list t
 
 - **WHEN** a swatch grid is rendered without a column count
 - **THEN** it lays out in 4 columns
+
+#### Scenario: A 4-column grid on a narrow phone
+
+- **WHEN** a 4-column swatch grid is shown in a window 360 px wide
+- **THEN** it lays out in 3 columns, and no swatch name overlaps the next swatch
+
+#### Scenario: A 4-column grid at 375 px
+
+- **WHEN** a 4-column swatch grid is shown in a window 375 px wide
+- **THEN** it lays out in 4 columns
+
+#### Scenario: A season preview on a narrow phone
+
+- **WHEN** `/seasons` is shown in a window 360 px wide
+- **THEN** each season's 4-color preview lays out in 4 columns
 
 ### Requirement: A button is a link when it navigates and a button when it acts
 

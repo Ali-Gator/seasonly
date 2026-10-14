@@ -105,8 +105,8 @@ export function Guide({ onCamera, onPhoto }: { onCamera: () => void; onPhoto: On
         <Icon name="lock" size={16} className="mt-0.5 flex-none" />
         <span>
           Only a crop of your face is sent, once you finish the quiz. An AI model from Google,
-          through Vercel, reads its colors and doesn&apos;t train on it. We delete it within 24
-          hours.{" "}
+          through Vercel, reads its colors and doesn&apos;t train on it. We delete our copy within
+          24 hours. Google may keep one up to 90 days for abuse checks.{" "}
           <Link href="/privacy" className="text-(--ink) underline">
             Privacy policy
           </Link>

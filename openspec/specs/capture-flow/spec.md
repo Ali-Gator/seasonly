@@ -94,7 +94,7 @@ Under the two actions, the guide SHALL show the upload notice in the canvas's wo
 
 - only a crop of the face is sent, and only once the quiz is finished;
 - an AI model from Google, reached through Vercel, reads its colors and does not train on it;
-- the crop is deleted within 24 hours.
+- Seasonly deletes its copy of the crop within 24 hours, and Google may keep one up to 90 days for abuse checks.
 
 It SHALL link to `/privacy`.
 
@@ -120,7 +120,7 @@ The capture step SHALL show the front camera's live view in the camera frame, wi
 #### Scenario: The guide names who reads the crop
 
 - **WHEN** the photo guide is shown
-- **THEN** below the two actions it says only a face crop is sent, once the quiz is finished. It also says an AI model from Google, through Vercel, reads it and does not train on it, and that the crop is deleted within 24 hours. It links to `/privacy`.
+- **THEN** below the two actions it says only a face crop is sent, once the quiz is finished. It also says an AI model from Google, through Vercel, reads it and does not train on it, that Seasonly deletes its copy within 24 hours, and that Google may keep one up to 90 days for abuse checks. It links to `/privacy`.
 
 #### Scenario: A desktop window
 

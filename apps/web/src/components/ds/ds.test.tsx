@@ -76,6 +76,19 @@ describe("SwatchGrid", () => {
     const out = html(<SwatchGrid colors={best} />);
     expect(out).toContain("grid-template-columns:repeat(4, minmax(0, 1fr))");
   });
+
+  /** {@link openspec/specs/ui-components/spec.md#scenario-a-4-column-grid-on-a-narrow-phone} */
+  it("marks a 4-column grid for the narrow-phone rule", () => {
+    expect(html(<SwatchGrid colors={best} />)).toMatch(/^<ul [^>]*data-columns="4"/);
+    expect(html(<SwatchGrid colors={best} columns={4} />)).toMatch(/^<ul [^>]*data-columns="4"/);
+  });
+
+  /** {@link openspec/specs/ui-components/spec.md#scenario-a-season-preview-on-a-narrow-phone} */
+  it("carries no narrow marker when asked to keep its columns", () => {
+    expect(html(<SwatchGrid colors={best} columns={4} keepColumns />)).not.toContain(
+      "data-columns",
+    );
+  });
 });
 
 describe("Button", () => {
@@ -304,6 +317,11 @@ describe("Stylesheets", () => {
     expect(
       ds().match(/#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/gi) ?? [],
     ).toEqual([]);
+  });
+
+  /** {@link openspec/specs/ui-components/spec.md#scenario-a-4-column-grid-on-a-narrow-phone} */
+  it("lays a 4-column grid out in 3 below 375 px", () => {
+    expect(ds()).toMatch(/374\.98px[^}]*\.sn-swatch-grid\[data-columns="4"\][^}]*repeat\(3,/);
   });
 
   /** {@link openspec/specs/ui-components/spec.md#scenario-a-stylesheet-loads-an-external-resource} */
