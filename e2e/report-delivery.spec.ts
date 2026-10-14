@@ -108,7 +108,10 @@ test("answers a report it cannot read with 500 and the reload page", async ({ pa
   const res = await page.goto("/r/AAAAAAAAAAAAAAAAAAAAAA");
   expect(res?.status()).toBe(500);
   // A dynamic page: no shared cache may keep it.
-  expect(res?.headers()["cache-control"]).toMatch(/private.*no-store|no-store.*private/);
+  // Built server only: Next dev overwrites Cache-Control.
+  if (process.env.CI) {
+    expect(res?.headers()["cache-control"]).toMatch(/private.*no-store|no-store.*private/);
+  }
   await expect(page.getByRole("heading", { name: "We couldn't open your report" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Reload" })).toBeVisible();
 });

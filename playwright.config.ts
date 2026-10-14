@@ -28,6 +28,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: PREBUILT,
   retries: PREBUILT ? 0 : 1,
+  // Locally one `next dev` compiles on demand for every worker.
+  workers: PREBUILT ? undefined : 2,
   reporter: PREBUILT ? [["github"], ["html", { open: "never" }]] : [["list"]],
   use: {
     baseURL: `http://localhost:${PORT}`,
