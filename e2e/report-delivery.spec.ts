@@ -108,7 +108,7 @@ test("answers a report it cannot read with 500 and the reload page", async ({ pa
   const res = await page.goto("/r/AAAAAAAAAAAAAAAAAAAAAA");
   expect(res?.status()).toBe(500);
   // A dynamic page: no shared cache may keep it.
-  // Built server only: Next dev overwrites Cache-Control.
+  // Built server only (`PREBUILT` in playwright.config.ts): Next dev overwrites Cache-Control.
   if (process.env.CI) {
     expect(res?.headers()["cache-control"]).toMatch(/private.*no-store|no-store.*private/);
   }

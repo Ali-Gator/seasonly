@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-65**
+_Next id:_ **BL-66**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -103,6 +103,13 @@ fold items in.
 
 ## Code quality
 
+- **[BL-65] A checked photo's pass shape is still loose one layer up** — `CheckedPhoto` keeps
+  `problem | null`, `traits: Traits | null` and `crop: Blob | null` after `PhotoCheck` became a
+  union, so `flow.tsx` still guards `checked.traits && checked.crop` and the reducer can turn a
+  pass with no photo into a no-face retake. Make `CheckedPhoto` a pass-or-rejection union and drop
+  those guards.
+  _Refs:_ `apps/web/src/lib/capture/photo.ts`, `apps/web/src/app/(flow)/analyze/flow.tsx` · _Status:_ open — `backlog-5` phase review, 2026-10-14
+
 - **[BL-02] A hung crop upload is abandoned, not cancelled** — `upload()` in
   `@supabase/storage-js` 2.117 takes no abort signal, so after the 3 s timeout the request keeps
   running until the function's time limit ends it. It is harmless today because the response is
@@ -137,12 +144,6 @@ update`). PGlite has one connection, so the test only checks that the lock is in
   Unenforced.
   _Refs:_ `apps/web/src/lib/email/store.test.ts`, `openspec/specs/abuse-controls/spec.md` ·
   _Status:_ gated — a local Postgres in tests (the local Supabase stack needs Docker)
-
-must-revalidate`, so a local `pnpm test:e2e`(dev mode) always shows one failure. The built
-  server and CI pass. Skip the header assertion outside the prebuilt mode, or run local E2E
-  against a build.
-  _Refs:_`e2e/report-delivery.spec.ts`, `playwright.config.ts`· _Status:_ open — found in
- `t5-funnel-analytics`, 2026-10-09
 
 - **[BL-23] Two copies of the E2E PostHog recorder** — `e2e/posthog.ts` (the sample report's
   "nothing is sent" check) and `funnel.spec.ts` each route the dead PostHog host and decode its
