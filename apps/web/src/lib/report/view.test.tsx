@@ -100,7 +100,9 @@ describe("ReportView", () => {
 
   /** {@link openspec/specs/report-page/spec.md#requirement-the-footer-says-where-the-report-lives} */
   it("ends with the footer's three lines", () => {
-    expect(text).toContain("Your photo is deleted within 24 hours of your analysis.");
+    expect(text).toContain(
+      "We delete our copy of your face crop within 24 hours of your analysis. Google may keep one up to 90 days for abuse checks.",
+    );
     expect(text).toContain(`This report stays at seasonly.me/r/${ID}.`);
     expect(text).toContain(
       "Seasons describe colors, not people. If a color you love isn't here, wear it away from your face.",
@@ -169,7 +171,16 @@ describe("ReportView", () => {
     const quiz = footer(html({ ...PHOTO, agreement: "quiz-only", textSource: "quiz-only" }));
     expect(quiz).not.toMatch(/photo/i);
     expect(quiz).toContain(`This report stays at seasonly.me/r/${ID}.`);
-    expect(footer(out)).toMatch(/photo/);
+    expect(footer(out)).toMatch(/face crop/);
+  });
+
+  /** {@link openspec/specs/report-page/spec.md#scenario-a-photo-reports-footer} */
+  it("names Google's copy in a photo report's footer", () => {
+    const footer = words(/<footer[\s\S]*?<\/footer>/.exec(out)?.[0] ?? "");
+    expect(footer).toContain(
+      "We delete our copy of your face crop within 24 hours of your analysis. Google may keep one up to 90 days for abuse checks.",
+    );
+    expect(footer).not.toContain("Your photo is deleted within 24 hours");
   });
 
   /** {@link openspec/specs/report-page/spec.md#scenario-a-desktop-window} */

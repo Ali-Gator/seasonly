@@ -21,7 +21,7 @@ const FAQ: [string, ReactNode][] = [
   ],
   [
     "What happens to my photo?",
-    "Only a crop of your face is uploaded, after the photo passes the check and you finish the quiz. It is deleted within 24 hours. We keep your report, not your photo.",
+    "Only a crop of your face is uploaded, after the photo passes the check and you finish the quiz. We delete our copy within 24 hours. Google may keep one up to 90 days for abuse checks. We keep your report, not your photo.",
   ],
   [
     "Can I wear colors that aren't in my palette?",

@@ -72,7 +72,12 @@ export function ReportView({ id, report }: { id: string; report: StoredReport })
           </div>
 
           <footer className="caption flex flex-col gap-(--space-2) border-t border-(--line) pt-(--space-6) text-(--ink-muted) lg:border-t-0 lg:pt-0">
-            {!quizOnly && <p>Your photo is deleted within 24 hours of your analysis.</p>}
+            {!quizOnly && (
+              <p>
+                We delete our copy of your face crop within 24 hours of your analysis. Google may
+                keep one up to 90 days for abuse checks.
+              </p>
+            )}
             <p>This report stays at seasonly.me/r/{id}.</p>
             <p>
               Seasons describe colors, not people. If a color you love isn&apos;t here, wear it away

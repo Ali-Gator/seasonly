@@ -281,6 +281,14 @@ describe("/how-it-works", () => {
     );
     expect(text(out)).not.toMatch(/you agree/i);
   });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-faq-names-googles-copy} */
+  it("names Google's copy in the photo FAQ", () => {
+    expect(text(out)).toContain(
+      "We delete our copy within 24 hours. Google may keep one up to 90 days for abuse checks.",
+    );
+    expect(text(out)).not.toContain("It is deleted within 24 hours");
+  });
 });
 
 describe("/sample-report", () => {

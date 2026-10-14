@@ -73,7 +73,7 @@ export default function ReportPage(props: {
 ## Edge Cases
 
 - Any failure to load the face, a 404 or a 500, shows the same line, which does not claim a deletion.
-- The footer says the photo is deleted within 24 hours. The daily retention job (`data-retention`) deletes it, up to about 49 h in the worst case (backlog).
+- The footer says our copy of the crop is deleted within 24 hours and Google may keep one up to 90 days for abuse checks. The daily retention job (`data-retention`) deletes it, up to about 49 h in the worst case (backlog).
 - In CI there is no database, so a well-formed id answers 500 (the E2E asserts this) and only a malformed id reaches the 404.
 
 ## Requirements
