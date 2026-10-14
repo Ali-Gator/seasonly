@@ -118,4 +118,11 @@ test.describe("design tokens", () => {
       await expect(page.locator("h1")).toHaveCSS("font-family", /Bodoni Moda/);
     });
   }
+
+  /** {@link openspec/specs/design-tokens/spec.md#scenario-a-kicker-on-a-page} */
+  test("a kicker draws no line above its text", async ({ page }) => {
+    await page.goto("/");
+    const kicker = page.locator(".overline", { hasText: "Seasonal color analysis" });
+    await expect(kicker).toHaveCSS("text-decoration-line", "none");
+  });
 });

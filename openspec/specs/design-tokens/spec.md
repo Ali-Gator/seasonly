@@ -17,7 +17,7 @@ Gives the web app the Seasonly design system's tokens and type styles as CSS var
 
 ## Behavior
 
-Artboard markup ports without renaming: `style="gap: var(--space-4)"` and `class="h1"` work as they do on the canvas. Updating the design system means replacing `tokens.json`; the unit test then lists every variable and type class to change. The type classes and the few ported component classes (`.sn-screen`, `.sn-btn`, `.sn-wordmark`, `.sn-navlink`) sit in `@layer components`, so Tailwind utilities still override them. Tailwind stays for layout; the tokens have no `@theme` mapping until a page needs one as a utility.
+Artboard markup ports without renaming: `style="gap: var(--space-4)"` and `class="h1"` work as they do on the canvas. Updating the design system means replacing `tokens.json`; the unit test then lists every variable and type class to change. The type classes and the few ported component classes (`.sn-screen`, `.sn-btn`, `.sn-wordmark`, `.sn-navlink`) sit in `@layer components`, so Tailwind utilities still override them. Tailwind's `overline` utility is not generated (`@source not inline("overline")`), so it cannot draw a line on the kicker class. Tailwind stays for layout; the tokens have no `@theme` mapping until a page needs one as a utility.
 
 ## Edge Cases
 
