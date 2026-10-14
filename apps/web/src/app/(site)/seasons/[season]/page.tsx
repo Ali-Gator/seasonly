@@ -117,16 +117,19 @@ export default async function Season({ params }: Props) {
           >
             <ul className="grid grid-cols-3 gap-(--space-3)">
               {famous.map((f) => (
-                <li key={f.name} className="flex flex-col gap-(--space-1)">
-                  <div className="sn-slot aspect-3/4">
-                    {/* eslint-disable-next-line @next/next/no-img-element -- static, pre-sized WebP */}
-                    <img src={f.image} alt={f.alt} loading="lazy" />
-                  </div>
-                  <span className="label">{f.name}</span>
-                  <span className="caption text-(--ink-muted)">
-                    Photo: <a href={f.credit.commonsUrl}>{f.credit.author}</a>,{" "}
-                    <a href={f.credit.licenseUrl}>{f.credit.license}</a>, cropped
-                  </span>
+                <li key={f.name}>
+                  {/* The caption names the photo, so its alt is empty: a screen reader reads the name once. */}
+                  <figure className="m-0 flex flex-col gap-(--space-1)">
+                    <div className="sn-slot aspect-3/4">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- static, pre-sized WebP */}
+                      <img src={f.image} alt="" loading="lazy" />
+                    </div>
+                    <figcaption className="label">{f.name}</figcaption>
+                    <span className="caption text-(--ink-muted)">
+                      Photo: <a href={f.credit.commonsUrl}>{f.credit.author}</a>,{" "}
+                      <a href={f.credit.licenseUrl}>{f.credit.license}</a>, cropped
+                    </span>
+                  </figure>
                 </li>
               ))}
             </ul>

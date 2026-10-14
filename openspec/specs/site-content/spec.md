@@ -17,7 +17,7 @@ Fixes what each core public page of seasonly.me shows and where its words, color
 
 `apps/web/src/lib/site-content/` holds the site's own content:
 
-- `seasons.ts`: `SEASON_CONTENT: Record<SeasonSlug, SeasonContent>`, with `about` (paragraphs), three `neighbours` (`{ slug, why }`) and three `famous` (`{ name, image, alt, credit: { author, license, licenseUrl, commonsUrl }, source: { title, url } }`); `famousIntro(plural)` and `FAMOUS_NOTE`.
+- `seasons.ts`: `SEASON_CONTENT: Record<SeasonSlug, SeasonContent>`, with `about` (paragraphs), three `neighbours` (`{ slug, why }`) and three `famous` (`{ name, image, credit: { author, license, licenseUrl, commonsUrl }, source: { title, url } }`); `famousIntro(plural)` and `FAMOUS_NOTE`.
 - `images.ts`: `TIP_PHOTOS` (light, makeup and filter, each a good and a bad `{ src, alt }`), `SAMPLE_FACE` and `QUIZ_PHOTOS` (quiz).
 - `sample.ts`: `softAutumnColors(names)`, the sample palettes picked by name from `PALETTES["soft-autumn"]`.
 - `season-link.tsx`: `SeasonLink({ slug, line?, wide?, compact? })`, a season's name as an `h3` holding its link, an optional line and its first highlight colors (four, or six from 1024 px with `wide`). `compact`, the landing's, shows the four as a chip-only `SwatchStrip` whose names are visually hidden.
