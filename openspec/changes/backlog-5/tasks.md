@@ -16,7 +16,7 @@
 
 ## 3. Verify, delete, review, archive, ship
 
-- [ ] 3.1 `pnpm fix`, `pnpm test` (local, dev mode: expect E2E green on a Mac; apply the BL-59 fallback if not)
-- [ ] 3.2 delete shipped bullets BL-16, BL-60, BL-12, BL-31, BL-59, BL-22, BL-47, BL-21 from `docs/backlog.md`
+- [x] 3.1 `pnpm fix`, `pnpm test` (local, dev mode: expect E2E green on a Mac; apply the BL-59 fallback if not)
+- [x] 3.2 delete shipped bullets BL-16, BL-60, BL-12, BL-31, BL-59, BL-22, BL-47, BL-21 from `docs/backlog.md`
 - [ ] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
 - [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge
