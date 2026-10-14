@@ -2,7 +2,7 @@
  * Records what PostHog receives in an E2E run. The E2E server's PostHog host is the dead
  * 127.0.0.1:9 (playwright.config.ts); routing it answers every request empty and keeps each event.
  * A spec that uses it calls `posingAsAPhone` first: posthog-js drops every event from a likely
- * bot. funnel.spec.ts keeps its own copy (BL-23).
+ * bot.
  */
 import zlib from "node:zlib";
 
@@ -27,6 +27,7 @@ export function posingAsAPhone() {
 export interface Captured {
   event: string;
   properties: Record<string, unknown>;
+  timestamp?: string;
 }
 
 /** A body as posthog-js sends it: gzip (by its magic bytes), base64 form data or plain JSON. */
@@ -42,24 +43,35 @@ function decode(req: Request): string {
   return text;
 }
 
-/** Routes the PostHog host and returns the events it receives, as they arrive. */
-export async function recordPostHog(page: Page): Promise<Captured[]> {
+/**
+ * Routes the PostHog host: every request answered empty. Returns, as they arrive, its events, every
+ * body (a POST as its URL and decoded text, any other request as its URL) and every body it could
+ * not decode.
+ */
+export async function recordPostHog(page: Page) {
   const events: Captured[] = [];
+  const bodies: string[] = [];
+  const errors: string[] = [];
   await page.route(`${POSTHOG}/**`, (route) => {
     const req = route.request();
     if (req.method() === "POST") {
-      const text = decode(req);
-      const parsed = text ? (JSON.parse(text) as unknown) : null;
-      const list = Array.isArray(parsed)
-        ? parsed
-        : ((parsed as { batch?: unknown[] } | null)?.batch ?? [parsed]);
-      for (const e of list)
-        if (e && typeof e === "object" && "event" in e) events.push(e as Captured);
-    }
+      try {
+        const text = decode(req);
+        bodies.push(`${req.url()} ${text}`);
+        const parsed = text ? (JSON.parse(text) as unknown) : null;
+        const list = Array.isArray(parsed)
+          ? parsed
+          : ((parsed as { batch?: unknown[] } | null)?.batch ?? [parsed]);
+        for (const e of list)
+          if (e && typeof e === "object" && "event" in e) events.push(e as Captured);
+      } catch (error) {
+        errors.push(`${req.url()} ${req.headers()["content-type"]}: ${String(error)}`);
+      }
+    } else bodies.push(req.url());
     return route.fulfill({
       json: {},
       headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "*" },
     });
   });
-  return events;
+  return { events, bodies, errors };
 }
