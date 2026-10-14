@@ -19,6 +19,6 @@
 ## 3. Verify, delete, review, archive, ship
 
 - [ ] 3.1 `pnpm fix`, `pnpm test` (and `pnpm test:eval`)
-- [ ] 3.2 delete shipped bullets BL-35, BL-65, BL-42, BL-63, BL-23 from `docs/backlog.md`
+- [x] 3.2 delete shipped bullets BL-35, BL-65, BL-42, BL-63, BL-23 from `docs/backlog.md`
 - [ ] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
 - [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge; PR notes that Oleg updates case 5 in the Claude directory portal if the listing was already submitted
