@@ -62,13 +62,9 @@ export type Question = (typeof QUESTIONS)[number];
 export type FlowEvent =
   | { type: "open-camera" }
   | { type: "checking"; id: number }
-  | {
-      type: "checked";
-      id: number;
-      problem: RetakeReason | null;
-      photo: PassedPhoto | null;
-      previewUrl: string | null;
-    }
+  | ({ type: "checked"; id: number; previewUrl: string | null } & (
+      { problem: null; photo: PassedPhoto } | { problem: RetakeReason; photo: null }
+    ))
   | { type: "retake" }
   | { type: "quiz-only" }
   | { type: "answer"; question: Question; value: string }
@@ -122,13 +118,13 @@ export function reduce(s: FlowState, e: FlowEvent): FlowState {
       return step.name === "checking" ? s : push(s, { name: "checking", id: e.id });
     case "checked": {
       if (step.name !== "checking" || step.id !== e.id) return s;
-      if (e.problem || !e.photo) {
+      if (e.problem) {
         const failures = s.failures + 1;
         return replace(
           { ...s, failures, photo: null },
           {
             name: "retake",
-            problem: e.problem ?? "no-face",
+            problem: e.problem,
             offerQuizOnly: failures >= 2,
             previewUrl: e.previewUrl,
           },
