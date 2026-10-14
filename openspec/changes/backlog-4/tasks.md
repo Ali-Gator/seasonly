@@ -19,11 +19,11 @@
 - [x] 2.8 BL-37 — `apps/web/src/app/(site)/terms/page.tsx`: the "Law and contact" `section` renders `id="contact"`; "Last updated" unchanged. `docs/chat-plugin-listing.md:63` Support → `https://seasonly.me/terms#contact` (drop the BL-37 note), `docs/chat-plugin-openai/plugin.json:21` `supportURL` → the same. Until 2.7 passes.
 - [x] 2.9 BL-56 — new failing e2e case in `e2e/funnel.spec.ts`: the analyze route answers 403 → exactly one `analysis_failed` with `{ quiz_only: false, blocked: true }` ({@link openspec/specs/analytics/spec.md#scenario-a-refused-browser}); a second new case, 500 → `blocked: false` ({@link openspec/specs/analytics/spec.md#scenario-a-server-error-is-not-a-refusal}). `answerAnalyze` (`:102`) gains a `403` branch; no existing assertion changes. Verify they fail.
 - [x] 2.10 BL-56 — `apps/web/src/app/(flow)/analyze/flow.tsx:181` sends `{ quiz_only: !request.photo, blocked }`. Hand-edit `openspec/specs/analytics/spec.md` Public Interface row for `analysis_failed` and `openspec/specs/season-reveal/spec.md` Behavior's BL-56 note. Until 2.9 passes.
-- [ ] 2.11 Browser check (built-in browser, dev server): a real local photo report at 1280 px — "Share my season" sits right under the agreement note and above the top of "Colors to avoid"; its footer and the how-it-works FAQ show the v55 lines; a season page's famous block looks as before; `/terms#contact` scrolls to "Law and contact". Screenshots in the PR.
+- [x] 2.11 Browser check (built-in browser, dev server): a real local photo report at 1280 px — "Share my season" sits right under the agreement note and above the top of "Colors to avoid"; its footer and the how-it-works FAQ show the v55 lines; a season page's famous block looks as before; `/terms#contact` scrolls to "Law and contact". Screenshots in the PR.
 
 ## 3. Verify, delete, review, archive, ship
 
-- [ ] 3.1 `pnpm fix`, `pnpm test`
-- [ ] 3.2 delete shipped bullets BL-62, BL-55, BL-24, BL-37, BL-56 from `docs/backlog.md`
+- [x] 3.1 `pnpm fix`, `pnpm test`
+- [x] 3.2 delete shipped bullets BL-62, BL-55, BL-24, BL-37, BL-56 from `docs/backlog.md`
 - [ ] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
 - [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge. PR body: Oleg's follow-up — once both directory reviews close, set each portal's support URL to `https://seasonly.me/terms#contact` (re-upload the ChatGPT ZIP).
