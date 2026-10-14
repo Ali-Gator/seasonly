@@ -199,6 +199,26 @@ describe("retakes", () => {
   });
 });
 
+describe("the crop's outline", () => {
+  const mask = new Blob([new Uint8Array([0x89, 0x50, 0x4e, 0x47])], { type: "image/png" });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-the-quiz-is-finished-with-an-outline} */
+  it("sends the outline as mask.png after the crop", () => {
+    const form = toFormData({ answers: {}, photo: { ...PASS, mask } });
+    expect([...form.keys()]).toEqual(["answers", "traits", "crop", "mask"]);
+    const sent = form.get("mask");
+    expect(sent).toBeInstanceOf(Blob);
+    expect((sent as File).name).toBe("mask.png");
+    expect((sent as Blob).type).toBe("image/png");
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-no-person-segmenter} */
+  it("sends no mask part for a photo without an outline", () => {
+    const form = toFormData({ answers: {}, photo: { ...PASS, mask: null } });
+    expect([...form.keys()]).toEqual(["answers", "traits", "crop"]);
+  });
+});
+
 describe("quiz", () => {
   /** {@link openspec/specs/quiz/spec.md#scenario-a-fresh-question} */
   it("selects nothing on a fresh question and blocks Next until an answer", () => {

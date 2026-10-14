@@ -78,17 +78,6 @@ fold items in.
 
 ## Privacy
 
-- **[BL-53] The draping preview shows the photo's own background** — the stored face crop keeps
-  the wall or window behind the face, which shows at the oval's edges on both colors. Remove the
-  background from the crop (the hair segmenter the photo check loads can make the mask), so only
-  the face sits on the color. It changes what is uploaded and stored, so a privacy review comes
-  first.
-  _Refs:_ `apps/web/src/lib/capture/photo.ts` (`cropBox`), `openspec/specs/draping-preview/spec.md`,
-  `t18-design-review` design.md (Non-Goals) · _Status:_ gated — its own change: a privacy sign-off,
-  a mask source (the hair segmenter is hair-vs-rest and cannot separate face from wall; the multiclass
-  selfie segmenter or the face-oval contour can), an alpha crop format (the crop path is JPEG-only),
-  canvas boards 10/18 redrawn, and an approved paid `eval:vision` run (backlog-5 triage, 2026-10-14)
-
 - **[BL-18] A crop can stay about 49 h while the pages say 24 h** — the retention job runs once a
   day (Vercel Hobby) with a 24 h cutoff, so a crop stored just after a run lasts until the run
   after next. Move to an hourly scheduler (Vercel Pro, or `pg_cron` + `pg_net` calling the same

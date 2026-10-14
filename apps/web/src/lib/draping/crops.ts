@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 
 /**
  * Face crops in the private Storage bucket `crops`, one `<report id>.jpg` per photo report, for
- * the draping preview.
+ * the draping preview, and beside it `<report id>.mask.png`, its outline, when the phone made one.
  *
  * @see openspec/specs/draping-preview/spec.md
  */
@@ -17,7 +17,12 @@ export type CropDownload = (path: string) => PromiseLike<{ data: Blob | null; er
 const BUCKET = "crops";
 
 const supabaseUpload: CropUpload = (path, bytes) =>
-  supabase().storage.from(BUCKET).upload(path, bytes, { contentType: "image/jpeg", upsert: false });
+  supabase()
+    .storage.from(BUCKET)
+    .upload(path, bytes, {
+      contentType: path.endsWith(".png") ? "image/png" : "image/jpeg",
+      upsert: false,
+    });
 const supabaseDownload: CropDownload = (path) => supabase().storage.from(BUCKET).download(path);
 
 /**
@@ -27,13 +32,25 @@ const supabaseDownload: CropDownload = (path) => supabase().storage.from(BUCKET)
  *
  * {@link openspec/specs/draping-preview/spec.md#requirement-a-failed-crop-upload-changes-nothing-the-person-sees}
  */
-export async function storeCrop(
-  id: string,
+export const storeCrop = (id: string, bytes: Uint8Array, options?: { upload?: CropUpload }) =>
+  store(`${id}.jpg`, "crop upload failed", bytes, options);
+
+/**
+ * Stores a crop's outline as `<id>.mask.png`, exactly as `storeCrop` stores the crop.
+ *
+ * {@link openspec/specs/draping-preview/spec.md#requirement-a-photo-results-outline-is-stored-next-to-its-crop}
+ */
+export const storeMask = (id: string, bytes: Uint8Array, options?: { upload?: CropUpload }) =>
+  store(`${id}.mask.png`, "outline upload failed", bytes, options);
+
+async function store(
+  path: string,
+  message: string,
   bytes: Uint8Array,
   { upload = supabaseUpload }: { upload?: CropUpload } = {},
 ): Promise<void> {
-  await withTimeout("crop upload failed", async () => {
-    const { error } = await upload(`${id}.jpg`, bytes);
+  await withTimeout(message, async () => {
+    const { error } = await upload(path, bytes);
     if (error) throw error;
   });
 }
@@ -46,16 +63,27 @@ export async function storeCrop(
  *
  * {@link openspec/specs/draping-preview/spec.md#requirement-the-face-route-serves-a-stored-crop-and-nothing-else}
  */
-export async function readCrop(
-  id: string,
+export const readCrop = (id: string, options?: { download?: CropDownload }) =>
+  read(`${id}.jpg`, options);
+
+/**
+ * A stored outline's bytes, or null when there is none, exactly as `readCrop` reads a crop.
+ *
+ * {@link openspec/specs/draping-preview/spec.md#requirement-the-outline-route-serves-a-stored-outline-and-nothing-else}
+ */
+export const readMask = (id: string, options?: { download?: CropDownload }) =>
+  read(`${id}.mask.png`, options);
+
+async function read(
+  path: string,
   { download = supabaseDownload }: { download?: CropDownload } = {},
 ): Promise<Uint8Array<ArrayBuffer> | null> {
-  const { data, error } = await download(`${id}.jpg`);
+  const { data, error } = await download(path);
   const notFound =
     error instanceof StorageApiError &&
     (error.status === 404 || error.statusCode === "404") &&
     !/bucket/i.test(error.message);
   if (notFound) return null;
-  if (error || !data) throw error ?? new Error("crop download gave no data");
+  if (error || !data) throw error ?? new Error(`${path} download gave no data`);
   return new Uint8Array(await data.arrayBuffer());
 }

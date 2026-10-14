@@ -12,7 +12,7 @@ import * as Sentry from "@sentry/nextjs";
 import { StorageApiError } from "@supabase/supabase-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { type CropUpload, readCrop, REPORT_ID, storeCrop } from "./crops";
+import { type CropUpload, readCrop, readMask, REPORT_ID, storeCrop, storeMask } from "./crops";
 
 vi.mock("@sentry/nextjs", () => ({
   captureException: vi.fn(),
@@ -141,6 +141,95 @@ describe("crops bucket", () => {
       },
     ]);
     expect(sql).not.toMatch(/create\s+policy/i);
+    await db.close();
+  });
+});
+
+describe("storeMask", () => {
+  const PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1]);
+
+  /** {@link openspec/specs/draping-preview/spec.md#scenario-a-photo-result-with-an-outline} */
+  it("uploads <id>.mask.png with exactly the outline's bytes", async () => {
+    const upload = vi.fn<CropUpload>(async () => ({ error: null }));
+    await storeMask(ID, PNG, { upload });
+    expect(upload).toHaveBeenCalledWith(`${ID}.mask.png`, PNG);
+    expect(Sentry.captureException).not.toHaveBeenCalled();
+  });
+
+  /** {@link openspec/specs/draping-preview/spec.md#scenario-the-outline-upload-fails} */
+  it("reports a failed or hung upload to Sentry after at most 3 s, and does not throw", async () => {
+    await expect(
+      storeMask(ID, PNG, { upload: () => Promise.reject(new Error("down")) }),
+    ).resolves.toBeUndefined();
+    vi.useFakeTimers();
+    let settled = false;
+    const pending = storeMask(ID, PNG, { upload: () => new Promise(() => {}) }).then(() => {
+      settled = true;
+    });
+    await vi.advanceTimersByTimeAsync(2999);
+    expect(settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    await pending;
+    expect(Sentry.captureException).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("readMask", () => {
+  const PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1]);
+
+  /** {@link openspec/specs/draping-preview/spec.md#scenario-a-stored-outline} */
+  it("gives the stored outline's bytes", async () => {
+    const download = vi.fn(async () => ({ data: new Blob([PNG]), error: null }));
+    expect(await readMask(ID, { download })).toEqual(PNG);
+    expect(download).toHaveBeenCalledWith(`${ID}.mask.png`);
+  });
+
+  /** {@link openspec/specs/draping-preview/spec.md#scenario-no-outline} */
+  it("gives null when the store says not found, and throws any other error", async () => {
+    const missing = new StorageApiError("Object not found", 400, "404");
+    expect(
+      await readMask(ID, { download: async () => ({ data: null, error: missing }) }),
+    ).toBeNull();
+    const down = new StorageApiError("Internal", 500, "500");
+    await expect(
+      readMask(ID, { download: async () => ({ data: null, error: down }) }),
+    ).rejects.toBe(down);
+  });
+});
+
+describe("crops bucket after every migration", () => {
+  const MIGRATIONS = path.resolve(import.meta.dirname, "../../../../../supabase/migrations");
+
+  /** {@link openspec/specs/draping-preview/spec.md#scenario-the-buckets-settings} */
+  it("is private, JPEG and PNG only, at most 512 KB, with no storage policy", async () => {
+    const files = fs
+      .readdirSync(MIGRATIONS)
+      .filter((f) => /_crops_bucket\w*\.sql$/.test(f))
+      .sort();
+    expect(files.length).toBeGreaterThan(1);
+    const db = new PGlite();
+    await db.exec(`
+      create schema storage;
+      create table storage.buckets (
+        id text primary key, name text not null, public boolean default false,
+        file_size_limit bigint, allowed_mime_types text[]
+      );
+    `);
+    for (const file of files) {
+      const sql = fs.readFileSync(path.join(MIGRATIONS, file), "utf8");
+      expect(sql, file).not.toMatch(/create\s+policy/i);
+      await db.exec(sql);
+    }
+    const { rows } = await db.query("select * from storage.buckets");
+    expect(rows).toEqual([
+      {
+        id: "crops",
+        name: "crops",
+        public: false,
+        file_size_limit: 524288,
+        allowed_mime_types: ["image/jpeg", "image/png"],
+      },
+    ]);
     await db.close();
   });
 });

@@ -16,11 +16,14 @@ export function DrapingView({
   best,
   worst,
   deleted,
+  maskSrc,
 }: {
   id: string;
   best: Swatch;
   worst: Swatch;
   deleted: boolean;
+  /** The face's outline, once it has loaded. */
+  maskSrc?: string;
 }) {
   return (
     <>
@@ -32,6 +35,7 @@ export function DrapingView({
           worst={worst}
           faceSrc={`/api/face/${id}`}
           faceAlt="Your face"
+          faceMaskSrc={maskSrc}
           className="lg:max-w-[560px]"
         />
       )}
@@ -44,9 +48,36 @@ export function DrapingView({
   );
 }
 
+/**
+ * The draping preview, its face cut out once the outline has loaded. The outline is fetched once
+ * and passed as an object URL: the route is `no-store`, so a CSS mask on the route would fetch it
+ * again, and a mask that fails to load hides the face. Until it loads or fails, the face images
+ * are hidden, not removed, so the photo's background never flashes and their errors still count.
+ *
+ * {@link openspec/specs/report-page/spec.md#requirement-the-draping-preview-cuts-the-stored-face-out-of-its-background}
+ */
 export function ReportDraping(props: { id: string; best: Swatch; worst: Swatch }) {
   const [deleted, setDeleted] = useState(false);
+  /** `undefined` while pending, `null` once it failed: the face then shows as it is. */
+  const [maskSrc, setMaskSrc] = useState<string | null>();
   const wrapper = useRef<HTMLDivElement>(null);
+  const { id } = props;
+  useEffect(() => {
+    let url: string | undefined;
+    let live = true;
+    fetch(`/api/face/${id}/mask`)
+      .then((r) => (r.ok ? r.blob() : null))
+      .catch(() => null)
+      .then((blob) => {
+        if (!live) return;
+        url = blob ? URL.createObjectURL(blob) : undefined;
+        setMaskSrc(url ?? null);
+      });
+    return () => {
+      live = false;
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, [id]);
   useEffect(() => {
     // Read from the DOM: an image can fail before hydration, when a React onError would miss it.
     const images = [...(wrapper.current?.querySelectorAll("img") ?? [])];
@@ -58,8 +89,11 @@ export function ReportDraping(props: { id: string; best: Swatch; worst: Swatch }
     return () => images.forEach((img) => img.removeEventListener("error", fail));
   }, []);
   return (
-    <div ref={wrapper} className="contents">
-      <DrapingView {...props} deleted={deleted} />
+    <div
+      ref={wrapper}
+      className={maskSrc === undefined ? "contents [&_img]:invisible" : "contents"}
+    >
+      <DrapingView {...props} deleted={deleted} maskSrc={maskSrc ?? undefined} />
     </div>
   );
 }

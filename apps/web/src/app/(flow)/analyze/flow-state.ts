@@ -31,6 +31,8 @@ export interface PassedPhoto {
   traits: Traits;
   crop: Blob;
   cropUrl: string;
+  /** The crop's outline, when the person segmenter made one. */
+  mask?: Blob | null;
 }
 
 export interface AnalysisRequest {
@@ -193,8 +195,8 @@ export function stepProgress(step: Step): number | null {
 }
 
 /**
- * The analyze route's multipart body: the answers always, and the traits with the crop only
- * when there is a photo.
+ * The analyze route's multipart body: the answers always, the traits with the crop only when
+ * there is a photo, and the crop's outline only when the photo has one.
  *
  * {@link openspec/specs/capture-flow/spec.md#requirement-only-a-face-crop-is-uploaded}
  */
@@ -204,6 +206,7 @@ export function toFormData({ answers, photo }: AnalysisRequest): FormData {
   if (photo) {
     form.set("traits", JSON.stringify(photo.traits));
     form.set("crop", photo.crop, "crop.jpg");
+    if (photo.mask) form.set("mask", photo.mask, "mask.png");
   }
   return form;
 }
