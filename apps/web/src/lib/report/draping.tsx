@@ -51,8 +51,9 @@ export function DrapingView({
 /**
  * The draping preview, its face cut out once the outline has loaded. The outline is fetched once
  * and passed as an object URL: the route is `no-store`, so a CSS mask on the route would fetch it
- * again, and a mask that fails to load hides the face. Until it loads or fails, the face images
- * are hidden, not removed, so the photo's background never flashes and their errors still count.
+ * again, and a mask that fails to load hides the face. Until it loads or fails, at most 4 s, the
+ * face images are hidden, not removed (`sn-face-pending` in globals.css, which also shows them
+ * after 4 s without a script), so the background never flashes and their errors still count.
  *
  * {@link openspec/specs/report-page/spec.md#requirement-the-draping-preview-cuts-the-stored-face-out-of-its-background}
  */
@@ -65,8 +66,15 @@ export function ReportDraping(props: { id: string; best: Swatch; worst: Swatch }
   useEffect(() => {
     let url: string | undefined;
     let live = true;
-    fetch(`/api/face/${id}/mask`)
+    // The same 4 s as the CSS reveal: a hung outline never keeps the face hidden.
+    fetch(`/api/face/${id}/mask`, { signal: AbortSignal.timeout(4000) })
       .then((r) => (r.ok ? r.blob() : null))
+      // Decoded first: CSS treats a mask it cannot decode as transparent, hiding the face.
+      .then(async (blob) => {
+        if (!blob) return null;
+        (await createImageBitmap(blob)).close();
+        return blob;
+      })
       .catch(() => null)
       .then((blob) => {
         if (!live) return;
@@ -89,10 +97,7 @@ export function ReportDraping(props: { id: string; best: Swatch; worst: Swatch }
     return () => images.forEach((img) => img.removeEventListener("error", fail));
   }, []);
   return (
-    <div
-      ref={wrapper}
-      className={maskSrc === undefined ? "contents [&_img]:invisible" : "contents"}
-    >
+    <div ref={wrapper} className={maskSrc === undefined ? "contents sn-face-pending" : "contents"}>
       <DrapingView {...props} deleted={deleted} maskSrc={maskSrc ?? undefined} />
     </div>
   );

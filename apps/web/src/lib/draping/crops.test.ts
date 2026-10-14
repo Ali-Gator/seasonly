@@ -12,7 +12,15 @@ import * as Sentry from "@sentry/nextjs";
 import { StorageApiError } from "@supabase/supabase-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { type CropUpload, readCrop, readMask, REPORT_ID, storeCrop, storeMask } from "./crops";
+import {
+  contentType,
+  type CropUpload,
+  readCrop,
+  readMask,
+  REPORT_ID,
+  storeCrop,
+  storeMask,
+} from "./crops";
 
 vi.mock("@sentry/nextjs", () => ({
   captureException: vi.fn(),
@@ -171,6 +179,14 @@ describe("storeMask", () => {
     await vi.advanceTimersByTimeAsync(1);
     await pending;
     expect(Sentry.captureException).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("contentType", () => {
+  /** {@link openspec/specs/draping-preview/spec.md#scenario-a-photo-result-with-an-outline} */
+  it("stores an outline as a PNG and a crop as a JPEG", () => {
+    expect(contentType(`${ID}.mask.png`)).toBe("image/png");
+    expect(contentType(`${ID}.jpg`)).toBe("image/jpeg");
   });
 });
 

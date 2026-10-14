@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-66**
+_Next id:_ **BL-67**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -78,6 +78,12 @@ fold items in.
 
 ## Privacy
 
+- **[BL-66] Outline misses on the phone go uncounted** — `outline()` in `photo.ts` returns null
+  silently on a slow or failed person segmenter, a size mismatch or a face it missed, so nobody
+  learns how often reports show an uncut face. Send the reason with `photo_checked` (or to Sentry)
+  and tune the 3 s wait from it.
+  _Refs:_ `apps/web/src/lib/capture/photo.ts`, t19-draping-cutout phase review · _Status:_ deferred —
+  until reports with an uncut face are seen after launch
 - **[BL-18] A crop can stay about 49 h while the pages say 24 h** — the retention job runs once a
   day (Vercel Hobby) with a 24 h cutoff, so a crop stored just after a run lasts until the run
   after next. Move to an hourly scheduler (Vercel Pro, or `pg_cron` + `pg_net` calling the same

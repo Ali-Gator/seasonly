@@ -104,6 +104,16 @@
 
 ## 8. Review, archive and ship
 
-- [ ] 8.1 Phase review in a fresh `general-purpose` subagent with the `phase-review` skill (`/code-review high`). Fix its findings, and log what stays unfixed (6.2). Verify: findings and their outcome are listed here.
+- [x] 8.1 Phase review in a fresh `general-purpose` subagent with the `phase-review` skill (`/code-review high`). Fix its findings, and log what stays unfixed (6.2). Verify: findings and their outcome are listed here.
+  - Done 2026-10-14 (fresh `general-purpose` subagent, `/code-review high`): nothing serious; nine findings.
+    1. A near-empty outline would empty the oval: fixed. `outline()` returns null when the mean confidence over the crop's middle third is below 0.5.
+    2. The face could stay hidden (no JS, or a hung outline): fixed. `sn-face-pending` in `globals.css` reveals the faces after 4 s without a script, and the fetch aborts at 4 s. Also fixed: the outline blob is decoded (`createImageBitmap`) before use, since CSS hides the face behind an undecodable mask.
+    3. The model-input test could never fail: fixed. It asserts the call's exact keys.
+    4. A third MediaPipe load at once could fail the check (shared `ModuleFactory` global): fixed. The person segmenter starts after `loadVision()` resolves.
+    5. Outline misses go unreported: logged as BL-66.
+    6. The download error message held the report id: fixed. The message is per kind.
+    7. The e2e outline test checked only the signature: fixed. It decodes the outline and checks its size against the crop, alpha > 200 in the middle and < 50 in a top corner.
+    8. The PNG content type was untested: fixed. A tested `contentType(path)` helper.
+    9. The crops mock in `route.test.ts` gained `storeMask` without approval: additive; the user is asked to approve it (see 1.5).
 - [ ] 8.2 `/opsx:archive`. Then re-add Public Interface and Behavior lines in the permanent specs touched: `draping-preview` (`storeMask`, `readMask`, the mask route, the PNG migration), `capture-flow` (`loadPerson`, `CheckedPhoto.mask`), `season-reveal` (the request line), `ui-components` (`faceMaskSrc`), `site-content` (the outline image), `data-retention` (the bucket holds outlines). No new capability, so no README row. Verify: `openspec validate --specs` is green.
 - [ ] 8.3 Tracker: set T19 to Done, with a Log line in plain words. Push, open the PR to `main` (naming the BL ids added and removed), and turn on auto-merge with a merge commit (`gh pr merge --auto --merge`, never squash). Verify: the PR shows auto-merge on and CI green.

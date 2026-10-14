@@ -16,13 +16,13 @@ export type CropDownload = (path: string) => PromiseLike<{ data: Blob | null; er
 
 const BUCKET = "crops";
 
+/** The stored file's type, from its name: an outline is a PNG, a crop a JPEG. */
+export const contentType = (path: string) => (path.endsWith(".png") ? "image/png" : "image/jpeg");
+
 const supabaseUpload: CropUpload = (path, bytes) =>
   supabase()
     .storage.from(BUCKET)
-    .upload(path, bytes, {
-      contentType: path.endsWith(".png") ? "image/png" : "image/jpeg",
-      upsert: false,
-    });
+    .upload(path, bytes, { contentType: contentType(path), upsert: false });
 const supabaseDownload: CropDownload = (path) => supabase().storage.from(BUCKET).download(path);
 
 /**
@@ -64,7 +64,7 @@ async function store(
  * {@link openspec/specs/draping-preview/spec.md#requirement-the-face-route-serves-a-stored-crop-and-nothing-else}
  */
 export const readCrop = (id: string, options?: { download?: CropDownload }) =>
-  read(`${id}.jpg`, options);
+  read(`${id}.jpg`, "crop", options);
 
 /**
  * A stored outline's bytes, or null when there is none, exactly as `readCrop` reads a crop.
@@ -72,10 +72,11 @@ export const readCrop = (id: string, options?: { download?: CropDownload }) =>
  * {@link openspec/specs/draping-preview/spec.md#requirement-the-outline-route-serves-a-stored-outline-and-nothing-else}
  */
 export const readMask = (id: string, options?: { download?: CropDownload }) =>
-  read(`${id}.mask.png`, options);
+  read(`${id}.mask.png`, "outline", options);
 
 async function read(
   path: string,
+  kind: string,
   { download = supabaseDownload }: { download?: CropDownload } = {},
 ): Promise<Uint8Array<ArrayBuffer> | null> {
   const { data, error } = await download(path);
@@ -84,6 +85,6 @@ async function read(
     (error.status === 404 || error.statusCode === "404") &&
     !/bucket/i.test(error.message);
   if (notFound) return null;
-  if (error || !data) throw error ?? new Error(`${path} download gave no data`);
+  if (error || !data) throw error ?? new Error(`${kind} download gave no data`);
   return new Uint8Array(await data.arrayBuffer());
 }

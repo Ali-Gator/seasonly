@@ -45,16 +45,30 @@ const jpeg = (canvas: HTMLCanvasElement) => encode(canvas, "image/jpeg", 0.85);
 
 /** How long a pass waits for the person segmenter before it goes on without an outline. */
 const PERSON_WAIT_MS = 3000;
+/** The least mean confidence over the crop's middle third, where the face is, for an outline. */
+const MIN_FACE_CONFIDENCE = 0.5;
+
+/** Mean confidence over the middle third of a `width` × `height` mask. */
+function middleConfidence(confidence: Float32Array, width: number, height: number): number {
+  let sum = 0;
+  let count = 0;
+  for (let y = Math.floor(height / 3); y < Math.ceil((2 * height) / 3); y++)
+    for (let x = Math.floor(width / 3); x < Math.ceil((2 * width) / 3); x++, count++)
+      sum += confidence[y * width + x] ?? 0;
+  return count ? sum / count : 0;
+}
 
 /**
  * The crop's outline: black, with the person segmenter's confidence as alpha. Null when the
- * segmenter fails to load in time or to run; the pass stands either way.
+ * segmenter fails to load in time or to run, or misses the face (the middle of a crop is the face
+ * box), so an outline never empties the oval; the pass stands either way.
  *
  * {@link openspec/specs/capture-flow/spec.md#scenario-no-person-segmenter}
  */
 async function outline(crop: HTMLCanvasElement): Promise<Blob | null> {
   try {
-    // ponytail: a fixed wait; the model usually loaded during the guide. Tune if Sentry shows misses.
+    // ponytail: a fixed wait, failures unreported; the model usually loaded during the guide.
+    // Count misses (an analytics reason) if reports show uncut faces.
     const segmenter = await Promise.race([
       loadPerson(),
       new Promise<never>((_, reject) =>
@@ -69,7 +83,8 @@ async function outline(crop: HTMLCanvasElement): Promise<Blob | null> {
         ? mask.getAsFloat32Array().slice()
         : null;
     segmented.close();
-    if (!confidence) return null;
+    if (!confidence || middleConfidence(confidence, crop.width, crop.height) < MIN_FACE_CONFIDENCE)
+      return null;
     const out = canvasOf(crop.width, crop.height);
     const image = out.context.createImageData(crop.width, crop.height);
     for (let i = 0; i < confidence.length; i++)

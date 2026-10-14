@@ -343,7 +343,7 @@ describe("the crop's outline", () => {
     expect(generateReportText).toHaveBeenCalledTimes(1);
     const [args] = vi.mocked(generateReportText).mock.calls[0] ?? [];
     expect(args?.faceCrop).toEqual(JPEG);
-    expect(JSON.stringify(args)).not.toContain(JSON.stringify(Array.from(PNG)).slice(1, -1));
+    expect(Object.keys(args ?? {}).sort()).toEqual(["answers", "faceCrop", "result"]);
   });
 
   /** {@link openspec/specs/draping-preview/spec.md#scenario-a-photo-result-with-an-outline} */

@@ -27,12 +27,12 @@ let vision: Promise<Vision> | undefined;
 let person: Promise<ImageSegmenter> | undefined;
 
 /**
- * Starts loading on first call; a failed load is retried on the next. Also starts the person
- * segmenter, which can fail on its own without failing the check.
+ * Starts loading on first call; a failed load is retried on the next. Once it has loaded, starts
+ * the person segmenter, which can fail on its own without failing the check.
  */
 export function loadVision(): Promise<Vision> {
-  void loadPerson().catch(() => {});
-  vision ??= (async () => {
+  if (vision) return vision;
+  vision = (async () => {
     const { FaceLandmarker, FilesetResolver, ImageSegmenter } =
       await import("@mediapipe/tasks-vision");
     const fileset = await FilesetResolver.forVisionTasks(WASM);
@@ -54,6 +54,9 @@ export function loadVision(): Promise<Vision> {
     vision = undefined;
     throw error;
   });
+  // After, not beside: MediaPipe's loaders share one global, so a third load at once could fail
+  // the check's own models.
+  void vision.then(loadPerson).catch(() => {});
   return vision;
 }
 
