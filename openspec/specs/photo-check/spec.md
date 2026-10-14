@@ -14,11 +14,9 @@ export interface PhotoMeasures {
   eyeWhite: Lab | null; // null when unmeasurable
   skin: Lab | null; // as color sampling measures it
 }
-export interface PhotoCheck {
-  problem: PhotoProblem | null;
-  measures: PhotoMeasures;
-  traits?: Traits; // set only on a pass
-}
+export type PhotoCheck =
+  | { problem: null; measures: PhotoMeasures; traits: Traits } // a pass carries its traits
+  | { problem: PhotoProblem; measures: PhotoMeasures; traits?: never }; // a rejection carries none
 export type PhotoCheckInput = Omit<PhotoInput, "landmarks"> & {
   landmarks: PhotoInput["landmarks"] | null; // null = no face detected
 };

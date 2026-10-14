@@ -43,12 +43,10 @@ export interface PhotoMeasures {
   skin: Lab | null;
 }
 
-export interface PhotoCheck {
-  problem: PhotoProblem | null;
-  measures: PhotoMeasures;
-  /** Color sampling's traits of the same input; set only on a pass. */
-  traits?: Traits;
-}
+/** A pass carries color sampling's traits of the same input; a rejection carries none. */
+export type PhotoCheck =
+  | { problem: null; measures: PhotoMeasures; traits: Traits }
+  | { problem: PhotoProblem; measures: PhotoMeasures; traits?: never };
 
 /** `PhotoInput` whose landmarks are null when no face was detected. */
 export type PhotoCheckInput = Omit<PhotoInput, "landmarks"> & {
@@ -91,7 +89,7 @@ export function checkPhoto(input: PhotoCheckInput): PhotoCheck {
   const xs = landmarks.map((p) => p.x);
   const faceWidth = (Math.max(...xs) - Math.min(...xs)) * width;
   const measures: PhotoMeasures = { faceWidth, eyeWhite: null, skin };
-  const result = (problem: PhotoProblem | null): PhotoCheck => ({ problem, measures });
+  const result = (problem: PhotoProblem): PhotoCheck => ({ problem, measures });
 
   // Written so a NaN coordinate counts as outside.
   const outside = landmarks.some((p) => !(p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1));
