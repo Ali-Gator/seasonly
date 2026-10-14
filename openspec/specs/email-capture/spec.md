@@ -238,9 +238,9 @@ Stored addresses SHALL be readable and writable only with the server's secret ke
 
 ### Requirement: The photo report email says what is kept
 
-The footer of a photo report's email SHALL carry one line about the photo, in the words of canvas artboard 12. The line SHALL say the face crop is deleted within 24 hours of the analysis, and that the report is kept until the person asks for deletion. It SHALL NOT say that only the result is kept: the report also holds the measured traits, the quiz answers and the personal text (`legal-pages`).
+The footer of a photo report's email SHALL carry one line about the photo, in the words of canvas v55 artboard 12: "We delete our copy of your face crop within 24 hours of your analysis. Google may keep one up to 90 days for abuse checks. We keep your report until you ask us to delete it." It SHALL NOT say the photo is deleted without naming Google's copy, and it SHALL NOT say that only the result is kept: the report also holds the measured traits, the quiz answers and the personal text (`legal-pages`). A quiz-only report's email sends Google nothing and carries no line about a photo.
 
 #### Scenario: The photo footer
 
 - **WHEN** the report email is rendered for a photo report
-- **THEN** its HTML and plain-text parts say the photo is deleted within 24 hours and the report is kept until the person asks for deletion, and neither holds "We keep only your result"
+- **THEN** its HTML and plain-text parts say "We delete our copy of your face crop within 24 hours of your analysis. Google may keep one up to 90 days for abuse checks. We keep your report until you ask us to delete it.", and neither holds "We keep only your result"

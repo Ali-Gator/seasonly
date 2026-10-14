@@ -110,10 +110,17 @@ It SHALL state the basis for using the face crop and the rest of the data: they 
 
 It SHALL link to `/privacy` and show the date it was last updated.
 
+The section with the contact address SHALL carry the id `contact`, so `https://seasonly.me/terms#contact` is the support URL the chat-plugin listings give.
+
 #### Scenario: Reading the terms
 
 - **WHEN** a person reads `/terms`
 - **THEN** it states the result is an estimate, the minimum age, own photos only, that a photo sends a face crop for the analysis, no warranty, the governing law and the contact address, and links to `/privacy`
+
+#### Scenario: The support link
+
+- **WHEN** `/terms` is rendered
+- **THEN** a `section` with `id="contact"` holds the "Law and contact" heading and the `mailto:care@seasonly.me` link
 
 ### Requirement: The legal pages are live and indexed
 
