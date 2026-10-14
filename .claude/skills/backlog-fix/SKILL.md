@@ -1,6 +1,6 @@
 ---
 name: backlog-fix
-description: Execute a `backlog-<n>` batch that `/backlog-batch` planned — the OpenSpec apply and archive flows around the backlog pipeline: assert fix-ready, verify deltas, tests then code with one editing subagent at a time, `pnpm fix` / `pnpm test`, delete shipped bullets, `/code-review high` in a fresh subagent, archive without the Tracker, then a preflight, a PR to `main` and auto-merge with a merge commit. Use when the user says "/backlog-fix", names a batch to ship, or asks to implement a batch `/backlog-batch` already triaged.
+description: Execute a `backlog-<n>` batch that `/backlog-batch` planned — the OpenSpec apply and archive flows around the backlog pipeline: assert fix-ready, verify deltas, tests then code with one editing subagent at a time, `pnpm fix` / `pnpm test` / `pnpm test:eval`, delete shipped bullets, `/code-review high` in a fresh subagent, archive without the Tracker, then a preflight, a PR to `main` and auto-merge with a merge commit. Use when the user says "/backlog-fix", names a batch to ship, or asks to implement a batch `/backlog-batch` already triaged.
 ---
 
 # `/backlog-fix backlog-<n>` — execute a planned batch
@@ -109,10 +109,22 @@ continuing, so the archived change matches what shipped.
 ```bash
 pnpm fix      # prettier --write, eslint --fix, typecheck
 pnpm test     # vitest run && playwright test
+pnpm test:eval  # the eval gate CI's `check` job runs; `pnpm test` does not include it
 ```
 
 `pnpm test` is the manual phase gate: the pre-commit hook runs only `test:unit`, and nothing
 runs Playwright between pushes except CI.
+
+`pnpm test:eval` fails with `results.json is stale` whenever the batch touched a hashed file:
+the core's sampling, photo-check, classifier or palettes, the capture code, `evals/*.ts` or
+`evals/manifest.json`, a Prettier reflow included (`evals/README.md`). The fix is
+`pnpm eval:run`, then commit `evals/results.json`. It is **free** (cached Commons photos, local
+MediaPipe, no AI Gateway), but the auto-mode classifier refuses it, so ask Oleg in one line to
+run `pnpm eval:run` from the repo root and wait for its `Test Files 1 passed` (about a minute).
+Then re-run `pnpm test:eval` and read `git diff evals/results.json`: a hash-only diff is the
+expected result of a type or refactor change. A moved metric is a behavior change: say so in the
+PR, and raise `baseline.json` only if the metric improved (lowering it needs Oleg's approval).
+Do this before the review, so the refreshed file is in the reviewed diff.
 
 Local Playwright starts `next dev`, which writes `apps/web/.next/dev/types/`, and the web
 tsconfig includes that folder. If a commit right after a test run fails `typecheck` on a file
@@ -162,7 +174,8 @@ It covers correctness bugs **and** reuse/simplification/efficiency cleanups in o
 `/simplify` is not needed separately. The main agent fixes the findings it can within the
 batch's decisions; a finding that would need a new decision or out-of-scope work is logged in
 `docs/backlog.md` as a new `BL-nn` (the `_Next id:_` counter, bumped) — CLAUDE.md "Backlog".
-Then re-run `pnpm test` (and step (c)'s regenerate line if typecheck trips on `.next/dev/types`).
+Then re-run `pnpm test` and `pnpm test:eval` (and step (c)'s regenerate line if typecheck trips
+on `.next/dev/types`).
 
 A re-review after substantial fixes is a **new** fresh subagent, not a `SendMessage` to the old
 one — a continued agent keeps its context, and with it whatever it already decided.
@@ -186,13 +199,13 @@ reopen the review.
 Then five checks. All five green → PR with auto-merge. Any one red **after one repair attempt**
 → PR **without** auto-merge, and report which check failed.
 
-| #   | Check                                                                                   | On failure                       |
-| --- | --------------------------------------------------------------------------------------- | -------------------------------- |
-| 1   | `pnpm format:check`, `pnpm lint`, `pnpm typecheck` clean                                | fix, re-run                      |
-| 2   | `pnpm test` green                                                                       | fix the **code**, never the test |
-| 3   | `openspec validate --all --no-interactive` green — what CI's `validate` job runs        | fix the spec or change           |
-| 4   | the fresh-subagent review left no finding that is neither fixed nor logged as a `BL-nn` | fix or log it                    |
-| 5   | working tree clean (`git status` clean, `git diff` empty) — everything is committed     | commit, or re-review if unseen   |
+| #   | Check                                                                                   | On failure                                                                        |
+| --- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| 1   | `pnpm format:check`, `pnpm lint`, `pnpm typecheck` clean                                | fix, re-run                                                                       |
+| 2   | `pnpm test` and `pnpm test:eval` green                                                  | fix the **code**, never the test; a stale `results.json` is step (c)'s `eval:run` |
+| 3   | `openspec validate --all --no-interactive` green — what CI's `validate` job runs        | fix the spec or change                                                            |
+| 4   | the fresh-subagent review left no finding that is neither fixed nor logged as a `BL-nn` | fix or log it                                                                     |
+| 5   | working tree clean (`git status` clean, `git diff` empty) — everything is committed     | commit, or re-review if unseen                                                    |
 
 Green:
 
