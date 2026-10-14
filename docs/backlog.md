@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-64**
+_Next id:_ **BL-65**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -98,21 +98,7 @@ fold items in.
   _Refs:_ `apps/web/src/lib/observability/posthog.ts`, `openspec/specs/analytics/spec.md` ·
   _Status:_ deferred — before paid promotion or a complaint; the user's choice, 2026-10-09
 
-- **[BL-62] Three more "deleted within 24 hours" lines leave out Google's copy** — the report
-  footer, the report email footer and the how-it-works FAQ say the photo is deleted within 24
-  hours, with no word that Google may keep the crop up to 90 days for abuse checks (`/privacy`
-  says it; the guide notice does from `backlog-3`). Decide whether each needs the caveat; each is
-  canvas copy (boards 10, 12, HowItWorks).
-  _Refs:_ `apps/web/src/lib/report/view.tsx`, `apps/web/src/lib/email/render.ts`,
-  `apps/web/src/app/(site)/how-it-works/page.tsx` · _Status:_ open — found in `backlog-3` triage, 2026-10-14
-
 ## Code quality
-
-- **[BL-56] A refused request counts as an ordinary failure in analytics** — a 403 from the bot
-  check sends the same `analysis_failed` as a 500 or a timeout, so a spike of blocked in-app
-  browsers would not show. Add a `blocked` property (analytics spec first).
-  _Refs:_ `apps/web/src/app/(flow)/analyze/flow.tsx`, `openspec/specs/analytics/spec.md` ·
-  _Status:_ open — t18 phase review, 2026-10-13
 
 - **[BL-02] A hung crop upload is abandoned, not cancelled** — `upload()` in
   `@supabase/storage-js` 2.117 takes no abort signal, so after the 3 s timeout the request keeps
@@ -209,16 +195,13 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   the check hold on any file system, or document it as Linux-only.
   _Refs:_ `e2e/site-structure.spec.ts:67` · _Status:_ open — found in `t12-mcp-teaser`, 2026-10-11
 
-## Design / UX
+- **[BL-64] `view.test.tsx` writes its footer helper twice** — "has no photo line in a quiz-only
+  footer" declares `footer` inline and "names Google's copy in a photo report's footer" repeats
+  the same regex. Hoist one `footer` helper to file scope; it edits an existing test, so it needs
+  the test edit approved.
+  _Refs:_ `apps/web/src/lib/report/view.test.tsx` · _Status:_ open — `backlog-4` phase review, 2026-10-14
 
-- **[BL-55] The wide report's actions wait for the palette's bottom** — from 1024 px the report
-  floats its copy left and its sections right; the left block with Share, Save, Premium and the
-  footer comes after sections 2–6 in the DOM, and a float cannot start above an earlier float, so
-  Share and Save start beside "Colors to avoid", up to about 200 px below the agreement note. Find
-  a layout that keeps the phone order and lets the left column run on (subgrid, or the actions
-  inside the season block on wide screens only).
-  _Refs:_ `apps/web/src/lib/report/view.tsx`, `apps/web/src/lib/report/sections.tsx` (`LEFT`,
-  `RIGHT`) · _Status:_ open — t18 phase review, 2026-10-13
+## Design / UX
 
 - **[BL-61] "Watermelon" still runs into the gap at 375–399 px** — a 4-column cell is
   (W − 100) / 4, so at 375 px Watermelon (74.9 px at 13 px) runs about 6 px into the 12 px gap in
@@ -226,7 +209,9 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   The approved 375 board shows Soft Autumn, whose names fit, so the fix changes the approved 375
   layout: a 375 board with a Light Spring palette first. `backlog-3` covers only below 375; a
   container query on cell width, not viewport width, would cover both in one rule.
-  _Refs:_ `apps/web/src/components/ds/ds.css` (`.sn-swatch__name`), MVP canvas board 10 · _Status:_ open — found in `backlog-3` triage, 2026-10-14
+  _Refs:_ `apps/web/src/components/ds/ds.css` (`.sn-swatch__name`), MVP canvas board 10 · _Status:_ gated — a Light Spring 375/390 board (`backlog-3`'s below-375 column rule
+  is the base; option 1 moves that breakpoint to ~404 px). Also hit:
+  390/393 px iPhones, True Summer best #16, Champagne in Light Spring metals (`backlog-4` triage, 2026-10-14)
 
 - **[BL-63] The swatch grid's `!important` column rule beats Tailwind's `!` utilities** —
   `SwatchGrid` sets its column count inline, so the below-375 rule in `ds.css` needs
@@ -247,13 +232,6 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3) · _Status:_ deferred — until a page renders a
   DOM card preview (`t5-report-delivery` shows the PNGs themselves); check whether the 2026-10-07
   redesign session already updated the canvas
-
-- **[BL-24] Famous people's names are read twice** — each famous photo's alt text is the
-  person's name, and the name is printed right under it, so a screen reader says it twice. Use
-  `alt=""` with the name as the caption (a `figure`/`figcaption`), or describe the photo instead;
-  the approved alt texts are the names (`t9-site-content` content.json).
-  _Refs:_ `apps/web/src/app/(site)/seasons/[season]/page.tsx`, `apps/web/src/lib/site-content/seasons.ts`
-  · _Status:_ open — t9 phase review, 2026-10-10
 
 - **[BL-26] The famous photos bypass `Slot`** — the season page builds its own `sn-slot` and
   `img` only to add `loading="lazy"`. Give the design system's `Slot` (and bundle.js) a `loading`
@@ -295,9 +273,3 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   result; ChatGPT called the tool. The no-result card shows only on an explicit request. Either
   accept it or move case 5 to the negative list for Claude.
   _Refs:_ `docs/chat-plugin-listing.md` · _Status:_ open — host check 6.3, 2026-10-11
-
-- **[BL-37] A support page with an HTTPS URL** — both directories ask for a support URL; the site
-  has only `care@seasonly.me`, so the listings point to `/terms`, whose last section gives that
-  address. A `#contact` anchor or a small support page would be a clearer target.
-  _Refs:_ `apps/web/src/app/(site)/terms/page.tsx`, `docs/chat-plugin-listing.md` · _Status:_ open
-  — 2026-10-11

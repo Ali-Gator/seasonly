@@ -12,7 +12,6 @@ export interface Famous {
   name: string;
   /** Under `/images/famous/<slug>/`: the Commons photo, cropped to 3:4. */
   image: string;
-  alt: string;
   credit: { author: string; license: string; licenseUrl: string; commonsUrl: string };
   /** The published color analysis that types this person as the season. */
   source: { title: string; url: string };
@@ -61,7 +60,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Taylor Swift",
         image: "/images/famous/light-spring/taylor-swift.webp",
-        alt: "Taylor Swift",
         credit: {
           author: "iHeartRadioCA",
           license: "CC BY 3.0",
@@ -77,7 +75,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Saoirse Ronan",
         image: "/images/famous/light-spring/saoirse-ronan.webp",
-        alt: "Saoirse Ronan",
         credit: {
           author: "Martin Kraft",
           license: "CC BY-SA 4.0",
@@ -93,7 +90,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Elle Fanning",
         image: "/images/famous/light-spring/elle-fanning.webp",
-        alt: "Elle Fanning",
         credit: {
           author: "Gage Skidmore",
           license: "CC BY-SA 3.0",
@@ -131,7 +127,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Kelly Reilly",
         image: "/images/famous/true-spring/kelly-reilly.webp",
-        alt: "Kelly Reilly",
         credit: {
           author: "Georges Biard",
           license: "CC BY-SA 3.0",
@@ -146,7 +141,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Amy Adams",
         image: "/images/famous/true-spring/amy-adams.webp",
-        alt: "Amy Adams",
         credit: {
           author: "Sara Komatsu",
           license: "CC BY-SA 4.0",
@@ -162,7 +156,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Jessica Chastain",
         image: "/images/famous/true-spring/jessica-chastain.webp",
-        alt: "Jessica Chastain",
         credit: {
           author: "Harald Krichel",
           license: "CC BY-SA 4.0",
@@ -201,7 +194,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Emma Stone",
         image: "/images/famous/bright-spring/emma-stone.webp",
-        alt: "Emma Stone",
         credit: {
           author: "Harald Krichel",
           license: "CC BY-SA 4.0",
@@ -217,7 +209,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Jane Levy",
         image: "/images/famous/bright-spring/jane-levy.webp",
-        alt: "Jane Levy",
         credit: {
           author: "Gage Skidmore",
           license: "CC BY-SA 2.0",
@@ -232,7 +223,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Jared Leto",
         image: "/images/famous/bright-spring/jared-leto.webp",
-        alt: "Jared Leto",
         credit: {
           author: "Gage Skidmore",
           license: "CC BY-SA 3.0",
@@ -270,7 +260,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Margot Robbie",
         image: "/images/famous/light-summer/margot-robbie.webp",
-        alt: "Margot Robbie",
         credit: {
           author: "Ondine Goat",
           license: "CC0",
@@ -286,7 +275,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Cate Blanchett",
         image: "/images/famous/light-summer/cate-blanchett.webp",
-        alt: "Cate Blanchett",
         credit: {
           author: "Harald Krichel",
           license: "CC BY-SA 4.0",
@@ -302,7 +290,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Sydney Sweeney",
         image: "/images/famous/light-summer/sydney-sweeney.webp",
-        alt: "Sydney Sweeney",
         credit: {
           author: "Jay Dixit",
           license: "CC BY-SA 4.0",
@@ -341,7 +328,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Emily Blunt",
         image: "/images/famous/true-summer/emily-blunt.webp",
-        alt: "Emily Blunt",
         credit: {
           author: "Kevin Paul",
           license: "CC BY 4.0",
@@ -357,7 +343,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Anna Kendrick",
         image: "/images/famous/true-summer/anna-kendrick.webp",
-        alt: "Anna Kendrick",
         credit: {
           author: "Jay Dixit",
           license: "CC BY-SA 4.0",
@@ -373,7 +358,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Kaya Scodelario",
         image: "/images/famous/true-summer/kaya-scodelario.webp",
-        alt: "Kaya Scodelario",
         credit: {
           author: "Desmond Herzfelder",
           license: "CC BY 4.0",
@@ -412,7 +396,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Jennifer Aniston",
         image: "/images/famous/soft-summer/jennifer-aniston.webp",
-        alt: "Jennifer Aniston",
         credit: {
           author: "Angela George",
           license: "CC BY-SA 3.0",
@@ -427,7 +410,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Dakota Johnson",
         image: "/images/famous/soft-summer/dakota-johnson.webp",
-        alt: "Dakota Johnson",
         credit: {
           author: "Gabriel Hutchinson",
           license: "CC BY-SA 4.0",
@@ -443,7 +425,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Kristen Stewart",
         image: "/images/famous/soft-summer/kristen-stewart.webp",
-        alt: "Kristen Stewart",
         credit: {
           author: "Kevin Paul",
           license: "CC BY 4.0",
@@ -482,7 +463,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Elizabeth Olsen",
         image: "/images/famous/soft-autumn/elizabeth-olsen.webp",
-        alt: "Elizabeth Olsen",
         credit: {
           author: "JoshPopov",
           license: "CC BY 4.0",
@@ -498,7 +478,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Scarlett Johansson",
         image: "/images/famous/soft-autumn/scarlett-johansson.webp",
-        alt: "Scarlett Johansson",
         credit: {
           author: "Harald Krichel",
           license: "CC BY-SA 4.0",
@@ -513,7 +492,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Adele",
         image: "/images/famous/soft-autumn/adele.webp",
-        alt: "Adele",
         credit: {
           author: "Marc E.",
           license: "CC BY 2.0",
@@ -551,7 +529,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Julia Roberts",
         image: "/images/famous/true-autumn/julia-roberts.webp",
-        alt: "Julia Roberts",
         credit: {
           author: "Colleen Sturtevant",
           license: "CC BY-SA 4.0",
@@ -566,7 +543,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Julianne Moore",
         image: "/images/famous/true-autumn/julianne-moore.webp",
-        alt: "Julianne Moore",
         credit: {
           author: "Harald Krichel",
           license: "CC BY-SA 4.0",
@@ -582,7 +558,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Ana de Armas",
         image: "/images/famous/true-autumn/ana-de-armas.webp",
-        alt: "Ana de Armas",
         credit: {
           author: "Gage Skidmore",
           license: "CC BY-SA 2.0",
@@ -621,7 +596,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Zendaya",
         image: "/images/famous/deep-autumn/zendaya.webp",
-        alt: "Zendaya",
         credit: {
           author: "PhilipRomano",
           license: "CC BY-SA 4.0",
@@ -636,7 +610,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Halle Berry",
         image: "/images/famous/deep-autumn/halle-berry.webp",
-        alt: "Halle Berry",
         credit: {
           author: "Harald Krichel",
           license: "CC BY-SA 4.0",
@@ -651,7 +624,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Freida Pinto",
         image: "/images/famous/deep-autumn/freida-pinto.webp",
-        alt: "Freida Pinto",
         credit: {
           author: "DFID - UK Department for International Development",
           license: "CC BY 2.0",
@@ -690,7 +662,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Dua Lipa",
         image: "/images/famous/deep-winter/dua-lipa.webp",
-        alt: "Dua Lipa",
         credit: {
           author: "Harald Krichel",
           license: "CC BY-SA 4.0",
@@ -705,7 +676,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Lucy Liu",
         image: "/images/famous/deep-winter/lucy-liu.webp",
-        alt: "Lucy Liu",
         credit: {
           author: "Bryan Berlin",
           license: "CC BY-SA 4.0",
@@ -720,7 +690,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Salma Hayek",
         image: "/images/famous/deep-winter/salma-hayek.webp",
-        alt: "Salma Hayek",
         credit: {
           author: "Martin Kraft",
           license: "CC BY-SA 4.0",
@@ -759,7 +728,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Katy Perry",
         image: "/images/famous/true-winter/katy-perry.webp",
-        alt: "Katy Perry",
         credit: {
           author: "Colleen Sturtevant",
           license: "CC BY-SA 4.0",
@@ -775,7 +743,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Marion Cotillard",
         image: "/images/famous/true-winter/marion-cotillard.webp",
-        alt: "Marion Cotillard",
         credit: {
           author: "Harald Krichel",
           license: "CC BY-SA 4.0",
@@ -790,7 +757,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Phoebe Waller-Bridge",
         image: "/images/famous/true-winter/phoebe-waller-bridge.webp",
-        alt: "Phoebe Waller-Bridge",
         credit: {
           author: "Scottish Government",
           license: "CC BY 2.0",
@@ -829,7 +795,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Megan Fox",
         image: "/images/famous/bright-winter/megan-fox.webp",
-        alt: "Megan Fox",
         credit: {
           author: "Kevin Paul",
           license: "CC BY 4.0",
@@ -844,7 +809,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Courteney Cox",
         image: "/images/famous/bright-winter/courteney-cox.webp",
-        alt: "Courteney Cox",
         credit: {
           author: "Albert Domasin",
           license: "CC BY-SA 2.0",
@@ -859,7 +823,6 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
       {
         name: "Krysten Ritter",
         image: "/images/famous/bright-winter/krysten-ritter.webp",
-        alt: "Krysten Ritter",
         credit: {
           author: "Kevin Paul",
           license: "CC BY 4.0",

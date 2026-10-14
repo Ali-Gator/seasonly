@@ -5,7 +5,7 @@ import { renderReportEmail } from "./render";
 const ID = "k7m2qxAAAAAAAAAAAAAAAA";
 const LINK = `https://seasonly.me/r/${ID}`;
 const FOOTER =
-  "Your photo is deleted within 24 hours of your analysis. We keep your report until you ask us to delete it.";
+  "We delete our copy of your face crop within 24 hours of your analysis. Google may keep one up to 90 days for abuse checks. We keep your report until you ask us to delete it.";
 /** The visible words of the HTML part, entities decoded. */
 const words = (html: string) =>
   html

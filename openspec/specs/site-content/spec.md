@@ -17,7 +17,7 @@ Fixes what each core public page of seasonly.me shows and where its words, color
 
 `apps/web/src/lib/site-content/` holds the site's own content:
 
-- `seasons.ts`: `SEASON_CONTENT: Record<SeasonSlug, SeasonContent>`, with `about` (paragraphs), three `neighbours` (`{ slug, why }`) and three `famous` (`{ name, image, alt, credit: { author, license, licenseUrl, commonsUrl }, source: { title, url } }`); `famousIntro(plural)` and `FAMOUS_NOTE`.
+- `seasons.ts`: `SEASON_CONTENT: Record<SeasonSlug, SeasonContent>`, with `about` (paragraphs), three `neighbours` (`{ slug, why }`) and three `famous` (`{ name, image, credit: { author, license, licenseUrl, commonsUrl }, source: { title, url } }`); `famousIntro(plural)` and `FAMOUS_NOTE`.
 - `images.ts`: `TIP_PHOTOS` (light, makeup and filter, each a good and a bad `{ src, alt }`), `SAMPLE_FACE` and `QUIZ_PHOTOS` (quiz).
 - `sample.ts`: `softAutumnColors(names)`, the sample palettes picked by name from `PALETTES["soft-autumn"]`.
 - `season-link.tsx`: `SeasonLink({ slug, line?, wide?, compact? })`, a season's name as an `h3` holding its link, an optional line and its first highlight colors (four, or six from 1024 px with `wide`). `compact`, the landing's, shows the four as a chip-only `SwatchStrip` whose names are visually hidden.
@@ -145,6 +145,8 @@ Each season page SHALL show three public figures typed as that season. Each figu
 
 The section SHALL say that these are readings of public photos and that no figure endorses Seasonly. A figure without a reusable photo and a source SHALL NOT be shown.
 
+The name SHALL be the photo's caption: the photo and its name sit in one `figure`, the name in its `figcaption`, and the photo's `alt` is empty, so a screen reader reads the name once.
+
 #### Scenario: A credited photo
 
 - **WHEN** any season page is rendered
@@ -155,11 +157,18 @@ The section SHALL say that these are readings of public photos and that no figur
 - **WHEN** the famous-people section is rendered
 - **THEN** it says these are readings of public photos and that no one shown endorses Seasonly
 
+#### Scenario: The name is read once
+
+- **WHEN** any season page is rendered
+- **THEN** each famous photo has `alt=""` and sits in a `figure` whose `figcaption` holds that person's name
+
 ### Requirement: How it works describes the real checks
 
 `/how-it-works` SHALL list every reason a photo is turned back, each under the title of its retake tip: "Too dark", "Tinted light", "Filter detected", "No face found" and "More than one face". The page SHALL say what happens when the photo and the quiz disagree, using the shared agreement copy: the photo counts for more. It SHALL NOT promise a correct result. The page SHALL link to `/sample-report`, `/privacy` and `/color-analysis-gpt-alternative`.
 
 Where the page says when the face crop is uploaded, it SHALL say: after the photo passes the check and the quiz is finished. It SHALL NOT mention an agreement step, since the flow has none.
+
+The FAQ answer to "What happens to my photo?" SHALL be, in the words of canvas v55 board HowItWorks: "Only a crop of your face is uploaded, after the photo passes the check and you finish the quiz. We delete our copy within 24 hours. Google may keep one up to 90 days for abuse checks. We keep your report, not your photo."
 
 #### Scenario: All five rejections
 
@@ -175,6 +184,11 @@ Where the page says when the face crop is uploaded, it SHALL say: after the phot
 
 - **WHEN** `/how-it-works` is rendered
 - **THEN** it says only a face crop is uploaded, after the photo passes the check and the quiz is finished, and it holds no "you agree"
+
+#### Scenario: The FAQ names Google's copy
+
+- **WHEN** `/how-it-works` is rendered
+- **THEN** the answer to "What happens to my photo?" says "We delete our copy within 24 hours. Google may keep one up to 90 days for abuse checks." and holds no "It is deleted within 24 hours"
 
 ### Requirement: The sample report is static and sends nothing
 

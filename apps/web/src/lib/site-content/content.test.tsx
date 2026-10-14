@@ -71,6 +71,19 @@ const imgs = (html: string) =>
     alt: /alt="([^"]*)"/.exec(attrs ?? "")?.[1],
   }));
 
+/** Each `figure`: its markup and its `figcaption`'s visible text ("" when it has none). */
+const figures = (html: string) =>
+  [...html.matchAll(/<figure[^>]*>(.*?)<\/figure>/g)].map(([, inner = ""]) => ({
+    inner,
+    caption: text(/<figcaption[^>]*>(.*?)<\/figcaption>/.exec(inner)?.[1] ?? "").trim(),
+  }));
+
+/** The page with every `alt=""` image inside a captioned `figure` removed: its caption names it. */
+const uncaptioned = (html: string) =>
+  html.replace(/<figure[^>]*>(.*?)<\/figure>/g, (fig: string) =>
+    figures(fig)[0]?.caption ? fig.replace(/<img [^>]*alt=""[^>]*>/g, "") : fig,
+  );
+
 const html = (el: ReactElement) => renderToStaticMarkup(el);
 const seasonPage = async (season: SeasonSlug) =>
   html(await Season({ params: Promise.resolve({ season }) }));
@@ -94,7 +107,7 @@ describe("every core page", () => {
     expect(text(out)).not.toMatch(/\[[A-Z][A-Z0-9 :'’,.-]+\]/);
     expect(text(out)).not.toMatch(/[{}]/);
     expect(out).not.toContain("sn-slot__label");
-    for (const img of imgs(out)) expect(img.alt, img.src).toBeTruthy();
+    for (const img of imgs(uncaptioned(out))) expect(img.alt, img.src).toBeTruthy();
   });
 
   /** {@link openspec/specs/site-content/spec.md#scenario-a-core-page-clears-the-word-floor} */
@@ -217,7 +230,10 @@ describe("/seasons/<slug>", () => {
     expect(out.replace(/&#x27;/g, "'").match(cta)).toHaveLength(2);
   });
 
-  /** {@link openspec/specs/site-content/spec.md#scenario-a-credited-photo} */
+  /**
+   * {@link openspec/specs/site-content/spec.md#scenario-a-credited-photo}
+   * {@link openspec/specs/site-content/spec.md#scenario-the-name-is-read-once}
+   */
   it.each(SEASON_SLUGS)("%s credits three famous people's photos and sources", async (slug) => {
     const out = await seasonPage(slug);
     const { famous } = SEASON_CONTENT[slug];
@@ -226,7 +242,10 @@ describe("/seasons/<slug>", () => {
     expect(new Set(famous.map((f) => f.source.url)).size).toBe(1);
     for (const f of famous) {
       expect(f.image).toMatch(new RegExp(`^/images/famous/${slug}/[a-z-]+\\.webp$`));
-      expect(imgs(out)).toContainEqual({ src: f.image, alt: f.alt });
+      expect(imgs(out)).toContainEqual({ src: f.image, alt: "" });
+      expect(figures(out).find((g) => g.inner.includes(`src="${f.image}"`))?.caption).toContain(
+        f.name,
+      );
       expect(text(out)).toContain(f.name);
       expect(f.credit.commonsUrl).toMatch(/^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
       expect(f.credit.license).toMatch(/^CC (0|BY|BY-SA) [\d.]+$|^CC0/);
@@ -280,6 +299,14 @@ describe("/how-it-works", () => {
       "Nothing is uploaded until the photo passes the check and you finish the quiz.",
     );
     expect(text(out)).not.toMatch(/you agree/i);
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-faq-names-googles-copy} */
+  it("names Google's copy in the photo FAQ", () => {
+    expect(text(out)).toContain(
+      "We delete our copy within 24 hours. Google may keep one up to 90 days for abuse checks.",
+    );
+    expect(text(out)).not.toContain("It is deleted within 24 hours");
   });
 });
 

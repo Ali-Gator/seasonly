@@ -33,8 +33,11 @@ export function Group({ title, children }: { title: string; children: ReactNode 
  * From 1024 px a report or a season page floats its copy left (4 of 12 columns) and its sections
  * right (7 of 12), each side clearing only its own kind, so the two columns stack apart although
  * the phone order interleaves them (t18-design-review decision 2). The parent is a flow root.
+ * A float cannot start above an earlier float, so a report's last left block (`LEFT_LAST`) stays
+ * in flow with `clear: left` instead and follows the agreement note (BL-55).
  */
-export const LEFT = "lg:float-left lg:clear-left lg:w-[calc(100%/3_-_var(--space-6)*2/3)]";
+export const LEFT_LAST = "lg:clear-left lg:w-[calc(100%/3_-_var(--space-6)*2/3)]";
+export const LEFT = `lg:float-left ${LEFT_LAST}`;
 export const RIGHT = "lg:float-right lg:clear-right lg:w-[calc(100%*7/12_-_var(--space-6)*5/12)]";
 
 /** A grid of 3 or 4 on a phone and `wide` columns from 1024 px. */

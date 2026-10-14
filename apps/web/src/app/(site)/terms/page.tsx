@@ -5,7 +5,7 @@ import { pageMetadata } from "@/lib/site/routes";
 
 export const metadata = pageMetadata("/terms");
 
-const SECTIONS: [heading: string, body: ReactNode][] = [
+const SECTIONS: [heading: string, body: ReactNode, id?: string][] = [
   [
     "What Seasonly is",
     "Seasonly estimates your seasonal color type from one selfie and four questions, and suggests colors to wear. A result is an estimate for choosing colors. It is not professional, medical or any other advice. Light, camera and makeup change a photo, so a result can be wrong.",
@@ -48,6 +48,8 @@ const SECTIONS: [heading: string, body: ReactNode][] = [
       of your own country&apos;s consumer law. Questions go to{" "}
       <a href="mailto:care@seasonly.me">care@seasonly.me</a>.
     </>,
+    // The listings' support URL is /terms#contact.
+    "contact",
   ],
 ];
 
@@ -65,8 +67,8 @@ export default function Page() {
         <p className="caption text-(--ink-muted)">Last updated October 12, 2026</p>
         <p className="lead">By using Seasonly you agree to these terms. They are short.</p>
       </div>
-      {SECTIONS.map(([heading, body]) => (
-        <section key={heading} className="flex flex-col gap-(--space-3)">
+      {SECTIONS.map(([heading, body, id]) => (
+        <section key={heading} id={id} className="flex flex-col gap-(--space-3)">
           <h2 className="h2">{heading}</h2>
           <p>{body}</p>
         </section>

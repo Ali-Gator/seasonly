@@ -62,7 +62,7 @@ export default function ReportPage(props: {
 
 - `/r/[id]` lives in its own `(report)` route group with no layout chrome: the view draws its own header (the wordmark with a ghost "Share" on a phone, the wordmark with the report's address from 1024 px).
 - The page refuses an id that fails `REPORT_ID` with `notFound()` before any read. `readReport` makes one PostgREST select that embeds the latest `report_emails` row (ordered and limited on the embed) and `interest_clicks`, through `withTimeout` (3 s). A failure is captured and flushed, then thrown, so `error.tsx` answers 500.
-- One DOM in phone reading order: the season's head, section 1 (the palette), the rest of the season block, sections 2–6, then the Premium card, the actions and the footer. From `lg` the main is a flow root: the head, the rest and a last block with the Premium card, actions (`lg:order-first`) and footer float left at 4 of 12 columns; section 1 and sections 2–6 float right at 7 of 12 (`LEFT`, `RIGHT` in `sections.tsx`). Floats cannot start above an earlier float, so the left last block starts level with section 2 (BL-55). Swatch grids go to 6 columns there.
+- One DOM in phone reading order: the season's head, section 1 (the palette), the rest of the season block, sections 2–6, then the Premium card, the actions and the footer. From `lg` the main is a flow root: the head and the rest float left at 4 of 12 columns; section 1 and sections 2–6 float right at 7 of 12 (`LEFT`, `RIGHT` in `sections.tsx`). A last left block with the Premium card, actions (`lg:order-first`) and footer takes the same 4 of 12 but is not a float: it stays in flow with `clear: left` (`LEFT_LAST`), so it follows the agreement note instead of starting level with section 2 (BL-55). Swatch grids go to 6 columns there.
 - Personal text replaces the summary and the note body only when `textSource` is `personal`. The note's icon is a check for `agree`, info otherwise.
 - `ReportDraping` reads the rendered images in an effect: an image already failed before hydration (`complete && naturalWidth === 0`), or a later `error` event, switches to `DrapingView` with `deleted`.
 - The share and save buttons prefetch the story card and the palette PNG as Files on mount, so the tap calls `navigator.share` with its activation intact. Where `canShare({ files })` is false, Share opens the `<dialog>` panel of board 10e (both PNGs with `shareCardAlt` as alt text and download links), and Save clicks a hidden download link. An `AbortError` changes nothing.
@@ -73,7 +73,7 @@ export default function ReportPage(props: {
 ## Edge Cases
 
 - Any failure to load the face, a 404 or a 500, shows the same line, which does not claim a deletion.
-- The footer says the photo is deleted within 24 hours. The daily retention job (`data-retention`) deletes it, up to about 49 h in the worst case (backlog).
+- The footer says our copy of the crop is deleted within 24 hours and Google may keep one up to 90 days for abuse checks. The daily retention job (`data-retention`) deletes it, up to about 49 h in the worst case (backlog).
 - In CI there is no database, so a well-formed id answers 500 (the E2E asserts this) and only a malformed id reaches the 404.
 
 ## Requirements
@@ -176,21 +176,31 @@ A report with no photo SHALL leave out the draping section and number the others
 
 ### Requirement: The footer says where the report lives
 
-The footer SHALL say "This report stays at seasonly.me/r/<id>." and "Seasons describe colors, not people. If a color you love isn't here, wear it away from your face." A photo report's footer SHALL also say "Your photo is deleted within 24 hours of your analysis."
+The footer SHALL say "This report stays at seasonly.me/r/<id>." and "Seasons describe colors, not people. If a color you love isn't here, wear it away from your face." A photo report's footer SHALL also say, in the words of canvas v55 boards "10 Full report" (375 and 1280), "We delete our copy of your face crop within 24 hours of your analysis. Google may keep one up to 90 days for abuse checks." It SHALL NOT say the photo is deleted without naming Google's copy: `/privacy` says Google may keep the crop up to 90 days for abuse checks.
 
 #### Scenario: A quiz-only report's footer
 
 - **WHEN** a quiz-only report is opened
 - **THEN** the footer has no line about a photo
 
+#### Scenario: A photo report's footer
+
+- **WHEN** a photo report is opened
+- **THEN** the footer says "We delete our copy of your face crop within 24 hours of your analysis. Google may keep one up to 90 days for abuse checks." and does not hold "Your photo is deleted within 24 hours"
+
 ### Requirement: The report has a wide layout
 
-From 1024 px wide, the report SHALL follow canvas artboard "10 Full report · 1280": the season, the agreement note, the actions and the Premium card in a left column, and the sections in a right column.
+From 1024 px wide, the report SHALL follow canvas artboard "10 Full report · 1280": the season, the agreement note, the actions and the Premium card in a left column, and the sections in a right column. The left column SHALL run on without a gap: the actions SHALL start right under the season block, not level with a later section on the right.
 
 #### Scenario: A desktop window
 
 - **WHEN** the report is opened 1280 px wide
 - **THEN** the season name and "Share my season" sit to the left of "Section 1 of 6"
+
+#### Scenario: The actions follow the agreement note
+
+- **WHEN** the report is opened 1280 px wide and its palette is taller than its season block
+- **THEN** "Share my season" starts right under the agreement note, above the top of "Colors to avoid", because the block that holds it clears only the left column
 
 ### Requirement: An unknown report answers 404
 

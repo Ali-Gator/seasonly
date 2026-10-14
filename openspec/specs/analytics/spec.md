@@ -18,16 +18,16 @@ export const maskReportIds: BeforeSendFn; // posthog-js before_send; null passes
 export function ShareButton(props: { /* … */ place?: "header" | "actions" }): JSX.Element; // default "actions"
 ```
 
-| Event                   | Fired from                                         | Properties                                                     |
-| ----------------------- | -------------------------------------------------- | -------------------------------------------------------------- |
-| `quiz_completed`        | `flow.tsx`, Next on the last question, answered    | `quiz_only` (`state.quizOnly`)                                 |
-| `analysis_failed`       | `flow.tsx`, the analyze request's `.catch`         | `quiz_only` (`!request.photo`); not when `left` (Back)         |
-| `report_requested`      | `flow.tsx`, "Get my full report" with a report id  | `quiz_only` (`agreement === "quiz-only"`)                      |
-| `email_submitted`       | `_email/step.tsx`, on `open`, before `router.push` | none                                                           |
-| `share_tapped`          | `ShareButton`, after `shareSeason`                 | `place`, `outcome` (`shared`, `panel`, `cancelled` for idle)   |
-| `share_card_downloaded` | the share panel's Download links                   | `ratio` (`story`, `post`)                                      |
-| `palette_saved`         | `SaveButton`, on `saved`                           | `method` (`download` when the closure ran, else `share-sheet`) |
-| `premium_tapped`        | `PremiumCard`, on `clicked`                        | none                                                           |
+| Event                   | Fired from                                         | Properties                                                                                                   |
+| ----------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `quiz_completed`        | `flow.tsx`, Next on the last question, answered    | `quiz_only` (`state.quizOnly`)                                                                               |
+| `analysis_failed`       | `flow.tsx`, the analyze request's `.catch`         | `quiz_only` (`!request.photo`), `blocked` (true when the analyze route answered 403); not when `left` (Back) |
+| `report_requested`      | `flow.tsx`, "Get my full report" with a report id  | `quiz_only` (`agreement === "quiz-only"`)                                                                    |
+| `email_submitted`       | `_email/step.tsx`, on `open`, before `router.push` | none                                                                                                         |
+| `share_tapped`          | `ShareButton`, after `shareSeason`                 | `place`, `outcome` (`shared`, `panel`, `cancelled` for idle)                                                 |
+| `share_card_downloaded` | the share panel's Download links                   | `ratio` (`story`, `post`)                                                                                    |
+| `palette_saved`         | `SaveButton`, on `saved`                           | `method` (`download` when the closure ran, else `share-sheet`)                                               |
+| `premium_tapped`        | `PremiumCard`, on `clicked`                        | none                                                                                                         |
 
 ## Behavior
 
@@ -174,7 +174,7 @@ It SHALL be filtered to the host `seasonly.me`, with test accounts filtered out.
 ### Requirement: The flow's events carry only their outcome
 
 - `quiz_completed` SHALL carry `quiz_only`: true when no photo will be sent.
-- `analysis_failed` SHALL fire when the analysis request fails or times out while the person is still waiting for it, and SHALL carry `quiz_only`. It SHALL NOT fire when the person leaves the analyzing step by Back.
+- `analysis_failed` SHALL fire when the analysis request fails or times out while the person is still waiting for it, and SHALL carry `quiz_only` and `blocked`: true when the analyze route answered 403 (the bot check refused the browser), false for any other failure. It SHALL NOT fire when the person leaves the analyzing step by Back.
 - `report_requested` SHALL carry `quiz_only`.
 
 None of them SHALL carry the answers, the image, the season's text or the report id.
@@ -188,3 +188,13 @@ None of them SHALL carry the answers, the image, the season's text or the report
 
 - **WHEN** the person goes Back while the analysis is running
 - **THEN** no `analysis_failed` event is sent
+
+#### Scenario: A refused browser
+
+- **WHEN** the analyze route answers 403
+- **THEN** one `analysis_failed` event is sent with `blocked: true`, and the blocked screen is shown
+
+#### Scenario: A server error is not a refusal
+
+- **WHEN** the analyze route answers 500
+- **THEN** one `analysis_failed` event is sent with `blocked: false`
