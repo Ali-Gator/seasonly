@@ -256,7 +256,9 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   columns 1–3 (Light Spring best #6, Bright Winter #1, Light Summer #20); it fits from about 400 px.
   The approved 375 board shows Soft Autumn, whose names fit, so the fix changes the approved 375
   layout: a 375 board with a Light Spring palette first. `backlog-3` covers only below 375.
-  _Refs:_ `apps/web/src/components/ds/ds.css` (`.sn-swatch__name`), MVP canvas board 10 · _Status:_ open — found in `backlog-3` triage, 2026-10-14
+  _Refs:_ `apps/web/src/components/ds/ds.css` (`.sn-swatch__name`), MVP canvas board 10 · _Status:_ gated — `backlog-3` merged (its below-375 column rule is the
+  base; option 1 moves that breakpoint to ~404 px), then a Light Spring 375/390 board. Also hit:
+  390/393 px iPhones, True Summer best #16, Champagne in Light Spring metals (`backlog-4` triage, 2026-10-14)
 
 - **[BL-58] A line is drawn above every overline** — the `overline` class the design system uses
   for kickers ("SEASONAL COLOR ANALYSIS", "STEP 1 OF 3") is also Tailwind's
