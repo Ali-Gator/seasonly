@@ -194,7 +194,9 @@ describe("ReportView", () => {
 
   /** {@link openspec/specs/report-page/spec.md#scenario-the-actions-follow-the-agreement-note} */
   it("keeps the block holding the actions in flow, clearing only the left column", () => {
-    const before = out.slice(0, out.indexOf(">Share my season</button>"));
+    const at = out.indexOf(">Share my season</button>");
+    expect(at).toBeGreaterThan(-1);
+    const before = out.slice(0, at);
     const block = [...before.matchAll(/class="([^"]*lg:clear-left[^"]*)"/g)].at(-1)?.[1];
     expect(block).toContain("lg:clear-left");
     expect(block).not.toContain("lg:float-left");

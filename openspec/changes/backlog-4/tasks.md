@@ -25,5 +25,5 @@
 
 - [x] 3.1 `pnpm fix`, `pnpm test`
 - [x] 3.2 delete shipped bullets BL-62, BL-55, BL-24, BL-37, BL-56 from `docs/backlog.md`
-- [ ] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
+- [x] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
 - [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge. PR body: Oleg's follow-up — once both directory reviews close, set each portal's support URL to `https://seasonly.me/terms#contact` (re-upload the ChatGPT ZIP).

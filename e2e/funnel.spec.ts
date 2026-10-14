@@ -249,45 +249,32 @@ test("sends one analysis_failed when the analysis fails", async ({ page }) => {
   expect(posthog.find("analysis_failed")[0]?.properties).toMatchObject({ quiz_only: false });
 });
 
-/** {@link openspec/specs/analytics/spec.md#scenario-a-refused-browser} */
-test("sends one analysis_failed with blocked: true when the bot check refuses", async ({
-  page,
-}) => {
-  test.setTimeout(90_000);
-  const posthog = await recordPostHog(page);
-  await answerAnalyze(page, 403);
+/**
+ * {@link openspec/specs/analytics/spec.md#scenario-a-refused-browser}
+ * {@link openspec/specs/analytics/spec.md#scenario-a-server-error-is-not-a-refusal}
+ */
+for (const [status, button, blocked, why] of [
+  [403, "Copy the link", true, "when the bot check refuses"],
+  [500, "Try again", false, "on a server error"],
+] as const) {
+  test(`sends one analysis_failed with blocked: ${blocked} ${why}`, async ({ page }) => {
+    test.setTimeout(90_000);
+    const posthog = await recordPostHog(page);
+    await answerAnalyze(page, status);
 
-  await page.goto("/analyze");
-  await uploadFace(page);
-  await answerQuiz(page);
-  await expect(page.getByRole("button", { name: "Copy the link" })).toBeVisible();
+    await page.goto("/analyze");
+    await uploadFace(page);
+    await answerQuiz(page);
+    await expect(page.getByRole("button", { name: button })).toBeVisible();
 
-  await expect.poll(posthog.named, POLL).toContain("analysis_failed");
-  expect(posthog.find("analysis_failed")).toHaveLength(1);
-  expect(posthog.find("analysis_failed")[0]?.properties).toMatchObject({
-    quiz_only: false,
-    blocked: true,
+    await expect.poll(posthog.named, POLL).toContain("analysis_failed");
+    expect(posthog.find("analysis_failed")).toHaveLength(1);
+    expect(posthog.find("analysis_failed")[0]?.properties).toMatchObject({
+      quiz_only: false,
+      blocked,
+    });
   });
-});
-
-/** {@link openspec/specs/analytics/spec.md#scenario-a-server-error-is-not-a-refusal} */
-test("sends one analysis_failed with blocked: false on a server error", async ({ page }) => {
-  test.setTimeout(90_000);
-  const posthog = await recordPostHog(page);
-  await answerAnalyze(page, 500);
-
-  await page.goto("/analyze");
-  await uploadFace(page);
-  await answerQuiz(page);
-  await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
-
-  await expect.poll(posthog.named, POLL).toContain("analysis_failed");
-  expect(posthog.find("analysis_failed")).toHaveLength(1);
-  expect(posthog.find("analysis_failed")[0]?.properties).toMatchObject({
-    quiz_only: false,
-    blocked: false,
-  });
-});
+}
 
 /** {@link openspec/specs/analytics/spec.md#scenario-the-analysis-times-out} */
 test("sends one analysis_failed when the analysis times out", async ({ page }) => {

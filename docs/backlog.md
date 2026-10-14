@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-64**
+_Next id:_ **BL-65**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -194,6 +194,12 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   and in CI, likely the case-insensitive file system serving the cached `soft-autumn` page. Make
   the check hold on any file system, or document it as Linux-only.
   _Refs:_ `e2e/site-structure.spec.ts:67` · _Status:_ open — found in `t12-mcp-teaser`, 2026-10-11
+
+- **[BL-64] `view.test.tsx` writes its footer helper twice** — "has no photo line in a quiz-only
+  footer" declares `footer` inline and "names Google's copy in a photo report's footer" repeats
+  the same regex. Hoist one `footer` helper to file scope; it edits an existing test, so it needs
+  the test edit approved.
+  _Refs:_ `apps/web/src/lib/report/view.test.tsx` · _Status:_ open — `backlog-4` phase review, 2026-10-14
 
 ## Design / UX
 
