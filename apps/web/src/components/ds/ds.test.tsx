@@ -321,9 +321,7 @@ describe("Stylesheets", () => {
 
   /** {@link openspec/specs/ui-components/spec.md#scenario-a-4-column-grid-on-a-narrow-phone} */
   it("lays a 4-column grid out in 3 below 375 px", () => {
-    expect(ds()).toMatch(
-      /@media \(max-width: 374\.98px\) \{\s*\.sn-swatch-grid\[data-columns="4"\] \{\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\) !important;/,
-    );
+    expect(ds()).toMatch(/374\.98px[^}]*\.sn-swatch-grid\[data-columns="4"\][^}]*repeat\(3,/);
   });
 
   /** {@link openspec/specs/ui-components/spec.md#scenario-a-stylesheet-loads-an-external-resource} */

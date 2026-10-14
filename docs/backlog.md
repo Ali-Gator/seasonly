@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-63**
+_Next id:_ **BL-64**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -97,10 +97,6 @@ fold items in.
   disclosed on `/privacy`. Turn on `cookieless_mode`, or add a banner with `on_reject`.
   _Refs:_ `apps/web/src/lib/observability/posthog.ts`, `openspec/specs/analytics/spec.md` ·
   _Status:_ deferred — before paid promotion or a complaint; the user's choice, 2026-10-09
-
-  2026-10-12 (carried from BL-20)
-
-  review of `t11-no-consent-step`, 2026-10-12
 
 - **[BL-62] Three more "deleted within 24 hours" lines leave out Google's copy** — the report
   footer, the report email footer and the how-it-works FAQ say the photo is deleted within 24
@@ -224,16 +220,22 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   _Refs:_ `apps/web/src/lib/report/view.tsx`, `apps/web/src/lib/report/sections.tsx` (`LEFT`,
   `RIGHT`) · _Status:_ open — t18 phase review, 2026-10-13
 
-  review, 2026-10-13
-
 - **[BL-61] "Watermelon" still runs into the gap at 375–399 px** — a 4-column cell is
   (W − 100) / 4, so at 375 px Watermelon (74.9 px at 13 px) runs about 6 px into the 12 px gap in
   columns 1–3 (Light Spring best #6, Bright Winter #1, Light Summer #20); it fits from about 400 px.
   The approved 375 board shows Soft Autumn, whose names fit, so the fix changes the approved 375
-  layout: a 375 board with a Light Spring palette first. `backlog-3` covers only below 375.
+  layout: a 375 board with a Light Spring palette first. `backlog-3` covers only below 375; a
+  container query on cell width, not viewport width, would cover both in one rule.
   _Refs:_ `apps/web/src/components/ds/ds.css` (`.sn-swatch__name`), MVP canvas board 10 · _Status:_ open — found in `backlog-3` triage, 2026-10-14
 
-  check, 2026-10-13
+- **[BL-63] The swatch grid's `!important` column rule beats Tailwind's `!` utilities** —
+  `SwatchGrid` sets its column count inline, so the below-375 rule in `ds.css` needs
+  `!important`, and inside `@layer components` that wins over any `grid-cols-N!` utility, so a
+  future override on a 4-column grid loses silently below 375 px. Set a `--sn-cols` custom
+  property instead and read it in `.sn-swatch-grid`; then neither the narrow rule nor the
+  `lg:grid-cols-N!` bangs need `!important`, and `data-columns` could become a 4-only marker.
+  Changes the inline-style tests in `ds.test.tsx`, so it needs the test edit approved.
+  _Refs:_ `apps/web/src/components/ds/swatch.tsx`, `apps/web/src/components/ds/ds.css` · _Status:_ open — `backlog-3` phase review, 2026-10-14
 
 - **[BL-04] The design system's ShareCard overflows on long names** — the approved
   `bundle.css` sets post-card names at 0.75 em, and "Bright Turquoise" needs about 379 px of a

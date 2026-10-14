@@ -24,5 +24,5 @@
 
 - [x] 3.1 `pnpm fix`, `pnpm test`
 - [x] 3.2 delete shipped bullets BL-30, BL-43, BL-44, BL-58, BL-57 from `docs/backlog.md`
-- [ ] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
-- [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge
+- [x] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
+- [x] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge
