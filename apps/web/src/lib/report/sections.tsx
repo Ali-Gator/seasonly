@@ -57,7 +57,7 @@ export function Colors({
       colors={colors}
       columns={columns}
       label={label}
-      className={wide === 6 ? "lg:grid-cols-6!" : wide === 2 ? "lg:grid-cols-2!" : undefined}
+      className={wide === 6 ? "lg:grid-cols-6" : wide === 2 ? "lg:grid-cols-2" : undefined}
     />
   );
 }
