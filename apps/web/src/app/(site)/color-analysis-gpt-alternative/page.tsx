@@ -147,7 +147,7 @@ export default function Page() {
         </div>
 
         <Note icon="clock" title="Your photo is deleted within 24 hours">
-          Only a crop of your face is uploaded. We keep your result, not your photo.
+          Only a crop of your face is uploaded. We keep your report, not your photo.
         </Note>
       </section>
 

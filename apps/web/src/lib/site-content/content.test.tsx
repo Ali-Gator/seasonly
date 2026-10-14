@@ -101,6 +101,15 @@ describe("every core page", () => {
   it.each(PAGES)("%s holds at least 250 words", async (_, render) => {
     expect(words(await render()).length).toBeGreaterThanOrEqual(250);
   });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-24-hour-notes} */
+  it.each(
+    PAGES.filter(([p]) => ["/", "/how-it-works", "/color-analysis-gpt-alternative"].includes(p)),
+  )("%s says it keeps the report, not the photo", async (_, render) => {
+    const out = text(await render());
+    expect(out).toContain("We keep your report, not your photo.");
+    expect(out).not.toContain("We keep your result");
+  });
 });
 
 describe("/", () => {

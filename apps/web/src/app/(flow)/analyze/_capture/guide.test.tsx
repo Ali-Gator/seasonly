@@ -35,7 +35,7 @@ describe("Guide", () => {
   it("says only a face crop is sent once the quiz is finished, who reads it, and links to /privacy", () => {
     const html = renderToStaticMarkup(<Guide onCamera={() => {}} onPhoto={() => {}} />);
     expect(words(html)).toContain(
-      "Only a crop of your face is sent, once you finish the quiz. An AI model from Google, through Vercel, reads its colors and doesn't train on it. We delete it within 24 hours. Privacy policy",
+      "Only a crop of your face is sent, once you finish the quiz. An AI model from Google, through Vercel, reads its colors and doesn't train on it. We delete our copy within 24 hours. Google may keep one up to 90 days for abuse checks. Privacy policy",
     );
     expect(html).toContain('href="/privacy"');
   });

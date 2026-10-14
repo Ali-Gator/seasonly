@@ -173,7 +173,7 @@ export default function Page() {
           photo passes the check and you finish the quiz.
         </Note>
         <Note icon="clock" title="Deleted within 24 hours">
-          We keep your result, your season and your colors, not your photo.
+          We keep your report, not your photo.
         </Note>
         <MoreLink href="/privacy">Read the privacy policy</MoreLink>
       </section>
