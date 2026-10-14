@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-61**
+_Next id:_ **BL-63**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -113,6 +113,14 @@ fold items in.
   _Refs:_ `apps/web/src/app/(site)/how-it-works/page.tsx`, `apps/web/src/app/(site)/page.tsx`,
   `apps/web/src/app/(site)/color-analysis-gpt-alternative/page.tsx` · _Status:_ open — phase
   review of `t11-no-consent-step`, 2026-10-12
+
+- **[BL-62] Three more "deleted within 24 hours" lines leave out Google's copy** — the report
+  footer, the report email footer and the how-it-works FAQ say the photo is deleted within 24
+  hours, with no word that Google may keep the crop up to 90 days for abuse checks (`/privacy`
+  says it; the guide notice does from `backlog-3`). Decide whether each needs the caveat; each is
+  canvas copy (boards 10, 12, HowItWorks).
+  _Refs:_ `apps/web/src/lib/report/view.tsx`, `apps/web/src/lib/email/render.ts`,
+  `apps/web/src/app/(site)/how-it-works/page.tsx` · _Status:_ open — found in `backlog-3` triage, 2026-10-14
 
 - **[BL-30] Sentry error reports can carry request bodies** — Sentry 10.75 attaches an incoming
   request's body (up to about 10 KB) to an error event by default, even with default PII off, so a
@@ -242,6 +250,13 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   names in 4-column grids below 360 px, or drop to 3 columns there.
   _Refs:_ `apps/web/src/components/ds/ds.css` (`.sn-swatch__name`) · _Status:_ open — t18 phase
   review, 2026-10-13
+
+- **[BL-61] "Watermelon" still runs into the gap at 375–399 px** — a 4-column cell is
+  (W − 100) / 4, so at 375 px Watermelon (74.9 px at 13 px) runs about 6 px into the 12 px gap in
+  columns 1–3 (Light Spring best #6, Bright Winter #1, Light Summer #20); it fits from about 400 px.
+  The approved 375 board shows Soft Autumn, whose names fit, so the fix changes the approved 375
+  layout: a 375 board with a Light Spring palette first. `backlog-3` covers only below 375.
+  _Refs:_ `apps/web/src/components/ds/ds.css` (`.sn-swatch__name`), MVP canvas board 10 · _Status:_ open — found in `backlog-3` triage, 2026-10-14
 
 - **[BL-58] A line is drawn above every overline** — the `overline` class the design system uses
   for kickers ("SEASONAL COLOR ANALYSIS", "STEP 1 OF 3") is also Tailwind's
