@@ -3,7 +3,7 @@
  */
 import type { QuizAnswers, SeasonResult } from "@seasonly/analysis";
 import * as Sentry from "@sentry/nextjs";
-import { APICallError } from "ai";
+import { APICallError, type LogWarningsFunction } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -216,6 +216,20 @@ describe("the request", () => {
     expect(files[0]).toMatchObject({ mediaType: "image/jpeg", data: { type: "data" } });
     const data = (files[0]?.data as { data: Uint8Array }).data;
     expect(new Uint8Array(data)).toEqual(FACE_CROP);
+  });
+
+  /** {@link openspec/specs/report-text/spec.md#scenario-no-deprecation-warning} */
+  it("logs no deprecation warning", async () => {
+    const previous = globalThis.AI_SDK_LOG_WARNINGS;
+    const logger = vi.fn<LogWarningsFunction>();
+    globalThis.AI_SDK_LOG_WARNINGS = logger;
+    try {
+      await run(modelReturning(VALID));
+    } finally {
+      globalThis.AI_SDK_LOG_WARNINGS = previous;
+    }
+    const warnings = logger.mock.calls.flatMap(([options]) => options.warnings);
+    expect(warnings.filter((w) => w.type === "deprecated")).toEqual([]);
   });
 });
 

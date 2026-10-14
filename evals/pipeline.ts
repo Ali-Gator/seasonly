@@ -110,7 +110,7 @@ function analyze(photo: EvalPhoto, e: Extraction, check: typeof checkPhoto) {
       variants: [],
     };
 
-  const traits = checked.traits ?? null;
+  const traits = checked.traits;
   const result = classify({ photo: traits, answers: {} });
   const variants =
     expectOf(photo) === "pass"

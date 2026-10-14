@@ -120,7 +120,10 @@ describe("the Node stage", () => {
   it("re-measures from cache, never calling the extractor again", async () => {
     await run(stubExtractor());
     const again = stubExtractor();
-    const dark = vi.fn<typeof checkPhoto>((input) => ({ ...checkPhoto(input), problem: "dark" }));
+    const dark = vi.fn<typeof checkPhoto>((input) => ({
+      measures: checkPhoto(input).measures,
+      problem: "dark",
+    }));
     const { outcomes } = await run(again, dark);
     expect(again).not.toHaveBeenCalled();
     expect(dark).toHaveBeenCalled();

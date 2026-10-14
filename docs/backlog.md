@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-65**
+_Next id:_ **BL-66**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -84,7 +84,10 @@ fold items in.
   the face sits on the color. It changes what is uploaded and stored, so a privacy review comes
   first.
   _Refs:_ `apps/web/src/lib/capture/photo.ts` (`cropBox`), `openspec/specs/draping-preview/spec.md`,
-  `t18-design-review` design.md (Non-Goals) · _Status:_ open — design review, 2026-10-12
+  `t18-design-review` design.md (Non-Goals) · _Status:_ gated — its own change: a privacy sign-off,
+  a mask source (the hair segmenter is hair-vs-rest and cannot separate face from wall; the multiclass
+  selfie segmenter or the face-oval contour can), an alpha crop format (the crop path is JPEG-only),
+  canvas boards 10/18 redrawn, and an approved paid `eval:vision` run (backlog-5 triage, 2026-10-14)
 
 - **[BL-18] A crop can stay about 49 h while the pages say 24 h** — the retention job runs once a
   day (Vercel Hobby) with a 24 h cutoff, so a crop stored just after a run lasts until the run
@@ -100,6 +103,13 @@ fold items in.
 
 ## Code quality
 
+- **[BL-65] A checked photo's pass shape is still loose one layer up** — `CheckedPhoto` keeps
+  `problem | null`, `traits: Traits | null` and `crop: Blob | null` after `PhotoCheck` became a
+  union, so `flow.tsx` still guards `checked.traits && checked.crop` and the reducer can turn a
+  pass with no photo into a no-face retake. Make `CheckedPhoto` a pass-or-rejection union and drop
+  those guards.
+  _Refs:_ `apps/web/src/lib/capture/photo.ts`, `apps/web/src/app/(flow)/analyze/flow.tsx` · _Status:_ open — `backlog-5` phase review, 2026-10-14
+
 - **[BL-02] A hung crop upload is abandoned, not cancelled** — `upload()` in
   `@supabase/storage-js` 2.117 takes no abort signal, so after the 3 s timeout the request keeps
   running until the function's time limit ends it. It is harmless today because the response is
@@ -109,18 +119,6 @@ fold items in.
   _Status:_ deferred — until Sentry shows `crop upload timed out` events, or storage-js adds a
   signal to `upload()`
 
-- **[BL-16] The vision call uses a deprecated AI SDK image part** — every call logs "The
-  "image" content part type is deprecated. Use a "file" part with mediaType". Switch the face
-  crop to a `file` part with `mediaType: "image/jpeg"` before the SDK drops it.
-  _Refs:_ `apps/web/src/lib/report-text/index.ts`, `openspec/specs/report-text/spec.md` ·
-  _Status:_ open — found in `t6-eval-set`, 2026-10-09
-
-- **[BL-60] A passing check's traits are optional in the type** — `PhotoCheck.traits?` lets a
-  stand-in `check` (eval `RunOptions.check`) pass with no traits, and `analyze` then records a pass
-  with no season instead of failing; `checkImage` and `analyze` both need `?? null`. Make
-  `PhotoCheck` a union whose pass case requires `traits`.
-  _Refs:_ `packages/analysis/src/photo-check/index.ts`, `evals/pipeline.ts`, `apps/web/src/lib/capture/photo.ts` · _Status:_ open — phase review of `backlog-2`, 2026-10-13
-
 ## Testing
 
 - **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
@@ -129,33 +127,6 @@ fold items in.
   check refuses them, decide what the bot check lets through.
   _Refs:_ `apps/web/src/app/api/analyze/route.ts` (`checkBotId`), `t18-design-review` tasks.md
   8.3 · _Status:_ deferred — until t18 is on seasonly.me (the preview sits behind Vercel login)
-
-- **[BL-47] One E2E test fails in the local phase gate** — `report-delivery.spec.ts` "answers a
-  report it cannot read with 500" expects `cache-control: private, no-store`, but local
-  `pnpm test` serves E2E with `pnpm dev`, which sends `no-cache, must-revalidate`; CI's prebuilt
-  server passes. Either set the header explicitly on that route or run that assertion only against
-  a production build, so `pnpm test` is green locally.
-  _Refs:_ `e2e/report-delivery.spec.ts:112`, `playwright.config.ts` · _Status:_ open — found in `t15-eval-growth`, 2026-10-13
-
-- **[BL-59] Local E2E times out on a loaded Mac** — with load average ~9, a full local
-  `pnpm test:e2e` fails a different set of flow tests each run on their 30 s limits (funnel,
-  analysis-flow), on `main` too (3 failed, 6 flaky); alone, each passes in ~10 s, and CI is green.
-  Cap local workers or raise the dev-mode timeouts, so the local phase gate reads true.
-  _Refs:_ `playwright.config.ts`, `e2e/funnel.spec.ts`, `e2e/analysis-flow.spec.ts` · _Status:_ open — found in `backlog-2`, 2026-10-13
-
-- **[BL-21] Two e2e cases fail on a Mac** — run locally, `/seasons/Soft-Autumn` answers 200
-  (the case-insensitive disk serves the prerendered `soft-autumn` page) and, on the dev server
-  (no `CI=1`), the report-500 page carries `no-cache, must-revalidate` instead of
-  `private, no-store`. CI on Linux passes. Skip or adapt both locally so a clean run is green.
-  _Refs:_ `e2e/site-structure.spec.ts`, `e2e/report-delivery.spec.ts`, `playwright.config.ts` ·
-  _Status:_ open — found in `t8-photo-privacy`, 2026-10-10
-
-- **[BL-22] A report page's RSC request answered 503 once** — moving from the email step to
-  `/r/<id>` on a preview, the `?_rsc` request answered 503 before the page loaded normally.
-  Find out whether the router fetched the report before it was readable and whether a visitor
-  can see an error.
-  _Refs:_ `apps/web/src/app/(report)/`, `openspec/specs/report-page/spec.md` · _Status:_ open —
-  network capture of `t8-photo-privacy`, 2026-10-10
 
 - **[BL-42] The citation gate ignores an open change's REMOVED requirements** — the gate reads
   the main specs, so a requirement an unarchived change removes must still be cited until
@@ -174,26 +145,12 @@ update`). PGlite has one connection, so the test only checks that the lock is in
   _Refs:_ `apps/web/src/lib/email/store.test.ts`, `openspec/specs/abuse-controls/spec.md` ·
   _Status:_ gated — a local Postgres in tests (the local Supabase stack needs Docker)
 
-- **[BL-12] One report-delivery E2E case fails under `pnpm dev`** — "answers a report it cannot
-  read with 500" expects `private, no-store`, but the dev server sends `no-cache,
-must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure. The built
-  server and CI pass. Skip the header assertion outside the prebuilt mode, or run local E2E
-  against a build.
-  _Refs:_ `e2e/report-delivery.spec.ts`, `playwright.config.ts` · _Status:_ open — found in
-  `t5-funnel-analytics`, 2026-10-09
-
 - **[BL-23] Two copies of the E2E PostHog recorder** — `e2e/posthog.ts` (the sample report's
   "nothing is sent" check) and `funnel.spec.ts` each route the dead PostHog host and decode its
   bodies. Point `funnel.spec.ts` at the shared helper, so a change in posthog-js's body format is
   fixed once. It is an edit to an existing test, so it waits for the user's approval.
   _Refs:_ `e2e/posthog.ts`, `e2e/funnel.spec.ts` · _Status:_ open — found in `t9-site-content`,
   2026-10-10
-
-- **[BL-31] `/seasons/Soft-Autumn` answers 200 in a full local E2E run** — the "not found" test
-  for a wrong-case season path fails in the full suite on macOS (on `main` too) but passes alone
-  and in CI, likely the case-insensitive file system serving the cached `soft-autumn` page. Make
-  the check hold on any file system, or document it as Linux-only.
-  _Refs:_ `e2e/site-structure.spec.ts:67` · _Status:_ open — found in `t12-mcp-teaser`, 2026-10-11
 
 - **[BL-64] `view.test.tsx` writes its footer helper twice** — "has no photo line in a quiz-only
   footer" declares `footer` inline and "names Google's copy in a photo report's footer" repeats

@@ -65,6 +65,10 @@ test.describe("not found", () => {
   /** {@link openspec/specs/site-structure/spec.md#scenario-a-report-id-with-no-report} */
   for (const path of ["/pricing", "/seasons/autumn", "/seasons/Soft-Autumn", "/r/unknown"]) {
     test(`${path} answers 404 with noindex and one site header`, async ({ page }) => {
+      test.skip(
+        path === "/seasons/Soft-Autumn" && process.platform === "darwin",
+        "site-structure Edge Case: a case-insensitive disk (macOS) serves the prerendered page",
+      );
       const response = await page.goto(path);
       expect(response?.status()).toBe(404);
       expect(await robotsMeta(page)).toContain("noindex");

@@ -90,7 +90,7 @@ export async function checkImage(source: Blob | ImageBitmap): Promise<CheckedPho
     ...outcome,
     problem: null,
     measures: check.measures,
-    traits: check.traits ?? null,
+    traits: check.traits,
     crop: await jpeg(out.canvas),
   };
 }

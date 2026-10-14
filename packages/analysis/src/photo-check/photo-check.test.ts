@@ -17,6 +17,7 @@ import {
   EYE_OPENINGS,
   MIN_FACE_WIDTH,
   RETAKE_TIPS,
+  type PhotoCheck,
   type PhotoCheckInput,
   type PhotoProblem,
 } from "./index.ts";
@@ -234,6 +235,18 @@ describe("checkPhoto", () => {
       const check = checkPhoto(darken(face()));
       expect(check.problem).toBe("dark");
       expect(check.traits).toBeUndefined();
+    });
+
+    /** {@link openspec/specs/photo-check/spec.md#scenario-the-type-refuses-a-pass-without-traits} */
+    it("refuses, in its type, a pass without traits and a problem with traits", () => {
+      const { measures, traits } = checkPhoto(face());
+      // Read below: an unused-local error (even `_`-prefixed) would satisfy the directive and hide a regression.
+      // @ts-expect-error a pass must carry traits
+      const passWithoutTraits: PhotoCheck = { problem: null, measures };
+      // @ts-expect-error a rejection must carry no traits
+      const darkWithTraits: PhotoCheck = { problem: "dark", measures, traits };
+      expect(passWithoutTraits.traits).toBeUndefined();
+      expect(darkWithTraits.traits).toBeDefined();
     });
   });
 
