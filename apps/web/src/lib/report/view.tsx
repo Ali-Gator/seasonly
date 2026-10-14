@@ -8,12 +8,13 @@ import { seasonName } from "@/lib/site/routes";
 import { SaveButton, ShareButton } from "./actions";
 import { ReportDraping } from "./draping";
 import type { StoredReport } from "./read";
-import { LEFT, ReportSections } from "./sections";
+import { LEFT_LAST, ReportSections } from "./sections";
 
 /**
  * The full report of canvas artboards "10 Full report · 375" and "· 1280": one DOM in phone
- * reading order, palette first; from 1024 px the copy and actions float left of the sections
- * (t5-analysis-flow decision 7, t18-design-review decision 2).
+ * reading order, palette first; from 1024 px the copy floats left of the sections and the last
+ * left block (Premium, actions, footer) stays in flow with `clear: left`, so it follows the
+ * agreement note (t5-analysis-flow decision 7, t18-design-review decision 2, BL-55).
  *
  * {@link openspec/specs/report-page/spec.md#requirement-a-stored-report-renders-the-canvas-report}
  * {@link openspec/specs/report-page/spec.md#requirement-the-report-has-a-wide-layout}
@@ -55,8 +56,9 @@ export function ReportView({ id, report }: { id: string; report: StoredReport })
           }
         />
 
-        {/* One left block from 1024 px, where the actions move above the Premium card. */}
-        <div className={`flex flex-col gap-(--space-12) lg:gap-(--space-5) ${LEFT}`}>
+        {/* One left block from 1024 px, in flow with clear: left so it follows the agreement note;
+            the actions move above the Premium card. */}
+        <div className={`flex flex-col gap-(--space-12) lg:gap-(--space-5) ${LEFT_LAST}`}>
           <div>
             <PremiumCard
               reportId={id}
