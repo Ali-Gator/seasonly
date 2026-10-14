@@ -118,6 +118,14 @@ describe("/terms", () => {
     expect(termsHtml).toContain('href="/privacy"');
     expect(terms).toMatch(/Last updated/);
   });
+
+  /** {@link openspec/specs/legal-pages/spec.md#scenario-the-support-link} */
+  it("puts the law and contact section at #contact, the listings' support URL", () => {
+    const contact = termsHtml.match(/<section[^>]*id="contact"[^>]*>[\s\S]*?<\/section>/)?.[0];
+    expect(contact).toBeDefined();
+    expect(text(contact ?? "")).toContain("Law and contact");
+    expect(contact).toContain('href="mailto:care@seasonly.me"');
+  });
 });
 
 describe("both legal pages", () => {

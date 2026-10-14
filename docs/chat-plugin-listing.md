@@ -55,13 +55,13 @@ A brand name; it does not use or imply "GPT", "ChatGPT", "OpenAI", "Claude" or "
 
 ### URLs
 
-| Field         | URL                                                                                                            |
-| ------------- | -------------------------------------------------------------------------------------------------------------- |
-| Documentation | `https://seasonly.me/color-analysis-gpt-alternative#chat-plugin`                                               |
-| Privacy       | `https://seasonly.me/privacy#chat-plugin`                                                                      |
-| Terms         | `https://seasonly.me/terms`                                                                                    |
-| Support       | `https://seasonly.me/terms` (its last section gives `care@seasonly.me`; both portals want an HTTPS URL, BL-37) |
-| Website       | `https://seasonly.me`                                                                                          |
+| Field         | URL                                                              |
+| ------------- | ---------------------------------------------------------------- |
+| Documentation | `https://seasonly.me/color-analysis-gpt-alternative#chat-plugin` |
+| Privacy       | `https://seasonly.me/privacy#chat-plugin`                        |
+| Terms         | `https://seasonly.me/terms`                                      |
+| Support       | `https://seasonly.me/terms#contact`                              |
+| Website       | `https://seasonly.me`                                            |
 
 ### Icon
 

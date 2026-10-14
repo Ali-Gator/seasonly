@@ -66,7 +66,13 @@ export default function Page() {
         <p className="lead">By using Seasonly you agree to these terms. They are short.</p>
       </div>
       {SECTIONS.map(([heading, body]) => (
-        <section key={heading} className="flex flex-col gap-(--space-3)">
+        <section
+          key={heading}
+          // The listings' support URL is /terms#contact.
+          // {@link openspec/specs/legal-pages/spec.md#requirement-the-terms-state-what-the-service-is-and-its-limits}
+          id={heading === "Law and contact" ? "contact" : undefined}
+          className="flex flex-col gap-(--space-3)"
+        >
           <h2 className="h2">{heading}</h2>
           <p>{body}</p>
         </section>
