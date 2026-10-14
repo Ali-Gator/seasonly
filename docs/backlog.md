@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-61**
+_Next id:_ **BL-64**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -98,29 +98,13 @@ fold items in.
   _Refs:_ `apps/web/src/lib/observability/posthog.ts`, `openspec/specs/analytics/spec.md` ·
   _Status:_ deferred — before paid promotion or a complaint; the user's choice, 2026-10-09
 
-- **[BL-43] The guide notice does not say Google may keep the crop** — the photo guide names
-  Google as the reader, then says "We delete it within 24 hours", while `/privacy` says Google may
-  keep the crop up to 90 days for abuse checks. The notice links to `/privacy`, but a reader of the
-  notice alone thinks every copy is gone in a day. Needs a canvas line (board 02) first.
-  _Refs:_ `apps/web/src/app/(flow)/analyze/_capture/steps.tsx` (`Guide`),
-  `openspec/specs/capture-flow/spec.md` · _Status:_ open — phase review of `t11-no-consent-step`,
-  2026-10-12 (carried from BL-20)
-
-- **[BL-44] Three site pages still say "We keep your result"** — `/how-it-works` ("Deleted within
-  24 hours" note), the landing and `/color-analysis-gpt-alternative` say only the result is kept,
-  though the report also holds the measured traits, quiz answers and personal text (the email
-  footer and the how-it-works FAQ now say "your report"). Needs a canvas line first.
-  _Refs:_ `apps/web/src/app/(site)/how-it-works/page.tsx`, `apps/web/src/app/(site)/page.tsx`,
-  `apps/web/src/app/(site)/color-analysis-gpt-alternative/page.tsx` · _Status:_ open — phase
-  review of `t11-no-consent-step`, 2026-10-12
-
-- **[BL-30] Sentry error reports can carry request bodies** — Sentry 10.75 attaches an incoming
-  request's body (up to about 10 KB) to an error event by default, even with default PII off, so a
-  failed analyze or email request can send quiz answers or email addresses. `/privacy`'s Sentry row
-  says only "the page address and your browser". Either set `ignoreRequestBody` / `maxRequestBodySize`
-  or update the row (the plugin section already discloses it).
-  _Refs:_ `apps/web/sentry.server.config.ts`, `apps/web/src/app/(site)/privacy/page.tsx`
-  · _Status:_ open — found in `t12-mcp-teaser`, 2026-10-11
+- **[BL-62] Three more "deleted within 24 hours" lines leave out Google's copy** — the report
+  footer, the report email footer and the how-it-works FAQ say the photo is deleted within 24
+  hours, with no word that Google may keep the crop up to 90 days for abuse checks (`/privacy`
+  says it; the guide notice does from `backlog-3`). Decide whether each needs the caveat; each is
+  canvas copy (boards 10, 12, HowItWorks).
+  _Refs:_ `apps/web/src/lib/report/view.tsx`, `apps/web/src/lib/email/render.ts`,
+  `apps/web/src/app/(site)/how-it-works/page.tsx` · _Status:_ open — found in `backlog-3` triage, 2026-10-14
 
 ## Code quality
 
@@ -236,20 +220,22 @@ must-revalidate`, so a local `pnpm test:e2e` (dev mode) always shows one failure
   _Refs:_ `apps/web/src/lib/report/view.tsx`, `apps/web/src/lib/report/sections.tsx` (`LEFT`,
   `RIGHT`) · _Status:_ open — t18 phase review, 2026-10-13
 
-- **[BL-57] Ten-letter color names overflow narrow 4-column grids** — names now break only
-  between words, and "Watermelon" (75 px at 13 px) is wider than a 4-column cell below 390 px.
-  At 360–375 px it runs into the 12 px gap; below about 340 px it reaches the next cell. Shrink
-  names in 4-column grids below 360 px, or drop to 3 columns there.
-  _Refs:_ `apps/web/src/components/ds/ds.css` (`.sn-swatch__name`) · _Status:_ open — t18 phase
-  review, 2026-10-13
+- **[BL-61] "Watermelon" still runs into the gap at 375–399 px** — a 4-column cell is
+  (W − 100) / 4, so at 375 px Watermelon (74.9 px at 13 px) runs about 6 px into the 12 px gap in
+  columns 1–3 (Light Spring best #6, Bright Winter #1, Light Summer #20); it fits from about 400 px.
+  The approved 375 board shows Soft Autumn, whose names fit, so the fix changes the approved 375
+  layout: a 375 board with a Light Spring palette first. `backlog-3` covers only below 375; a
+  container query on cell width, not viewport width, would cover both in one rule.
+  _Refs:_ `apps/web/src/components/ds/ds.css` (`.sn-swatch__name`), MVP canvas board 10 · _Status:_ open — found in `backlog-3` triage, 2026-10-14
 
-- **[BL-58] A line is drawn above every overline** — the `overline` class the design system uses
-  for kickers ("SEASONAL COLOR ANALYSIS", "STEP 1 OF 3") is also Tailwind's
-  `text-decoration-line: overline` utility, which wins over the component rule, so each kicker has
-  a thin line above it on every page. Rename the class or reset the decoration in the utilities
-  layer.
-  _Refs:_ `apps/web/src/app/globals.css` (`.overline`) · _Status:_ open — found in the t18 browser
-  check, 2026-10-13
+- **[BL-63] The swatch grid's `!important` column rule beats Tailwind's `!` utilities** —
+  `SwatchGrid` sets its column count inline, so the below-375 rule in `ds.css` needs
+  `!important`, and inside `@layer components` that wins over any `grid-cols-N!` utility, so a
+  future override on a 4-column grid loses silently below 375 px. Set a `--sn-cols` custom
+  property instead and read it in `.sn-swatch-grid`; then neither the narrow rule nor the
+  `lg:grid-cols-N!` bangs need `!important`, and `data-columns` could become a 4-only marker.
+  Changes the inline-style tests in `ds.test.tsx`, so it needs the test edit approved.
+  _Refs:_ `apps/web/src/components/ds/swatch.tsx`, `apps/web/src/components/ds/ds.css` · _Status:_ open — `backlog-3` phase review, 2026-10-14
 
 - **[BL-04] The design system's ShareCard overflows on long names** — the approved
   `bundle.css` sets post-card names at 0.75 em, and "Bright Turquoise" needs about 379 px of a

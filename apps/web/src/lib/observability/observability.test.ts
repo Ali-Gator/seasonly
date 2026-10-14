@@ -1,10 +1,13 @@
+import { httpIntegration } from "@sentry/nextjs";
 import posthog from "posthog-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { initPostHog } from "./posthog";
 import { baseSentryOptions } from "./sentry";
+import { serverSentryOptions } from "./sentry-server";
 
 vi.mock("posthog-js", () => ({ default: { init: vi.fn() } }));
+vi.mock("@sentry/nextjs", () => ({ httpIntegration: vi.fn(() => ({ name: "Http" })) }));
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -35,5 +38,20 @@ describe("observability without keys", () => {
     });
     expect(initPostHog()).toBe(true);
     expect(posthog.init).toHaveBeenCalledWith("phc_test", expect.any(Object));
+  });
+});
+
+describe("server Sentry setup", () => {
+  /** {@link openspec/specs/observability/spec.md#scenario-the-server-setup} */
+  it("captures no incoming request body and keeps request spans off", () => {
+    const defaults = [{ name: "Http" }, { name: "Console" }];
+    const integrations = serverSentryOptions().integrations(defaults);
+    expect(httpIntegration).toHaveBeenCalledWith({
+      disableIncomingRequestSpans: true,
+      maxIncomingRequestBodySize: "none",
+    });
+    expect(integrations).not.toContain(defaults[0]);
+    expect(integrations).toContain(defaults[1]);
+    expect(integrations).toContain(vi.mocked(httpIntegration).mock.results[0]?.value);
   });
 });

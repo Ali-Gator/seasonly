@@ -30,13 +30,22 @@ export interface SwatchGridProps {
   columns?: number;
   label?: string;
   className?: string;
+  /** Keep the column count below 375 px, where a 4-column grid otherwise lays out in 3 (BL-57). */
+  keepColumns?: boolean;
 }
 
-export function SwatchGrid({ colors, columns = 4, label, className }: SwatchGridProps) {
+export function SwatchGrid({
+  colors,
+  columns = 4,
+  label,
+  className,
+  keepColumns = false,
+}: SwatchGridProps) {
   return (
     <ul
       className={cx("sn-swatch-grid", className)}
       style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+      data-columns={keepColumns ? undefined : columns}
       aria-label={label}
     >
       {colors.map((c) => (

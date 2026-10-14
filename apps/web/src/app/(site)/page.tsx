@@ -147,7 +147,7 @@ export default function Page() {
             title="Your photo is deleted within 24 hours"
             className="max-lg:order-1"
           >
-            Only a crop of your face is uploaded. We keep your result, not your photo.
+            Only a crop of your face is uploaded. We keep your report, not your photo.
           </Note>
           <Note icon="sun" title="Daylight, no makeup, no filter" className="hidden lg:flex">
             Three things that change how your skin reads. Get them right and the result gets

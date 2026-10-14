@@ -17,7 +17,7 @@ Gives the web app the Seasonly design system's tokens and type styles as CSS var
 
 ## Behavior
 
-Artboard markup ports without renaming: `style="gap: var(--space-4)"` and `class="h1"` work as they do on the canvas. Updating the design system means replacing `tokens.json`; the unit test then lists every variable and type class to change. The type classes and the few ported component classes (`.sn-screen`, `.sn-btn`, `.sn-wordmark`, `.sn-navlink`) sit in `@layer components`, so Tailwind utilities still override them. Tailwind stays for layout; the tokens have no `@theme` mapping until a page needs one as a utility.
+Artboard markup ports without renaming: `style="gap: var(--space-4)"` and `class="h1"` work as they do on the canvas. Updating the design system means replacing `tokens.json`; the unit test then lists every variable and type class to change. The type classes and the few ported component classes (`.sn-screen`, `.sn-btn`, `.sn-wordmark`, `.sn-navlink`) sit in `@layer components`, so Tailwind utilities still override them. Tailwind's `overline` utility is not generated (`@source not inline("overline")`), so it cannot draw a line on the kicker class. Tailwind stays for layout; the tokens have no `@theme` mapping until a page needs one as a utility.
 
 ## Edge Cases
 
@@ -43,12 +43,17 @@ The repo SHALL keep a copy of the design system's `tokens.json` at `apps/web/src
 
 ### Requirement: The type styles are classes with the design-system values
 
-`globals.css` SHALL define the classes `.display`, `.h1`, `.h2`, `.h3`, `.quote`, `.lead`, `.body`, `.label`, `.caption`, `.hex` and `.overline`, each with the font family, size, line height, weight, letter spacing, style and optical size its type style has in `tokens.json`.
+`globals.css` SHALL define the classes `.display`, `.h1`, `.h2`, `.h3`, `.quote`, `.lead`, `.body`, `.label`, `.caption`, `.hex` and `.overline`, each with the font family, size, line height, weight, letter spacing, style and optical size its type style has in `tokens.json`. No type class SHALL draw a text decoration: a utility of the same name (Tailwind's `overline` draws a line above the text) SHALL NOT apply to it.
 
 #### Scenario: A type style differs from tokens.json
 
 - **WHEN** a class's font size, line height or weight differs from its type style in `tokens.json`
 - **THEN** the unit suite fails, naming the class and the property
+
+#### Scenario: A kicker on a page
+
+- **WHEN** a page with an `.overline` kicker is loaded
+- **THEN** the kicker's computed `text-decoration-line` is `none`
 
 ### Requirement: Fonts are self-hosted and the page uses paper and ink
 
