@@ -93,6 +93,7 @@ export type DrapingPairProps = {
   best: Color;
   worst: Color;
   className?: string;
+  faceMaskSrc?: string; // the face's outline; same-origin only, ignored without faceSrc
 } & ({ faceSrc: string; faceAlt: string } | { faceSrc?: undefined; faceAlt?: undefined });
 
 export interface EmailInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
@@ -135,6 +136,7 @@ They are server components: no state, no effects, no `"use client"`. ReportSecti
 Since `t18-design-review` (design system version 30):
 
 - The draping frame is a positioned box with `overflow: hidden`. The face's oval sits inside it with no ring, its image zoomed 1.15×, and a `::after` collar with `background: inherit` takes the frame's inline color over the oval's bottom.
+- With `faceMaskSrc`, the slot gets `sn-drape__face--cut` and `--sn-face-mask: url("…")`. `.sn-drape__face--cut` drops the slot's fill, and its `img` takes `-webkit-mask` and `mask` of `var(--sn-face-mask) 50% 40% / cover no-repeat`, the image's own fit and position, so the outline lines up under the 1.15× zoom. CSS fetches a mask in CORS mode and treats one that fails to load or decode as transparent, so the outline must be same-origin and set only once it has loaded (t19-draping-cutout).
 - A swatch name keeps `min-height: 36px` (two 18 px lines) and breaks only between words; the large swatch drops the reserved line.
 - The step progress's current bar is a gradient that stops at `--sn-steps-fill`, which StepProgress sets inline from `sub`; without one it fills whole.
 - `.sn-btn--lg-swap`, in `globals.css` and not in the bundle, swaps the primary and secondary fills from 1024 px on buttons that are not disabled. It stays out of the design system because a viewport query would also swap the canvas's phone boards.
@@ -397,3 +399,17 @@ A swatch strip SHALL render a row of color chips with no visible names or hex co
 
 - **WHEN** a swatch strip renders Pumpkin `#D2691E`, Peacock Teal `#1F6E6E`, Mustard `#CC9B2B` and Salmon `#E07B5A` with the label "True Autumn colors"
 - **THEN** it is a list labeled "True Autumn colors" with four items, each filled with its color, whose accessible text is that color's name, and no hex code is visible
+
+### Requirement: A draping pair can cut the face out with its outline
+
+DrapingPair SHALL take an optional outline source next to its face source. With both, each frame's face image SHALL be masked by the outline, aligned with the image as it is cropped, positioned and zoomed in its oval. The oval SHALL have no fill of its own behind the image, so the frame's color shows wherever the outline is transparent. Without an outline source, the face SHALL fill its oval as it does today. An outline source without a face source SHALL be ignored.
+
+#### Scenario: A pair with an outline
+
+- **WHEN** DrapingPair renders with a face source and an outline source
+- **THEN** both face images are masked by that outline, and the oval behind each image has no fill, so the frame's color shows through
+
+#### Scenario: A pair without an outline
+
+- **WHEN** DrapingPair renders with a face source and no outline source
+- **THEN** both face images carry no mask, as before this change

@@ -21,10 +21,14 @@ type Step =
 function initialState(): FlowState;
 function reduce(s: FlowState, e: FlowEvent): FlowState; // push = new history entry, replace = same entry, back = pop
 function stepProgress(step: Step): number | null; // Photo 0, Quiz 1, Result 2; none on the reveal
-function toFormData(r: AnalysisRequest): FormData; // answers always; traits + crop only with a photo
+function toFormData(r: AnalysisRequest): FormData; // answers always; traits + crop only with a photo; mask (mask.png) only when the photo has one
 
 // apps/web/src/lib/capture/ (browser only)
-function checkImage(source: Blob | ImageBitmap): Promise<CheckedPhoto>; // decode, ≤ 1280 px, landmarks, hair mask, checkPhoto, crop
+function checkImage(source: Blob | ImageBitmap): Promise<CheckedPhoto>; // decode, ≤ 1280 px, landmarks, hair mask, checkPhoto, crop, outline
+interface CheckedPhoto {
+  /* … */ crop: Blob | null;
+  mask: Blob | null;
+} // mask: the crop's PNG outline, null without a pass or a segmenter
 function pickFace(
   faces: readonly Landmarks[],
   width: number,
@@ -35,7 +39,8 @@ function cropBox(
   width: number,
   height: number,
 ): Box & { outWidth: number; outHeight: number };
-function loadVision(): Promise<{ landmarker: FaceLandmarker; segmenter: ImageSegmenter }>; // once per visit, CPU delegate
+function loadVision(): Promise<{ landmarker: FaceLandmarker; segmenter: ImageSegmenter }>; // once per visit, CPU delegate; then starts loadPerson
+function loadPerson(): Promise<ImageSegmenter>; // the selfie segmenter (PERSON_MODEL), confidence mask, cached on its own
 export { track } from "@/lib/analytics"; // re-exported; owned by analytics, no-op without PostHog
 function photoCheckedProps(o: {
   problem;
@@ -51,7 +56,8 @@ function photoCheckedProps(o: {
 - `Flow` (`flow.tsx`) is the only client component with state. It maps the reducer's trail onto browser history: one `pushState({ depth })` per trail entry, numbered from the entry it mounted on. A popstate below the shown depth dispatches `back` once per level; Forward is undone with `history.go`; an entry below the mount's base belongs to an earlier visit, so Back onto it leaves the flow. With no page before that entry the browser stays, and the flow re-bases on the guide.
 - The check and the analysis replace their spinner with the outcome, so Back never lands on a spinner. Each check carries an id; a result whose id is not the shown `checking` step is dropped and not reported.
 - The camera frame is taken before `checking` unmounts the camera. The photo is checked at ≤ 1280 px on its longer side; the crop is the face box plus 30 % per side, ≤ 512 px, JPEG 0.85.
-- MediaPipe's wasm comes from jsDelivr at the exact installed `@mediapipe/tasks-vision` version, the models from Google's versioned paths; both start loading on the guide.
+- MediaPipe's wasm comes from jsDelivr at the exact installed `@mediapipe/tasks-vision` version, the models from Google's versioned paths; both start loading on the guide. The person segmenter (0.25 MB) starts once the other two have loaded, since MediaPipe's loaders share one global.
+- After a pass, `checkImage` waits at most 3 s for the person segmenter and runs it on the crop canvas. The outline is black with alpha `round(confidence × 255)`, the crop's size, encoded `toBlob("image/png")`. It is dropped (`mask: null`) when the segmenter is late or fails, or when the mean confidence over the crop's middle third is below 0.5, so it never empties the oval. Measured 2026-10-15 on a real selfie: 13.6 KB.
 - A check that throws (an undecodable file, models that failed to load) shows the no-face retake and goes to Sentry.
 - Each new step scrolls to the top and focuses its `main h1`. The effect skips while the step is the one it last handled, which is the opening guide on mount and on StrictMode's second run, so `/analyze` opens without moving focus; Back to the guide still moves it. `globals.css` draws no outline on `h1[tabindex="-1"]:focus`.
 - The retake screen takes the second-failure layout when `offerQuizOnly` is set: the photo as a 96 px thumbnail beside an `h1` styled `h2`, then the notes, then "Retake photo", "Continue with the quiz only" (secondary) and "Upload a different photo".
@@ -174,10 +180,22 @@ The threshold is measured on the labeled eval set (`analysis-eval`, 2026-10-09):
 
 The upload SHALL hold only a crop of the face, never the whole photo. The crop SHALL be the face landmarks' bounding box widened by a margin on every side and clamped to the image. It SHALL be scaled down to at most 512 px on its longer side and encoded as JPEG. The traits SHALL be measured from the full photo the check passed, before cropping.
 
+With the crop, the upload SHALL carry the crop's outline when the device can make one. The outline is a PNG with exactly the crop's width and height. Its alpha is the person segmenter's confidence that each pixel shows the person, so the background is transparent. The outline SHALL be made on the device from the crop alone. It SHALL change neither the crop nor the traits. When the person segmenter fails to load or to run, the photo SHALL still pass, and the upload SHALL carry the crop and the traits without an outline.
+
 #### Scenario: A large photo
 
 - **WHEN** a 3000 × 4000 photo with a face 1200 px wide passes
 - **THEN** the uploaded crop is a JPEG no larger than 512 px on its longer side and contains the whole face box
+
+#### Scenario: The crop's outline
+
+- **WHEN** a photo passes and the person segmenter runs on its crop
+- **THEN** the upload carries a PNG outline with the crop's width and height, opaque on the person and transparent on the background
+
+#### Scenario: No person segmenter
+
+- **WHEN** a photo passes but the person segmenter failed to load
+- **THEN** the photo is not asked to be retaken, and the upload carries the crop and the traits without an outline
 
 ### Requirement: Repeated failures offer a quiz-only result
 
@@ -229,7 +247,7 @@ It SHALL NOT carry pixels, the image, the landmarks or the crop. With PostHog of
 
 ### Requirement: Nothing leaves the device before the quiz is finished
 
-The photo, its face crop and its traits SHALL NOT be sent anywhere before the person answers the quiz's last question. They SHALL be sent only with the analyze request. A person who leaves the flow before that sends nothing, whether by Back, by closing the page or by reloading it. The full photo SHALL never be sent.
+The photo, its face crop, the crop's outline and its traits SHALL NOT be sent anywhere before the person answers the quiz's last question. They SHALL be sent only with the analyze request. A person who leaves the flow before that sends nothing, whether by Back, by closing the page or by reloading it. The full photo SHALL never be sent.
 
 #### Scenario: Leaving during the quiz
 
@@ -240,6 +258,11 @@ The photo, its face crop and its traits SHALL NOT be sent anywhere before the pe
 
 - **WHEN** the person answers the last question
 - **THEN** one analyze request carries the answers, the traits and the face crop
+
+#### Scenario: The quiz is finished with an outline
+
+- **WHEN** the person whose photo passed with an outline answers the last question
+- **THEN** that one analyze request also carries the outline, and no other request carries it
 
 ### Requirement: A new step moves focus to its heading, the first screen does not
 
