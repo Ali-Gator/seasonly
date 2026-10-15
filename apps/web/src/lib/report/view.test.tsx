@@ -25,6 +25,8 @@ const words = (markup: string) =>
     .replace(/&#x27;/g, "'")
     .replace(/&amp;/g, "&")
     .replace(/\s+/g, " ");
+/** The page's `<footer>` as words, or "" when there is none. */
+const footer = (markup: string) => words(/<footer[\s\S]*?<\/footer>/.exec(markup)?.[0] ?? "");
 /** Each section's overline and title, in order. */
 const sections = (markup: string) =>
   [
@@ -167,7 +169,6 @@ describe("ReportView", () => {
 
   /** {@link openspec/specs/report-page/spec.md#scenario-a-quiz-only-reports-footer} */
   it("has no photo line in a quiz-only footer", () => {
-    const footer = (markup: string) => words(/<footer[\s\S]*?<\/footer>/.exec(markup)?.[0] ?? "");
     const quiz = footer(html({ ...PHOTO, agreement: "quiz-only", textSource: "quiz-only" }));
     expect(quiz).not.toMatch(/photo/i);
     expect(quiz).toContain(`This report stays at seasonly.me/r/${ID}.`);
@@ -176,11 +177,11 @@ describe("ReportView", () => {
 
   /** {@link openspec/specs/report-page/spec.md#scenario-a-photo-reports-footer} */
   it("names Google's copy in a photo report's footer", () => {
-    const footer = words(/<footer[\s\S]*?<\/footer>/.exec(out)?.[0] ?? "");
-    expect(footer).toContain(
+    const photo = footer(out);
+    expect(photo).toContain(
       "We delete our copy of your face crop within 24 hours of your analysis. Google may keep one up to 90 days for abuse checks.",
     );
-    expect(footer).not.toContain("Your photo is deleted within 24 hours");
+    expect(photo).not.toContain("Your photo is deleted within 24 hours");
   });
 
   /** {@link openspec/specs/report-page/spec.md#scenario-a-desktop-window} */

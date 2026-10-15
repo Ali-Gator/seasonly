@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-69**
+_Next id:_ **BL-73**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -109,28 +109,24 @@ fold items in.
 
 ## Testing
 
+- **[BL-71] The gate's rename readers accept only one `FROM:`/`TO:` spelling** — `deltaAnchors`
+  and `deltaProof` read only a `-` bullet, single spaces and a backticked heading, while OpenSpec
+  also accepts no backticks, `*`/`+` bullets and extra spaces. A valid rename written that
+  way blocks its change (fails closed). Use OpenSpec's pattern shape for both readers.
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-7` review, 2026-10-15
+
+- **[BL-72] No test pins that a delta naming the unenforced flag mid-sentence exempts nothing** —
+  a MODIFIED delta whose body only mentions the flag must keep its uncited requirement reported.
+  Today it holds through the line-start match alone; a regression would fail open. Add a
+  `deltaProof` + `unprovenRequirements` rule test (edits the approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-7` review, 2026-10-15
+
 - **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
   403 now shows the blocked screen, but nobody has opened seasonly.me inside either app and run a
   photo. Run it once on a phone after `t18-design-review` ships (one paid vision call), and if the
   check refuses them, decide what the bot check lets through.
   _Refs:_ `apps/web/src/app/api/analyze/route.ts` (`checkBotId`), `t18-design-review` tasks.md
   8.3 · _Status:_ deferred — until t18 is on seasonly.me (the preview sits behind Vercel login)
-
-- **[BL-66] A RENAMED `TO:` name with a backtick slugs wrong** — `deltaAnchors` in the citation
-  gate reads `TO:` names with a regex that stops at the first backtick inside the name, so a
-  rename to a name like the fixture's `` `plan_shared` fires … `` slugs as `requirement-` and a
-  test citing the new name is reported stale. The `FROM:` reader added in `backlog-6` reads to
-  the end of the line; `TO:` should too. Best done as one shared delta-section parser with one
-  rename regex, which also stops `deltaAnchors` and `deltaProof` parsing each delta twice and
-  `openDeltas()` reading every delta file twice per run.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open
-
-- **[BL-67] A change that marks a requirement unenforced still has to cite it until archive** —
-  `deltaProof` ignores the `**Unenforced:**` flag on a MODIFIED requirement, so a change that
-  makes a requirement unenforced and drops its last citing test fails the proof check until
-  archive, the same deadlock `backlog-6` fixed for removed and renamed ones. Treat it as gone, and
-  add the clause to the spec-workflow requirement.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open
 
 - **[BL-08] Two concurrent email stores are never raced in a test** — the abuse-controls
   scenario "Two requests at once" rests on `store_report_email` locking the report row (`for
@@ -139,12 +135,6 @@ update`). PGlite has one connection, so the test only checks that the lock is in
   Unenforced.
   _Refs:_ `apps/web/src/lib/email/store.test.ts`, `openspec/specs/abuse-controls/spec.md` ·
   _Status:_ gated — a local Postgres in tests (the local Supabase stack needs Docker)
-
-- **[BL-64] `view.test.tsx` writes its footer helper twice** — "has no photo line in a quiz-only
-  footer" declares `footer` inline and "names Google's copy in a photo report's footer" repeats
-  the same regex. Hoist one `footer` helper to file scope; it edits an existing test, so it needs
-  the test edit approved.
-  _Refs:_ `apps/web/src/lib/report/view.test.tsx` · _Status:_ open — `backlog-4` phase review, 2026-10-14
 
 ## Design / UX
 
@@ -169,11 +159,10 @@ update`). PGlite has one connection, so the test only checks that the lock is in
   DOM card preview (`t5-report-delivery` shows the PNGs themselves); check whether the 2026-10-07
   redesign session already updated the canvas
 
-- **[BL-26] The famous photos bypass `Slot`** — the season page builds its own `sn-slot` and
-  `img` only to add `loading="lazy"`. Give the design system's `Slot` (and bundle.js) a `loading`
-  prop and use it there.
-  _Refs:_ `apps/web/src/components/ds/slot.tsx`, `apps/web/src/app/(site)/seasons/[season]/page.tsx`
-  · _Status:_ open — t9 phase review, 2026-10-10
+- **[BL-70] The season reveal builds its own photo slot** — `_reveal/steps.tsx` hand-builds an
+  `sn-slot` and `img` that the design system's `Slot` already covers (`src`, `alt`, `className`).
+  `Slot` is exported from `@/components/ds` since `backlog-7`; use it there.
+  _Refs:_ `apps/web/src/app/(flow)/analyze/_reveal/steps.tsx`, `openspec/specs/season-reveal/spec.md` · _Status:_ open — found in `backlog-7` triage, 2026-10-15
 
 - **[BL-27] The GPT-alternative page goes stale on December 11** — its title, description, h1
   and lead say the GPT "is retiring" on December 11, 2026. Re-check OpenAI's FAQ and switch the

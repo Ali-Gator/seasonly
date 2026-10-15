@@ -5,8 +5,9 @@
  * and `@see openspec/specs/<cap>/spec.md` links. Anchors are GitHub heading slugs of a
  * `### Requirement:` or `#### Scenario:` heading. A citation resolves against the main
  * specs plus the ADDED/MODIFIED/RENAMED headings of unarchived changes; only main-spec
- * requirements must be proven, minus those an unarchived change removes or renames away
- * from, and a modified one is also proven by a test citing a scenario its delta adds.
+ * requirements must be proven, minus those an unarchived change removes, renames away
+ * from or marks unenforced, and a modified one is also proven by a test citing a scenario
+ * its delta adds.
  * A test is any file with `.test.` or `__tests__/` in its path, or anything under `e2e/`.
  *
  * Fixture citations below are built by concatenation so this file's own scan never
@@ -78,7 +79,7 @@ function parseRequirements(text: string): Requirement[] {
       current = undefined;
     } else if (current && scenario?.[1]) {
       current.scenarios.push(slugify(scenario[1]));
-    } else if (current && line.includes("**Unenforced:**")) {
+    } else if (current && line.startsWith("**Unenforced:**")) {
       current.unenforced = true;
     }
   }
@@ -96,7 +97,7 @@ function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): 
   const renamed = sections
     .filter((s) => s.startsWith("## RENAMED Requirements"))
     .flatMap((s) =>
-      [...s.matchAll(/TO: `### (Requirement: [^`]+)`/g)].map((m) => slugify(m[1] ?? "")),
+      [...s.matchAll(/TO: `### (Requirement: .+)`\s*$/gm)].map((m) => slugify(m[1] ?? "")),
     );
   const anchors: string[] = [...renamed];
   for (const section of sections) {
@@ -113,7 +114,7 @@ function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): 
 
 /** What open changes do to the proof check, per capability. */
 interface OpenDelta {
-  /** Requirements a delta removes or renames away from: they need no citing test. */
+  /** Requirements a delta removes, renames away from or marks unenforced: they need no citing test. */
   gone: Set<string>;
   /** Scenarios a delta adds to a modified requirement: citing one proves it. */
   scenarios: Map<string, string[]>;
@@ -134,6 +135,7 @@ function deltaProof(
       }
     } else if (section.startsWith("## MODIFIED Requirements")) {
       for (const r of parseRequirements(body)) {
+        if (r.unenforced) into.gone.add(r.anchor);
         into.scenarios.set(r.anchor, [...(into.scenarios.get(r.anchor) ?? []), ...r.scenarios]);
       }
     }
@@ -351,6 +353,17 @@ describe("spec citation rules", () => {
     ]);
   });
 
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-whose-prose-only-names-the-flag} */
+  it("a requirement whose prose only names the unenforced flag still needs a citing test", () => {
+    const prose = [
+      "### Requirement: Names the flag",
+      "",
+      "A requirement nobody can test carries a `**Unenforced:**` line giving the reason.",
+    ];
+    const named = new Map([["cap", parseRequirements(prose.join("\n"))]]);
+    expect(unprovenRequirements(named, [])).toEqual(["cap: Requirement: Names the flag"]);
+  });
+
   /** {@link openspec/specs/constitution/spec.md#scenario-only-code-cites-a-requirement} */
   it("a citation from code does not prove a requirement", () => {
     const citations = extractCitations("apps/web/src/lib/a.ts", cite("cap", REQ));
@@ -447,6 +460,16 @@ describe("spec citation rules", () => {
     expect(deltaAnchors(delta.join("\n"), new Set(["requirement-old-thing"]))).toEqual([]);
   });
 
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-test-citing-a-new-name-that-holds-a-code-span} */
+  it("a RENAMED name that holds a code span is citable in full", () => {
+    const delta = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: Old flag`",
+      "- TO: `### Requirement: The `foo` flag`",
+    ];
+    expect(deltaAnchors(delta.join("\n"))).toEqual(["requirement-the-foo-flag"]);
+  });
+
   /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-an-unarchived-change-removes-or-renames} */
   it("a requirement an open change removes or renames away from needs no citing test", () => {
     const removed = ["## REMOVED Requirements", "### Requirement: Untested", "**Reason**: gone"];
@@ -473,6 +496,19 @@ describe("spec citation rules", () => {
     const citations = extractCitations("a.test.ts", cite("cap", "scenario-now-tested"));
     expect(
       unprovenRequirements(specs, citations, new Map([["cap", deltaProof(delta.join("\n"))]])),
+    ).toEqual(["cap: Requirement: `plan_shared` fires on a slug-mint, never: on open"]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-an-unarchived-change-marks-unenforced} */
+  it("a requirement an open change marks unenforced needs no citing test", () => {
+    const delta = [
+      "## MODIFIED Requirements",
+      "### Requirement: Untested",
+      "",
+      "**Unenforced:** a judgment call now.",
+    ];
+    expect(
+      unprovenRequirements(specs, [], new Map([["cap", deltaProof(delta.join("\n"))]])),
     ).toEqual(["cap: Requirement: `plan_shared` fires on a slug-mint, never: on open"]);
   });
 
