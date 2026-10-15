@@ -55,7 +55,10 @@ fold items in.
   a fresh run instead of the committed result.
   _Refs:_ `.github/workflows/eval-weekly.yml`, `evals/gate.ts` · _Status:_ deferred — until four
   consecutive weekly runs fetch cleanly and match the committed metrics within the drift the
-  analysis-eval spec allows another machine
+  analysis-eval spec allows another machine; 0 of 4 so far (the one run, manual `38420860039` on
+  2026-10-13, failed its fetch on Commons 429s before the BL-52 retry fix), first scheduled run
+  2026-10-19, and the spec's drift ("may move a metric slightly") needs a number before this can
+  close (backlog-8 triage, 2026-10-15)
 
 - **[BL-50] Re-sweep the eye-white tint limit on the new measure** — `MAX_EYE_WHITE_CHROMA`
   (C\*ab 22) was tuned on the old brightest-40% eye white; tuning `tint` false rejects are 12 of 27.
@@ -74,7 +77,7 @@ fold items in.
   requirement "Eye whites that cannot be measured do not reject a photo".
   _Refs:_ `packages/analysis/src/sampling/index.ts`, `openspec/changes/archive/*-backlog-1/design.md` · _Status:_ deferred —
   until about 50 production `photo_checked` events (PostHog, excluding preview hosts and Oleg's own
-  sessions) reach the eye-white step after the backlog-1 deploy; 1 so far, 0 null (backlog-2 triage, 2026-10-13)
+  sessions) reach the eye-white step after the backlog-1 deploy; 3 so far, 0 null (backlog-8 triage, 2026-10-15)
 
 ## Privacy
 
