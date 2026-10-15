@@ -9,6 +9,7 @@
 - [x] 1.4 Seasonly design system (https://claude.ai/code/artifact/69473bf0-748a-4814-892f-1cfe8b16ddac): port 1.2's DrapingPair change into `components/bundle.js` and `bundle.css`, with a README line saying an outline must be same-origin (design decision 5). Publish as memory says: a bare `read` of the url first, and `design-system.json` in a separate, last call. Record the new DS version in the canvas's `designSystems` entry. Verify: the DrapingPair preview still renders, and the version id is noted here.
   - Done 2026-10-14: DS version 33 (1792008391-e50a). `bundle.js`, `bundle.css`, `index.d.ts` and the DrapingPair README (the same-origin line) published, then the index (`lastChange`) last. Canvas v58 (1792008414-d518) records it in `designSystems`.
 - [x] 1.5 Existing-test edits: none planned. The outline is optional, so `flow-state.test.ts`'s form keys (`["answers", "traits", "crop"]`), `route.test.ts`'s `storeCrop` and `faceCrop` assertions, `crops.test.ts`'s `.jpg`/`image/jpeg` cases and `report-text.test.ts`'s `mediaType` all hold unedited. If one breaks anyway, stop and ask the user before editing it (CLAUDE.md).
+  - One existing-test edit after all: the crops mock in `route.test.ts` gained `storeMask: vi.fn()` (additive). Approved by the user on 2026-10-15.
 
 ## 2. Tests first (each cites its scenario at the permanent path)
 
@@ -88,18 +89,21 @@
 
 ## 6. Docs and backlog
 
-- [ ] 6.1 `docs/privacy-requests.md`: the by-link procedure also removes `<id>.mask.png` from the crops bucket. Verify: the step names the outline. Try the procedure once on a test report's crop and outline, and record the result here (data-retention's Unenforced note).
+- [x] 6.1 `docs/privacy-requests.md`: the by-link procedure also removes `<id>.mask.png` from the crops bucket. Verify: the step names the outline. Try the procedure once on a test report's crop and outline, and record the result here (data-retention's Unenforced note).
+  - Done 2026-10-15 on test report `kAi5SJSsw1Nu6cfgW57fKw` (`is_test`, from 7.2): removed `<id>.jpg` and `<id>.mask.png` through the Storage API, then `delete from public.reports`. `/r/<id>`, `/api/face/<id>` and `/api/face/<id>/mask` all answer 404.
 - [x] 6.2 `docs/backlog.md`: delete BL-53 in this change's PR. Log every review finding left unfixed as a new `BL-nn` (CLAUDE.md), with the ids named in the PR. Verify: `grep BL-53 docs/backlog.md` finds nothing.
 
 ## 7. Verify
 
-- [ ] 7.1 `pnpm fix`, then `pnpm test`. Verify: green, and `evals/results.json` is unchanged (`git diff --stat evals/`).
-- [ ] 7.2 A manual photo run in the user's Chrome on `pnpm dev`, with their own selfie (memory: manual photo tests). Check that:
+- [x] 7.1 `pnpm fix`, then `pnpm test`. Verify: green, and `evals/results.json` is unchanged (`git diff --stat evals/`).
+  - Done: `pnpm test` green (903 unit, 71 e2e). `pnpm eval:run` refreshed `results.json`, a hash-only diff (`inputsHash`; no metric moved), and `pnpm test:eval` is green.
+- [x] 7.2 A manual photo run in the user's Chrome on `pnpm dev`, with their own selfie (memory: manual photo tests). Check that:
   - the analyze request carries `mask` (network panel);
   - storage holds `<id>.jpg` and `<id>.mask.png`;
   - the report shows the cut-out on both colors with no flash of the wall;
   - an older report (no outline) shows the face as before.
     Verify: screenshots of the report before and after are shared with the user.
+  - Done 2026-10-15 in the user's Chrome on `pnpm dev` (this branch). The analyze request carried `mask`; storage held `<id>.jpg` (15,448 B) and `<id>.mask.png` (13,569 B, `image/png`); the report showed the cut-out on True Red and Mustard (screenshot shared). The first load after a cold dev compile took 4.1 s for the outline, past the 4 s limit, and showed the plain face, as designed; a reload cut it out (outline in about 0.5 s). An older report (no outline) got 404 for its outline and showed the face unmasked, with no "couldn't load" line.
 - [ ] 7.3 On the preview deployment, open a fresh photo report on an iPhone (Safari, or the Instagram in-app browser) to confirm the iOS path: the outline is encoded and the mask renders. Verify: the user confirms, or a screenshot from their phone is recorded here.
 
 ## 8. Review, archive and ship
