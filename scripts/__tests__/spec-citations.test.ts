@@ -96,7 +96,7 @@ function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): 
   const renamed = sections
     .filter((s) => s.startsWith("## RENAMED Requirements"))
     .flatMap((s) =>
-      [...s.matchAll(/TO: `### (Requirement: [^`]+)`/g)].map((m) => slugify(m[1] ?? "")),
+      [...s.matchAll(/TO: `### (Requirement: .+)`\s*$/gm)].map((m) => slugify(m[1] ?? "")),
     );
   const anchors: string[] = [...renamed];
   for (const section of sections) {
@@ -456,6 +456,16 @@ describe("spec citation rules", () => {
       "#### Scenario: Ghost",
     ];
     expect(deltaAnchors(delta.join("\n"), new Set(["requirement-old-thing"]))).toEqual([]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-test-citing-a-new-name-that-holds-a-code-span} */
+  it("a RENAMED name that holds a code span is citable in full", () => {
+    const delta = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: Old flag`",
+      "- TO: `### Requirement: The `foo` flag`",
+    ];
+    expect(deltaAnchors(delta.join("\n"))).toEqual(["requirement-the-foo-flag"]);
   });
 
   /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-an-unarchived-change-removes-or-renames} */
