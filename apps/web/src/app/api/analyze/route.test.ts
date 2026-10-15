@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { BOTID_PROTECT } from "@/lib/abuse/botid";
 import { saveReport } from "@/lib/analysis/store";
-import { storeCrop } from "@/lib/draping/crops";
+import { storeCrop, storeMask } from "@/lib/draping/crops";
 import { generateReportText } from "@/lib/report-text";
 
 import { maxDuration, POST } from "./route";
@@ -23,7 +23,7 @@ vi.mock("@sentry/nextjs", () => ({
 vi.mock("botid/server", () => ({ checkBotId: vi.fn() }));
 vi.mock("@/lib/report-text", () => ({ generateReportText: vi.fn() }));
 vi.mock("@/lib/analysis/store", () => ({ saveReport: vi.fn() }));
-vi.mock("@/lib/draping/crops", () => ({ storeCrop: vi.fn() }));
+vi.mock("@/lib/draping/crops", () => ({ storeCrop: vi.fn(), storeMask: vi.fn() }));
 // Outside a request scope the real `after` throws; run its callback at once instead.
 vi.mock("next/server", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/server")>()),
@@ -289,5 +289,76 @@ describe("bot protection", () => {
   /** {@link openspec/specs/abuse-controls/spec.md#scenario-the-browser-protects-the-request} */
   it("protects POST /api/analyze in the browser", () => {
     expect(BOTID_PROTECT).toContainEqual({ path: "/api/analyze", method: "POST" });
+  });
+});
+
+describe("the crop's outline", () => {
+  /** A PNG's signature, then filler. */
+  const PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3]);
+  const png = (bytes: Uint8Array<ArrayBuffer> = PNG) => new Blob([bytes], { type: "image/png" });
+
+  /** A request with an outline; `crop: null` leaves the traits and the crop out. */
+  function withMask(mask: Blob, { crop = true } = {}) {
+    const form = new FormData();
+    form.set("answers", JSON.stringify({}));
+    if (crop) {
+      form.set("traits", JSON.stringify(SOFT_AUTUMN));
+      form.set("crop", jpeg(), "crop.jpg");
+    }
+    form.set("mask", mask, "mask.png");
+    return new Request("http://localhost/api/analyze", { method: "POST", body: form });
+  }
+
+  /** {@link openspec/specs/season-reveal/spec.md#scenario-an-outline-without-a-crop} */
+  it("answers 400 for an outline without a crop, spending nothing", async () => {
+    expect((await POST(withMask(png(), { crop: false }))).status).toBe(400);
+    nothingSpent();
+  });
+
+  /** {@link openspec/specs/season-reveal/spec.md#scenario-an-outline-that-is-not-a-png} */
+  it("answers 400 for a JPEG outline, or one typed PNG without the PNG bytes, spending nothing", async () => {
+    expect((await POST(withMask(jpeg()))).status).toBe(400);
+    const typedOnly = new Blob([JPEG], { type: "image/png" });
+    expect((await POST(withMask(typedOnly))).status).toBe(400);
+    nothingSpent();
+  });
+
+  /** {@link openspec/specs/season-reveal/spec.md#requirement-the-analyze-route-refuses-malformed-input-before-spending-anything} */
+  it("answers 400 for an outline over 512 KB, spending nothing", async () => {
+    const big = new Uint8Array(512 * 1024 + 1);
+    big.set(PNG);
+    expect((await POST(withMask(png(big)))).status).toBe(400);
+    nothingSpent();
+  });
+
+  /** {@link openspec/specs/season-reveal/spec.md#scenario-a-photo-without-an-outline} */
+  it("passes a photo without an outline and stores no outline", async () => {
+    expect((await POST(photo())).status).toBe(200);
+    expect(storeMask).not.toHaveBeenCalled();
+  });
+
+  /** {@link openspec/specs/season-reveal/spec.md#scenario-the-outline-stays-out-of-the-model-call} */
+  it("sends the model exactly the crop and none of the outline's bytes", async () => {
+    expect((await POST(withMask(png()))).status).toBe(200);
+    expect(generateReportText).toHaveBeenCalledTimes(1);
+    const [args] = vi.mocked(generateReportText).mock.calls[0] ?? [];
+    expect(args?.faceCrop).toEqual(JPEG);
+    expect(Object.keys(args ?? {}).sort()).toEqual(["answers", "faceCrop", "result"]);
+  });
+
+  /** {@link openspec/specs/draping-preview/spec.md#scenario-a-photo-result-with-an-outline} */
+  it("schedules the outline under the report id beside the crop", async () => {
+    await POST(withMask(png()));
+    expect(storeCrop).toHaveBeenCalledWith(REPORT_ID, JPEG);
+    expect(storeMask).toHaveBeenCalledTimes(1);
+    expect(storeMask).toHaveBeenCalledWith(REPORT_ID, PNG);
+  });
+
+  /** {@link openspec/specs/draping-preview/spec.md#scenario-nothing-to-store-the-outline-under} */
+  it("stores neither the crop nor the outline under a null report id", async () => {
+    vi.mocked(saveReport).mockResolvedValue(null);
+    expect(await (await POST(withMask(png()))).json()).toMatchObject({ reportId: null });
+    expect(storeCrop).not.toHaveBeenCalled();
+    expect(storeMask).not.toHaveBeenCalled();
   });
 });

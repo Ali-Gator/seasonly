@@ -1,6 +1,9 @@
 /**
  * @see openspec/specs/ui-components/spec.md
  */
+import fs from "node:fs";
+import path from "node:path";
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
@@ -44,5 +47,56 @@ describe("DrapingPair", () => {
     const out = renderToStaticMarkup(<DrapingPair best={BEST} worst={WORST} />);
     expect(out).not.toContain("<img");
     expect(out.match(/<span class="sn-slot__label">Face<\/span>/g)).toHaveLength(2);
+  });
+});
+
+describe("DrapingPair with an outline", () => {
+  const CUT = "sn-drape__face--cut";
+  const slots = (markup: string) => markup.match(/<div class="sn-slot[^"]*"[^>]*>/g) ?? [];
+
+  /** {@link openspec/specs/ui-components/spec.md#scenario-a-pair-with-an-outline} */
+  it("cuts both faces out with the outline", () => {
+    const out = renderToStaticMarkup(
+      <DrapingPair
+        best={BEST}
+        worst={WORST}
+        faceSrc="/api/face/abc"
+        faceAlt="Your face"
+        faceMaskSrc="/api/face/abc/mask"
+      />,
+    );
+    expect(slots(out)).toEqual([
+      `<div class="sn-slot sn-drape__face ${CUT}" style="--sn-face-mask:url(&quot;/api/face/abc/mask&quot;)">`,
+      `<div class="sn-slot sn-drape__face ${CUT}" style="--sn-face-mask:url(&quot;/api/face/abc/mask&quot;)">`,
+    ]);
+  });
+
+  /** {@link openspec/specs/ui-components/spec.md#scenario-a-pair-without-an-outline} */
+  it("leaves the faces unmasked without an outline, and ignores an outline without a face", () => {
+    const plain = renderToStaticMarkup(
+      <DrapingPair best={BEST} worst={WORST} faceSrc="/api/face/abc" faceAlt="Your face" />,
+    );
+    const noFace = renderToStaticMarkup(
+      <DrapingPair best={BEST} worst={WORST} faceMaskSrc="/api/face/abc/mask" />,
+    );
+    for (const out of [plain, noFace]) {
+      expect(out).not.toContain(CUT);
+      expect(out).not.toContain("--sn-face-mask");
+    }
+  });
+
+  /** {@link openspec/specs/ui-components/spec.md#requirement-a-draping-pair-can-cut-the-face-out-with-its-outline} */
+  it("styles the cut-out: no fill behind the face, and a mask in both syntaxes", () => {
+    const css = fs
+      .readFileSync(path.resolve(import.meta.dirname, "ds.css"), "utf-8")
+      .replace(/\/\*[\s\S]*?\*\//g, "");
+    const rule = (selector: string) =>
+      new RegExp(`${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{([^}]*)\\}`).exec(
+        css,
+      )?.[1] ?? "";
+    expect(rule(`.${CUT}`)).toMatch(/background:\s*none/);
+    const img = rule(`.${CUT} img`);
+    expect(img).toMatch(/-webkit-mask:\s*var\(--sn-face-mask\) 50% 40% \/ cover no-repeat/);
+    expect(img).toMatch(/(^|[^-])mask:\s*var\(--sn-face-mask\) 50% 40% \/ cover no-repeat/);
   });
 });

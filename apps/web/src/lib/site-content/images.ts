@@ -50,6 +50,14 @@ export const SAMPLE_FACE: Photo = {
 };
 
 /**
+ * The sample face's outline, made once by `scripts/sample-face-mask.ts` with the phone's person
+ * segmenter, so the sample is cut out like a real report. Static, so it never reaches `/api/`.
+ *
+ * {@link openspec/specs/site-content/spec.md#requirement-the-sample-face-is-cut-out-like-a-real-reports}
+ */
+export const SAMPLE_FACE_MASK = "/images/examples/face-mask.png";
+
+/**
  * The quiz's example photos (t18-design-review design.md decision 8): the same fictional woman's
  * wrist and face, edited per answer, and a gold jewelry set edited to silver and to a mix. Approved by the user on the canvas on 2026-10-13.
  *

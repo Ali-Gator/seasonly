@@ -4,6 +4,9 @@
  *
  * @see openspec/specs/site-content/spec.md
  */
+import fs from "node:fs";
+import path from "node:path";
+
 import {
   AGREEMENT_COPY,
   PALETTES,
@@ -433,5 +436,28 @@ describe("palette first on a phone", () => {
     const palette = out.indexOf('aria-label="Your Soft Autumn palette"');
     expect(out.indexOf("Warm, soft and earthy.")).toBeLessThan(palette);
     expect(palette).toBeLessThan(out.indexOf(SEASON_COPY["soft-autumn"].summary));
+  });
+});
+
+describe("the sample face's cut-out", () => {
+  const MASK = "/images/examples/face-mask.png";
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-sample-draping-pair} */
+  it.each([
+    ["/sample-report", () => html(<SampleReport />)],
+    ["/color-analysis-gpt-alternative", () => html(<GptAlternative />)],
+  ])("cuts the sample face out with its static outline on %s", (_path, render) => {
+    const slots = render().match(/<div class="sn-slot sn-drape__face[^"]*"[^>]*>/g) ?? [];
+    expect(slots).toHaveLength(2);
+    for (const slot of slots) {
+      expect(slot).toContain("sn-drape__face--cut");
+      expect(slot).toContain(`--sn-face-mask:url(&quot;${MASK}&quot;)`);
+    }
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#requirement-the-sample-face-is-cut-out-like-a-real-reports} */
+  it("ships the outline as a PNG beside the sample face", () => {
+    const file = path.resolve(import.meta.dirname, "../../../public", MASK.slice(1));
+    expect(fs.readFileSync(file).subarray(0, 4)).toEqual(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
   });
 });

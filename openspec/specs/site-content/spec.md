@@ -18,11 +18,11 @@ Fixes what each core public page of seasonly.me shows and where its words, color
 `apps/web/src/lib/site-content/` holds the site's own content:
 
 - `seasons.ts`: `SEASON_CONTENT: Record<SeasonSlug, SeasonContent>`, with `about` (paragraphs), three `neighbours` (`{ slug, why }`) and three `famous` (`{ name, image, credit: { author, license, licenseUrl, commonsUrl }, source: { title, url } }`); `famousIntro(plural)` and `FAMOUS_NOTE`.
-- `images.ts`: `TIP_PHOTOS` (light, makeup and filter, each a good and a bad `{ src, alt }`), `SAMPLE_FACE` and `QUIZ_PHOTOS` (quiz).
+- `images.ts`: `TIP_PHOTOS` (light, makeup and filter, each a good and a bad `{ src, alt }`), `SAMPLE_FACE`, `SAMPLE_FACE_MASK` (its outline, `/images/examples/face-mask.png`) and `QUIZ_PHOTOS` (quiz).
 - `sample.ts`: `softAutumnColors(names)`, the sample palettes picked by name from `PALETTES["soft-autumn"]`.
 - `season-link.tsx`: `SeasonLink({ slug, line?, wide?, compact? })`, a season's name as an `h3` holding its link, an optional line and its first highlight colors (four, or six from 1024 px with `wide`). `compact`, the landing's, shows the four as a chip-only `SwatchStrip` whose names are visually hidden.
 
-Images are WebP under `apps/web/public/images/examples/` (the generated model) and `apps/web/public/images/famous/<slug>/` (Commons photos cropped to 3:4), each at most about 80 KB. The sample report renders `ReportSections` from `lib/report/sections.tsx` (report-page) with a static `DrapingPair` on `SAMPLE_FACE`.
+Images are WebP under `apps/web/public/images/examples/` (the generated model) and `apps/web/public/images/famous/<slug>/` (Commons photos cropped to 3:4), each at most about 80 KB. The sample report renders `ReportSections` from `lib/report/sections.tsx` (report-page) with a static `DrapingPair` on `SAMPLE_FACE`, cut out with `SAMPLE_FACE_MASK`, as the GPT-alternative page does. The outline is a 384 × 512 PNG made once by `scripts/sample-face-mask.ts` with the phone's person segmenter (t19-draping-cutout).
 
 ## Behavior
 
@@ -259,3 +259,12 @@ Where `/`, `/how-it-works` or `/color-analysis-gpt-alternative` says what Season
 
 - **WHEN** `/`, `/how-it-works` and `/color-analysis-gpt-alternative` are rendered
 - **THEN** each page's 24-hour note says "We keep your report, not your photo.", and none of the three says "We keep your result"
+
+### Requirement: The sample face is cut out like a real report's
+
+Every draping pair on the sample face, on `/sample-report` and on `/color-analysis-gpt-alternative`, SHALL mask the sample face with its outline, so the sample looks like a real report's draping preview. The outline SHALL be a static PNG beside the sample face, made with the same person segmenter the phone uses. It SHALL NOT be fetched from `/api/`.
+
+#### Scenario: The sample draping pair
+
+- **WHEN** `/sample-report` or `/color-analysis-gpt-alternative` is rendered
+- **THEN** its draping pair shows the sample face masked by the sample face's static outline, and no request goes to `/api/`

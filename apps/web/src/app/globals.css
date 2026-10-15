@@ -255,4 +255,16 @@ body {
   h1[tabindex="-1"]:focus {
     outline: none;
   }
+  /* The report's draping preview while its face outline loads: the faces wait hidden, so the
+     photo's background never flashes, and show after 4 s even if the script never runs
+     (t19-draping-cutout). */
+  .sn-face-pending img {
+    visibility: hidden;
+    animation: sn-face-reveal 0s 4s forwards;
+  }
+  @keyframes sn-face-reveal {
+    to {
+      visibility: visible;
+    }
+  }
 }

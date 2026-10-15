@@ -408,6 +408,15 @@
     object-position: 50% 40%;
     transform: scale(1.15);
   }
+  /* The cut-out: the outline masks the image with the image's own fit and position, so the
+     frame's color shows where the photo's background was. The outline must be same-origin. */
+  .sn-drape__face--cut {
+    background: none;
+  }
+  .sn-drape__face--cut img {
+    -webkit-mask: var(--sn-face-mask) 50% 40% / cover no-repeat;
+    mask: var(--sn-face-mask) 50% 40% / cover no-repeat;
+  }
   .sn-drape__frame::after {
     content: "";
     position: absolute;
