@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-71**
+_Next id:_ **BL-73**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -109,6 +109,18 @@ fold items in.
 
 ## Testing
 
+- **[BL-71] The gate's rename readers accept only one `FROM:`/`TO:` spelling** — `deltaAnchors`
+  and `deltaProof` read only a `-` bullet, single spaces and a backticked heading, while OpenSpec
+  also accepts no backticks, `*`/`+` bullets and extra spaces. A valid rename written that
+  way blocks its change (fails closed). Use OpenSpec's pattern shape for both readers.
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-7` review, 2026-10-15
+
+- **[BL-72] No test pins that a delta naming the unenforced flag mid-sentence exempts nothing** —
+  a MODIFIED delta whose body only mentions the flag must keep its uncited requirement reported.
+  Today it holds through the line-start match alone; a regression would fail open. Add a
+  `deltaProof` + `unprovenRequirements` rule test (edits the approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-7` review, 2026-10-15
+
 - **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
   403 now shows the blocked screen, but nobody has opened seasonly.me inside either app and run a
   photo. Run it once on a phone after `t18-design-review` ships (one paid vision call), and if the
@@ -149,7 +161,7 @@ update`). PGlite has one connection, so the test only checks that the lock is in
 
 - **[BL-70] The season reveal builds its own photo slot** — `_reveal/steps.tsx` hand-builds an
   `sn-slot` and `img` that the design system's `Slot` already covers (`src`, `alt`, `className`).
-  Use `Slot` there once it is exported (BL-26).
+  `Slot` is exported from `@/components/ds` since `backlog-7`; use it there.
   _Refs:_ `apps/web/src/app/(flow)/analyze/_reveal/steps.tsx`, `openspec/specs/season-reveal/spec.md` · _Status:_ open — found in `backlog-7` triage, 2026-10-15
 
 - **[BL-27] The GPT-alternative page goes stale on December 11** — its title, description, h1
