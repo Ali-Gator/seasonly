@@ -78,7 +78,7 @@ function parseRequirements(text: string): Requirement[] {
       current = undefined;
     } else if (current && scenario?.[1]) {
       current.scenarios.push(slugify(scenario[1]));
-    } else if (current && line.includes("**Unenforced:**")) {
+    } else if (current && line.startsWith("**Unenforced:**")) {
       current.unenforced = true;
     }
   }
@@ -349,6 +349,17 @@ describe("spec citation rules", () => {
       "cap: Requirement: `plan_shared` fires on a slug-mint, never: on open",
       "cap: Requirement: Untested",
     ]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-whose-prose-only-names-the-flag} */
+  it("a requirement whose prose only names the unenforced flag still needs a citing test", () => {
+    const prose = [
+      "### Requirement: Names the flag",
+      "",
+      "A requirement nobody can test carries a `**Unenforced:**` line giving the reason.",
+    ];
+    const named = new Map([["cap", parseRequirements(prose.join("\n"))]]);
+    expect(unprovenRequirements(named, [])).toEqual(["cap: Requirement: Names the flag"]);
   });
 
   /** {@link openspec/specs/constitution/spec.md#scenario-only-code-cites-a-requirement} */
