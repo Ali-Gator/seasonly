@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-68**
+_Next id:_ **BL-70**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -137,6 +137,13 @@ fold items in.
   add the clause to the spec-workflow requirement.
   _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open
 
+- **[BL-68] Prose that names the unenforced flag marks a requirement unenforced** —
+  `parseRequirements` flags any line that _contains_ `**Unenforced:**`, so constitution "Every
+  requirement is proven by a test that cites it" is flagged by its own body (:64) and a WHEN line
+  (:83). Harmless while tests cite it, but it would exempt any requirement whose prose mentions
+  the flag. Match only a line that starts with it, as every real flag does.
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/constitution/spec.md` · _Status:_ open — found in `backlog-7` triage, 2026-10-15
+
 - **[BL-08] Two concurrent email stores are never raced in a test** — the abuse-controls
   scenario "Two requests at once" rests on `store_report_email` locking the report row (`for
 update`). PGlite has one connection, so the test only checks that the lock is in the SQL. Race
@@ -179,6 +186,11 @@ update`). PGlite has one connection, so the test only checks that the lock is in
   prop and use it there.
   _Refs:_ `apps/web/src/components/ds/slot.tsx`, `apps/web/src/app/(site)/seasons/[season]/page.tsx`
   · _Status:_ open — t9 phase review, 2026-10-10
+
+- **[BL-69] The season reveal builds its own photo slot** — `_reveal/steps.tsx` hand-builds an
+  `sn-slot` and `img` that the design system's `Slot` already covers (`src`, `alt`, `className`).
+  Use `Slot` there once it is exported (BL-26).
+  _Refs:_ `apps/web/src/app/(flow)/analyze/_reveal/steps.tsx`, `openspec/specs/season-reveal/spec.md` · _Status:_ open — found in `backlog-7` triage, 2026-10-15
 
 - **[BL-27] The GPT-alternative page goes stale on December 11** — its title, description, h1
   and lead say the GPT "is retiring" on December 11, 2026. Re-check OpenAI's FAQ and switch the
