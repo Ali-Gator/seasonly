@@ -29,13 +29,11 @@ export function Swatch({ name, hex, size, className }: SwatchProps) {
 
 export interface SwatchGridProps {
   colors: readonly Color[];
+  /** Set as `--sn-cols`, so a page's column utility still wins (BL-63). */
   columns?: number;
   label?: string;
   className?: string;
-  /**
-   * Keep the column count below 375 px, where a 4-column grid otherwise lays out in 3 (BL-57). The
-   * count is set as `--sn-cols`, so a page's column utility still wins (BL-63).
-   */
+  /** Keep the column count below 375 px, where a 4-column grid otherwise lays out in 3 (BL-57). */
   keepColumns?: boolean;
 }
 

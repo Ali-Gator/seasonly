@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-67**
+_Next id:_ **BL-68**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -125,8 +125,17 @@ fold items in.
   gate reads `TO:` names with a regex that stops at the first backtick inside the name, so a
   rename to a name like the fixture's `` `plan_shared` fires … `` slugs as `requirement-` and a
   test citing the new name is reported stale. The `FROM:` reader added in `backlog-6` reads to
-  the end of the line; `TO:` should too.
+  the end of the line; `TO:` should too. Best done as one shared delta-section parser with one
+  rename regex, which also stops `deltaAnchors` and `deltaProof` parsing each delta twice and
+  `openDeltas()` reading every delta file twice per run.
   _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open
+
+- **[BL-67] A change that marks a requirement unenforced still has to cite it until archive** —
+  `deltaProof` ignores the `**Unenforced:**` flag on a MODIFIED requirement, so a change that
+  makes a requirement unenforced and drops its last citing test fails the proof check until
+  archive, the same deadlock `backlog-6` fixed for removed and renamed ones. Treat it as gone, and
+  add the clause to the spec-workflow requirement.
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open
 
 - **[BL-08] Two concurrent email stores are never raced in a test** — the abuse-controls
   scenario "Two requests at once" rests on `store_report_email` locking the report row (`for

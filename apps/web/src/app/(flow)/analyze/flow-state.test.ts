@@ -397,8 +397,11 @@ describe("the checked types", () => {
     const passedWithoutPhoto: FlowEvent = { ...event, problem: null, photo: null };
     // @ts-expect-error a rejection must carry no photo
     const darkWithPhoto: FlowEvent = { ...event, problem: "dark", photo: PASS };
+    // @ts-expect-error a rejection must carry no crop
+    const darkWithCrop: CheckedPhoto = { ...photo, problem: "dark", crop };
     expect(passWithoutCrop.crop).toBeNull();
     expect(passedWithoutPhoto.type).toBe("checked");
     expect(darkWithPhoto.type).toBe("checked");
+    expect(darkWithCrop.crop).toBe(crop);
   });
 });

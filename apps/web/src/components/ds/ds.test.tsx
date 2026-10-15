@@ -100,13 +100,14 @@ describe("SwatchGrid", () => {
     const rules = read("ds.css").match(/[^{}]*\.sn-swatch-grid[^{}]*\{[^}]*\}/g) ?? [];
     expect(rules.length).toBeGreaterThan(0);
     for (const rule of rules) expect(rule).not.toContain("!important");
-    for (const caller of [
-      "../../app/(site)/page.tsx",
-      "../../lib/report/sections.tsx",
-      "../../lib/site-content/season-link.tsx",
-    ]) {
-      expect(read(caller)).not.toMatch(/grid-cols-\d+!/);
-    }
+    const src = path.resolve(import.meta.dirname, "../..");
+    const callers = fs
+      .readdirSync(src, { recursive: true, encoding: "utf-8" })
+      .filter((f) => f.endsWith(".tsx") && !f.includes(".test."))
+      .map((f) => read(path.join(src, f)))
+      .filter((text) => text.includes("<SwatchGrid"));
+    expect(callers.length).toBeGreaterThan(0);
+    for (const caller of callers) expect(caller).not.toMatch(/grid-cols-\d+!/);
   });
 });
 

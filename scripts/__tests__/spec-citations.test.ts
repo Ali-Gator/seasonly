@@ -129,7 +129,7 @@ function deltaProof(
     if (section.startsWith("## REMOVED Requirements")) {
       for (const r of parseRequirements(body)) into.gone.add(r.anchor);
     } else if (section.startsWith("## RENAMED Requirements")) {
-      for (const m of section.matchAll(/FROM: `### (Requirement: .+)`$/gm)) {
+      for (const m of section.matchAll(/FROM: `### (Requirement: .+)`\s*$/gm)) {
         into.gone.add(slugify(m[1] ?? ""));
       }
     } else if (section.startsWith("## MODIFIED Requirements")) {
