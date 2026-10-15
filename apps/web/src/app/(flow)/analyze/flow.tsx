@@ -126,6 +126,7 @@ export function Flow() {
                   traits: checked.traits,
                   crop: checked.crop,
                   cropUrl: objectUrl(checked.crop),
+                  mask: checked.mask,
                 },
                 previewUrl,
               }

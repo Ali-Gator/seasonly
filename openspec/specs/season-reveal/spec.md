@@ -42,7 +42,7 @@ public.reports (id text pk, created_at, season, runner_up, confidence numeric(3,
 ## Behavior
 
 - The route answers in this order and stops at the first that applies: BotID (403), validation (400), `classify` no-result (200 `no-result`), with a photo `generateReportText` rejection (200 `rejected`), `saveReport`, then 200 `result`.
-- Request: `multipart/form-data` with `answers` (JSON, required) and `traits` + `crop` (both or neither; the crop a JPEG by magic bytes and type, ≤ 512 KB).
+- Request: `multipart/form-data` with `answers` (JSON, required) and `traits` + `crop` (both or neither; the crop a JPEG by magic bytes and type, ≤ 512 KB), then an optional `mask`, only with a crop (a PNG by its 8-byte signature and type, ≤ 512 KB). `AnalyzeRequest.photo.mask?: Uint8Array`. The outline is stored, never sent to the model.
 - `saveReport` writes a 22-character base64url id from 16 random bytes, with a 3 s abort that is also raced; any failure goes to Sentry and gives `null`, and the reveal still shows.
 - `is_test` is `VERCEL_ENV !== "production"`, so previews, local runs and CI write test rows.
 - The personal summary and note are stored, not returned: the reveal shows the season family, its tagline and its reveal line only.
@@ -65,7 +65,11 @@ public.reports (id text pk, created_at, season, runner_up, confidence numeric(3,
 - the answers are missing, or hold an unknown question or value;
 - a trait is missing or not a number from -1 to 1;
 - the traits come without a crop, or a crop without traits;
-- the crop is not a JPEG, or is larger than 512 KB.
+- the crop is not a JPEG, or is larger than 512 KB;
+- an outline comes without a crop;
+- the outline is not a PNG, or is larger than 512 KB.
+
+An outline is optional: a request with traits and a crop but no outline is valid.
 
 #### Scenario: A trait out of range
 
@@ -76,6 +80,21 @@ public.reports (id text pk, created_at, season, runner_up, confidence numeric(3,
 
 - **WHEN** the crop is a PNG
 - **THEN** the route answers 400, and no slot is claimed and no model call is made
+
+#### Scenario: An outline without a crop
+
+- **WHEN** the request carries answers and an outline, but no traits and no crop
+- **THEN** the route answers 400, and no slot is claimed and no model call is made
+
+#### Scenario: An outline that is not a PNG
+
+- **WHEN** the request carries traits, a crop and an outline that is a JPEG
+- **THEN** the route answers 400, and no slot is claimed and no model call is made
+
+#### Scenario: A photo without an outline
+
+- **WHEN** the request carries answers, traits and a crop, and no outline
+- **THEN** the request passes validation
 
 ### Requirement: The server decides the season
 
@@ -88,7 +107,7 @@ The route SHALL classify the request's traits and answers with the core classifi
 
 ### Requirement: One report-text call per photo analysis, none without a photo
 
-A request with traits and a crop SHALL make exactly one report-text call with that crop, the classifier's result and the answers. A quiz-only request SHALL make none, and its report SHALL use the static copy.
+A request with traits and a crop SHALL make exactly one report-text call with that crop, the classifier's result and the answers. A quiz-only request SHALL make none, and its report SHALL use the static copy. The crop's outline SHALL NOT be sent to the model: it reads the crop with its background, whether an outline came or not.
 
 #### Scenario: A photo analysis
 
@@ -99,6 +118,11 @@ A request with traits and a crop SHALL make exactly one report-text call with th
 
 - **WHEN** a valid request with answers only is analyzed
 - **THEN** no report text is requested, and the text source is `quiz-only`
+
+#### Scenario: The outline stays out of the model call
+
+- **WHEN** a valid request with a crop and an outline is analyzed
+- **THEN** report text is requested once with exactly the uploaded crop, and the outline's bytes are not part of the call
 
 ### Requirement: A rejected photo stores nothing and asks for a retake
 

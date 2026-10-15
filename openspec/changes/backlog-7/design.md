@@ -1,15 +1,15 @@
 ## Context
 
-See proposal.md for why. Triage ran on `origin/main` at `e440268`. Four read-only Plan investigators ran in parallel: BL-66, BL-67, BL-26 and BL-64. All four are real and fixable. The BL-67 investigator found BL-68; the BL-26 investigator found BL-69. Both were logged; BL-68 joins as the fifth fix. Every approval was given by Oleg on 2026-10-15. No canvas design is involved: BL-26 changes no pixels.
+See proposal.md for why. Triage ran on `origin/main` at `e440268`. Four read-only Plan investigators ran in parallel: BL-66, BL-67, BL-26 and BL-64. All four are real and fixable. The BL-67 investigator found BL-69; the BL-26 investigator found BL-70. Both were logged; BL-69 joins as the fifth fix. Every approval was given by Oleg on 2026-10-15. No canvas design is involved: BL-26 changes no pixels.
 
 | Id    | Lane         | Why                                                                                                            |
 | ----- | ------------ | -------------------------------------------------------------------------------------------------------------- |
-| BL-68 | B            | The gate lives in an existing test file (Decision 1).                                                          |
+| BL-69 | B            | The gate lives in an existing test file (Decision 1).                                                          |
 | BL-66 | B            | Same file (Decision 2).                                                                                        |
 | BL-67 | B            | Same file (Decision 3).                                                                                        |
 | BL-26 | A            | A listed port difference, a technical call; no existing test changes, no canvas change. See the BL-26 section. |
 | BL-64 | B            | Two existing tests change (Decision 4).                                                                        |
-| BL-69 | not in batch | Found in triage; `season-reveal`, and the batch is at its ceiling of five. Logged `open`.                      |
+| BL-70 | not in batch | Found in triage; `season-reveal`, and the batch is at its ceiling of five. Logged `open`.                      |
 
 ## Goals / Non-Goals
 
@@ -22,13 +22,13 @@ See proposal.md for why. Triage ran on `origin/main` at `e440268`. Four read-onl
 - No per-scenario unenforced flag: a flag anywhere in a requirement's body marks the whole requirement, before and after archive alike.
 - No design-system (`bundle.js`) change for `Slot`: see BL-26.
 - "ends with the footer's three lines" in `view.test.tsx` keeps reading the whole page (Decision 4, option b declined).
-- BL-69 waits for the next batch.
+- BL-70 waits for the next batch.
 
 ## Members
 
-Order matters: BL-68 lands before BL-67. Once `deltaProof` reads the flag from deltas, a delta line that only names the flag would mark its requirement gone until the line-start match lands. That fails open, so nothing blocks, but the gate is wrong in between.
+Order matters: BL-69 lands before BL-67. Once `deltaProof` reads the flag from deltas, a delta line that only names the flag would mark its requirement gone until the line-start match lands. That fails open, so nothing blocks, but the gate is wrong in between.
 
-### BL-68 — only a line-start flag counts
+### BL-69 — only a line-start flag counts
 
 `scripts/__tests__/spec-citations.test.ts:81`: `parseRequirements` sets `unenforced` when a line _starts with_ the flag instead of when it _contains_ it. Today constitution "Every requirement is proven by a test that cites it" is flagged by its body (:64) and a WHEN line (:83); it stays green because tests cite it. Every one of the 30 real flags across 18 specs starts its line, so nothing else moves. The fixture at :323 (a flag after the section closes) is unaffected. New rule test: a requirement whose body names the flag mid-sentence and that nobody cites is reported unproven ({@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-whose-prose-only-names-the-flag}); it fails before the fix. Files: `spec-citations.test.ts` (approved).
 
@@ -40,7 +40,7 @@ Order matters: BL-68 lands before BL-67. Once `deltaProof` reads the flag from d
 
 `spec-citations.test.ts:135-138`: in `deltaProof`'s MODIFIED branch, a requirement whose delta body carries the flag (`r.unenforced`) is added to `into.gone`, as REMOVED and RENAMED-FROM are. The `OpenDelta.gone` doc comment (:116) and the header comment (:7-9) add "or marks unenforced". `unprovenRequirements` (:176-182) needs no change: it already skips `gone`. New rule test: a delta that modifies an uncited requirement and marks it unenforced removes it from the report, while another uncited requirement is still reported ({@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-an-unarchived-change-marks-unenforced}); it fails before the fix. Existing `deltaProof` tests (:451, :467) keep passing: none of their deltas carries the flag. Files: `spec-citations.test.ts` (approved).
 
-The spec-workflow delta never writes the flag token itself, only "marked unenforced" in prose; with BL-68 in place a mention would be harmless anyway.
+The spec-workflow delta never writes the flag token itself, only "marked unenforced" in prose; with BL-69 in place a mention would be harmless anyway.
 
 ### BL-26 — `Slot` takes `loading`, is exported, and the season page uses it
 
@@ -60,12 +60,12 @@ Why a listed port difference and not a design-system change first: `loading` has
 
 ## Decisions
 
-### 1. BL-68 — approve the edit to `scripts/__tests__/spec-citations.test.ts`
+### 1. BL-69 — approve the edit to `scripts/__tests__/spec-citations.test.ts`
 
 The match at :81 changes from contains to starts-with; one new rule test. No existing `it` or fixture changes.
 
 - **a. Approve.**
-- **b. Not now:** BL-68 stays open; the batch drops to four fixes.
+- **b. Not now:** BL-69 stays open; the batch drops to four fixes.
 
 Trade-off: a closes a hole that BL-67 would widen; b keeps the constitution's proof requirement silently flagged.
 

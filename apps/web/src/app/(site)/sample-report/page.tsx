@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { Button, DrapingPair, Icon } from "@/components/ds";
 import { ReportSections } from "@/lib/report/sections";
-import { SAMPLE_FACE } from "@/lib/site-content/images";
+import { SAMPLE_FACE, SAMPLE_FACE_MASK } from "@/lib/site-content/images";
 import { pageMetadata } from "@/lib/site/routes";
 
 export const metadata = pageMetadata("/sample-report");
@@ -52,6 +52,7 @@ export default function Page() {
                 worst={draping.worst}
                 faceSrc={SAMPLE_FACE.src}
                 faceAlt={SAMPLE_FACE.alt}
+                faceMaskSrc={SAMPLE_FACE_MASK}
                 className="lg:max-w-[560px]"
               />
             }

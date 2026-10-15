@@ -2,7 +2,7 @@ import { PALETTES, RETAKE_TIPS } from "@seasonly/analysis";
 import Link from "next/link";
 
 import { Button, DrapingPair, Icon, Note, SwatchGrid } from "@/components/ds";
-import { SAMPLE_FACE } from "@/lib/site-content/images";
+import { SAMPLE_FACE, SAMPLE_FACE_MASK } from "@/lib/site-content/images";
 import { softAutumnColors } from "@/lib/site-content/sample";
 import { ORIGIN, pageMetadata } from "@/lib/site/routes";
 
@@ -131,6 +131,7 @@ export default function Page() {
             worst={palette.draping.worst}
             faceSrc={SAMPLE_FACE.src}
             faceAlt={SAMPLE_FACE.alt}
+            faceMaskSrc={SAMPLE_FACE_MASK}
           />
         </div>
 

@@ -5,8 +5,8 @@
 
 ## 2. Fixes — one subagent at a time, serially
 
-- [ ] 2.1 BL-68 — new rule test in `scripts/__tests__/spec-citations.test.ts`: a requirement whose body names the flag mid-sentence, with no line starting with it and no citing test, is reported unproven ({@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-whose-prose-only-names-the-flag}). Build the flag token by concatenation if the file's own scan would read it. Verify it fails on the current code.
-- [ ] 2.2 BL-68 — edit the existing test file (approved, design.md Decision 1): `parseRequirements` (:81) sets `unenforced` only when the line starts with the flag. No existing `it` or fixture changes. Until 2.1 passes and `pnpm test:unit` is green (constitution's proof requirement must stay proven by its citing tests).
+- [ ] 2.1 BL-69 — new rule test in `scripts/__tests__/spec-citations.test.ts`: a requirement whose body names the flag mid-sentence, with no line starting with it and no citing test, is reported unproven ({@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-whose-prose-only-names-the-flag}). Build the flag token by concatenation if the file's own scan would read it. Verify it fails on the current code.
+- [ ] 2.2 BL-69 — edit the existing test file (approved, design.md Decision 1): `parseRequirements` (:81) sets `unenforced` only when the line starts with the flag. No existing `it` or fixture changes. Until 2.1 passes and `pnpm test:unit` is green (constitution's proof requirement must stay proven by its citing tests).
 - [ ] 2.3 BL-66 — new rule test: a RENAMED delta whose `TO:` name holds a backticked word makes the full slug citable via `deltaAnchors` ({@link openspec/specs/spec-workflow/spec.md#scenario-a-test-citing-a-new-name-that-holds-a-code-span}). Verify it fails on the current code.
 - [ ] 2.4 BL-66 — edit the existing test file (approved, design.md Decision 2): the `TO:` regex in `deltaAnchors` (:99) takes the `FROM:` reader's shape (`.+`, closing backtick at end of line, multiline). Until 2.3 passes and the existing delta tests (:415, :441) pass unchanged.
 - [ ] 2.5 BL-67 — new rule test next to :451/:467: a delta that modifies an uncited requirement and marks it unenforced removes it from `unprovenRequirements`' report, while an unrelated uncited requirement is still reported ({@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-an-unarchived-change-marks-unenforced}). Verify it fails on the current code.
@@ -18,6 +18,6 @@
 ## 3. Verify, delete, review, archive, ship
 
 - [ ] 3.1 `pnpm fix`, `pnpm test` (and `pnpm test:eval`)
-- [ ] 3.2 delete shipped bullets BL-68, BL-66, BL-67, BL-26, BL-64 from `docs/backlog.md`; BL-69 stays
+- [ ] 3.2 delete shipped bullets BL-69, BL-66, BL-67, BL-26, BL-64 from `docs/backlog.md`; BL-70 stays
 - [ ] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
-- [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR naming new ids BL-68 and BL-69, auto-merge
+- [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR naming new ids BL-69 and BL-70, auto-merge

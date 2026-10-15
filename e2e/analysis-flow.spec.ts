@@ -7,7 +7,7 @@
 import path from "node:path";
 import zlib from "node:zlib";
 
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 const FACE = path.resolve(import.meta.dirname, "fixtures/face.jpg");
 const FAMILIES = /^(Spring|Summer|Autumn|Winter)$/;
@@ -163,4 +163,86 @@ test("the guide shows a loaded good photo and three bad ones on its tip card", a
     }
   }
   await expect(page.locator(".sn-slot__label")).toHaveCount(0);
+});
+
+/** The multipart part names of a request body, each with the first bytes of its content. */
+function parts(body: Buffer): Map<string, Buffer> {
+  const out = new Map<string, Buffer>();
+  const boundary = body.subarray(0, body.indexOf("\r\n")).toString();
+  let at = 0;
+  while ((at = body.indexOf(boundary, at)) !== -1) {
+    const start = at + boundary.length + 2;
+    const headerEnd = body.indexOf("\r\n\r\n", start);
+    if (headerEnd === -1) break;
+    const name = /name="([^"]+)"/.exec(body.subarray(start, headerEnd).toString())?.[1];
+    const next = body.indexOf(boundary, headerEnd);
+    if (name) out.set(name, body.subarray(headerEnd + 4, next - 2));
+    at = next;
+  }
+  return out;
+}
+
+/** Uploads the fixture, answers the quiz and gives the analyze request's parts, answered empty. */
+async function sentParts(page: Page): Promise<Map<string, Buffer>> {
+  let body: Buffer | null = null;
+  await page.route("**/api/analyze", (route) => {
+    body = route.request().postDataBuffer();
+    return route.fulfill({ status: 500, body: "" });
+  });
+  await page.goto("/analyze");
+  const upload = page.getByLabel("Upload a photo");
+  await expect(upload).toBeEnabled();
+  await upload.setInputFiles(FACE);
+  await expect(page.getByText("Question 1 of 4")).toBeVisible();
+  for (const label of ["Green or olive", "Gold", "Tans easily, rarely burns"])
+    await page.getByText(label, { exact: true }).click();
+  await page.getByText("Medium or light brown", { exact: true }).click();
+  await page.getByRole("button", { name: "See my result" }).click();
+  await expect.poll(() => body !== null, { timeout: 20_000 }).toBe(true);
+  return parts(body ?? Buffer.alloc(0));
+}
+
+const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+
+/** {@link openspec/specs/capture-flow/spec.md#scenario-the-crops-outline} */
+test("the analyze request carries the crop's PNG outline", async ({ page }) => {
+  test.setTimeout(90_000);
+  const sent = await sentParts(page);
+  expect([...sent.keys()]).toEqual(["answers", "traits", "crop", "mask"]);
+  const mask = sent.get("mask") ?? Buffer.alloc(0);
+  expect(mask.subarray(0, 8)).toEqual(PNG_SIGNATURE);
+  // Decoded in the page: the crop's size, opaque on the face in the middle, clear in a top corner.
+  const read = await page.evaluate(async (base64) => {
+    const png = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    const bitmap = await createImageBitmap(new Blob([png], { type: "image/png" }));
+    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("no 2d canvas");
+    context.drawImage(bitmap, 0, 0);
+    const alpha = (x: number, y: number) => context.getImageData(x, y, 1, 1).data[3] ?? -1;
+    const { width, height } = bitmap;
+    return { width, height, middle: alpha(width >> 1, height >> 1), corner: alpha(2, 2) };
+  }, mask.toString("base64"));
+  const crop = await page.evaluate(
+    async (base64) => {
+      const bitmap = await createImageBitmap(
+        new Blob([Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))]),
+      );
+      return { width: bitmap.width, height: bitmap.height };
+    },
+    (sent.get("crop") ?? Buffer.alloc(0)).toString("base64"),
+  );
+  expect({ width: read.width, height: read.height }).toEqual(crop);
+  expect(read.middle).toBeGreaterThan(200);
+  expect(read.corner).toBeLessThan(50);
+});
+
+/** {@link openspec/specs/capture-flow/spec.md#scenario-no-person-segmenter} */
+test("a photo still passes without the person segmenter, and no outline is sent", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  await page.route("**/selfie_segmenter*", (route) => route.abort());
+  const sent = await sentParts(page);
+  expect([...sent.keys()]).toEqual(["answers", "traits", "crop"]);
 });

@@ -32,10 +32,10 @@ to the right one.
 
 ## 3. Delete
 
-**By report link**: the report, its addresses, its interest record and its crop.
+**By report link**: the report, its addresses, its interest record, its crop and the crop's outline.
 
-1. Storage → bucket `crops` → delete `<id>.jpg` if it is there (the daily job removes it after 24 h
-   anyway).
+1. Storage → bucket `crops` → delete `<id>.jpg` and its outline `<id>.mask.png`, each if it is
+   there (the daily job removes both after 24 h anyway).
 2. Run:
 
    ```sql

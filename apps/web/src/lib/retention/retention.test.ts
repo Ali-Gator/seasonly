@@ -56,6 +56,18 @@ describe("deleteOldCrops", () => {
     expect(b.names()).toEqual(["young.jpg"]);
   });
 
+  /** {@link openspec/specs/data-retention/spec.md#scenario-an-old-outline} */
+  it("removes a crop and its outline 25 h old and keeps a pair 23 h old", async () => {
+    const b = bucket([
+      crop("old.jpg", 25),
+      crop("old.mask.png", 25),
+      crop("young.jpg", 23),
+      crop("young.mask.png", 23),
+    ]);
+    expect(await deleteOldCrops(CUTOFF, b)).toBe(2);
+    expect(b.names()).toEqual(["young.jpg", "young.mask.png"]);
+  });
+
   /** {@link openspec/specs/data-retention/spec.md#scenario-more-old-crops-than-one-listing-holds} */
   it("removes 250 old crops among young ones across pages of 100", async () => {
     const old = Array.from({ length: 250 }, (_, i) => crop(`old-${i}.jpg`, 25 + i / 100));

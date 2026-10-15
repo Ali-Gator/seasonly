@@ -92,6 +92,14 @@ describe("maskReportIds", () => {
   });
 
   /** {@link openspec/specs/analytics/spec.md#requirement-no-report-id-reaches-posthog} */
+  it("masks the id in the face outline's URL", () => {
+    expect(maskPath(`/api/face/${ID}/mask`)).toBe("/api/face/:id/mask");
+    expect(maskPath(`https://seasonly.me/api/face/${ID}/mask`)).toBe(
+      "https://seasonly.me/api/face/:id/mask",
+    );
+  });
+
+  /** {@link openspec/specs/analytics/spec.md#requirement-no-report-id-reaches-posthog} */
   it("masks exactly the ids REPORT_ID accepts", () => {
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
     const random = (n: number) =>

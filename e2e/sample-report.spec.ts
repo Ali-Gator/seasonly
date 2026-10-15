@@ -44,3 +44,22 @@ test("the sample report makes no API request and sends no funnel event", async (
   expect(api).toEqual([]);
   expect(errors).toEqual([]);
 });
+
+/** {@link openspec/specs/site-content/spec.md#scenario-the-sample-draping-pair} */
+test("the sample face is cut out with its static outline at 375 px", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  const api: string[] = [];
+  page.on("request", (r) => {
+    if (new URL(r.url()).pathname.startsWith("/api/")) api.push(r.url());
+  });
+  await page.goto("/sample-report");
+  const face = page.locator(".sn-drape__face img").first();
+  await face.scrollIntoViewIfNeeded();
+  await expect(face).toBeVisible();
+  const mask = await face.evaluate((img) => {
+    const style = getComputedStyle(img);
+    return style.maskImage || style.webkitMaskImage;
+  });
+  expect(mask).toContain("/images/examples/face-mask.png");
+  expect(api).toEqual([]);
+});
