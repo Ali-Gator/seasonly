@@ -10,18 +10,21 @@ import { loadPerson, loadVision } from "./mediapipe";
  *
  * {@link openspec/specs/capture-flow/spec.md#requirement-every-photo-is-checked-on-the-device-before-anything-is-uploaded}
  */
-export interface CheckedPhoto {
-  problem: RetakeReason | null;
+export type CheckedPhoto = {
   faceCount: number;
   measures: PhotoMeasures;
   /** The photo as checked, for the retake screen. */
   preview: Blob;
-  /** Set only for a pass. */
-  traits: Traits | null;
-  crop: Blob | null;
-  /** The crop's outline, a PNG whose alpha is the person; null without a pass or a segmenter. */
-  mask: Blob | null;
-}
+} & (
+  | {
+      problem: null;
+      traits: Traits;
+      crop: Blob;
+      /** The crop's outline, a PNG whose alpha is the person; null without a segmenter. */
+      mask: Blob | null;
+    }
+  | { problem: RetakeReason; traits?: never; crop?: never; mask?: never }
+);
 
 /** Longer side, in pixels, the photo is checked at. */
 export const MAX_SIDE = 1280;
@@ -112,7 +115,7 @@ export async function checkImage(source: Blob | ImageBitmap): Promise<CheckedPho
 
   const faces = landmarker.detect(canvas).faceLandmarks;
   const { severalFaces, landmarks } = pickFace(faces, width, height);
-  const outcome = { faceCount: faces.length, preview, traits: null, crop: null, mask: null };
+  const outcome = { faceCount: faces.length, preview };
   if (severalFaces) return { ...outcome, problem: "several-faces", measures: NO_MEASURES };
 
   const pixels = context.getImageData(0, 0, width, height).data;

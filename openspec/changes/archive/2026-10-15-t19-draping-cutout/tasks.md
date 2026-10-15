@@ -115,7 +115,7 @@
     2. The face could stay hidden (no JS, or a hung outline): fixed. `sn-face-pending` in `globals.css` reveals the faces after 4 s without a script, and the fetch aborts at 4 s. Also fixed: the outline blob is decoded (`createImageBitmap`) before use, since CSS hides the face behind an undecodable mask.
     3. The model-input test could never fail: fixed. It asserts the call's exact keys.
     4. A third MediaPipe load at once could fail the check (shared `ModuleFactory` global): fixed. The person segmenter starts after `loadVision()` resolves.
-    5. Outline misses go unreported: logged as BL-66.
+    5. Outline misses go unreported: logged as BL-68.
     6. The download error message held the report id: fixed. The message is per kind.
     7. The e2e outline test checked only the signature: fixed. It decodes the outline and checks its size against the crop, alpha > 200 in the middle and < 50 in a top corner.
     8. The PNG content type was untested: fixed. A tested `contentType(path)` helper.
@@ -123,4 +123,4 @@
 - [x] 8.2 `/opsx:archive`. Then re-add Public Interface and Behavior lines in the permanent specs touched: `draping-preview` (`storeMask`, `readMask`, the mask route, the PNG migration), `capture-flow` (`loadPerson`, `CheckedPhoto.mask`), `season-reveal` (the request line), `ui-components` (`faceMaskSrc`), `site-content` (the outline image), `data-retention` (the bucket holds outlines). No new capability, so no README row. Verify: `openspec validate --specs` is green.
   - Done 2026-10-15: archived as `2026-10-15-t19-draping-cutout` (+5 added, ~7 modified requirements). Public Interface and Behavior lines updated in draping-preview, capture-flow, season-reveal, ui-components, site-content and data-retention. `openspec validate --specs`: 29 passed.
 - [x] 8.3 Tracker: set T19 to Done, with a Log line in plain words. Push, open the PR to `main` (naming the BL ids added and removed), and turn on auto-merge with a merge commit (`gh pr merge --auto --merge`, never squash). Verify: the PR shows auto-merge on and CI green.
-  - Done 2026-10-15: Tracker rev 76 (T19 Done, Log line). PR https://github.com/Ali-Gator/seasonly/pull/36 (BL-53 removed, BL-66 added), auto-merge on with a merge commit after the iPhone check. CI's first run failed on a Node 22 detail in the new DOM test (jsdom Blob in `Response`), fixed in 848d497.
+  - Done 2026-10-15: Tracker rev 76 (T19 Done, Log line). PR https://github.com/Ali-Gator/seasonly/pull/36 (BL-53 removed, BL-68 added), auto-merge on with a merge commit after the iPhone check. CI's first run failed on a Node 22 detail in the new DOM test (jsdom Blob in `Response`), fixed in 848d497.

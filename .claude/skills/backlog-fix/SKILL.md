@@ -118,10 +118,12 @@ runs Playwright between pushes except CI.
 `pnpm test:eval` fails with `results.json is stale` whenever the batch touched a hashed file:
 the core's sampling, photo-check, classifier or palettes, the capture code, `evals/*.ts` or
 `evals/manifest.json`, a Prettier reflow included (`evals/README.md`). The fix is
-`pnpm eval:run`, then commit `evals/results.json`. It is **free** (cached Commons photos, local
-MediaPipe, no AI Gateway), but the auto-mode classifier refuses it, so ask Oleg in one line to
-run `pnpm eval:run` from the repo root and wait for its `Test Files 1 passed` (about a minute).
-Then re-run `pnpm test:eval` and read `git diff evals/results.json`: a hash-only diff is the
+`pnpm eval:run`, then commit `evals/results.json`. Run it **yourself, only on that stale
+message** — never on a fresh `test:eval`, where it would only rewrite the same numbers. It is
+**free** (cached Commons photos, local MediaPipe, no AI Gateway) and allowed in
+`.claude/settings.json`: run exactly `pnpm eval:run` from the repo root, no `cd … &&` prefix and
+no env vars, so the allow rule matches, with `run_in_background` (about a minute cached, much
+longer on a cold photo cache), and wait for its `Test Files 1 passed`. Then re-run `pnpm test:eval` and read `git diff evals/results.json`: a hash-only diff is the
 expected result of a type or refactor change. A moved metric is a behavior change: say so in the
 PR, and raise `baseline.json` only if the metric improved (lowering it needs Oleg's approval).
 Do this before the review, so the refreshed file is in the reviewed diff.

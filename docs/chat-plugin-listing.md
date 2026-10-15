@@ -85,7 +85,9 @@ The answers below were run on the local production build on 2026-10-11. The colo
 | 2   | Am I a summer or a winter? Blue veins, silver looks better on me, I burn and rarely tan, and my hair is dark brown. | `{ veins: "blue", jewelry: "silver", sun: "burn", hair: "dark" }`       | Winter, "Cool, crisp and bold.", 6 colors from Blue Red to Charcoal, the link                 |
 | 3   | I have natural red hair and I burn in the sun. Which colors suit me?                                                | `{ sun: "burn", hair: "red" }`                                          | Spring, "Warm, light and fresh.", 6 colors from Peach to Light Taupe, the link                |
 | 4   | Help me find my seasonal color palette.                                                                             | The model asks the four questions, then calls with the answers given    | The family and 6 colors for those answers, the link                                           |
-| 5   | I honestly can't tell my vein color, jewelry, tan or hair, it's all hard to say.                                    | `{ veins: "unsure", jewelry: "unsure", sun: "unsure", hair: "unsure" }` | No season: "These answers don't point to one season", why, and the link to the photo analysis |
+| 5   | Run the Seasonly quiz with all four answers as unsure.                                                              | `{ veins: "unsure", jewelry: "unsure", sun: "unsure", hair: "unsure" }` | No season: "These answers don't point to one season", why, and the link to the photo analysis |
+
+The ChatGPT package keeps case 5's original wording, "I honestly can't tell my vein color, jewelry, tan or hair, it's all hard to say.": ChatGPT called the tool for it, and Claude answered itself.
 
 ### Negative (the tool is not called)
 
@@ -101,11 +103,11 @@ In `docs/chat-plugin-screenshots/`, taken in task 6.3 on 2026-10-11, each with i
 
 1. `1-spring.png`: positive case 3, the Spring card.
 2. `2-winter.png`: positive case 2, the Winter card.
-3. `3-no-result.png`: "Run the Seasonly quiz with all four answers as unsure.", the no-result card. Claude did not call the tool for case 5's wording (BL-35).
+3. `3-no-result.png`: "Run the Seasonly quiz with all four answers as unsure.", the no-result card.
 
 ## ChatGPT package
 
-OpenAI takes a plugin ZIP, not a form. Its source is `docs/chat-plugin-openai/` (`plugin.json`, `mcp.json`, `assets/`), built with `zip -X -r seasonly-plugin.zip plugin.json mcp.json assets -x '.*'` from that folder. The review test cases above live in `plugin.json`; `tools_triggered` is a string. The portal also wants `review.demo_recording_url`, a reviewer-accessible video.
+OpenAI takes a plugin ZIP, not a form. Its source is `docs/chat-plugin-openai/` (`plugin.json`, `mcp.json`, `assets/`), built with `zip -X -r seasonly-plugin.zip plugin.json mcp.json assets -x '.*'` from that folder. The review test cases above live in `plugin.json`, except case 5's wording, above; `tools_triggered` is a string. The portal also wants `review.demo_recording_url`, a reviewer-accessible video.
 
 ## Domain challenge (ChatGPT)
 

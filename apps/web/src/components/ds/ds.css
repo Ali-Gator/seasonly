@@ -173,6 +173,7 @@
   }
   .sn-swatch-grid {
     display: grid;
+    grid-template-columns: repeat(var(--sn-cols, 4), minmax(0, 1fr));
     gap: var(--space-4) var(--space-3);
     padding: var(--space-4);
     margin: 0;
@@ -181,10 +182,11 @@
     border-radius: var(--radius-lg);
   }
   /* Below 375 px a 4-column grid takes 3, so a name like Watermelon fits its cell (BL-57).
-     !important beats the inline column count; grids with keepColumns carry no marker. */
+     It sets the template, not --sn-cols, which the inline count would beat; grids with keepColumns
+     carry no marker, and a page's column utility still wins (BL-63). */
   @media (max-width: 374.98px) {
     .sn-swatch-grid[data-columns="4"] {
-      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 

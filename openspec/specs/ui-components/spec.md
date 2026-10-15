@@ -141,7 +141,7 @@ Since `t18-design-review` (design system version 30):
 - The step progress's current bar is a gradient that stops at `--sn-steps-fill`, which StepProgress sets inline from `sub`; without one it fills whole.
 - `.sn-btn--lg-swap`, in `globals.css` and not in the bundle, swaps the primary and secondary fills from 1024 px on buttons that are not disabled. It stays out of the design system because a viewport query would also swap the canvas's phone boards.
 
-Since `backlog-3` (BL-57): SwatchGrid keeps its inline column count and marks it as `data-columns`. Below 375 px, a `ds.css` rule with `!important` lays a grid marked `4` out in 3 columns, so "Watermelon" fits its cell. `keepColumns` drops the marker; `SeasonLink`'s 4-color season previews use it and keep 4 columns. The `bundle.css` on the canvas keeps 4, since no board is narrower than 375. From 375 to ~399 px "Watermelon" still runs a few pixels into the gap (BL-61).
+Since `backlog-3` (BL-57), reworked in `backlog-6` (BL-63): SwatchGrid sets its column count inline as the `--sn-cols` custom property, which `.sn-swatch-grid` reads for its `grid-template-columns` (4 when unset), and marks it as `data-columns`. Below 375 px, a `ds.css` rule lays a grid marked `4` out in 3 columns by setting the template directly, so "Watermelon" fits its cell. Nothing is `!important` and no inline template is set, so a page's column utility (such as `lg:grid-cols-6`) wins without a bang. `keepColumns` drops the marker; `SeasonLink`'s 4-color season previews use it and keep 4 columns. The `bundle.css` on the canvas keeps 4, since no board is narrower than 375. From 375 to ~399 px "Watermelon" still runs a few pixels into the gap (BL-61).
 
 ## Edge Cases
 
@@ -182,7 +182,7 @@ The name SHALL always take the height of two lines and SHALL break only between 
 
 ### Requirement: A swatch grid shows every color of a list in order
 
-A swatch grid SHALL render one swatch per color, in the order given, as a list that carries the grid's accessible label. It SHALL lay the swatches out in the number of columns asked for, and in 4 columns when none is given. In a window narrower than 375 px, a grid that would lay out in 4 columns SHALL lay out in 3 instead, so a ten-letter name such as "Watermelon" never reaches the next swatch's name. A grid MAY be asked to keep its 4 columns on narrow phones; the 4-color season previews on `/seasons` and on a season page's neighbours do, since their names fit.
+A swatch grid SHALL render one swatch per color, in the order given, as a list that carries the grid's accessible label. It SHALL lay the swatches out in the number of columns asked for, and in 4 columns when none is given. In a window narrower than 375 px, a grid that would lay out in 4 columns SHALL lay out in 3 instead, so a ten-letter name such as "Watermelon" never reaches the next swatch's name. A grid MAY be asked to keep its 4 columns on narrow phones; the 4-color season previews on `/seasons` and on a season page's neighbours do, since their names fit. A page that sets a grid's columns with its own column utility SHALL get that column count at every width it targets, the narrow-phone rule included, without marking the utility important.
 
 #### Scenario: A season's palette renders as a grid
 
@@ -208,6 +208,11 @@ A swatch grid SHALL render one swatch per color, in the order given, as a list t
 
 - **WHEN** `/seasons` is shown in a window 360 px wide
 - **THEN** each season's 4-color preview lays out in 4 columns
+
+#### Scenario: A page overrides a grid's columns
+
+- **WHEN** a page gives a 4-column swatch grid its own column utility, not marked important
+- **THEN** the page's column count applies at every width the utility targets, below 375 px included
 
 ### Requirement: A button is a link when it navigates and a button when it acts
 

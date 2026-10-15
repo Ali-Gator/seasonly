@@ -115,21 +115,23 @@ export function Flow() {
         const now = shownStep.current;
         if (now.name === "checking" && now.id === id)
           track("photo_checked", photoCheckedProps({ ...checked, attempt: id, source }));
-        dispatch({
-          type: "checked",
-          id,
-          problem: checked.problem,
-          photo:
-            checked.traits && checked.crop
-              ? {
+        const previewUrl = objectUrl(checked.preview);
+        dispatch(
+          checked.problem === null
+            ? {
+                type: "checked",
+                id,
+                problem: null,
+                photo: {
                   traits: checked.traits,
                   crop: checked.crop,
                   cropUrl: objectUrl(checked.crop),
                   mask: checked.mask,
-                }
-              : null,
-          previewUrl: objectUrl(checked.preview),
-        });
+                },
+                previewUrl,
+              }
+            : { type: "checked", id, problem: checked.problem, photo: null, previewUrl },
+        );
       } catch (error) {
         // A photo the browser cannot decode, or models that failed to load.
         // ponytail: shown as the no-face retake; a screen of its own if Sentry shows load failures.

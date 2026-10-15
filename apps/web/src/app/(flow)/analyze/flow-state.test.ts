@@ -6,6 +6,8 @@
  */
 import { describe, expect, it } from "vitest";
 
+import type { CheckedPhoto } from "@/lib/capture/photo";
+
 import {
   type FlowEvent,
   type FlowState,
@@ -396,5 +398,30 @@ describe("a refused request", () => {
   it("leaves any other failure an ordinary error", () => {
     const failed = reduce(run(toAnalyzing), { type: "failed", blocked: false });
     expect(failed.step).toEqual({ name: "error" });
+  });
+});
+
+describe("the checked types", () => {
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-the-type-refuses-a-pass-without-its-photo} */
+  it("refuses, in its type, a pass without its photo and a problem with one", () => {
+    const photo = {
+      faceCount: 1,
+      measures: { faceWidth: null, eyeWhite: null, skin: null },
+      preview: crop,
+    };
+    const event = { type: "checked", id: 1, previewUrl: null } as const;
+    // Read below: an unused-local error (even `_`-prefixed) would satisfy the directive and hide a regression.
+    // @ts-expect-error a pass must carry traits and a crop
+    const passWithoutCrop: CheckedPhoto = { ...photo, problem: null, traits: null, crop: null };
+    // @ts-expect-error a passed check must carry its photo
+    const passedWithoutPhoto: FlowEvent = { ...event, problem: null, photo: null };
+    // @ts-expect-error a rejection must carry no photo
+    const darkWithPhoto: FlowEvent = { ...event, problem: "dark", photo: PASS };
+    // @ts-expect-error a rejection must carry no crop
+    const darkWithCrop: CheckedPhoto = { ...photo, problem: "dark", crop };
+    expect(passWithoutCrop.crop).toBeNull();
+    expect(passedWithoutPhoto.type).toBe("checked");
+    expect(darkWithPhoto.type).toBe("checked");
+    expect(darkWithCrop.crop).toBe(crop);
   });
 });

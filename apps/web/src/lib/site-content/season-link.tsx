@@ -54,7 +54,7 @@ export function SeasonLink({
         columns={4}
         keepColumns
         label={`${name} colors`}
-        className={wide ? "max-lg:[&>li:nth-child(n+5)]:hidden lg:grid-cols-3!" : undefined}
+        className={wide ? "max-lg:[&>li:nth-child(n+5)]:hidden lg:grid-cols-3" : undefined}
       />
     </div>
   );

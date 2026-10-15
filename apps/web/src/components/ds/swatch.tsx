@@ -1,5 +1,7 @@
 import type { Swatch as Color } from "@seasonly/analysis";
 
+import type { CSSProperties } from "react";
+
 import { cx } from "./icon";
 
 export interface SwatchProps extends Color {
@@ -27,6 +29,7 @@ export function Swatch({ name, hex, size, className }: SwatchProps) {
 
 export interface SwatchGridProps {
   colors: readonly Color[];
+  /** Set as `--sn-cols`, so a page's column utility still wins (BL-63). */
   columns?: number;
   label?: string;
   className?: string;
@@ -44,7 +47,7 @@ export function SwatchGrid({
   return (
     <ul
       className={cx("sn-swatch-grid", className)}
-      style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+      style={{ "--sn-cols": columns } as CSSProperties}
       data-columns={keepColumns ? undefined : columns}
       aria-label={label}
     >

@@ -68,13 +68,13 @@ describe("SwatchGrid", () => {
   /** {@link openspec/specs/ui-components/spec.md#requirement-a-swatch-grid-shows-every-color-of-a-list-in-order} */
   it("lays out in the number of columns asked for", () => {
     const out = html(<SwatchGrid colors={best} columns={3} />);
-    expect(out).toContain("grid-template-columns:repeat(3, minmax(0, 1fr))");
+    expect(out).toContain("--sn-cols:3");
   });
 
   /** {@link openspec/specs/ui-components/spec.md#scenario-no-column-count-is-given} */
   it("lays out in 4 columns by default", () => {
     const out = html(<SwatchGrid colors={best} />);
-    expect(out).toContain("grid-template-columns:repeat(4, minmax(0, 1fr))");
+    expect(out).toContain("--sn-cols:4");
   });
 
   /** {@link openspec/specs/ui-components/spec.md#scenario-a-4-column-grid-on-a-narrow-phone} */
@@ -88,6 +88,26 @@ describe("SwatchGrid", () => {
     expect(html(<SwatchGrid colors={best} columns={4} keepColumns />)).not.toContain(
       "data-columns",
     );
+  });
+
+  /** {@link openspec/specs/ui-components/spec.md#scenario-a-page-overrides-a-grids-columns} */
+  it("leaves its columns to a page's utility, with nothing important to beat", () => {
+    expect(html(<SwatchGrid colors={best} columns={3} />)).not.toContain("grid-template-columns");
+    const read = (file: string) =>
+      fs
+        .readFileSync(path.resolve(import.meta.dirname, file), "utf-8")
+        .replace(/\/\*[\s\S]*?\*\//g, "");
+    const rules = read("ds.css").match(/[^{}]*\.sn-swatch-grid[^{}]*\{[^}]*\}/g) ?? [];
+    expect(rules.length).toBeGreaterThan(0);
+    for (const rule of rules) expect(rule).not.toContain("!important");
+    const src = path.resolve(import.meta.dirname, "../..");
+    const callers = fs
+      .readdirSync(src, { recursive: true, encoding: "utf-8" })
+      .filter((f) => f.endsWith(".tsx") && !f.includes(".test."))
+      .map((f) => read(path.join(src, f)))
+      .filter((text) => text.includes("<SwatchGrid"));
+    expect(callers.length).toBeGreaterThan(0);
+    for (const caller of callers) expect(caller).not.toMatch(/grid-cols-\d+!/);
   });
 });
 
