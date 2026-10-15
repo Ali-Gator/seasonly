@@ -116,29 +116,6 @@ fold items in.
   _Refs:_ `apps/web/src/app/api/analyze/route.ts` (`checkBotId`), `t18-design-review` tasks.md
   8.3 · _Status:_ deferred — until t18 is on seasonly.me (the preview sits behind Vercel login)
 
-- **[BL-66] A RENAMED `TO:` name with a backtick slugs wrong** — `deltaAnchors` in the citation
-  gate reads `TO:` names with a regex that stops at the first backtick inside the name, so a
-  rename to a name like the fixture's `` `plan_shared` fires … `` slugs as `requirement-` and a
-  test citing the new name is reported stale. The `FROM:` reader added in `backlog-6` reads to
-  the end of the line; `TO:` should too. Best done as one shared delta-section parser with one
-  rename regex, which also stops `deltaAnchors` and `deltaProof` parsing each delta twice and
-  `openDeltas()` reading every delta file twice per run.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open
-
-- **[BL-67] A change that marks a requirement unenforced still has to cite it until archive** —
-  `deltaProof` ignores the `**Unenforced:**` flag on a MODIFIED requirement, so a change that
-  makes a requirement unenforced and drops its last citing test fails the proof check until
-  archive, the same deadlock `backlog-6` fixed for removed and renamed ones. Treat it as gone, and
-  add the clause to the spec-workflow requirement.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open
-
-- **[BL-69] Prose that names the unenforced flag marks a requirement unenforced** —
-  `parseRequirements` flags any line that _contains_ `**Unenforced:**`, so constitution "Every
-  requirement is proven by a test that cites it" is flagged by its own body (:64) and a WHEN line
-  (:83). Harmless while tests cite it, but it would exempt any requirement whose prose mentions
-  the flag. Match only a line that starts with it, as every real flag does.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/constitution/spec.md` · _Status:_ open — found in `backlog-7` triage, 2026-10-15
-
 - **[BL-08] Two concurrent email stores are never raced in a test** — the abuse-controls
   scenario "Two requests at once" rests on `store_report_email` locking the report row (`for
 update`). PGlite has one connection, so the test only checks that the lock is in the SQL. Race
@@ -146,12 +123,6 @@ update`). PGlite has one connection, so the test only checks that the lock is in
   Unenforced.
   _Refs:_ `apps/web/src/lib/email/store.test.ts`, `openspec/specs/abuse-controls/spec.md` ·
   _Status:_ gated — a local Postgres in tests (the local Supabase stack needs Docker)
-
-- **[BL-64] `view.test.tsx` writes its footer helper twice** — "has no photo line in a quiz-only
-  footer" declares `footer` inline and "names Google's copy in a photo report's footer" repeats
-  the same regex. Hoist one `footer` helper to file scope; it edits an existing test, so it needs
-  the test edit approved.
-  _Refs:_ `apps/web/src/lib/report/view.test.tsx` · _Status:_ open — `backlog-4` phase review, 2026-10-14
 
 ## Design / UX
 
@@ -175,12 +146,6 @@ update`). PGlite has one connection, so the test only checks that the lock is in
   (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3) · _Status:_ deferred — until a page renders a
   DOM card preview (`t5-report-delivery` shows the PNGs themselves); check whether the 2026-10-07
   redesign session already updated the canvas
-
-- **[BL-26] The famous photos bypass `Slot`** — the season page builds its own `sn-slot` and
-  `img` only to add `loading="lazy"`. Give the design system's `Slot` (and bundle.js) a `loading`
-  prop and use it there.
-  _Refs:_ `apps/web/src/components/ds/slot.tsx`, `apps/web/src/app/(site)/seasons/[season]/page.tsx`
-  · _Status:_ open — t9 phase review, 2026-10-10
 
 - **[BL-70] The season reveal builds its own photo slot** — `_reveal/steps.tsx` hand-builds an
   `sn-slot` and `img` that the design system's `Slot` already covers (`src`, `alt`, `className`).

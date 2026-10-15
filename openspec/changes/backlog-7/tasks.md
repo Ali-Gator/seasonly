@@ -17,7 +17,7 @@
 
 ## 3. Verify, delete, review, archive, ship
 
-- [ ] 3.1 `pnpm fix`, `pnpm test` (and `pnpm test:eval`)
-- [ ] 3.2 delete shipped bullets BL-69, BL-66, BL-67, BL-26, BL-64 from `docs/backlog.md`; BL-70 stays
+- [x] 3.1 `pnpm fix`, `pnpm test` (and `pnpm test:eval`)
+- [x] 3.2 delete shipped bullets BL-69, BL-66, BL-67, BL-26, BL-64 from `docs/backlog.md`; BL-70 stays
 - [ ] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
 - [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR naming new ids BL-69 and BL-70, auto-merge
