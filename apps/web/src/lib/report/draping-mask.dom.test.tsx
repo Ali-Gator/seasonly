@@ -84,7 +84,7 @@ describe("ReportDraping's cut-out", () => {
   /** {@link openspec/specs/report-page/spec.md#scenario-a-stored-outline} */
   it("masks both faces with the loaded outline, then shows them", async () => {
     await render();
-    await act(async () => answer(new Response(new Blob(["png"]), { status: 200 })));
+    await act(async () => answer(new Response("png", { status: 200 })));
     expect(wrapper().className).not.toContain(HIDDEN);
     expect(slots()).toHaveLength(2);
     for (const slot of slots()) {
