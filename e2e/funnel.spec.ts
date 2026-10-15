@@ -7,14 +7,14 @@
  * @see openspec/specs/analytics/spec.md
  */
 import path from "node:path";
-import zlib from "node:zlib";
 
-import { expect, type Page, type Request, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
+
+import { posingAsAPhone, recordPostHog as recordAll } from "./posthog";
 
 const FACE = path.resolve(import.meta.dirname, "fixtures/face.jpg");
 const ID = "e2eFunnelReport0000000";
 const ADDRESS = "funnel.e2e@example.com";
-const POSTHOG = "http://127.0.0.1:9";
 /** The events the funnel names; others (`$pageleave`, `$autocapture`, …) are not counted. */
 const NAMED = new Set([
   "$pageview",
@@ -26,66 +26,13 @@ const NAMED = new Set([
   "email_submitted",
 ]);
 
-test.use({
-  viewport: { width: 390, height: 844 },
-  // posthog-js drops every event from a likely bot: a HeadlessChrome user agent, its brands or
-  // `navigator.webdriver` (cleared below).
-  userAgent:
-    "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36",
-});
+test.use({ viewport: { width: 390, height: 844 } });
+posingAsAPhone();
 
-test.beforeEach(({ page }) =>
-  page.addInitScript(() => {
-    Object.defineProperty(Navigator.prototype, "webdriver", { get: () => false });
-    Object.defineProperty(Navigator.prototype, "userAgentData", { get: () => undefined });
-  }),
-);
-
-interface Captured {
-  event: string;
-  properties: Record<string, unknown>;
-  timestamp?: string;
-}
-
-/** A body as posthog-js sends it: gzip (by its magic bytes), base64 form data or plain JSON. */
-function decode(req: Request): string {
-  const url = new URL(req.url());
-  const body = req.postDataBuffer() ?? Buffer.alloc(0);
-  const compression = url.searchParams.get("compression");
-  if (compression === "gzip-js" || (body[0] === 0x1f && body[1] === 0x8b))
-    return zlib.gunzipSync(body).toString();
-  const text = body.toString();
-  if (compression === "base64" || text.startsWith("data="))
-    return Buffer.from(new URLSearchParams(text).get("data") ?? "", "base64").toString();
-  return text;
-}
-
-/** Routes the PostHog host: every request answered empty, every body kept. */
+/** The shared recorder, plus the funnel's named events and a lookup by name. */
 async function recordPostHog(page: Page) {
-  const bodies: string[] = [];
-  const events: Captured[] = [];
-  const errors: string[] = [];
-  await page.route(`${POSTHOG}/**`, (route) => {
-    const req = route.request();
-    if (req.method() === "POST") {
-      try {
-        const text = decode(req);
-        bodies.push(`${req.url()} ${text}`);
-        const parsed = text ? (JSON.parse(text) as unknown) : null;
-        const list = Array.isArray(parsed)
-          ? parsed
-          : ((parsed as { batch?: unknown[] } | null)?.batch ?? [parsed]);
-        for (const e of list)
-          if (e && typeof e === "object" && "event" in e) events.push(e as Captured);
-      } catch (error) {
-        errors.push(`${req.url()} ${req.headers()["content-type"]}: ${String(error)}`);
-      }
-    } else bodies.push(req.url());
-    return route.fulfill({
-      json: {},
-      headers: { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "*" },
-    });
-  });
+  const recorded = await recordAll(page);
+  const { events } = recorded;
   /** The named events in the order they happened, a page view as `$pageview <path>`. */
   const named = () =>
     events
@@ -95,7 +42,7 @@ async function recordPostHog(page: Page) {
         e.event === "$pageview" ? `$pageview ${String(e.properties.$pathname)}` : e.event,
       );
   const find = (name: string) => events.filter((e) => e.event === name);
-  return { bodies, events, errors, named, find };
+  return { ...recorded, named, find };
 }
 
 /** The analyze route answers a result with `ID`, a 403 (the bot check), a 500, or never (`hold`). */

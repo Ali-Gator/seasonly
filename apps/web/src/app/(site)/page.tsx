@@ -102,7 +102,7 @@ export default function Page() {
             colors={SAMPLE}
             columns={4}
             label="A sample Soft Autumn palette"
-            className="lg:grid-cols-6!"
+            className="lg:grid-cols-6"
           />
           <Link href="/sample-report" className="label sn-navlink">
             See the full sample report
