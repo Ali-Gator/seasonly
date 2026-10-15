@@ -156,7 +156,7 @@ Whenever a photo result's crop is stored, the outline the request carried SHALL 
 - **WHEN** `/api/face/<id>/mask` is requested for a report whose outline is stored
 - **THEN** it answers 200, `image/png`, `Cache-Control: private, no-store`, and the outline's bytes
 
-#### Scenario: A malformed id
+#### Scenario: A malformed outline id
 
 - **WHEN** the outline route receives the id `../reports` or `short`
 - **THEN** it answers 404, and the store is not called

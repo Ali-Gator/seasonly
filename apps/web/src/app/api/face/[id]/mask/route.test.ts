@@ -44,7 +44,7 @@ describe("GET /api/face/[id]/mask", () => {
     expect(readMask).toHaveBeenCalledWith(ID);
   });
 
-  /** {@link openspec/specs/draping-preview/spec.md#scenario-a-malformed-id} */
+  /** {@link openspec/specs/draping-preview/spec.md#scenario-a-malformed-outline-id} */
   it.each(["short", "../reports"])(
     "answers 404 for the id %s without reaching the store",
     async (id) => {
