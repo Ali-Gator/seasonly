@@ -104,7 +104,8 @@
   - an older report (no outline) shows the face as before.
     Verify: screenshots of the report before and after are shared with the user.
   - Done 2026-10-15 in the user's Chrome on `pnpm dev` (this branch). The analyze request carried `mask`; storage held `<id>.jpg` (15,448 B) and `<id>.mask.png` (13,569 B, `image/png`); the report showed the cut-out on True Red and Mustard (screenshot shared). The first load after a cold dev compile took 4.1 s for the outline, past the 4 s limit, and showed the plain face, as designed; a reload cut it out (outline in about 0.5 s). An older report (no outline) got 404 for its outline and showed the face unmasked, with no "couldn't load" line.
-- [ ] 7.3 On the preview deployment, open a fresh photo report on an iPhone (Safari, or the Instagram in-app browser) to confirm the iOS path: the outline is encoded and the mask renders. Verify: the user confirms, or a screenshot from their phone is recorded here.
+- [x] 7.3 On the preview deployment, open a fresh photo report on an iPhone (Safari, or the Instagram in-app browser) to confirm the iOS path: the outline is encoded and the mask renders. Verify: the user confirms, or a screenshot from their phone is recorded here.
+  - Done 2026-10-15: the user confirmed on their iPhone, on preview `seasonly-f0moujujf-aligators-projects.vercel.app`, that the outline was made and the face is cut out on both colors.
 
 ## 8. Review, archive and ship
 
@@ -121,4 +122,5 @@
     9. The crops mock in `route.test.ts` gained `storeMask` without approval: additive; the user is asked to approve it (see 1.5).
 - [x] 8.2 `/opsx:archive`. Then re-add Public Interface and Behavior lines in the permanent specs touched: `draping-preview` (`storeMask`, `readMask`, the mask route, the PNG migration), `capture-flow` (`loadPerson`, `CheckedPhoto.mask`), `season-reveal` (the request line), `ui-components` (`faceMaskSrc`), `site-content` (the outline image), `data-retention` (the bucket holds outlines). No new capability, so no README row. Verify: `openspec validate --specs` is green.
   - Done 2026-10-15: archived as `2026-10-15-t19-draping-cutout` (+5 added, ~7 modified requirements). Public Interface and Behavior lines updated in draping-preview, capture-flow, season-reveal, ui-components, site-content and data-retention. `openspec validate --specs`: 29 passed.
-- [ ] 8.3 Tracker: set T19 to Done, with a Log line in plain words. Push, open the PR to `main` (naming the BL ids added and removed), and turn on auto-merge with a merge commit (`gh pr merge --auto --merge`, never squash). Verify: the PR shows auto-merge on and CI green.
+- [x] 8.3 Tracker: set T19 to Done, with a Log line in plain words. Push, open the PR to `main` (naming the BL ids added and removed), and turn on auto-merge with a merge commit (`gh pr merge --auto --merge`, never squash). Verify: the PR shows auto-merge on and CI green.
+  - Done 2026-10-15: Tracker rev 76 (T19 Done, Log line). PR https://github.com/Ali-Gator/seasonly/pull/36 (BL-53 removed, BL-66 added), auto-merge on with a merge commit after the iPhone check. CI's first run failed on a Node 22 detail in the new DOM test (jsdom Blob in `Response`), fixed in 848d497.
