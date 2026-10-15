@@ -35,7 +35,7 @@ _None._ No member landed in lane D.
 - `scripts/__tests__/spec-citations.test.ts` — `unprovenRequirements` takes the open changes, the real-repo proof call passes them, the header comment changes; existing rule-test assertions stay (design.md Decision 2, Oleg, 2026-10-14).
 - `apps/web/src/components/ds/ds.test.tsx:68-78` — "lays out in the number of columns asked for" and "lays out in 4 columns by default" assert `--sn-cols` instead of the inline `grid-template-columns` (design.md Decision 3, Oleg, 2026-10-14).
 - `e2e/funnel.spec.ts` — its local route, decode and recorder go; it wraps the shared helper (design.md Decision 4, Oleg, 2026-10-14).
-- `e2e/sample-report.spec.ts:27` — destructures `events` from the helper's new return (design.md Decision 4, Oleg, 2026-10-14).
+- `e2e/sample-report.spec.ts:27` — destructures `events` and `errors` from the helper's new return and asserts `errors` is empty (design.md Decision 4, Oleg, 2026-10-14; the `errors` assertion 2026-10-15).
 
 ## Capabilities
 

@@ -24,7 +24,7 @@ posingAsAPhone();
 
 /** {@link openspec/specs/site-content/spec.md#scenario-nothing-is-sent} */
 test("the sample report makes no API request and sends no funnel event", async ({ page }) => {
-  const { events } = await recordPostHog(page);
+  const { events, errors } = await recordPostHog(page);
   const api: string[] = [];
   page.on("request", (r) => {
     if (new URL(r.url()).pathname.startsWith("/api/")) api.push(r.url());
@@ -42,4 +42,5 @@ test("the sample report makes no API request and sends no funnel event", async (
   await expect.poll(pageviews, { timeout: 20_000 }).toEqual(["/sample-report", "/"]);
   expect(events.map((e) => e.event).filter((e) => CUSTOM.includes(e))).toEqual([]);
   expect(api).toEqual([]);
+  expect(errors).toEqual([]);
 });

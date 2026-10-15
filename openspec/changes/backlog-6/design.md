@@ -96,6 +96,8 @@ The proof check (`unprovenRequirements` over the main specs, real-repo call at :
 
 **Answer:** a — approved, both files (Oleg, 2026-10-14)
 
+**Review follow-up:** the helper now catches decode errors, so `sample-report.spec.ts` also asserts `errors` is empty, or a body-format change would hide a funnel event (approved, Oleg, 2026-10-15).
+
 ## Corrections to the bullets
 
 - **BL-42** says the gate "already skips" ADDED headings. It does not skip them: `deltaAnchors` makes them citable, and they escape the proof check only because they are not in the main specs yet. The same root cause also hits RENAMED-FROM requirements and MODIFIED requirements proven through a new scenario (Decision 2).
