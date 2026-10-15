@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { Button, Icon, ReportSection } from "@/components/ds";
+import { Button, Icon, ReportSection, Slot } from "@/components/ds";
 import { Colors, Group, LEFT, RIGHT, SeasonTraits } from "@/lib/report/sections";
 import { SeasonLink } from "@/lib/site-content/season-link";
 import { FAMOUS_NOTE, famousIntro, SEASON_CONTENT } from "@/lib/site-content/seasons";
@@ -121,10 +121,7 @@ export default async function Season({ params }: Props) {
                   {/* The caption names the photo, so its alt is empty: a screen reader reads the name once.
                       A figcaption must be the figure's first or last child, so the credit sits after it. */}
                   <figure className="m-0 flex flex-col gap-(--space-1)">
-                    <div className="sn-slot aspect-3/4">
-                      {/* eslint-disable-next-line @next/next/no-img-element -- static, pre-sized WebP */}
-                      <img src={f.image} alt="" loading="lazy" />
-                    </div>
+                    <Slot src={f.image} className="aspect-3/4" loading="lazy" />
                     <figcaption className="label">{f.name}</figcaption>
                   </figure>
                   <span className="caption text-(--ink-muted)">

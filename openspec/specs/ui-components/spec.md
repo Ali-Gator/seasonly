@@ -102,6 +102,14 @@ export interface EmailInputProps extends Omit<InputHTMLAttributes<HTMLInputEleme
   error?: string; // replaces the hint; marks the field invalid and reads "Error: …"
   ref?: Ref<HTMLInputElement>;
 }
+export interface SlotProps {
+  src?: string;
+  alt?: string; // default ""
+  label?: string; // shown in place of a missing image, default "Photo"
+  className?: string;
+  style?: CSSProperties;
+  loading?: "lazy" | "eager"; // unset leaves the browser's default
+}
 
 export function Button(props: ButtonProps): JSX.Element;
 export function Icon(props: IconProps): JSX.Element;
@@ -115,16 +123,18 @@ export function Note(props: NoteProps): JSX.Element;
 export function ReportSection(props: ReportSectionProps): JSX.Element;
 export function DrapingPair(props: DrapingPairProps): JSX.Element; // the face is /api/face/<report id> (draping-preview)
 export function EmailInput(props: EmailInputProps): JSX.Element; // the report email step (email-capture)
+export function Slot(props: SlotProps): JSX.Element; // an image, or a labeled placeholder
 ```
 
 Styles: `apps/web/src/components/ds/ds.css`, imported once from `globals.css` right after Tailwind.
 
 ## Behavior
 
-Each component is a JSX port of its function in the design system's `bundle.js` (https://claude.ai/artifact/E11hciU9VsyCxTFnJJNbHD, `project/components/`), typed from its `index.d.ts`. Element types, class names, ARIA attributes, defaults and icon path data match the bundle. Two things differ:
+Each component is a JSX port of its function in the design system's `bundle.js` (https://claude.ai/artifact/E11hciU9VsyCxTFnJJNbHD, `project/components/`), typed from its `index.d.ts`. Element types, class names, ARIA attributes, defaults and icon path data match the bundle. Three things differ:
 
 - A Button with `href` renders `next/link`, so navigation stays client-side. Every other prop passes through, `aria-disabled` included.
 - Swatches take the analysis core's `Swatch` type, so a `PALETTES` entry renders without mapping.
+- `Slot` is public here, while the bundle keeps it internal, and takes an optional `loading` passed to its `img`, which the bundle's has not.
 
 They are server components: no state, no effects, no `"use client"`. ReportSection uses `useId()` for its heading id when no `id` is given.
 
