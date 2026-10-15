@@ -17,8 +17,8 @@ export interface SlotProps {
 export function Slot({ src, alt = "", label = "Photo", className, style, loading }: SlotProps) {
   return (
     <div className={cx("sn-slot", className)} style={style}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- object URLs, placeholders and pre-sized static photos */}
       {src ? (
+        // eslint-disable-next-line @next/next/no-img-element -- object URLs, placeholders and pre-sized static photos
         <img src={src} alt={alt} loading={loading} />
       ) : (
         <span className="sn-slot__label">{label}</span>
