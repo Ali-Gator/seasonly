@@ -541,6 +541,22 @@ describe("spec citation rules", () => {
     ).toEqual(["cap: Requirement: `plan_shared` fires on a slug-mint, never: on open"]);
   });
 
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-whose-prose-only-names-the-flag} */
+  it("an open change whose delta prose only names the unenforced flag still needs a citing test", () => {
+    const delta = [
+      "## MODIFIED Requirements",
+      "### Requirement: Untested",
+      "",
+      "A requirement nobody can test carries a `**Unenforced:**` line giving the reason.",
+    ];
+    expect(
+      unprovenRequirements(specs, [], new Map([["cap", deltaProof(delta.join("\n"))]])),
+    ).toEqual([
+      "cap: Requirement: `plan_shared` fires on a slug-mint, never: on open",
+      "cap: Requirement: Untested",
+    ]);
+  });
+
   it("a repeated scenario name within a capability is reported", () => {
     const dup = new Map([
       ["cap", parseRequirements(SPEC + "\n### Requirement: B\n#### Scenario: Opening the dialog")],
