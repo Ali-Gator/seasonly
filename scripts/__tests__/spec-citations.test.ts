@@ -70,10 +70,12 @@ function parseRequirements(text: string): Requirement[] {
   for (const line of text.split("\n")) {
     if (line.startsWith("```")) fenced = !fenced;
     if (fenced) continue;
-    const req = /^### (Requirement: .+)$/.exec(line);
+    // Archive's `REQUIREMENT_HEADER_REGEX`: the keyword in any letter case.
+    const req = /^###\s*Requirement:\s*(.+)\s*$/i.exec(line);
     const scenario = /^#### (Scenario: .+)$/.exec(line);
     if (req?.[1]) {
-      current = { name: req[1].trim(), anchor: slugify(req[1]), scenarios: [], unenforced: false };
+      const name = `Requirement: ${req[1].trim()}`;
+      current = { name, anchor: slugify(name), scenarios: [], unenforced: false };
       requirements.push(current);
     } else if (/^#{1,3} /.test(line)) {
       current = undefined;
@@ -99,10 +101,10 @@ const TO_LINE = renameLine("TO");
  * that never cross a line. A `FROM:` line sets the pending old name; a `TO:` line pairs with it
  * only when one is pending, so a line with no partner yields nothing.
  */
-function renamedPairs(section: string): { from: string; to: string }[] {
+function renamedPairs(body: string[]): { from: string; to: string }[] {
   const pairs: { from: string; to: string }[] = [];
   let from: string | undefined;
-  for (const line of section.split("\n")) {
+  for (const line of body) {
     const f = FROM_LINE.exec(line);
     const t = f ? null : TO_LINE.exec(line);
     if (f?.[1]) {
@@ -115,6 +117,28 @@ function renamedPairs(section: string): { from: string; to: string }[] {
   return pairs;
 }
 
+const SECTION_KINDS = ["added", "modified", "removed", "renamed"] as const;
+
+/**
+ * A delta's `## ` sections in document order, as archive splits them (`splitTopLevelSections`)
+ * and looks them up (`getSectionsCaseInsensitive`): the title trimmed, lowercased and compared
+ * whole to `<kind> requirements`. Any other title is a section of no kind that still ends the
+ * one before it. Repeated headings stay separate bodies.
+ */
+function deltaSections(text: string): { kind?: (typeof SECTION_KINDS)[number]; body: string[] }[] {
+  const sections: ReturnType<typeof deltaSections> = [];
+  text.split("\n").forEach((line) => {
+    const m = /^##\s+(.+)$/.exec(line);
+    if (m) {
+      const title = (m[1] ?? "").trim().toLowerCase();
+      sections.push({ kind: SECTION_KINDS.find((k) => title === `${k} requirements`), body: [] });
+    } else {
+      sections.at(-1)?.body.push(line);
+    }
+  });
+  return sections;
+}
+
 /**
  * Anchors a change delta makes citable before archive: its ADDED requirements and scenarios,
  * RENAMED targets, and MODIFIED requirements and scenarios — a MODIFIED one only when its
@@ -122,16 +146,15 @@ function renamedPairs(section: string): { from: string; to: string }[] {
  * since archive refuses any other.
  */
 function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): string[] {
-  const sections = text.split(/^(?=## )/m);
+  const sections = deltaSections(text);
   const renamed = sections
-    .filter((s) => s.startsWith("## RENAMED Requirements"))
-    .flatMap((s) => renamedPairs(s).map((p) => p.to));
+    .filter((s) => s.kind === "renamed")
+    .flatMap((s) => renamedPairs(s.body).map((p) => p.to));
   const anchors: string[] = [...renamed];
-  for (const section of sections) {
-    const added = section.startsWith("## ADDED Requirements");
-    if (!added && !section.startsWith("## MODIFIED Requirements")) continue;
-    for (const r of parseRequirements(section.replace(/^## .*\n/, ""))) {
-      if (added || existing.has(r.anchor) || renamed.includes(r.anchor)) {
+  for (const { kind, body } of sections) {
+    if (kind !== "added" && kind !== "modified") continue;
+    for (const r of parseRequirements(body.join("\n"))) {
+      if (kind === "added" || existing.has(r.anchor) || renamed.includes(r.anchor)) {
         anchors.push(r.anchor, ...r.scenarios);
       }
     }
@@ -152,14 +175,13 @@ function deltaProof(
   text: string,
   into: OpenDelta = { gone: new Set(), scenarios: new Map() },
 ): OpenDelta {
-  for (const section of text.split(/^(?=## )/m)) {
-    const body = section.replace(/^## .*\n/, "");
-    if (section.startsWith("## REMOVED Requirements")) {
-      for (const r of parseRequirements(body)) into.gone.add(r.anchor);
-    } else if (section.startsWith("## RENAMED Requirements")) {
-      for (const { from } of renamedPairs(section)) into.gone.add(from);
-    } else if (section.startsWith("## MODIFIED Requirements")) {
-      for (const r of parseRequirements(body)) {
+  for (const { kind, body } of deltaSections(text)) {
+    if (kind === "removed") {
+      for (const r of parseRequirements(body.join("\n"))) into.gone.add(r.anchor);
+    } else if (kind === "renamed") {
+      for (const { from } of renamedPairs(body)) into.gone.add(from);
+    } else if (kind === "modified") {
+      for (const r of parseRequirements(body.join("\n"))) {
         if (r.unenforced) into.gone.add(r.anchor);
         into.scenarios.set(r.anchor, [...(into.scenarios.get(r.anchor) ?? []), ...r.scenarios]);
       }
@@ -592,6 +614,29 @@ describe("spec citation rules", () => {
       "cap: Requirement: `plan_shared` fires on a slug-mint, never: on open",
       "cap: Requirement: Untested",
     ]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-delta-section-heading-in-another-letter-case} */
+  it("a delta section heading is matched trimmed, in any letter case, and whole", () => {
+    const delta = [
+      "## Renamed Requirements",
+      "- FROM: `### Requirement: Before`",
+      "- TO: `### Requirement: After`",
+      "##   modified requirements  ",
+      "### requirement: After",
+      "#### Scenario: Case-free heading",
+      "## ADDED Requirements (draft)",
+      "### Requirement: Draft thing",
+      "#### Scenario: Draft works",
+    ].join("\n");
+    expect(deltaAnchors(delta)).toEqual([
+      "requirement-after",
+      "requirement-after",
+      "scenario-case-free-heading",
+    ]);
+    const proof = deltaProof(delta);
+    expect([...proof.gone]).toEqual(["requirement-before"]);
+    expect([...proof.scenarios]).toEqual([["requirement-after", ["scenario-case-free-heading"]]]);
   });
 
   it("a repeated scenario name within a capability is reported", () => {
