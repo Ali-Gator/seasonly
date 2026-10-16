@@ -91,13 +91,11 @@ function splitLines(text: string): string[] {
 }
 
 /** `mask` is the lines' slice of the whole delta's fence mask, when they are one section's body. */
-function parseRequirements(text: string, mask?: boolean[]): Requirement[] {
+function parseRequirements(lines: string[], mask: boolean[] = fenceMask(lines)): Requirement[] {
   const requirements: Requirement[] = [];
   let current: Requirement | undefined;
-  const lines = splitLines(text);
-  const masked = mask ?? fenceMask(lines);
   for (const [i, line] of lines.entries()) {
-    if (masked[i]) continue;
+    if (mask[i]) continue;
     // Archive's `REQUIREMENT_HEADER_REGEX`: the keyword in any letter case.
     const req = /^###\s*Requirement:\s*(.+)\s*$/i.exec(line);
     const scenario = /^#### (Scenario: .+)$/.exec(line);
@@ -189,7 +187,7 @@ function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): 
   const anchors: string[] = [...renamed];
   for (const { kind, body, mask } of sections) {
     if (kind !== "added" && kind !== "modified") continue;
-    for (const r of parseRequirements(body.join("\n"), mask)) {
+    for (const r of parseRequirements(body, mask)) {
       if (kind === "added" || existing.has(r.anchor) || renamed.includes(r.anchor)) {
         anchors.push(r.anchor, ...r.scenarios);
       }
@@ -213,11 +211,11 @@ function deltaProof(
 ): OpenDelta {
   for (const { kind, body, mask } of deltaSections(text)) {
     if (kind === "removed") {
-      for (const r of parseRequirements(body.join("\n"), mask)) into.gone.add(r.anchor);
+      for (const r of parseRequirements(body, mask)) into.gone.add(r.anchor);
     } else if (kind === "renamed") {
       for (const { from } of renamedPairs(body, mask)) into.gone.add(from);
     } else if (kind === "modified") {
-      for (const r of parseRequirements(body.join("\n"), mask)) {
+      for (const r of parseRequirements(body, mask)) {
         if (r.unenforced) into.gone.add(r.anchor);
         into.scenarios.set(r.anchor, [...(into.scenarios.get(r.anchor) ?? []), ...r.scenarios]);
       }
@@ -308,7 +306,8 @@ function mainSpecs(): Map<string, Requirement[]> {
   const specs = new Map<string, Requirement[]>();
   for (const cap of fs.readdirSync(SPECS_DIR)) {
     const file = path.join(SPECS_DIR, cap, "spec.md");
-    if (fs.existsSync(file)) specs.set(cap, parseRequirements(fs.readFileSync(file, "utf-8")));
+    if (fs.existsSync(file))
+      specs.set(cap, parseRequirements(splitLines(fs.readFileSync(file, "utf-8"))));
   }
   return specs;
 }
@@ -411,7 +410,7 @@ describe("spec citation rules", () => {
   const SCENARIO = "scenario-opening-the-dialog";
   const cite = (cap: string, anchor?: string) =>
     "/** {@link openspec/specs/" + cap + "/spec.md" + (anchor ? "#" + anchor : "") + "} */";
-  const specs = new Map([["cap", parseRequirements(SPEC)]]);
+  const specs = new Map([["cap", parseRequirements(splitLines(SPEC))]]);
   const known = new Map([["cap", new Set([REQ, SCENARIO])]]);
 
   it("slugs keep letters, digits, hyphens and underscores, and drop backticks and colons", () => {
@@ -443,7 +442,7 @@ describe("spec citation rules", () => {
       "",
       "A requirement nobody can test carries a `**Unenforced:**` line giving the reason.",
     ];
-    const named = new Map([["cap", parseRequirements(prose.join("\n"))]]);
+    const named = new Map([["cap", parseRequirements(prose)]]);
     expect(unprovenRequirements(named, [])).toEqual(["cap: Requirement: Names the flag"]);
   });
 
@@ -693,7 +692,12 @@ describe("spec citation rules", () => {
 
   it("a repeated scenario name within a capability is reported", () => {
     const dup = new Map([
-      ["cap", parseRequirements(SPEC + "\n### Requirement: B\n#### Scenario: Opening the dialog")],
+      [
+        "cap",
+        parseRequirements(
+          splitLines(SPEC + "\n### Requirement: B\n#### Scenario: Opening the dialog"),
+        ),
+      ],
     ]);
     expect(duplicateHeadings(dup)).toEqual([`cap#${SCENARIO}`]);
   });
