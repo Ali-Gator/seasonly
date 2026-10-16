@@ -91,6 +91,9 @@ function splitLines(text: string): string[] {
     .split("\n");
 }
 
+/** A requirement's name as archive's `normalizeRequirementName` builds it: the captured title, trimmed. */
+const requirementName = (title: string) => `Requirement: ${title.trim()}`;
+
 /** `mask` is the lines' slice of the whole delta's fence mask, when they are one section's body. */
 function parseRequirements(lines: string[], mask: boolean[] = fenceMask(lines)): Requirement[] {
   const requirements: Requirement[] = [];
@@ -102,7 +105,7 @@ function parseRequirements(lines: string[], mask: boolean[] = fenceMask(lines)):
     // Any spacing after `####`, `Scenario:` in any letter case; the anchor is its text as written.
     const scenario = /^####\s+(scenario:.*\S.*)$/i.exec(line);
     if (req?.[1]) {
-      const name = `Requirement: ${req[1].trim()}`;
+      const name = requirementName(req[1]);
       current = { name, anchor: slugify(name), scenarios: [], unenforced: false };
       requirements.push(current);
     } else if (/^#{1,3} /.test(line)) {
@@ -138,9 +141,9 @@ function renamedPairs(body: string[], mask: boolean[]): { from: string; to: stri
     const f = FROM_LINE.exec(line);
     const t = f ? null : TO_LINE.exec(line);
     if (f?.[1]) {
-      from = `Requirement: ${f[1].trim()}`;
+      from = requirementName(f[1]);
     } else if (t?.[1] && from) {
-      pairs.push({ from, to: `Requirement: ${t[1].trim()}` });
+      pairs.push({ from, to: requirementName(t[1]) });
       from = undefined;
     }
   }
@@ -218,7 +221,7 @@ function deltaProof(
       // Archive's `parseRemovedNames` also reads a requirement heading behind a list bullet.
       for (const [i, line] of body.entries()) {
         const m = mask[i] ? null : REMOVED_BULLET.exec(line);
-        if (m?.[1]) into.gone.add(`Requirement: ${m[1].trim()}`);
+        if (m?.[1]) into.gone.add(requirementName(m[1]));
       }
     } else if (kind === "renamed") {
       for (const { from } of renamedPairs(body, mask)) into.gone.add(from);
