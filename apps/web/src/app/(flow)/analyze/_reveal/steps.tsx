@@ -3,7 +3,7 @@
 import { AGREEMENT_COPY, SEASON_COPY } from "@seasonly/analysis";
 import { useEffect, useState } from "react";
 
-import { Button, Icon, Note } from "@/components/ds";
+import { Button, Icon, Note, Slot } from "@/components/ds";
 import { familyName } from "@/lib/site/routes";
 
 import type { Result } from "../flow-state";
@@ -34,10 +34,7 @@ export function Analyzing({ cropUrl }: { cropUrl: string | null }) {
   return (
     <>
       {cropUrl && (
-        <div className="sn-slot h-44 w-33 self-center rounded-full">
-          {/* eslint-disable-next-line @next/next/no-img-element -- a local object URL */}
-          <img src={cropUrl} alt="Your face crop" />
-        </div>
+        <Slot src={cropUrl} alt="Your face crop" className="h-44 w-33 self-center rounded-full" />
       )}
       <div className="flex flex-col gap-(--space-3) text-center">
         <h1 className="h1" tabIndex={-1}>
