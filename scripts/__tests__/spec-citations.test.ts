@@ -87,14 +87,16 @@ function parseRequirements(text: string): Requirement[] {
 }
 
 /**
- * A `FROM:`/`TO:` rename line in OpenSpec's archive shape (`parseRenamedPairs`): start of line,
- * optional `-`/`*`/`+` bullet, optional backticks; group 1 is the bare requirement name.
+ * Anchors a RENAMED section's `FROM:` or `TO:` lines name, read in OpenSpec's archive shape
+ * (`parseRenamedPairs`): start of line, optional `-`/`*`/`+` bullet, optional backticks, spaces
+ * that never cross a line.
  */
-function renameLine(keyword: "FROM" | "TO"): RegExp {
-  return new RegExp(
-    `^[ \\t]*[-*+]?[ \\t]*${keyword}:[ \\t]*\`?###[ \\t]*Requirement:[ \\t]*(.+?)\`?[ \\t]*$`,
+function renamedAnchors(section: string, keyword: "FROM" | "TO"): string[] {
+  const line = new RegExp(
+    `^[^\\S\\n]*[-*+]?[^\\S\\n]*${keyword}:[^\\S\\n]*\`?###[^\\S\\n]*Requirement:[^\\S\\n]*(.+?)\`?[^\\S\\n]*$`,
     "gm",
   );
+  return [...section.matchAll(line)].map((m) => slugify(`Requirement: ${m[1]}`));
 }
 
 /**
@@ -107,9 +109,7 @@ function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): 
   const sections = text.split(/^(?=## )/m);
   const renamed = sections
     .filter((s) => s.startsWith("## RENAMED Requirements"))
-    .flatMap((s) =>
-      [...s.matchAll(renameLine("TO"))].map((m) => slugify(`Requirement: ${(m[1] ?? "").trim()}`)),
-    );
+    .flatMap((s) => renamedAnchors(s, "TO"));
   const anchors: string[] = [...renamed];
   for (const section of sections) {
     const added = section.startsWith("## ADDED Requirements");
@@ -141,9 +141,7 @@ function deltaProof(
     if (section.startsWith("## REMOVED Requirements")) {
       for (const r of parseRequirements(body)) into.gone.add(r.anchor);
     } else if (section.startsWith("## RENAMED Requirements")) {
-      for (const m of section.matchAll(renameLine("FROM"))) {
-        into.gone.add(slugify(`Requirement: ${(m[1] ?? "").trim()}`));
-      }
+      for (const anchor of renamedAnchors(section, "FROM")) into.gone.add(anchor);
     } else if (section.startsWith("## MODIFIED Requirements")) {
       for (const r of parseRequirements(body)) {
         if (r.unenforced) into.gone.add(r.anchor);
@@ -489,13 +487,21 @@ describe("spec citation rules", () => {
       "  + TO:   ### Requirement:   New thing   ",
       "FROM:`### Requirement: Second old`",
       "TO:`### Requirement: Second new`",
+      "\t- FROM:\t### Requirement: Third old",
+      "- TO:\u00a0### Requirement: Third new",
       "INTO: `### Requirement: Into`",
       "Moved here, then TO: `### Requirement: Mid sentence`",
+      "Taken FROM: `### Requirement: Mid from`",
     ].join("\n");
-    expect(deltaAnchors(delta)).toEqual(["requirement-new-thing", "requirement-second-new"]);
+    expect(deltaAnchors(delta)).toEqual([
+      "requirement-new-thing",
+      "requirement-second-new",
+      "requirement-third-new",
+    ]);
     expect([...deltaProof(delta).gone]).toEqual([
       "requirement-old-thing",
       "requirement-second-old",
+      "requirement-third-old",
     ]);
   });
 

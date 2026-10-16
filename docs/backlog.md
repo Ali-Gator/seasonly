@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-73**
+_Next id:_ **BL-76**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -111,6 +111,26 @@ fold items in.
   signal to `upload()`
 
 ## Testing
+
+- **[BL-73] A lone `FROM:` line exempts its requirement from the proof check** — `deltaProof`
+  marks every `FROM:` name gone, but OpenSpec's archive renames only a `FROM:` followed by a
+  `TO:`, so a rename whose `TO:` line is misspelled leaves the requirement unrenamed and untested
+  (fails open). Read `FROM:`/`TO:` as pairs, like `parseRenamedPairs` (edits the approved-only
+  gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-8` review, 2026-10-16
+
+- **[BL-74] The gate reads delta section headers in one spelling only** — it matches
+  `## RENAMED Requirements` (and ADDED, MODIFIED, REMOVED) case- and space-exactly, while
+  OpenSpec's archive trims the title and ignores case, so `## Renamed Requirements` archives but
+  its citations are reported stale (fails closed). Match headers the way archive does (edits the
+  approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-8` review, 2026-10-16
+
+- **[BL-75] The gate reads rename lines inside code fences** — OpenSpec's archive skips fenced
+  lines, the gate does not, so a fenced example `FROM:` line exempts a requirement (fails open),
+  while the spec now says a non-rename line is never read as one. No delta has a fenced rename
+  today (`backlog-8` design, Non-Goals); skip fenced lines when one appears, or narrow the spec.
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ deferred — until a delta carries a fenced rename example
 
 - **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
   403 now shows the blocked screen, but nobody has opened seasonly.me inside either app and run a
