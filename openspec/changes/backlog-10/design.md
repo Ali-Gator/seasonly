@@ -31,7 +31,7 @@ Signature becomes `parseRequirements(lines: string[], mask: boolean[] = fenceMas
 
 - `deltaAnchors` (:192) and `deltaProof` (:216, :220) pass `body` and `mask` with no `join`.
 - `mainSpecs` (:311) passes `splitLines(fs.readFileSync(...))`, so a permanent spec still gets archive's BOM and CRLF normalisation.
-- Fixtures: :414 `parseRequirements(splitLines(SPEC))`; :446 `parseRequirements(prose)` (already an array); :696 `parseRequirements(splitLines(SPEC + …))`. No assertion changes.
+- The three fixture call sites listed in Decision 1. No assertion changes.
 
 The only behavioral difference: a section body whose first line starts with U+FEFF was stripped by the re-split, which archive (normalising only at file start) does not do. Passing lines removes that difference. No test needed for it; the existing suite, unchanged, is the proof.
 
@@ -52,7 +52,7 @@ Anchors stay slugs for citation lookup. Every comparison between a delta and the
 - `OpenDelta.gone` and the `scenarios` map are keyed by name (:216, :218, :221, :222). `unprovenRequirements` (:264, :265) looks up `r.name`.
 - Doc comments at :5-10, :178-183 and :203 say names, not anchors.
 
-Existing assertions that change (Decision 2): `existing` sets at :525 and :543 become `new Set(["Requirement: Old thing"])`; the `gone` expectations at :575-579, :664, :686 (`proof.scenarios` key) and :691 become names. :725 and :745 assert `[]` and stay.
+Existing assertions that change are listed in Decision 2.
 
 New rule test: main has `Untested` and "`plan_shared` fires on a slug-mint, never: on open". A delta REMOVEs `untested`, RENAMEs FROM the second name without its backticks and colon, and MODIFIEs `UNTESTED` with an `**Unenforced:**` line and a new scenario. No test cites the main requirements. Both stay reported by the proof check, the MODIFIED scenario does not resolve through `deltaAnchors` with the main names as `existing`, and a test citing it proves nothing ({@link openspec/specs/spec-workflow/spec.md#scenario-a-delta-name-that-differs-from-the-permanent-one-only-in-case-or-punctuation}). It fails before the fix.
 
@@ -75,7 +75,13 @@ Write every fixture's bullet, heading and fence lines inside template strings in
 
 ### 1. BL-79, BL-77, BL-76 — approve the edit to `scripts/__tests__/spec-citations.test.ts`
 
-Helper code: the lines-in `parseRequirements` (BL-79), the scenario regex (BL-77), the REMOVED bullet reader (BL-76). The three `parseRequirements` call sites in existing `it`s at :414, :446 and :696 pass lines instead of a string. Two new rule tests (BL-77, BL-76). No assertion changes.
+Helper code: the lines-in `parseRequirements` (BL-79), the scenario regex (BL-77), the REMOVED bullet reader (BL-76). Two new rule tests (BL-77, BL-76). No assertion changes.
+
+The three `parseRequirements` call sites pass lines instead of a string (line numbers at `a7cc9d9`, a hint only):
+
+- the shared `specs` fixture of `describe("spec citation rules")` (:414): `parseRequirements(splitLines(SPEC))`;
+- "a requirement whose prose only names the unenforced flag still needs a citing test" (:446): `parseRequirements(prose)`, already an array;
+- "a repeated scenario name within a capability is reported" (:696): `parseRequirements(splitLines(SPEC + …))`.
 
 - **a. Approve all three.**
 - **b. Not now:** all three stay open, and the batch drops below three fixes.
@@ -86,14 +92,24 @@ Helper code: the lines-in `parseRequirements` (BL-79), the scenario regex (BL-77
 
 ### 2. BL-78 — approve rewriting existing assertions from slugs to names
 
-`existing` fixtures at :525 and :543 and the `gone` / `scenarios` expectations at :575-579, :664, :686 and :691 change from slugs to requirement names, because the comparison key changes on purpose. One new rule test.
+The comparison key changes on purpose, so these change with it. One new rule test.
+
+Assertions that change from slugs to requirement names (line numbers at `a7cc9d9`, a hint only):
+
+- "a change delta makes its ADDED, MODIFIED and RENAMED headings citable" (:525): `existing` becomes `new Set(["Requirement: Old thing"])`;
+- "a MODIFIED requirement missing from the main spec makes nothing citable" (:543): the same `existing` set;
+- "a rename in any spelling OpenSpec's archive accepts is read, and only at line start" (:575-579): the `gone` list;
+- "a rename line with no partner is neither citable nor gone, as archive pairs them" (:664): the `gone` list;
+- "a delta section heading is matched trimmed, in any letter case, and whole" (:686, :687, :691): both `gone` lists and the `proof.scenarios` key (`requirement-after` becomes `Requirement: After`; its scenario slugs stay).
+
+Assertions of `[]` (:725, :745) stay.
 
 - **a. Approve the rewrite.** Closes the fail-open while a change is open.
 - **b. Not now:** BL-78 parks; the batch ships three fixes, and the fail-open stays until the archive commit catches it.
 
 **Recommendation:** a.
 
-**Answer:** a — approved (Oleg, 2026-10-16)
+**Answer:** a — approved (Oleg, 2026-10-16). The `proof.scenarios` key in "a delta section heading is matched trimmed, in any letter case, and whole" was missed in the first list and approved separately (Oleg, 2026-10-16).
 
 ### 3. BL-77 — widen the scenario heading only, keep the block end
 

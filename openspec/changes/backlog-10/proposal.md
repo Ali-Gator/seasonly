@@ -32,8 +32,8 @@ _None._ No investigated item is lane D.
 
 All in `scripts/__tests__/spec-citations.test.ts`:
 
-- **BL-79, BL-77, BL-76** (design.md Decision 1): helper code; the three `parseRequirements` call sites in existing `it`s at :414, :446 and :696 pass lines instead of a string; new `it`s. No assertion changes.
-- **BL-78** (design.md Decision 2): `existing` fixtures at :525 and :543 become requirement names, and the `gone` expectations at :575-579, :664, :686 and :691 become names instead of slugs. New `it`s.
+- **BL-79, BL-77, BL-76** (design.md Decision 1): helper code; the three `parseRequirements` fixture call sites listed there pass lines instead of a string; new `it`s. No assertion changes.
+- **BL-78** (design.md Decision 2): the `existing` fixtures, `gone` lists and one `proof.scenarios` key in the five `it`s listed there become requirement names instead of slugs. New `it`s.
 
 ## Capabilities
 
