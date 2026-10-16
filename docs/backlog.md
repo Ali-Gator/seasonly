@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-73**
+_Next id:_ **BL-76**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -55,7 +55,10 @@ fold items in.
   a fresh run instead of the committed result.
   _Refs:_ `.github/workflows/eval-weekly.yml`, `evals/gate.ts` · _Status:_ deferred — until four
   consecutive weekly runs fetch cleanly and match the committed metrics within the drift the
-  analysis-eval spec allows another machine
+  analysis-eval spec allows another machine; 0 of 4 so far (the one run, manual `38420860039` on
+  2026-10-13, failed its fetch on Commons 429s before the BL-52 retry fix), first scheduled run
+  2026-10-19, and the spec's drift ("may move a metric slightly") needs a number before this can
+  close (backlog-8 triage, 2026-10-15)
 
 - **[BL-50] Re-sweep the eye-white tint limit on the new measure** — `MAX_EYE_WHITE_CHROMA`
   (C\*ab 22) was tuned on the old brightest-40% eye white; tuning `tint` false rejects are 12 of 27.
@@ -74,7 +77,7 @@ fold items in.
   requirement "Eye whites that cannot be measured do not reject a photo".
   _Refs:_ `packages/analysis/src/sampling/index.ts`, `openspec/changes/archive/*-backlog-1/design.md` · _Status:_ deferred —
   until about 50 production `photo_checked` events (PostHog, excluding preview hosts and Oleg's own
-  sessions) reach the eye-white step after the backlog-1 deploy; 1 so far, 0 null (backlog-2 triage, 2026-10-13)
+  sessions) reach the eye-white step after the backlog-1 deploy; 3 so far, 0 null (backlog-8 triage, 2026-10-15)
 
 ## Privacy
 
@@ -109,17 +112,25 @@ fold items in.
 
 ## Testing
 
-- **[BL-71] The gate's rename readers accept only one `FROM:`/`TO:` spelling** — `deltaAnchors`
-  and `deltaProof` read only a `-` bullet, single spaces and a backticked heading, while OpenSpec
-  also accepts no backticks, `*`/`+` bullets and extra spaces. A valid rename written that
-  way blocks its change (fails closed). Use OpenSpec's pattern shape for both readers.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-7` review, 2026-10-15
+- **[BL-73] A lone `FROM:` line exempts its requirement from the proof check** — `deltaProof`
+  marks every `FROM:` name gone, but OpenSpec's archive renames only a `FROM:` followed by a
+  `TO:`, so a rename whose `TO:` line is misspelled leaves the requirement unrenamed and untested
+  (fails open). Read `FROM:`/`TO:` as pairs, like `parseRenamedPairs` (edits the approved-only
+  gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-8` review, 2026-10-16
 
-- **[BL-72] No test pins that a delta naming the unenforced flag mid-sentence exempts nothing** —
-  a MODIFIED delta whose body only mentions the flag must keep its uncited requirement reported.
-  Today it holds through the line-start match alone; a regression would fail open. Add a
-  `deltaProof` + `unprovenRequirements` rule test (edits the approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-7` review, 2026-10-15
+- **[BL-74] The gate reads delta section headers in one spelling only** — it matches
+  `## RENAMED Requirements` (and ADDED, MODIFIED, REMOVED) case- and space-exactly, while
+  OpenSpec's archive trims the title and ignores case, so `## Renamed Requirements` archives but
+  its citations are reported stale (fails closed). Match headers the way archive does (edits the
+  approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-8` review, 2026-10-16
+
+- **[BL-75] The gate reads rename lines inside code fences** — OpenSpec's archive skips fenced
+  lines, the gate does not, so a fenced example `FROM:` line exempts a requirement (fails open),
+  while the spec now says a non-rename line is never read as one. No delta has a fenced rename
+  today (`backlog-8` design, Non-Goals); skip fenced lines when one appears, or narrow the spec.
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ deferred — until a delta carries a fenced rename example
 
 - **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
   403 now shows the blocked screen, but nobody has opened seasonly.me inside either app and run a
@@ -158,11 +169,6 @@ update`). PGlite has one connection, so the test only checks that the lock is in
   (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3) · _Status:_ deferred — until a page renders a
   DOM card preview (`t5-report-delivery` shows the PNGs themselves); check whether the 2026-10-07
   redesign session already updated the canvas
-
-- **[BL-70] The season reveal builds its own photo slot** — `_reveal/steps.tsx` hand-builds an
-  `sn-slot` and `img` that the design system's `Slot` already covers (`src`, `alt`, `className`).
-  `Slot` is exported from `@/components/ds` since `backlog-7`; use it there.
-  _Refs:_ `apps/web/src/app/(flow)/analyze/_reveal/steps.tsx`, `openspec/specs/season-reveal/spec.md` · _Status:_ open — found in `backlog-7` triage, 2026-10-15
 
 - **[BL-27] The GPT-alternative page goes stale on December 11** — its title, description, h1
   and lead say the GPT "is retiring" on December 11, 2026. Re-check OpenAI's FAQ and switch the

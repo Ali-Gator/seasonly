@@ -147,7 +147,7 @@ touches it, not as a precondition for the migration.
 
 The citation checks the constitution requires — every anchored citation resolves, and every requirement is proven by a citing test or marked unenforced — SHALL run in the unit test suite, and therefore in the pre-commit gate, and SHALL also run in CI (`ci.yml`) on every push, so a commit made outside the agent's hook is gated too. They SHALL scan the source and test files under `apps/`, `packages/`, `scripts/`, `e2e/` and `evals/`, and SHALL count end-to-end specs as tests, since several requirements are proven only in the browser. A failure SHALL name every offending citation by file and line and every unproven requirement by capability and name, not only the first.
 
-A citation SHALL also resolve against a requirement or scenario that an unarchived change adds, modifies or renames under `openspec/changes/<change>/specs/<capability>/spec.md` — a modified one only when its requirement exists in the permanent spec or is renamed to in the same delta, since archive refuses any other — so a test written before its change is archived can already cite the permanent spec path. Only archived requirements SHALL be subject to the proven-by-a-test check, and an unarchived change's delta SHALL apply to that check as it applies to citations: a requirement the change removes, or renames to another name, SHALL no longer need a citing test, a requirement the change modifies SHALL count as proven when a test cites a scenario the delta adds to it, and a requirement the change modifies and marks unenforced SHALL no longer need a citing test. A renamed requirement's new name SHALL be read whole, whatever characters it holds. A requirement SHALL count as marked unenforced only when a line of its own body starts with the flag; a sentence that merely names the flag SHALL NOT mark it.
+A citation SHALL also resolve against a requirement or scenario that an unarchived change adds, modifies or renames under `openspec/changes/<change>/specs/<capability>/spec.md` — a modified one only when its requirement exists in the permanent spec or is renamed to in the same delta, since archive refuses any other — so a test written before its change is archived can already cite the permanent spec path. Only archived requirements SHALL be subject to the proven-by-a-test check, and an unarchived change's delta SHALL apply to that check as it applies to citations: a requirement the change removes, or renames to another name, SHALL no longer need a citing test, a requirement the change modifies SHALL count as proven when a test cites a scenario the delta adds to it, and a requirement the change modifies and marks unenforced SHALL no longer need a citing test. A renamed requirement's new name SHALL be read whole, whatever characters it holds. A rename's old and new names SHALL be read in every spelling OpenSpec's archive accepts — with or without a list bullet, backticks around the heading, or extra spaces — and a line that is not a rename line SHALL NOT be read as one. A requirement SHALL count as marked unenforced only when a line of its own body starts with the flag; a sentence that merely names the flag SHALL NOT mark it.
 
 #### Scenario: A commit with a stale citation
 
@@ -203,6 +203,11 @@ A citation SHALL also resolve against a requirement or scenario that an unarchiv
 
 - **WHEN** a requirement's body mentions the unenforced flag inside a sentence, no line of its body starts with the flag, and no test cites it
 - **THEN** the proof check reports it as unproven
+
+#### Scenario: A rename written in another spelling OpenSpec accepts
+
+- **WHEN** an unarchived change renames a requirement with rename lines written without backticks, with extra spaces, or with another list bullet, and a test cites the new name
+- **THEN** the citation resolves, the old requirement needs no citing test, and the commit is allowed
 
 ### Requirement: Mapping rows never overlap
 
