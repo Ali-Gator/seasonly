@@ -63,17 +63,47 @@ function slugify(heading: string): string {
     .replace(/ /g, "-");
 }
 
-function parseRequirements(text: string): Requirement[] {
+/**
+ * Archive's `buildCodeFenceMask`: `true` for each line inside a fenced code block, the
+ * opening and closing fence lines included. A fence opens on three or more backticks or
+ * tildes after optional spaces, and closes on a line of only the same marker, at least as
+ * long. An unclosed fence runs to the end.
+ */
+function fenceMask(lines: string[]): boolean[] {
+  let open: string | undefined;
+  return lines.map((line) => {
+    if (open === undefined) {
+      open = /^\s*(`{3,}|~{3,})/.exec(line)?.[1];
+      return open !== undefined;
+    }
+    const close = /^\s*(`{3,}|~{3,})\s*$/.exec(line)?.[1];
+    if (close && close[0] === open[0] && close.length >= open.length) open = undefined;
+    return true;
+  });
+}
+
+/** Archive's `normalizeLineEndings`: no UTF-8 BOM, `\n` line endings. */
+function splitLines(text: string): string[] {
+  return text
+    .replace(/^\uFEFF/, "")
+    .replace(/\r\n?/g, "\n")
+    .split("\n");
+}
+
+/** `mask` is the lines' slice of the whole delta's fence mask, when they are one section's body. */
+function parseRequirements(text: string, mask?: boolean[]): Requirement[] {
   const requirements: Requirement[] = [];
   let current: Requirement | undefined;
-  let fenced = false;
-  for (const line of text.split("\n")) {
-    if (line.startsWith("```")) fenced = !fenced;
-    if (fenced) continue;
-    const req = /^### (Requirement: .+)$/.exec(line);
+  const lines = splitLines(text);
+  const masked = mask ?? fenceMask(lines);
+  for (const [i, line] of lines.entries()) {
+    if (masked[i]) continue;
+    // Archive's `REQUIREMENT_HEADER_REGEX`: the keyword in any letter case.
+    const req = /^###\s*Requirement:\s*(.+)\s*$/i.exec(line);
     const scenario = /^#### (Scenario: .+)$/.exec(line);
     if (req?.[1]) {
-      current = { name: req[1].trim(), anchor: slugify(req[1]), scenarios: [], unenforced: false };
+      const name = `Requirement: ${req[1].trim()}`;
+      current = { name, anchor: slugify(name), scenarios: [], unenforced: false };
       requirements.push(current);
     } else if (/^#{1,3} /.test(line)) {
       current = undefined;
@@ -86,17 +116,63 @@ function parseRequirements(text: string): Requirement[] {
   return requirements;
 }
 
-/**
- * Anchors a RENAMED section's `FROM:` or `TO:` lines name, read in OpenSpec's archive shape
- * (`parseRenamedPairs`): start of line, optional `-`/`*`/`+` bullet, optional backticks, spaces
- * that never cross a line.
- */
-function renamedAnchors(section: string, keyword: "FROM" | "TO"): string[] {
-  const line = new RegExp(
+const renameLine = (keyword: "FROM" | "TO") =>
+  new RegExp(
     `^[^\\S\\n]*[-*+]?[^\\S\\n]*${keyword}:[^\\S\\n]*\`?###[^\\S\\n]*Requirement:[^\\S\\n]*(.+?)\`?[^\\S\\n]*$`,
-    "gm",
   );
-  return [...section.matchAll(line)].map((m) => slugify(`Requirement: ${m[1]}`));
+const FROM_LINE = renameLine("FROM");
+const TO_LINE = renameLine("TO");
+
+/**
+ * One RENAMED section's rename pairs as anchors, read in OpenSpec's archive shape
+ * (`parseRenamedPairs`): start of line, optional `-`/`*`/`+` bullet, optional backticks, spaces
+ * that never cross a line. A `FROM:` line sets the pending old name; a `TO:` line pairs with it
+ * only when one is pending, so a line with no partner yields nothing.
+ */
+function renamedPairs(body: string[], mask: boolean[]): { from: string; to: string }[] {
+  const pairs: { from: string; to: string }[] = [];
+  let from: string | undefined;
+  for (const [i, line] of body.entries()) {
+    if (mask[i]) continue;
+    const f = FROM_LINE.exec(line);
+    const t = f ? null : TO_LINE.exec(line);
+    if (f?.[1]) {
+      from = slugify(`Requirement: ${f[1]}`);
+    } else if (t?.[1] && from) {
+      pairs.push({ from, to: slugify(`Requirement: ${t[1]}`) });
+      from = undefined;
+    }
+  }
+  return pairs;
+}
+
+const SECTION_KINDS = ["added", "modified", "removed", "renamed"] as const;
+
+/**
+ * A delta's `## ` sections in document order, as archive splits them (`splitTopLevelSections`)
+ * and looks them up (`getSectionsCaseInsensitive`): the title trimmed, lowercased and compared
+ * whole to `<kind> requirements`. Any other title is a section of no kind that still ends the
+ * one before it. Repeated headings stay separate bodies. The fence mask is built once for the
+ * whole delta and each body carries its slice, so a fenced `## ` line opens no section.
+ */
+function deltaSections(
+  text: string,
+): { kind?: (typeof SECTION_KINDS)[number]; body: string[]; mask: boolean[] }[] {
+  const sections: ReturnType<typeof deltaSections> = [];
+  const lines = splitLines(text);
+  const masked = fenceMask(lines);
+  lines.forEach((line, i) => {
+    const m = masked[i] ? null : /^##\s+(.+)$/.exec(line);
+    if (m) {
+      const title = (m[1] ?? "").trim().toLowerCase();
+      const kind = SECTION_KINDS.find((k) => title === `${k} requirements`);
+      sections.push({ kind, body: [], mask: [] });
+    } else {
+      sections.at(-1)?.body.push(line);
+      sections.at(-1)?.mask.push(masked[i] ?? false);
+    }
+  });
+  return sections;
 }
 
 /**
@@ -106,16 +182,15 @@ function renamedAnchors(section: string, keyword: "FROM" | "TO"): string[] {
  * since archive refuses any other.
  */
 function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): string[] {
-  const sections = text.split(/^(?=## )/m);
+  const sections = deltaSections(text);
   const renamed = sections
-    .filter((s) => s.startsWith("## RENAMED Requirements"))
-    .flatMap((s) => renamedAnchors(s, "TO"));
+    .filter((s) => s.kind === "renamed")
+    .flatMap((s) => renamedPairs(s.body, s.mask).map((p) => p.to));
   const anchors: string[] = [...renamed];
-  for (const section of sections) {
-    const added = section.startsWith("## ADDED Requirements");
-    if (!added && !section.startsWith("## MODIFIED Requirements")) continue;
-    for (const r of parseRequirements(section.replace(/^## .*\n/, ""))) {
-      if (added || existing.has(r.anchor) || renamed.includes(r.anchor)) {
+  for (const { kind, body, mask } of sections) {
+    if (kind !== "added" && kind !== "modified") continue;
+    for (const r of parseRequirements(body.join("\n"), mask)) {
+      if (kind === "added" || existing.has(r.anchor) || renamed.includes(r.anchor)) {
         anchors.push(r.anchor, ...r.scenarios);
       }
     }
@@ -136,14 +211,13 @@ function deltaProof(
   text: string,
   into: OpenDelta = { gone: new Set(), scenarios: new Map() },
 ): OpenDelta {
-  for (const section of text.split(/^(?=## )/m)) {
-    const body = section.replace(/^## .*\n/, "");
-    if (section.startsWith("## REMOVED Requirements")) {
-      for (const r of parseRequirements(body)) into.gone.add(r.anchor);
-    } else if (section.startsWith("## RENAMED Requirements")) {
-      for (const anchor of renamedAnchors(section, "FROM")) into.gone.add(anchor);
-    } else if (section.startsWith("## MODIFIED Requirements")) {
-      for (const r of parseRequirements(body)) {
+  for (const { kind, body, mask } of deltaSections(text)) {
+    if (kind === "removed") {
+      for (const r of parseRequirements(body.join("\n"), mask)) into.gone.add(r.anchor);
+    } else if (kind === "renamed") {
+      for (const { from } of renamedPairs(body, mask)) into.gone.add(from);
+    } else if (kind === "modified") {
+      for (const r of parseRequirements(body.join("\n"), mask)) {
         if (r.unenforced) into.gone.add(r.anchor);
         into.scenarios.set(r.anchor, [...(into.scenarios.get(r.anchor) ?? []), ...r.scenarios]);
       }
@@ -563,10 +637,111 @@ describe("spec citation rules", () => {
     ]);
   });
 
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-line-with-no-partner} */
+  it("a rename line with no partner is neither citable nor gone, as archive pairs them", () => {
+    const delta = [
+      "## RENAMED Requirements",
+      "- TO: `### Requirement: Lone new`",
+      "- FROM: `### Requirement: Untested`",
+      "- T0: `### Requirement: Misspelled new`",
+    ].join("\n");
+    expect(deltaAnchors(delta)).toEqual([]);
+    expect(unprovenRequirements(specs, [], new Map([["cap", deltaProof(delta)]]))).toEqual([
+      "cap: Requirement: `plan_shared` fires on a slug-mint, never: on open",
+      "cap: Requirement: Untested",
+    ]);
+    // Pairing starts empty in each RENAMED body, and a later FROM overwrites an unpaired one.
+    const split = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: Untested`",
+      "## RENAMED Requirements",
+      "- TO: `### Requirement: Across bodies`",
+      "- FROM: `### Requirement: `plan_shared` fires on a slug-mint, never: on open`",
+      "- FROM: `### Requirement: Untested`",
+      "- TO: `### Requirement: Overwritten new`",
+    ].join("\n");
+    expect(deltaAnchors(split)).toEqual(["requirement-overwritten-new"]);
+    expect([...deltaProof(split).gone]).toEqual(["requirement-untested"]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-delta-section-heading-in-another-letter-case} */
+  it("a delta section heading is matched trimmed, in any letter case, and whole", () => {
+    const delta = [
+      "## Renamed Requirements",
+      "- FROM: `### Requirement: Before`",
+      "- TO: `### Requirement: After`",
+      "##   modified requirements  ",
+      "### requirement: After",
+      "#### Scenario: Case-free heading",
+      "## ADDED Requirements (draft)",
+      "### Requirement: Draft thing",
+      "#### Scenario: Draft works",
+    ].join("\n");
+    expect(deltaAnchors(delta)).toEqual([
+      "requirement-after",
+      "requirement-after",
+      "scenario-case-free-heading",
+    ]);
+    const proof = deltaProof(delta);
+    expect([...proof.gone]).toEqual(["requirement-before"]);
+    expect([...proof.scenarios]).toEqual([["requirement-after", ["scenario-case-free-heading"]]]);
+    // Archive drops a BOM and reads CRLF line endings as LF.
+    const crlf = "\uFEFF" + delta.replace(/\n/g, "\r\n");
+    expect(deltaAnchors(crlf)).toEqual(deltaAnchors(delta));
+    expect([...deltaProof(crlf).gone]).toEqual(["requirement-before"]);
+  });
+
   it("a repeated scenario name within a capability is reported", () => {
     const dup = new Map([
       ["cap", parseRequirements(SPEC + "\n### Requirement: B\n#### Scenario: Opening the dialog")],
     ]);
     expect(duplicateHeadings(dup)).toEqual([`cap#${SCENARIO}`]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-example-inside-a-code-fence} */
+  it("a line inside a code fence is read as neither a heading nor a rename line", () => {
+    const delta = [
+      "## RENAMED Requirements",
+      "```md",
+      "- FROM: `### Requirement: Untested`",
+      "- TO: `### Requirement: Backtick new`",
+      "```",
+      "  ~~~",
+      "  - FROM: `### Requirement: `plan_shared` fires on a slug-mint, never: on open`",
+      "  - TO: `### Requirement: Tilde new`",
+      "  ~~~",
+      "## ADDED Requirements",
+      "  ~~~markdown",
+      "### Requirement: Fenced added",
+      "#### Scenario: Fenced scenario",
+      "  ~~~",
+      "```",
+      "## RENAMED Requirements",
+      "```",
+      "- FROM: `### Requirement: Untested`",
+      "- TO: `### Requirement: Heading new`",
+    ].join("\n");
+    expect(deltaAnchors(delta)).toEqual([]);
+    expect([...deltaProof(delta).gone]).toEqual([]);
+    expect(unprovenRequirements(specs, [], new Map([["cap", deltaProof(delta)]]))).toEqual([
+      "cap: Requirement: `plan_shared` fires on a slug-mint, never: on open",
+      "cap: Requirement: Untested",
+    ]);
+    // A fence closes only on its own marker, at least as long as the opening one.
+    const nested = [
+      "## RENAMED Requirements",
+      "````",
+      "```",
+      "- FROM: `### Requirement: Untested`",
+      "- TO: `### Requirement: Inside four backticks`",
+      "````",
+      "```",
+      "~~~",
+      "- FROM: `### Requirement: Untested`",
+      "- TO: `### Requirement: Inside backticks`",
+      "```",
+    ].join("\n");
+    expect(deltaAnchors(nested)).toEqual([]);
+    expect([...deltaProof(nested).gone]).toEqual([]);
   });
 });

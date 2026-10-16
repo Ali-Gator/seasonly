@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-76**
+_Next id:_ **BL-80**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -129,40 +129,43 @@ fold items in.
 
 ## Testing
 
-- **[BL-73] A lone `FROM:` line exempts its requirement from the proof check** — `deltaProof`
-  marks every `FROM:` name gone, but OpenSpec's archive renames only a `FROM:` followed by a
-  `TO:`, so a rename whose `TO:` line is misspelled leaves the requirement unrenamed and untested
-  (fails open). Read `FROM:`/`TO:` as pairs, like `parseRenamedPairs` (edits the approved-only
-  gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-8` review, 2026-10-16
+- **[BL-76] The gate misses a REMOVED requirement written as a bullet** — OpenSpec's archive
+  (`parseRemovedNames`) also removes a requirement listed as `- ### Requirement: <name>` (any
+  `-`/`*`/`+` bullet, optional backticks); the gate reads REMOVED bodies with `parseRequirements`
+  only, so that requirement keeps needing a citing test until archive (fails closed). Read the
+  bullet form too (edits the approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-9` triage, 2026-10-16
 
-- **[BL-74] The gate reads delta section headers in one spelling only** — it matches
-  `## RENAMED Requirements` (and ADDED, MODIFIED, REMOVED) case- and space-exactly, while
-  OpenSpec's archive trims the title and ignores case, so `## Renamed Requirements` archives but
-  its citations are reported stale (fails closed). Match headers the way archive does (edits the
+- **[BL-77] The gate ends a requirement body and reads scenarios unlike archive** — in
+  `parseRequirements` any `#`–`###` line ends the current requirement, while archive's
+  `parseRequirementBlocksFromSection` runs on to the next requirement header or `## ` line; and
+  scenarios need `#### Scenario: ` with one space and that case, while archive takes any
+  `####\s+` header. So a delta with `### Notes` before a new scenario, or `#### scenario: X`, is
+  reported stale before archive (fails closed). Match archive's block end and scenario header
+  (edits the approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-9` review, 2026-10-16
+
+- **[BL-78] The gate matches delta requirement names by slug, archive by exact name** — `gone`,
+  `existing` and the rename lists compare slugs, which drop case and punctuation, while archive
+  matches the trimmed name exactly. A REMOVED `untested` or a FROM naming `Un-tested` exempts
+  main's `Untested`, which archive leaves in place untested (fails open). Compare names, not
+  slugs, where the delta meets the main spec (edits the approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-9` review, 2026-10-16
+
+- **[BL-79] Section bodies round-trip through a string before `parseRequirements`** —
+  `deltaSections` returns body lines, and each caller joins them for `parseRequirements`, which
+  splits them again so the fence-mask slice lines up. Exact today, but the alignment rests on the
+  round trip. Let `parseRequirements` take lines plus an optional mask (simplification; edits the
   approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-8` review, 2026-10-16
-
-- **[BL-75] The gate reads rename lines inside code fences** — OpenSpec's archive skips fenced
-  lines, the gate does not, so a fenced example `FROM:` line exempts a requirement (fails open),
-  while the spec now says a non-rename line is never read as one. No delta has a fenced rename
-  today (`backlog-8` design, Non-Goals); skip fenced lines when one appears, or narrow the spec.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ deferred — until a delta carries a fenced rename example
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — `backlog-9` review, 2026-10-16
 
 - **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
   403 now shows the blocked screen, but nobody has opened seasonly.me inside either app and run a
   photo. Run it once on a phone after `t18-design-review` ships (one paid vision call), and if the
   check refuses them, decide what the bot check lets through.
   _Refs:_ `apps/web/src/app/api/analyze/route.ts` (`checkBotId`), `t18-design-review` tasks.md
-  8.3 · _Status:_ deferred — until t18 is on seasonly.me (the preview sits behind Vercel login)
-
-- **[BL-08] Two concurrent email stores are never raced in a test** — the abuse-controls
-  scenario "Two requests at once" rests on `store_report_email` locking the report row (`for
-update`). PGlite has one connection, so the test only checks that the lock is in the SQL. Race
-  two sessions against a real Postgres (the Supabase CLI's local stack), or mark the scenario
-  Unenforced.
-  _Refs:_ `apps/web/src/lib/email/store.test.ts`, `openspec/specs/abuse-controls/spec.md` ·
-  _Status:_ gated — a local Postgres in tests (the local Supabase stack needs Docker)
+  8.3 · _Status:_ gated — Oleg's phone run inside TikTok and Instagram, one photo each (two paid vision
+  calls, his yes first); t18 is live on seasonly.me since 2026-10-13 (`backlog-9` triage, 2026-10-16)
 
 ## Design / UX
 
