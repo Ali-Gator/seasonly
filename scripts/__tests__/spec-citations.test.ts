@@ -63,13 +63,33 @@ function slugify(heading: string): string {
     .replace(/ /g, "-");
 }
 
-function parseRequirements(text: string): Requirement[] {
+/**
+ * Archive's `buildCodeFenceMask`: `true` for each line inside a fenced code block, the
+ * opening and closing fence lines included. A fence opens on three or more backticks or
+ * tildes after optional spaces, and closes on a line of only the same marker, at least as
+ * long. An unclosed fence runs to the end.
+ */
+function fenceMask(lines: string[]): boolean[] {
+  let open: string | undefined;
+  return lines.map((line) => {
+    if (open === undefined) {
+      open = /^\s*(`{3,}|~{3,})/.exec(line)?.[1];
+      return open !== undefined;
+    }
+    const close = /^\s*(`{3,}|~{3,})\s*$/.exec(line)?.[1];
+    if (close && close[0] === open[0] && close.length >= open.length) open = undefined;
+    return true;
+  });
+}
+
+/** `mask` is the lines' slice of the whole delta's fence mask, when they are one section's body. */
+function parseRequirements(text: string, mask?: boolean[]): Requirement[] {
   const requirements: Requirement[] = [];
   let current: Requirement | undefined;
-  let fenced = false;
-  for (const line of text.split("\n")) {
-    if (line.startsWith("```")) fenced = !fenced;
-    if (fenced) continue;
+  const lines = text.split("\n");
+  const masked = mask ?? fenceMask(lines);
+  for (const [i, line] of lines.entries()) {
+    if (masked[i]) continue;
     // Archive's `REQUIREMENT_HEADER_REGEX`: the keyword in any letter case.
     const req = /^###\s*Requirement:\s*(.+)\s*$/i.exec(line);
     const scenario = /^#### (Scenario: .+)$/.exec(line);
@@ -101,10 +121,11 @@ const TO_LINE = renameLine("TO");
  * that never cross a line. A `FROM:` line sets the pending old name; a `TO:` line pairs with it
  * only when one is pending, so a line with no partner yields nothing.
  */
-function renamedPairs(body: string[]): { from: string; to: string }[] {
+function renamedPairs(body: string[], mask: boolean[]): { from: string; to: string }[] {
   const pairs: { from: string; to: string }[] = [];
   let from: string | undefined;
-  for (const line of body) {
+  for (const [i, line] of body.entries()) {
+    if (mask[i]) continue;
     const f = FROM_LINE.exec(line);
     const t = f ? null : TO_LINE.exec(line);
     if (f?.[1]) {
@@ -123,17 +144,24 @@ const SECTION_KINDS = ["added", "modified", "removed", "renamed"] as const;
  * A delta's `## ` sections in document order, as archive splits them (`splitTopLevelSections`)
  * and looks them up (`getSectionsCaseInsensitive`): the title trimmed, lowercased and compared
  * whole to `<kind> requirements`. Any other title is a section of no kind that still ends the
- * one before it. Repeated headings stay separate bodies.
+ * one before it. Repeated headings stay separate bodies. The fence mask is built once for the
+ * whole delta and each body carries its slice, so a fenced `## ` line opens no section.
  */
-function deltaSections(text: string): { kind?: (typeof SECTION_KINDS)[number]; body: string[] }[] {
+function deltaSections(
+  text: string,
+): { kind?: (typeof SECTION_KINDS)[number]; body: string[]; mask: boolean[] }[] {
   const sections: ReturnType<typeof deltaSections> = [];
-  text.split("\n").forEach((line) => {
-    const m = /^##\s+(.+)$/.exec(line);
+  const lines = text.split("\n");
+  const masked = fenceMask(lines);
+  lines.forEach((line, i) => {
+    const m = masked[i] ? null : /^##\s+(.+)$/.exec(line);
     if (m) {
       const title = (m[1] ?? "").trim().toLowerCase();
-      sections.push({ kind: SECTION_KINDS.find((k) => title === `${k} requirements`), body: [] });
+      const kind = SECTION_KINDS.find((k) => title === `${k} requirements`);
+      sections.push({ kind, body: [], mask: [] });
     } else {
       sections.at(-1)?.body.push(line);
+      sections.at(-1)?.mask.push(masked[i] ?? false);
     }
   });
   return sections;
@@ -149,11 +177,11 @@ function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): 
   const sections = deltaSections(text);
   const renamed = sections
     .filter((s) => s.kind === "renamed")
-    .flatMap((s) => renamedPairs(s.body).map((p) => p.to));
+    .flatMap((s) => renamedPairs(s.body, s.mask).map((p) => p.to));
   const anchors: string[] = [...renamed];
-  for (const { kind, body } of sections) {
+  for (const { kind, body, mask } of sections) {
     if (kind !== "added" && kind !== "modified") continue;
-    for (const r of parseRequirements(body.join("\n"))) {
+    for (const r of parseRequirements(body.join("\n"), mask)) {
       if (kind === "added" || existing.has(r.anchor) || renamed.includes(r.anchor)) {
         anchors.push(r.anchor, ...r.scenarios);
       }
@@ -175,13 +203,13 @@ function deltaProof(
   text: string,
   into: OpenDelta = { gone: new Set(), scenarios: new Map() },
 ): OpenDelta {
-  for (const { kind, body } of deltaSections(text)) {
+  for (const { kind, body, mask } of deltaSections(text)) {
     if (kind === "removed") {
-      for (const r of parseRequirements(body.join("\n"))) into.gone.add(r.anchor);
+      for (const r of parseRequirements(body.join("\n"), mask)) into.gone.add(r.anchor);
     } else if (kind === "renamed") {
-      for (const { from } of renamedPairs(body)) into.gone.add(from);
+      for (const { from } of renamedPairs(body, mask)) into.gone.add(from);
     } else if (kind === "modified") {
-      for (const r of parseRequirements(body.join("\n"))) {
+      for (const r of parseRequirements(body.join("\n"), mask)) {
         if (r.unenforced) into.gone.add(r.anchor);
         into.scenarios.set(r.anchor, [...(into.scenarios.get(r.anchor) ?? []), ...r.scenarios]);
       }
@@ -644,5 +672,36 @@ describe("spec citation rules", () => {
       ["cap", parseRequirements(SPEC + "\n### Requirement: B\n#### Scenario: Opening the dialog")],
     ]);
     expect(duplicateHeadings(dup)).toEqual([`cap#${SCENARIO}`]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-example-inside-a-code-fence} */
+  it("a line inside a code fence is read as neither a heading nor a rename line", () => {
+    const delta = [
+      "## RENAMED Requirements",
+      "```md",
+      "- FROM: `### Requirement: Untested`",
+      "- TO: `### Requirement: Backtick new`",
+      "```",
+      "  ~~~",
+      "  - FROM: `### Requirement: `plan_shared` fires on a slug-mint, never: on open`",
+      "  - TO: `### Requirement: Tilde new`",
+      "  ~~~",
+      "## ADDED Requirements",
+      "  ~~~markdown",
+      "### Requirement: Fenced added",
+      "#### Scenario: Fenced scenario",
+      "  ~~~",
+      "```",
+      "## RENAMED Requirements",
+      "```",
+      "- FROM: `### Requirement: Untested`",
+      "- TO: `### Requirement: Heading new`",
+    ].join("\n");
+    expect(deltaAnchors(delta)).toEqual([]);
+    expect([...deltaProof(delta).gone]).toEqual([]);
+    expect(unprovenRequirements(specs, [], new Map([["cap", deltaProof(delta)]]))).toEqual([
+      "cap: Requirement: `plan_shared` fires on a slug-mint, never: on open",
+      "cap: Requirement: Untested",
+    ]);
   });
 });
