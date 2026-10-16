@@ -122,6 +122,7 @@ const renameLine = (keyword: "FROM" | "TO") =>
   );
 const FROM_LINE = renameLine("FROM");
 const TO_LINE = renameLine("TO");
+const REMOVED_BULLET = /^\s*[-*+]\s*`?###\s*Requirement:\s*(.+?)`?\s*$/;
 
 /**
  * One RENAMED section's rename pairs as requirement names, read in OpenSpec's archive shape
@@ -214,6 +215,11 @@ function deltaProof(
   for (const { kind, body, mask } of deltaSections(text)) {
     if (kind === "removed") {
       for (const r of parseRequirements(body, mask)) into.gone.add(r.name);
+      // Archive's `parseRemovedNames` also reads a requirement heading behind a list bullet.
+      for (const [i, line] of body.entries()) {
+        const m = mask[i] ? null : REMOVED_BULLET.exec(line);
+        if (m?.[1]) into.gone.add(`Requirement: ${m[1].trim()}`);
+      }
     } else if (kind === "renamed") {
       for (const { from } of renamedPairs(body, mask)) into.gone.add(from);
     } else if (kind === "modified") {
@@ -794,5 +800,29 @@ describe("spec citation rules", () => {
     expect(deltaAnchors(delta, main)).toEqual(["requirement-shared"]);
     const citations = extractCitations("a.test.ts", cite("cap", "scenario-case-only"));
     expect(unprovenRequirements(specs, citations, open)).toEqual(both);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-removal-written-as-a-list-bullet} */
+  it("a removal written as a list bullet, with or without backticks, is read as archive reads it", () => {
+    const main = new Map([
+      [
+        "cap",
+        parseRequirements(
+          splitLines("### Requirement: Untested\n### Requirement: Second\n### Requirement: Third"),
+        ),
+      ],
+    ]);
+    const delta = [
+      "## REMOVED Requirements",
+      "- ### Requirement: Untested",
+      "* `### Requirement: Second`",
+      "```",
+      "+ ### Requirement: Third",
+      "```",
+    ].join("\n");
+    expect(unprovenRequirements(main, [], new Map([["cap", deltaProof(delta)]]))).toEqual([
+      "cap: Requirement: Third",
+    ]);
+    expect([...deltaProof(delta).gone]).toEqual(["Requirement: Untested", "Requirement: Second"]);
   });
 });
