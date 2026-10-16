@@ -87,6 +87,17 @@ function parseRequirements(text: string): Requirement[] {
 }
 
 /**
+ * A `FROM:`/`TO:` rename line in OpenSpec's archive shape (`parseRenamedPairs`): start of line,
+ * optional `-`/`*`/`+` bullet, optional backticks; group 1 is the bare requirement name.
+ */
+function renameLine(keyword: "FROM" | "TO"): RegExp {
+  return new RegExp(
+    `^[ \\t]*[-*+]?[ \\t]*${keyword}:[ \\t]*\`?###[ \\t]*Requirement:[ \\t]*(.+?)\`?[ \\t]*$`,
+    "gm",
+  );
+}
+
+/**
  * Anchors a change delta makes citable before archive: its ADDED requirements and scenarios,
  * RENAMED targets, and MODIFIED requirements and scenarios — a MODIFIED one only when its
  * requirement already exists in the main spec (`existing`) or is renamed to in the same delta,
@@ -97,7 +108,7 @@ function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): 
   const renamed = sections
     .filter((s) => s.startsWith("## RENAMED Requirements"))
     .flatMap((s) =>
-      [...s.matchAll(/TO: `### (Requirement: .+)`\s*$/gm)].map((m) => slugify(m[1] ?? "")),
+      [...s.matchAll(renameLine("TO"))].map((m) => slugify(`Requirement: ${(m[1] ?? "").trim()}`)),
     );
   const anchors: string[] = [...renamed];
   for (const section of sections) {
@@ -130,8 +141,8 @@ function deltaProof(
     if (section.startsWith("## REMOVED Requirements")) {
       for (const r of parseRequirements(body)) into.gone.add(r.anchor);
     } else if (section.startsWith("## RENAMED Requirements")) {
-      for (const m of section.matchAll(/FROM: `### (Requirement: .+)`\s*$/gm)) {
-        into.gone.add(slugify(m[1] ?? ""));
+      for (const m of section.matchAll(renameLine("FROM"))) {
+        into.gone.add(slugify(`Requirement: ${(m[1] ?? "").trim()}`));
       }
     } else if (section.startsWith("## MODIFIED Requirements")) {
       for (const r of parseRequirements(body)) {
@@ -468,6 +479,24 @@ describe("spec citation rules", () => {
       "- TO: `### Requirement: The `foo` flag`",
     ];
     expect(deltaAnchors(delta.join("\n"))).toEqual(["requirement-the-foo-flag"]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-written-in-another-spelling-openspec-accepts} */
+  it("a rename in any spelling OpenSpec's archive accepts is read, and only at line start", () => {
+    const delta = [
+      "## RENAMED Requirements",
+      "*   FROM:   ### Requirement: Old thing",
+      "  + TO:   ### Requirement:   New thing   ",
+      "FROM:`### Requirement: Second old`",
+      "TO:`### Requirement: Second new`",
+      "INTO: `### Requirement: Into`",
+      "Moved here, then TO: `### Requirement: Mid sentence`",
+    ].join("\n");
+    expect(deltaAnchors(delta)).toEqual(["requirement-new-thing", "requirement-second-new"]);
+    expect([...deltaProof(delta).gone]).toEqual([
+      "requirement-old-thing",
+      "requirement-second-old",
+    ]);
   });
 
   /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-an-unarchived-change-removes-or-renames} */
