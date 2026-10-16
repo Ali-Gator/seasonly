@@ -34,10 +34,27 @@ fold items in.
   b\* 5.8): tuning agreement 0.5733 / 0.5800 / 0.5613 / 0.5513 / 0.5320 and temperature spread
   0.330 / 0.288 / 0.274 / 0.266 / 0.278 at k 0 / 0.25 / 0.5 / 0.75 / 1; holdout agreement 0.550 /
   0.488 / 0.498 / 0.560 / 0.529. No k passes t15-eval-growth's D6 rule (needs tuning +0.023 and
-  holdout no worse than −0.036). Find a white reference that holds on the holdout (background,
-  teeth, gray-world are untried) or grow the set.
+  holdout no worse than −0.036). The other references were swept on 2026-10-16 by replaying the
+  MediaPipe cache (k 0 reproduces `results.json` exactly; the balance touches only traits, so
+  false-reject and catch are unchanged), each with its tuning-set median as the reference. Rows
+  are k 0.25 / 0.5 / 0.75 / 1, k 0 as above (tuning 0.5733, spread 0.330; holdout 0.550, 0.204):
+  - teeth (brightest 30% of the inner mouth when brighter than skin; found on 56/116 photos):
+    tuning 0.547 / 0.537 / 0.545 / 0.503, spread 0.312 / 0.325 / 0.343 / 0.363; holdout 0.535 /
+    0.577 / 0.535 / 0.494, spread 0.172 / 0.150 / 0.151 / 0.164.
+  - background (not hair, outside the face box grown 25%, above the chin; clothes leak in):
+    tuning 0.512 / 0.479 / 0.475 / 0.464, spread 0.381 / 0.482 / 0.502 / 0.527; holdout 0.431 /
+    0.535 / 0.473 / 0.431, spread 0.294 / 0.372 / 0.403 / 0.434.
+  - background, near-neutral only (chroma ≤ 8; 55/116): tuning 0.563 / 0.533 / 0.503 / 0.533,
+    spread 0.330 / 0.330 / 0.330 / 0.334; holdout 0.550 / 0.488 / 0.488 / 0.488, spread 0.222 /
+    0.242 / 0.257 / 0.271.
+  - gray-world (mean sRGB of the frame): tuning 0.563 / 0.543 / 0.580 / 0.519, spread 0.317 /
+    0.347 / 0.388 / 0.418; holdout 0.473 / 0.435 / 0.498 / 0.456, spread 0.247 / 0.297 / 0.337 /
+    0.372.
+
+  None reaches tuning 0.596. Teeth at k 0.5 helps only the holdout. BL-39 caps what any white
+  balance can do for label accuracy.
   _Refs:_ `packages/analysis/src/sampling/traits.ts`, `openspec/changes/archive/*-t15-eval-growth/design.md` (D6) · _Status:_ gated —
-  a new white reference to try, or more labeled people; the eye white fails D6 on both measures (backlog-2 triage, 2026-10-13)
+  more labeled people; eye white, teeth, background and gray-world all fail D6 (2026-10-16)
 
 - **[BL-39] Skin hue barely separates warm and cool labels** — on the 26 tuning people,
   warm-labeled people average skin hue 49.2° and cool-labeled 46.9°, a 2.3° gap against a 9.2°
