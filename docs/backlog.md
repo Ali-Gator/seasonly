@@ -129,36 +129,6 @@ fold items in.
 
 ## Testing
 
-- **[BL-76] The gate misses a REMOVED requirement written as a bullet** — OpenSpec's archive
-  (`parseRemovedNames`) also removes a requirement listed as `- ### Requirement: <name>` (any
-  `-`/`*`/`+` bullet, optional backticks); the gate reads REMOVED bodies with `parseRequirements`
-  only, so that requirement keeps needing a citing test until archive (fails closed). Read the
-  bullet form too (edits the approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-9` triage, 2026-10-16
-
-- **[BL-77] The gate ends a requirement body and reads scenarios unlike archive** — in
-  `parseRequirements` any `#`–`###` line ends the current requirement, while archive's
-  `parseRequirementBlocksFromSection` runs on to the next requirement header or `## ` line; and
-  scenarios need `#### Scenario: ` with one space and that case, while archive takes any
-  `####\s+` header. So a delta with `### Notes` before a new scenario, or `#### scenario: X`, is
-  reported stale before archive (fails closed). Match archive's block end and scenario header
-  (edits the approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-9` review, 2026-10-16
-
-- **[BL-78] The gate matches delta requirement names by slug, archive by exact name** — `gone`,
-  `existing` and the rename lists compare slugs, which drop case and punctuation, while archive
-  matches the trimmed name exactly. A REMOVED `untested` or a FROM naming `Un-tested` exempts
-  main's `Untested`, which archive leaves in place untested (fails open). Compare names, not
-  slugs, where the delta meets the main spec (edits the approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-9` review, 2026-10-16
-
-- **[BL-79] Section bodies round-trip through a string before `parseRequirements`** —
-  `deltaSections` returns body lines, and each caller joins them for `parseRequirements`, which
-  splits them again so the fence-mask slice lines up. Exact today, but the alignment rests on the
-  round trip. Let `parseRequirements` take lines plus an optional mask (simplification; edits the
-  approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — `backlog-9` review, 2026-10-16
-
 - **[BL-80] The gate folds spaces inside a requirement name that GitHub keeps** — `parseRequirements`
   stores `Requirement: ${name.trim()}`, and its `\s*` eats every space after `Requirement:`, so
   `### Requirement:  X` (two spaces) gets the gate anchor `requirement-x` while GitHub's slug is

@@ -16,7 +16,7 @@ Each task leaves the suite green before the next starts. All of them edit `scrip
 
 ## 3. Verify, delete, review, archive, ship
 
-- [ ] 3.1 `pnpm fix`, then `pnpm test`; both green
-- [ ] 3.2 delete shipped bullets BL-76, BL-77, BL-78, BL-79 from `docs/backlog.md`
+- [x] 3.1 `pnpm fix`, then `pnpm test`; both green
+- [x] 3.2 delete shipped bullets BL-76, BL-77, BL-78, BL-79 from `docs/backlog.md`
 - [ ] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
 - [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge
