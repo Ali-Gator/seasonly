@@ -86,17 +86,33 @@ function parseRequirements(text: string): Requirement[] {
   return requirements;
 }
 
-/**
- * Anchors a RENAMED section's `FROM:` or `TO:` lines name, read in OpenSpec's archive shape
- * (`parseRenamedPairs`): start of line, optional `-`/`*`/`+` bullet, optional backticks, spaces
- * that never cross a line.
- */
-function renamedAnchors(section: string, keyword: "FROM" | "TO"): string[] {
-  const line = new RegExp(
+const renameLine = (keyword: "FROM" | "TO") =>
+  new RegExp(
     `^[^\\S\\n]*[-*+]?[^\\S\\n]*${keyword}:[^\\S\\n]*\`?###[^\\S\\n]*Requirement:[^\\S\\n]*(.+?)\`?[^\\S\\n]*$`,
-    "gm",
   );
-  return [...section.matchAll(line)].map((m) => slugify(`Requirement: ${m[1]}`));
+const FROM_LINE = renameLine("FROM");
+const TO_LINE = renameLine("TO");
+
+/**
+ * One RENAMED section's rename pairs as anchors, read in OpenSpec's archive shape
+ * (`parseRenamedPairs`): start of line, optional `-`/`*`/`+` bullet, optional backticks, spaces
+ * that never cross a line. A `FROM:` line sets the pending old name; a `TO:` line pairs with it
+ * only when one is pending, so a line with no partner yields nothing.
+ */
+function renamedPairs(section: string): { from: string; to: string }[] {
+  const pairs: { from: string; to: string }[] = [];
+  let from: string | undefined;
+  for (const line of section.split("\n")) {
+    const f = FROM_LINE.exec(line);
+    const t = f ? null : TO_LINE.exec(line);
+    if (f?.[1]) {
+      from = slugify(`Requirement: ${f[1]}`);
+    } else if (t?.[1] && from) {
+      pairs.push({ from, to: slugify(`Requirement: ${t[1]}`) });
+      from = undefined;
+    }
+  }
+  return pairs;
 }
 
 /**
@@ -109,7 +125,7 @@ function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): 
   const sections = text.split(/^(?=## )/m);
   const renamed = sections
     .filter((s) => s.startsWith("## RENAMED Requirements"))
-    .flatMap((s) => renamedAnchors(s, "TO"));
+    .flatMap((s) => renamedPairs(s).map((p) => p.to));
   const anchors: string[] = [...renamed];
   for (const section of sections) {
     const added = section.startsWith("## ADDED Requirements");
@@ -141,7 +157,7 @@ function deltaProof(
     if (section.startsWith("## REMOVED Requirements")) {
       for (const r of parseRequirements(body)) into.gone.add(r.anchor);
     } else if (section.startsWith("## RENAMED Requirements")) {
-      for (const anchor of renamedAnchors(section, "FROM")) into.gone.add(anchor);
+      for (const { from } of renamedPairs(section)) into.gone.add(from);
     } else if (section.startsWith("## MODIFIED Requirements")) {
       for (const r of parseRequirements(body)) {
         if (r.unenforced) into.gone.add(r.anchor);
@@ -558,6 +574,21 @@ describe("spec citation rules", () => {
     expect(
       unprovenRequirements(specs, [], new Map([["cap", deltaProof(delta.join("\n"))]])),
     ).toEqual([
+      "cap: Requirement: `plan_shared` fires on a slug-mint, never: on open",
+      "cap: Requirement: Untested",
+    ]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-line-with-no-partner} */
+  it("a rename line with no partner is neither citable nor gone, as archive pairs them", () => {
+    const delta = [
+      "## RENAMED Requirements",
+      "- TO: `### Requirement: Lone new`",
+      "- FROM: `### Requirement: Untested`",
+      "- T0: `### Requirement: Misspelled new`",
+    ].join("\n");
+    expect(deltaAnchors(delta)).toEqual([]);
+    expect(unprovenRequirements(specs, [], new Map([["cap", deltaProof(delta)]]))).toEqual([
       "cap: Requirement: `plan_shared` fires on a slug-mint, never: on open",
       "cap: Requirement: Untested",
     ]);
