@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-77**
+_Next id:_ **BL-79**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -135,6 +135,22 @@ fold items in.
   only, so that requirement keeps needing a citing test until archive (fails closed). Read the
   bullet form too (edits the approved-only gate test file).
   _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-9` triage, 2026-10-16
+
+- **[BL-77] The gate ends a requirement body and reads scenarios unlike archive** — in
+  `parseRequirements` any `#`–`###` line ends the current requirement, while archive's
+  `parseRequirementBlocksFromSection` runs on to the next requirement header or `## ` line; and
+  scenarios need `#### Scenario: ` with one space and that case, while archive takes any
+  `####\s+` header. So a delta with `### Notes` before a new scenario, or `#### scenario: X`, is
+  reported stale before archive (fails closed). Match archive's block end and scenario header
+  (edits the approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-9` review, 2026-10-16
+
+- **[BL-78] The gate matches delta requirement names by slug, archive by exact name** — `gone`,
+  `existing` and the rename lists compare slugs, which drop case and punctuation, while archive
+  matches the trimmed name exactly. A REMOVED `untested` or a FROM naming `Un-tested` exempts
+  main's `Untested`, which archive leaves in place untested (fails open). Compare names, not
+  slugs, where the delta meets the main spec (edits the approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-9` review, 2026-10-16
 
 - **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
   403 now shows the blocked screen, but nobody has opened seasonly.me inside either app and run a

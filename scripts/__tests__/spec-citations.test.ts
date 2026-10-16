@@ -82,11 +82,19 @@ function fenceMask(lines: string[]): boolean[] {
   });
 }
 
+/** Archive's `normalizeLineEndings`: no UTF-8 BOM, `\n` line endings. */
+function splitLines(text: string): string[] {
+  return text
+    .replace(/^\uFEFF/, "")
+    .replace(/\r\n?/g, "\n")
+    .split("\n");
+}
+
 /** `mask` is the lines' slice of the whole delta's fence mask, when they are one section's body. */
 function parseRequirements(text: string, mask?: boolean[]): Requirement[] {
   const requirements: Requirement[] = [];
   let current: Requirement | undefined;
-  const lines = text.split("\n");
+  const lines = splitLines(text);
   const masked = mask ?? fenceMask(lines);
   for (const [i, line] of lines.entries()) {
     if (masked[i]) continue;
@@ -151,7 +159,7 @@ function deltaSections(
   text: string,
 ): { kind?: (typeof SECTION_KINDS)[number]; body: string[]; mask: boolean[] }[] {
   const sections: ReturnType<typeof deltaSections> = [];
-  const lines = text.split("\n");
+  const lines = splitLines(text);
   const masked = fenceMask(lines);
   lines.forEach((line, i) => {
     const m = masked[i] ? null : /^##\s+(.+)$/.exec(line);
@@ -642,6 +650,18 @@ describe("spec citation rules", () => {
       "cap: Requirement: `plan_shared` fires on a slug-mint, never: on open",
       "cap: Requirement: Untested",
     ]);
+    // Pairing starts empty in each RENAMED body, and a later FROM overwrites an unpaired one.
+    const split = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: Untested`",
+      "## RENAMED Requirements",
+      "- TO: `### Requirement: Across bodies`",
+      "- FROM: `### Requirement: `plan_shared` fires on a slug-mint, never: on open`",
+      "- FROM: `### Requirement: Untested`",
+      "- TO: `### Requirement: Overwritten new`",
+    ].join("\n");
+    expect(deltaAnchors(split)).toEqual(["requirement-overwritten-new"]);
+    expect([...deltaProof(split).gone]).toEqual(["requirement-untested"]);
   });
 
   /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-delta-section-heading-in-another-letter-case} */
@@ -665,6 +685,10 @@ describe("spec citation rules", () => {
     const proof = deltaProof(delta);
     expect([...proof.gone]).toEqual(["requirement-before"]);
     expect([...proof.scenarios]).toEqual([["requirement-after", ["scenario-case-free-heading"]]]);
+    // Archive drops a BOM and reads CRLF line endings as LF.
+    const crlf = "\uFEFF" + delta.replace(/\n/g, "\r\n");
+    expect(deltaAnchors(crlf)).toEqual(deltaAnchors(delta));
+    expect([...deltaProof(crlf).gone]).toEqual(["requirement-before"]);
   });
 
   it("a repeated scenario name within a capability is reported", () => {
@@ -703,5 +727,21 @@ describe("spec citation rules", () => {
       "cap: Requirement: `plan_shared` fires on a slug-mint, never: on open",
       "cap: Requirement: Untested",
     ]);
+    // A fence closes only on its own marker, at least as long as the opening one.
+    const nested = [
+      "## RENAMED Requirements",
+      "````",
+      "```",
+      "- FROM: `### Requirement: Untested`",
+      "- TO: `### Requirement: Inside four backticks`",
+      "````",
+      "```",
+      "~~~",
+      "- FROM: `### Requirement: Untested`",
+      "- TO: `### Requirement: Inside backticks`",
+      "```",
+    ].join("\n");
+    expect(deltaAnchors(nested)).toEqual([]);
+    expect([...deltaProof(nested).gone]).toEqual([]);
   });
 });
