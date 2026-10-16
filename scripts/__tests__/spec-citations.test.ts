@@ -98,7 +98,8 @@ function parseRequirements(lines: string[], mask: boolean[] = fenceMask(lines)):
     if (mask[i]) continue;
     // Archive's `REQUIREMENT_HEADER_REGEX`: the keyword in any letter case.
     const req = /^###\s*Requirement:\s*(.+)\s*$/i.exec(line);
-    const scenario = /^#### (Scenario: .+)$/.exec(line);
+    // Any spacing after `####`, `Scenario:` in any letter case; the anchor is its text as written.
+    const scenario = /^####\s+(scenario:.*\S.*)$/i.exec(line);
     if (req?.[1]) {
       const name = `Requirement: ${req[1].trim()}`;
       current = { name, anchor: slugify(name), scenarios: [], unenforced: false };
@@ -688,6 +689,26 @@ describe("spec citation rules", () => {
     const crlf = "\uFEFF" + delta.replace(/\n/g, "\r\n");
     expect(deltaAnchors(crlf)).toEqual(deltaAnchors(delta));
     expect([...deltaProof(crlf).gone]).toEqual(["requirement-before"]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-scenario-heading-in-another-letter-case} */
+  it("a scenario heading is read with any spacing after #### and Scenario: in any letter case", () => {
+    const body = [
+      "### Requirement: Loose scenarios",
+      "#### scenario: Lower case",
+      "####   Scenario:  Wide",
+      "#### Notes",
+      "##### Scenario: Too deep",
+    ];
+    expect(parseRequirements(body)[0]?.scenarios).toEqual([
+      "scenario-lower-case",
+      "scenario--wide",
+    ]);
+    expect(deltaAnchors(["## ADDED Requirements", ...body].join("\n"))).toEqual([
+      "requirement-loose-scenarios",
+      "scenario-lower-case",
+      "scenario--wide",
+    ]);
   });
 
   it("a repeated scenario name within a capability is reported", () => {
