@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-80**
+_Next id:_ **BL-83**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -129,35 +129,33 @@ fold items in.
 
 ## Testing
 
-- **[BL-76] The gate misses a REMOVED requirement written as a bullet** — OpenSpec's archive
-  (`parseRemovedNames`) also removes a requirement listed as `- ### Requirement: <name>` (any
-  `-`/`*`/`+` bullet, optional backticks); the gate reads REMOVED bodies with `parseRequirements`
-  only, so that requirement keeps needing a citing test until archive (fails closed). Read the
-  bullet form too (edits the approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-9` triage, 2026-10-16
+- **[BL-80] The gate folds spaces inside a requirement name that GitHub keeps** — `parseRequirements`
+  stores `Requirement: ${name.trim()}`, and its `\s*` eats every space after `Requirement:`, so
+  `### Requirement:  X` (two spaces) gets the gate anchor `requirement-x` while GitHub's slug is
+  `requirement--x`. A citation of `#requirement-x` then passes the gate as a broken link (fails
+  open). No spec has such a heading today. Slug the heading text as written (edits the
+  approved-only gate test file). Same family, scenario headings (`backlog-10` review): a closing
+  `####` sequence (`#### Scenario: X ####`) anchors `scenario-x-` where GitHub's is `scenario-x`
+  (fails closed), and `\s+` accepts a no-break space after `####`, which CommonMark renders as no
+  heading (fails open).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/constitution/spec.md` (Behavior) · _Status:_ open — `backlog-10` triage, 2026-10-16
 
-- **[BL-77] The gate ends a requirement body and reads scenarios unlike archive** — in
-  `parseRequirements` any `#`–`###` line ends the current requirement, while archive's
-  `parseRequirementBlocksFromSection` runs on to the next requirement header or `## ` line; and
-  scenarios need `#### Scenario: ` with one space and that case, while archive takes any
-  `####\s+` header. So a delta with `### Notes` before a new scenario, or `#### scenario: X`, is
-  reported stale before archive (fails closed). Match archive's block end and scenario header
-  (edits the approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-9` review, 2026-10-16
+- **[BL-81] A rename's new name is citable even when archive would refuse the rename** —
+  `deltaAnchors` makes every RENAMED `TO` citable without checking that its `FROM` names a
+  main-spec requirement exactly. A FROM that drops backticks or a colon makes archive throw
+  "RENAMED failed … source not found", while a test citing the TO anchor stays green as long as
+  the change is open (fails open until archive). Guard renames as MODIFIED is guarded; the
+  `backlog-10` rule test asserting `["requirement-shared"]` changes with it (approved-only gate
+  test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-10` review, 2026-10-16
 
-- **[BL-78] The gate matches delta requirement names by slug, archive by exact name** — `gone`,
-  `existing` and the rename lists compare slugs, which drop case and punctuation, while archive
-  matches the trimmed name exactly. A REMOVED `untested` or a FROM naming `Un-tested` exempts
-  main's `Untested`, which archive leaves in place untested (fails open). Compare names, not
-  slugs, where the delta meets the main spec (edits the approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-9` review, 2026-10-16
-
-- **[BL-79] Section bodies round-trip through a string before `parseRequirements`** —
-  `deltaSections` returns body lines, and each caller joins them for `parseRequirements`, which
-  splits them again so the fence-mask slice lines up. Exact today, but the alignment rests on the
-  round trip. Let `parseRequirements` take lines plus an optional mask (simplification; edits the
-  approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — `backlog-9` review, 2026-10-16
+- **[BL-82] A MODIFIED requirement under a renamed-away or removed name still resolves** —
+  `deltaAnchors` accepts a MODIFIED requirement whose name is a rename's old name or one the
+  same delta removes, both of which archive's pre-validate refuses ("MODIFIED must reference the
+  NEW header"; a MODIFIED/REMOVED conflict). Its scenarios resolve, and under REMOVED+MODIFIED
+  the requirement is also exempt from the proof check (fails open until archive). Reject both
+  shapes as archive does (approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-10` review, 2026-10-16
 
 - **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
   403 now shows the blocked screen, but nobody has opened seasonly.me inside either app and run a
