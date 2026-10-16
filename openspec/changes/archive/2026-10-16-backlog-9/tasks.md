@@ -20,4 +20,4 @@ Each of 2.1–2.6 leaves the suite green before the next starts. All of them edi
 - [x] 3.1 `pnpm fix`, then `pnpm test`; both green
 - [x] 3.2 delete shipped bullets BL-73, BL-74, BL-75, BL-08 from `docs/backlog.md`
 - [x] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
-- [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge
+- [x] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge
