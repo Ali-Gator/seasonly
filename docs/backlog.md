@@ -129,27 +129,6 @@ fold items in.
 
 ## Testing
 
-- **[BL-73] A lone `FROM:` line exempts its requirement from the proof check** — `deltaProof`
-  marks every `FROM:` name gone, but OpenSpec's archive renames only a `FROM:` followed by a
-  `TO:`, so a rename whose `TO:` line is misspelled leaves the requirement unrenamed and untested
-  (fails open). Read `FROM:`/`TO:` as pairs, like `parseRenamedPairs` (edits the approved-only
-  gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-8` review, 2026-10-16
-
-- **[BL-74] The gate reads delta section headers in one spelling only** — it matches
-  `## RENAMED Requirements` (and ADDED, MODIFIED, REMOVED) case- and space-exactly, while
-  OpenSpec's archive trims the title and ignores case, so `## Renamed Requirements` archives but
-  its citations are reported stale (fails closed). Match headers the way archive does (edits the
-  approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-8` review, 2026-10-16
-
-- **[BL-75] The gate reads rename lines inside code fences** — OpenSpec's archive skips fenced
-  lines, the gate does not, so a fenced example `FROM:` line exempts a requirement (fails open),
-  while the spec now says a non-rename line is never read as one. No delta has a fenced rename
-  today (`backlog-8` design, Non-Goals); skip fenced lines when one appears, or narrow the spec.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — reopened in `backlog-9`
-  triage, 2026-10-16: the fail-open is silent, so its trigger could never be seen to fire, and the spec already promises the skip
-
 - **[BL-76] The gate misses a REMOVED requirement written as a bullet** — OpenSpec's archive
   (`parseRemovedNames`) also removes a requirement listed as `- ### Requirement: <name>` (any
   `-`/`*`/`+` bullet, optional backticks); the gate reads REMOVED bodies with `parseRequirements`
@@ -164,14 +143,6 @@ fold items in.
   _Refs:_ `apps/web/src/app/api/analyze/route.ts` (`checkBotId`), `t18-design-review` tasks.md
   8.3 · _Status:_ gated — Oleg's phone run inside TikTok and Instagram, one photo each (two paid vision
   calls, his yes first); t18 is live on seasonly.me since 2026-10-13 (`backlog-9` triage, 2026-10-16)
-
-- **[BL-08] Two concurrent email stores are never raced in a test** — the abuse-controls
-  scenario "Two requests at once" rests on `store_report_email` locking the report row (`for
-update`). PGlite has one connection, so the test only checks that the lock is in the SQL. Race
-  two sessions against a real Postgres (the Supabase CLI's local stack), or mark the scenario
-  Unenforced.
-  _Refs:_ `apps/web/src/lib/email/store.test.ts`, `openspec/specs/abuse-controls/spec.md` ·
-  _Status:_ open — `backlog-9` triage, 2026-10-16: marked Unenforced instead, like the daily cap
 
 ## Design / UX
 
