@@ -112,18 +112,6 @@ fold items in.
 
 ## Testing
 
-- **[BL-71] The gate's rename readers accept only one `FROM:`/`TO:` spelling** — `deltaAnchors`
-  and `deltaProof` read only a `-` bullet, single spaces and a backticked heading, while OpenSpec
-  also accepts no backticks, `*`/`+` bullets and extra spaces. A valid rename written that
-  way blocks its change (fails closed). Use OpenSpec's pattern shape for both readers.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-7` review, 2026-10-15
-
-- **[BL-72] No test pins that a delta naming the unenforced flag mid-sentence exempts nothing** —
-  a MODIFIED delta whose body only mentions the flag must keep its uncited requirement reported.
-  Today it holds through the line-start match alone; a regression would fail open. Add a
-  `deltaProof` + `unprovenRequirements` rule test (edits the approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-7` review, 2026-10-15
-
 - **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
   403 now shows the blocked screen, but nobody has opened seasonly.me inside either app and run a
   photo. Run it once on a phone after `t18-design-review` ships (one paid vision call), and if the
@@ -161,11 +149,6 @@ update`). PGlite has one connection, so the test only checks that the lock is in
   (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3) · _Status:_ deferred — until a page renders a
   DOM card preview (`t5-report-delivery` shows the PNGs themselves); check whether the 2026-10-07
   redesign session already updated the canvas
-
-- **[BL-70] The season reveal builds its own photo slot** — `_reveal/steps.tsx` hand-builds an
-  `sn-slot` and `img` that the design system's `Slot` already covers (`src`, `alt`, `className`).
-  `Slot` is exported from `@/components/ds` since `backlog-7`; use it there.
-  _Refs:_ `apps/web/src/app/(flow)/analyze/_reveal/steps.tsx`, `openspec/specs/season-reveal/spec.md` · _Status:_ open — found in `backlog-7` triage, 2026-10-15
 
 - **[BL-27] The GPT-alternative page goes stale on December 11** — its title, description, h1
   and lead say the GPT "is retiring" on December 11, 2026. Re-check OpenAI's FAQ and switch the
