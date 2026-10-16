@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-79**
+_Next id:_ **BL-80**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -151,6 +151,13 @@ fold items in.
   main's `Untested`, which archive leaves in place untested (fails open). Compare names, not
   slugs, where the delta meets the main spec (edits the approved-only gate test file).
   _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-9` review, 2026-10-16
+
+- **[BL-79] Section bodies round-trip through a string before `parseRequirements`** —
+  `deltaSections` returns body lines, and each caller joins them for `parseRequirements`, which
+  splits them again so the fence-mask slice lines up. Exact today, but the alignment rests on the
+  round trip. Let `parseRequirements` take lines plus an optional mask (simplification; edits the
+  approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — `backlog-9` review, 2026-10-16
 
 - **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
   403 now shows the blocked screen, but nobody has opened seasonly.me inside either app and run a
