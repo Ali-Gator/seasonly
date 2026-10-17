@@ -199,23 +199,36 @@ function removedNames(body: string[], mask: boolean[]): string[] {
 }
 
 /**
- * Names archive's pre-validate refuses within one delta (`specs-apply.js`), compared exactly: a
- * MODIFIED name the same delta also removes or renames from, in any parsed rename pair. A
- * conflicting name's MODIFIED block, REMOVED entry and rename from it all count for nothing.
+ * Names archive's pre-validate refuses within one delta (`specs-apply.js`): a name repeated
+ * within ADDED, MODIFIED or REMOVED, or as a rename's FROM or TO; a MODIFIED name also added,
+ * removed or renamed from; an ADDED name equal to a rename's TO, compared exactly; and a rename
+ * FROM with every REMOVED name that matches it folded (`foldRequirementName`). A conflicting
+ * name's blocks, REMOVED entries and rename pairs all count for nothing.
  */
 function conflicts(sections: ReturnType<typeof deltaSections>): Set<string> {
   const of = (kind: (typeof SECTION_KINDS)[number]) => sections.filter((s) => s.kind === kind);
-  const away = new Set([
-    ...of("removed").flatMap((s) => removedNames(s.body, s.mask)),
-    ...of("renamed").flatMap((s) => renamedPairs(s.body, s.mask).map((p) => p.from)),
+  const names = (kind: "added" | "modified") =>
+    of(kind).flatMap((s) => parseRequirements(s.body, s.mask).map((r) => r.name));
+  const [added, modified] = [names("added"), names("modified")];
+  const removed = of("removed").flatMap((s) => removedNames(s.body, s.mask));
+  const pairs = of("renamed").flatMap((s) => renamedPairs(s.body, s.mask));
+  const [froms, tos] = [pairs.map((p) => p.from), pairs.map((p) => p.to)];
+  const fold = (name: string) => name.toLowerCase().replace(/\s+/g, " ");
+  const repeated = (list: string[]) => list.filter((n, i) => list.indexOf(n) !== i);
+  return new Set([
+    ...[added, modified, removed, froms, tos].flatMap(repeated),
+    ...modified.filter((n) => added.includes(n) || removed.includes(n) || froms.includes(n)),
+    ...added.filter((n) => tos.includes(n)),
+    ...froms.flatMap((from) => {
+      const match = removed.filter((r) => fold(r) === fold(from));
+      return match.length > 0 ? [from, ...match] : [];
+    }),
   ]);
-  const modified = of("modified").flatMap((s) => parseRequirements(s.body, s.mask));
-  return new Set(modified.map((r) => r.name).filter((name) => away.has(name)));
 }
 
 /**
  * The rename pairs archive applies, walked in document order against a running copy of the
- * main spec's names (`specs-apply.js` RENAMED): a pair from a `dropped` name never enters the
+ * main spec's names (`specs-apply.js` RENAMED): a pair naming a `dropped` name never enters the
  * walk; a pair is refused when its new name is already held, or, with `checkFrom`, when its old
  * name is not; an accepted pair renames in the copy, so a chain succeeds.
  */
@@ -230,7 +243,8 @@ function appliedRenames(
     .filter((s) => s.kind === "renamed")
     .flatMap((s) => renamedPairs(s.body, s.mask))
     .filter(({ from, to }) => {
-      if (dropped.has(from) || names.has(to) || (checkFrom && !names.has(from))) return false;
+      if (dropped.has(from) || dropped.has(to) || names.has(to) || (checkFrom && !names.has(from)))
+        return false;
       names.delete(from);
       names.add(to);
       return true;
@@ -251,7 +265,7 @@ function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): 
   for (const { kind, body, mask } of sections) {
     if (kind !== "added" && kind !== "modified") continue;
     for (const r of parseRequirements(body, mask)) {
-      if (kind === "modified" && dropped.has(r.name)) continue;
+      if (dropped.has(r.name)) continue;
       if (kind === "added" || existing.has(r.name) || renamed.includes(r.name)) {
         anchors.push(...anchorsOf(r));
       }
@@ -1032,5 +1046,88 @@ describe("spec citation rules", () => {
       "cap: Requirement: Removed one",
       "cap: Requirement: Renamed one",
     ]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-delta-names-archives-pre-validate-refuses} */
+  it("delta names archive's pre-validate refuses make nothing citable or exempt", () => {
+    // [main names, delta, anchors a test cites]
+    const shapes: [string[], string[], string[]][] = [
+      [
+        ["Both"],
+        [
+          "## ADDED Requirements",
+          "### Requirement: Both",
+          "#### Scenario: Added both",
+          "## MODIFIED Requirements",
+          "### Requirement: Both",
+          "#### Scenario: Modified both",
+        ],
+        ["scenario-added-both", "scenario-modified-both"],
+      ],
+      [
+        ["Old name"],
+        [
+          "## RENAMED Requirements",
+          "- FROM: `### Requirement: Old name`",
+          "- TO: `### Requirement: New name`",
+          "## ADDED Requirements",
+          "### Requirement: New name",
+          "#### Scenario: Added new",
+        ],
+        ["requirement-new-name", "scenario-added-new"],
+      ],
+      [
+        ["Folded one", "FOLDED  one"],
+        [
+          "## REMOVED Requirements",
+          "### Requirement: FOLDED  one",
+          "## RENAMED Requirements",
+          "- FROM: `### Requirement: Folded one`",
+          "- TO: `### Requirement: Folded new`",
+        ],
+        ["requirement-folded-new"],
+      ],
+      [
+        ["Twice from", "Other", "Third"],
+        [
+          "## RENAMED Requirements",
+          "- FROM: `### Requirement: Twice from`",
+          "- TO: `### Requirement: Target a`",
+          "- FROM: `### Requirement: Twice from`",
+          "- TO: `### Requirement: Target b`",
+          "- FROM: `### Requirement: Other`",
+          "- TO: `### Requirement: Same to`",
+          "- FROM: `### Requirement: Third`",
+          "- TO: `### Requirement: Same to`",
+        ],
+        ["requirement-target-a", "requirement-target-b", "requirement-same-to"],
+      ],
+      [
+        ["Mod twice", "Rem twice"],
+        [
+          "## ADDED Requirements",
+          "### Requirement: Add twice",
+          "### Requirement: Add twice",
+          "## MODIFIED Requirements",
+          "### Requirement: Mod twice",
+          "#### Scenario: First copy",
+          "### Requirement: Mod twice",
+          "#### Scenario: Second copy",
+          "## REMOVED Requirements",
+          "- ### Requirement: Rem twice",
+          "- ### Requirement: Rem twice",
+        ],
+        ["requirement-add-twice", "scenario-first-copy", "scenario-second-copy"],
+      ],
+    ];
+    const got = shapes.map(([held, lines, cited]) => {
+      const main = new Map([["cap", parseRequirements(held.map((n) => "### Requirement: " + n))]]);
+      const names = new Set(main.get("cap")?.map((r) => r.name));
+      const delta = lines.join("\n");
+      const citations = extractCitations("a.test.ts", cited.map((a) => cite("cap", a)).join("\n"));
+      const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
+      return [deltaAnchors(delta, names), unprovenRequirements(main, citations, open)];
+    });
+    expect(got).toEqual(shapes.map(([held]) => [[], held.map((n) => "cap: Requirement: " + n)]));
   });
 });
