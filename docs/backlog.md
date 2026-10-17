@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-91**
+_Next id:_ **BL-93**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -170,6 +170,21 @@ fold items in.
   does, and use one walk. Needs approval to change the `deltaProof(delta)` and `openChanges()`
   calls inside existing `it`s (`backlog-11` review).
   _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — `backlog-11` review, 2026-10-17
+
+- **[BL-91] A removal that folds onto a rename's new name aborts archive** — archive applies
+  renames before removals, and a REMOVED name that matches a rename's new name only once letter
+  case and spacing are folded (`Requirement: b` against `Requirement: B`) hits the near-miss throw
+  in `specs-apply.js` (~:321), which aborts the whole archive. The gate does not model that
+  apply-time abort, so the new name stays citable. Drop both names, as the pre-validate
+  conflicts are dropped (`backlog-12` triage; approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-12` triage, 2026-10-17
+
+- **[BL-92] The gate reads requirement headings outside `## Requirements`** — `mainSpecs` parses
+  the whole spec file, but archive reads only the `## Requirements` section, so a
+  `### Requirement:` heading under Behavior or Edge Cases would be held as a name (an ADDED of it
+  fails closed) and need a citing test. No spec has one today.
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`mainSpecs`, `parseRequirements`) · _Status:_ deferred —
+  until a spec holds a `### Requirement:` heading outside `## Requirements` (`backlog-12` triage, 2026-10-17)
 
 - **[BL-85] `slugify` drops combining marks that GitHub keeps** — github-slugger keeps `\p{M}`,
   the gate's `slugify` drops it, so a heading with a combining accent anchors differently. No
