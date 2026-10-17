@@ -95,8 +95,9 @@ function splitLines(text: string): string[] {
 /** A requirement's name as archive's `normalizeRequirementName` builds it: the captured title, trimmed. */
 const requirementName = (title: string) => `Requirement: ${title.trim()}`;
 
-/** A heading's text as GitHub renders it: trimmed, a closing `#` run after a space or tab dropped. */
-const headingText = (text: string) => text.trim().replace(/[ \t]+#+$/, "");
+/** A heading's text as GitHub renders it: spaces and tabs trimmed, a closing `#` run after a space or tab dropped. */
+const headingText = (text: string) =>
+  text.replace(/^[ \t]+|[ \t]+$/g, "").replace(/[ \t]+#+[ \t]*$/, "");
 
 /** `mask` is the lines' slice of the whole delta's fence mask, when they are one section's body. */
 function parseRequirements(lines: string[], mask: boolean[] = fenceMask(lines)): Requirement[] {
@@ -845,6 +846,8 @@ describe("spec citation rules", () => {
       "requirement-closed",
       "scenario-closed-too",
     ]);
+    // CommonMark closes a heading only before spaces or tabs, so a trailing no-break space keeps the run.
+    expect(parseRequirements(["### Requirement: X #\u00a0"])[0]?.anchor).toBe("requirement-x-");
   });
 
   /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-heading-with-no-space-after-its-marker} */
