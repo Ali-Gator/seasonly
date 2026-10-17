@@ -90,4 +90,5 @@
 
   Public Interface gains `{ type: "start-camera" }`. Verify: `openspec validate --specs` passes.
 
-- [ ] 5.2 Tracker: T20 status Done, plus a Log line in plain words. Verify: the row shows Done.
+- [x] 5.2 Tracker: T20 status Done, plus a Log line in plain words. Verify: the row shows Done.
+  - Done 2026-10-17 (Tracker rev 91): T20 shows Done, and the Log line is at the top.
