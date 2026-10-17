@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-91**
+_Next id:_ **BL-95**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -129,47 +129,34 @@ fold items in.
 
 ## Testing
 
-- **[BL-86] A rename's new name stays citable when the delta moves it on** — for a rename A to
-  B then B to C in one delta, `deltaAnchors` makes both `requirement-b` and `requirement-c`
-  citable, but B no longer exists after archive, so a test citing B passes the gate and goes
-  stale at archive (fails open). Same for a rename A to B whose B the delta also removes: archive
-  applies renames before removals, and neither pre-validate nor `validate` flags it (`backlog-11`
-  review). Make citable only the names still held after the rename walk and the removals
-  (approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-11` apply, 2026-10-17
+- **[BL-91] A removal that folds onto a rename's new name aborts archive** — archive applies
+  renames before removals, and a REMOVED name that matches a rename's new name only once letter
+  case and spacing are folded (`Requirement: b` against `Requirement: B`) hits the near-miss throw
+  in `specs-apply.js` (~:321), which aborts the whole archive. The gate does not model that
+  apply-time abort, so the new name stays citable. Drop both names, as the pre-validate
+  conflicts are dropped (`backlog-12` triage; approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-12` triage, 2026-10-17
 
-- **[BL-87] A name both added and removed in one delta still counts** — archive's pre-validate
-  refuses a name in ADDED and REMOVED (`specs-apply.js` "ADDED and REMOVED" conflict), but the
-  gate's `conflicts` omits that shape: the ADDED anchors resolve and the REMOVED name is exempt.
-  `openspec validate` reports it, so the window is commit to push. Add it to the spec's conflict
-  list and to `conflicts` (approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-11` apply, 2026-10-17
+- **[BL-92] The gate reads requirement headings outside `## Requirements`** — `mainSpecs` parses
+  the whole spec file, but archive reads only the `## Requirements` section, so a
+  `### Requirement:` heading under Behavior or Edge Cases would be held as a name (an ADDED of it
+  fails closed) and need a citing test. No spec has one today.
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`mainSpecs`, `parseRequirements`) · _Status:_ deferred —
+  until a spec holds a `### Requirement:` heading outside `## Requirements` (`backlog-12` triage, 2026-10-17)
 
-- **[BL-88] A MODIFIED block's own heading never replaces the permanent anchor** — a MODIFIED
-  block matches by name, so `### Requirement:Foo` or `### Requirement:   Foo` modifies
-  `Requirement: Foo`, but the gate keeps resolving and proving the permanent `requirement-foo`
-  while archive writes the delta's heading, whose anchor differs or is absent (fails open until
-  archive). The reverse fails closed: a permanent `###Requirement: Glued` that a MODIFIED delta
-  fixes stays unproven though a test cites the scenario the delta adds. Scenario headings archive
-  folds as the same have the same gap. Let an accepted MODIFIED block's anchors replace the
-  permanent ones (`backlog-11` review; approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-11` review, 2026-10-17
+- **[BL-93] A rename round trip in one delta exempts the name it ends on** — for A to B then B to
+  A, archive's pre-validate passes (no FROM or TO repeats) and the walk ends holding A, but
+  `deltaProof` puts both accepted FROMs in `gone`, so `Requirement: A` needs no citing test
+  (fails open until archive). Add to `gone` only an accepted FROM the walk no longer holds
+  (`backlog-12` apply; approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`deltaProof`) · _Status:_ open — `backlog-12` apply, 2026-10-17
 
-- **[BL-89] An ADDED name the permanent spec already holds stays citable** — archive refuses an
-  ADDED requirement that already exists with other content ("ADDED failed … already exists";
-  identical content is an early-sync no-op), but `deltaAnchors` makes its anchors citable
-  (window commit to push). Skip such a block unless it matches the permanent one (`backlog-11`
-  review; approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-11` review, 2026-10-17
-
-- **[BL-90] The gate re-parses each delta several times and walks renames twice** — `conflicts`,
-  `appliedRenames`, `deltaAnchors` and `deltaProof` each re-read the same sections; `deltaProof`
-  re-reads rename pairs it already has from `appliedRenames`; the `checkFrom` flag gives two walks
-  that disagree on a missing old name (a trap for BL-86); and `openChanges()` re-reads every
-  permanent spec its caller just parsed. Parse each delta once, as archive's `parseDeltaSpec`
-  does, and use one walk. Needs approval to change the `deltaProof(delta)` and `openChanges()`
-  calls inside existing `it`s (`backlog-11` review).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — `backlog-11` review, 2026-10-17
+- **[BL-94] `resolvableAnchors` repeats `openChanges`' per-capability `deltaProof` loop** — the
+  citation side and the proof side each build the open changes' `OpenDelta` map, so a fix to one
+  (BL-93) must be mirrored by hand or they drift. Give `openChanges` a trailing optional `deltas`
+  and call it from `resolvableAnchors`; `backlog-12` Non-Goals froze that signature
+  (`backlog-12` review).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — `backlog-12` review, 2026-10-17
 
 - **[BL-85] `slugify` drops combining marks that GitHub keeps** — github-slugger keeps `\p{M}`,
   the gate's `slugify` drops it, so a heading with a combining accent anchors differently. No
@@ -177,13 +164,13 @@ fold items in.
   _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ deferred — until a spec heading
   holds a combining mark (`backlog-11` triage, 2026-10-17)
 
-- **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
-  403 now shows the blocked screen, but nobody has opened seasonly.me inside either app and run a
-  photo. Run it once on a phone after `t18-design-review` ships (one paid vision call), and if the
-  check refuses them, decide what the bot check lets through.
-  _Refs:_ `apps/web/src/app/api/analyze/route.ts` (`checkBotId`), `t18-design-review` tasks.md
-  8.3 · _Status:_ gated — Oleg's phone run inside TikTok and Instagram, one photo each (two paid vision
-  calls, his yes first); t18 is live on seasonly.me since 2026-10-13 (`backlog-9` triage, 2026-10-16)
+- **[BL-54] TikTok's in-app browser is untested against the bot check** — Instagram's passed on
+  2026-10-17 (camera, analysis and report email on an iPhone, no 403). TikTok shows no tappable bio
+  link below 1,000 followers, so nobody reaches its browser yet. Once the link exists, open
+  seasonly.me from it on a phone and run one photo; if the check refuses it, decide what the bot
+  check lets through.
+  _Refs:_ `apps/web/src/app/api/analyze/route.ts` (`checkBotId`), Launch plan step 3 · _Status:_
+  deferred — until the TikTok account has 1,000 followers and its bio link
 
 ## Design / UX
 
