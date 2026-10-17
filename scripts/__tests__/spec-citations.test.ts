@@ -281,19 +281,23 @@ function appliedRenames(
  * MODIFIED, so a rename's new name counts only when no later pair renames it again and the
  * delta does not remove it, and a MODIFIED block only when its name is still held after both
  * steps: in the main spec (`existing`, main-spec names) or renamed to, and not renamed away
- * from or removed.
+ * from or removed. Archive adds last: an ADDED name still held then is a no-op when its block
+ * matches the main spec's, whose anchors are already citable, and a refusal otherwise, so such
+ * a block adds nothing. A rename that moves the name away frees it; a name also removed never
+ * gets here, since `conflicts` drops it.
  */
 function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): string[] {
   const plan = deltaPlan(text);
   const dropped = conflicts(plan);
-  const { pairs, held } = appliedRenames(plan, existing, dropped);
+  const { pairs, held: renamed } = appliedRenames(plan, existing, dropped);
+  const held = new Set(renamed);
   for (const e of plan) if (e.kind === "removed" && !dropped.has(e.name)) held.delete(e.name);
   const anchors = pairs.filter((p) => held.has(p.to)).map((p) => slugify(p.to));
   for (const e of plan) {
     if (e.kind !== "added" && e.kind !== "modified") continue;
     const r = e.block;
     if (dropped.has(r.name)) continue;
-    if (e.kind === "added" || held.has(r.name)) anchors.push(...anchorsOf(r));
+    if (e.kind === "added" ? !renamed.has(r.name) : held.has(r.name)) anchors.push(...anchorsOf(r));
   }
   return anchors;
 }
@@ -1218,5 +1222,40 @@ describe("spec citation rules", () => {
     expect(deltaAnchors(delta, names)).not.toContain("requirement-b");
     const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
     expect(unprovenRequirements(main, [], open)).not.toContain("cap: Requirement: A");
+  });
+
+  /**
+   * {@link openspec/specs/spec-workflow/spec.md#scenario-an-added-name-the-permanent-spec-already-holds}
+   * {@link openspec/specs/spec-workflow/spec.md#scenario-an-added-name-a-rename-of-the-same-delta-frees}
+   */
+  it("an added name the main spec still holds adds nothing citable, unless a rename frees it", () => {
+    const permanent = ["### Requirement: Held", "", "#### Scenario: P"];
+    const main = parseRequirements(permanent);
+    const names = new Set(["Requirement: Held"]);
+    // Built as resolvableAnchors builds it: the main spec's anchors, then the delta's.
+    const known = (delta: string) =>
+      new Map([["cap", new Set([...main.flatMap(anchorsOf), ...deltaAnchors(delta, names)])]]);
+    const stale = (delta: string, ...anchors: string[]) =>
+      staleCitations(
+        extractCitations("a.test.ts", anchors.map((a) => cite("cap", a)).join("\n")),
+        known(delta),
+      );
+
+    const differs = ["## ADDED Requirements", ...permanent, "", "#### Scenario: Q"].join("\n");
+    expect(deltaAnchors(differs, names)).not.toContain("scenario-q");
+    expect(stale(differs, "scenario-q")).toEqual(["a.test.ts:1 cap#scenario-q"]);
+
+    const identical = ["## ADDED Requirements", ...permanent].join("\n");
+    expect(stale(identical, "requirement-held", "scenario-p")).toEqual([]);
+
+    const freed = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: X`",
+      "- TO: `### Requirement: Y`",
+      "## ADDED Requirements",
+      "### Requirement: X",
+      "#### Scenario: Z",
+    ].join("\n");
+    expect(deltaAnchors(freed, new Set(["Requirement: X"]))).toContain("scenario-z");
   });
 });
