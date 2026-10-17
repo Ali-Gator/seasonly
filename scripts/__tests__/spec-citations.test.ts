@@ -329,6 +329,12 @@ interface OpenDelta {
    * these, never through its main-spec heading, scenarios or flag.
    */
   replaced: Map<string, { anchor?: string; unenforced: boolean }[]>;
+  /**
+   * Main-spec names a delta's accepted renames move to a name the same delta modifies, followed
+   * back through a chain: archive writes that block over the renamed one, so none of the old
+   * requirement's anchors survive either.
+   */
+  carried: Set<string>;
 }
 
 /**
@@ -336,16 +342,29 @@ interface OpenDelta {
  * archive would refuse — from a name `existing` (main-spec names) or an earlier rename does not
  * hold, or onto one it does — leaves its old name needing a citing test. A MODIFIED block's
  * scenarios, unenforced flag and place in `replaced` count whatever its name; only a main-spec
- * requirement of that name is ever looked up.
+ * requirement of that name is ever looked up. A rename's main-spec name enters `carried` only
+ * when a MODIFIED block of the same delta names where its chain ends.
  */
 function deltaProof(
   text: string,
-  into: OpenDelta = { gone: new Set(), scenarios: new Map(), replaced: new Map() },
+  into: OpenDelta = {
+    gone: new Set(),
+    scenarios: new Map(),
+    replaced: new Map(),
+    carried: new Set(),
+  },
   existing: ReadonlySet<string> = new Set(),
 ): OpenDelta {
   const plan = deltaPlan(text);
   const dropped = conflicts(plan);
-  const renamedFrom = new Set(appliedRenames(plan, existing, dropped).pairs.map((p) => p.from));
+  const { pairs } = appliedRenames(plan, existing, dropped);
+  const renamedFrom = new Set(pairs.map((p) => p.from));
+  // The name each accepted chain of renames ends at, and the main-spec name it starts from.
+  const origin = new Map<string, string>();
+  for (const { from, to } of pairs) {
+    origin.set(to, origin.get(from) ?? from);
+    origin.delete(from);
+  }
   for (const e of plan) {
     if (e.kind === "removed") {
       if (!dropped.has(e.name)) into.gone.add(e.name);
@@ -357,6 +376,8 @@ function deltaProof(
       if (r.unenforced) into.gone.add(r.name);
       into.scenarios.set(r.name, [...(into.scenarios.get(r.name) ?? []), ...r.scenarios]);
       into.replaced.set(r.name, [...(into.replaced.get(r.name) ?? []), r]);
+      const from = origin.get(r.name);
+      if (from) into.carried.add(from);
     }
   }
   return into;
@@ -487,9 +508,9 @@ function openDeltas(): [cap: string, text: string][] {
 /**
  * Every anchor a citation may name, by capability: the main spec's, minus those of each
  * requirement an open change modifies, by its own name or by the name an accepted chain of
- * renames in one delta ends at, plus each delta's own (`deltaAnchors`). A requirement only
- * renamed keeps its main-spec anchors until archive. `deltas` are the open changes'
- * `[capability, delta text]`, read from disk by default.
+ * renames in the same delta ends at (`carried`), plus each delta's own (`deltaAnchors`). A
+ * requirement only renamed keeps its main-spec anchors until archive. `deltas` are the open
+ * changes' `[capability, delta text]`, read from disk by default.
  */
 function resolvableAnchors(
   specs: Map<string, Requirement[]>,
@@ -497,24 +518,12 @@ function resolvableAnchors(
 ): Map<string, Set<string>> {
   const names = (cap: string) => new Set(specs.get(cap)?.map((r) => r.name) ?? []);
   const open = new Map<string, OpenDelta>();
-  // Per capability, the name each delta's accepted renames end at, and the main-spec name they start from.
-  const moved = new Map<string, [to: string, from: string][]>();
-  for (const [cap, text] of deltas) {
-    open.set(cap, deltaProof(text, open.get(cap), names(cap)));
-    const plan = deltaPlan(text);
-    const origin = new Map<string, string>();
-    for (const { from, to } of appliedRenames(plan, names(cap), conflicts(plan)).pairs) {
-      origin.set(to, origin.get(from) ?? from);
-      origin.delete(from);
-    }
-    moved.set(cap, [...(moved.get(cap) ?? []), ...origin]);
-  }
+  for (const [cap, text] of deltas) open.set(cap, deltaProof(text, open.get(cap), names(cap)));
   const known = new Map<string, Set<string>>();
   for (const [cap, requirements] of specs) {
-    const replaced = open.get(cap)?.replaced;
-    const carried = (moved.get(cap) ?? []).filter(([to]) => replaced?.has(to));
+    const delta = open.get(cap);
     const kept = requirements.filter(
-      (r) => !replaced?.has(r.name) && !carried.some(([, from]) => from === r.name),
+      (r) => !delta?.replaced.has(r.name) && !delta?.carried.has(r.name),
     );
     known.set(cap, new Set(kept.flatMap(anchorsOf)));
   }
@@ -1417,7 +1426,7 @@ describe("spec citation rules", () => {
     expect(staleCitations(own, resolvableAnchors(main, [["cap", spaced]]))).toEqual([]);
   });
 
-  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-renamed-requirement-modified-under-another-spelling} */
+  /** {@link openspec/specs/spec-workflow/spec.md#requirement-citations-are-gated-at-every-commit} */
   it("a renamed requirement modified under another spelling keeps none of its old scenario anchors", () => {
     const main = new Map([
       ["cap", parseRequirements(["### Requirement: A", "#### Scenario: Opening"])],
@@ -1442,6 +1451,31 @@ describe("spec citation rules", () => {
       ["requirement-a", "scenario-opening"].map((a) => cite("cap", a)).join("\n"),
     );
     expect(staleCitations(old, resolvableAnchors(main, [["cap", renameOnly]]))).toEqual([]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#requirement-citations-are-gated-at-every-commit} */
+  it("a rename in one change keeps its old anchors when only another change modifies the new name", () => {
+    const main = new Map([
+      ["cap", parseRequirements(["### Requirement: A", "#### Scenario: Opening"])],
+    ]);
+    const rename = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: A`",
+      "- TO: `### Requirement: B`",
+    ].join("\n");
+    const modify = [
+      "## MODIFIED Requirements",
+      "### Requirement: B",
+      "#### Scenario: Opening",
+      "#### Scenario: New",
+    ].join("\n");
+    const deltas: [string, string][] = [
+      ["cap", rename],
+      ["cap", modify],
+    ];
+    const text = ["requirement-a", "scenario-opening"];
+    const citations = extractCitations("a.test.ts", text.map((a) => cite("cap", a)).join("\n"));
+    expect(staleCitations(citations, resolvableAnchors(main, deltas))).toEqual([]);
   });
 
   /** {@link openspec/specs/spec-workflow/spec.md#scenario-two-changes-modifying-one-requirement} */
