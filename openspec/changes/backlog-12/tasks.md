@@ -6,7 +6,7 @@
 
 Each task leaves the suite green before the next starts. All of them edit `scripts/__tests__/spec-citations.test.ts`, as approved in design.md Decisions 1–3. Order is fixed: BL-90, BL-87, BL-86, BL-89, BL-88 (design.md Members). Keep every signature (Decision 5).
 
-- [ ] 2.1 BL-90 — existing-test edit approved in design.md Decision 2: in the four `it`s it names (found by title), pass the permanent names as `deltaProof`'s third argument at the five calls listed, no assertion changed. Verify the suite stays green on the old code.
+- [x] 2.1 BL-90 — existing-test edit approved in design.md Decision 2: in the four `it`s it names (found by title), pass the permanent names as `deltaProof`'s third argument at the five calls listed, no assertion changed. Verify the suite stays green on the old code.
 - [ ] 2.2 BL-90 — parse each delta once into a plan; one in-order rename walk checking FROM and TO, shared by `deltaAnchors` and `deltaProof` (`gone` from its accepted FROMs); drop `checkFrom`; memoize `mainSpecs()`. Keep `deltaProof`'s MODIFIED rule and document order with duplicates (design.md BL-90). Done when every `it` passes unchanged beyond 2.1.
 - [ ] 2.3 BL-87 — new failing rule test: ADDED and REMOVED `Both` against a permanent `Both`; the added scenario does not resolve and `Requirement: Both` is reported ({@link openspec/specs/spec-workflow/spec.md#scenario-a-name-added-and-removed-in-one-delta}). A new `it`, not a row in the existing `shapes` fixture. Verify it fails.
 - [ ] 2.4 BL-87 — add the added-against-removed term to `conflicts` and its JSDoc. Done when 2.3 passes and every other `it` passes.

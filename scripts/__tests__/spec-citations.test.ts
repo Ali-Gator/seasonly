@@ -675,7 +675,7 @@ describe("spec citation rules", () => {
       "requirement-second-new",
       "requirement-third-new",
     ]);
-    expect([...deltaProof(delta).gone]).toEqual([
+    expect([...deltaProof(delta, undefined, old).gone]).toEqual([
       "Requirement: Old thing",
       "Requirement: Second old",
       "Requirement: Third old",
@@ -694,7 +694,20 @@ describe("spec citation rules", () => {
       "- TO: `### Requirement: Shared`",
     ];
     expect(
-      unprovenRequirements(specs, [], new Map([["cap", deltaProof(renamed.join("\n"))]])),
+      unprovenRequirements(
+        specs,
+        [],
+        new Map([
+          [
+            "cap",
+            deltaProof(
+              renamed.join("\n"),
+              undefined,
+              new Set(specs.get("cap")?.map((r) => r.name)),
+            ),
+          ],
+        ]),
+      ),
     ).toEqual(["cap: Requirement: Untested"]);
   });
 
@@ -765,7 +778,7 @@ describe("spec citation rules", () => {
       "- TO: `### Requirement: Overwritten new`",
     ].join("\n");
     expect(deltaAnchors(split, untested)).toEqual(["requirement-overwritten-new"]);
-    expect([...deltaProof(split).gone]).toEqual(["Requirement: Untested"]);
+    expect([...deltaProof(split, undefined, untested).gone]).toEqual(["Requirement: Untested"]);
   });
 
   /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-delta-section-heading-in-another-letter-case} */
@@ -787,13 +800,13 @@ describe("spec citation rules", () => {
       "requirement-after",
       "scenario-case-free-heading",
     ]);
-    const proof = deltaProof(delta);
+    const proof = deltaProof(delta, undefined, before);
     expect([...proof.gone]).toEqual(["Requirement: Before"]);
     expect([...proof.scenarios]).toEqual([["Requirement: After", ["scenario-case-free-heading"]]]);
     // Archive drops a BOM and reads CRLF line endings as LF.
     const crlf = "\uFEFF" + delta.replace(/\n/g, "\r\n");
     expect(deltaAnchors(crlf, before)).toEqual(deltaAnchors(delta, before));
-    expect([...deltaProof(crlf).gone]).toEqual(["Requirement: Before"]);
+    expect([...deltaProof(crlf, undefined, before).gone]).toEqual(["Requirement: Before"]);
   });
 
   /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-scenario-heading-in-another-letter-case} */
