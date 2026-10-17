@@ -26,3 +26,4 @@ evals/photos/
 .playwright-mcp/
 .claude/settings.local.json
 .claude/worktrees/
+marketing/out/

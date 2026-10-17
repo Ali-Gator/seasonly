@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-95**
+_Next id:_ **BL-97**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -27,6 +27,19 @@ along the way that are worth fixing later. CLAUDE.md ("Backlog") says when to ad
 fold items in.
 
 ## Analysis
+
+- **[BL-95] The photo check passes the photo guide's own filter example** — `images/examples/filter.webp`
+  (the guide's "filtered" photo) passes `checkPhoto` and classifies Light Summer, while the same
+  face unfiltered (`base.webp`) is Deep Autumn. The guide promises a filter retake, so tune the
+  filter check until this example is caught, or swap the example. Found by
+  `scripts/marketing/faces.ts analyze` (launch plan step 5).
+  _Refs:_ `openspec/specs/photo-check/spec.md`, `packages/analysis/src/photo-check/` · _Status:_ open
+- **[BL-96] The sample report drapes its model in a season the core does not give her** —
+  `/sample-report` shows `examples/face.webp` on Soft Autumn's draping (hard-coded
+  `PALETTES["soft-autumn"]`), but the core classifies that photo Deep Autumn (and production gave
+  her example twin Deep Autumn on Oct 17). A visitor who runs the same photo sees another season.
+  Use the core's result for the sample, or relabel the page as an illustration.
+  _Refs:_ `apps/web/src/app/(site)/sample-report/page.tsx` · _Status:_ open
 
 - **[BL-13] Temperature reads cool and moves with the light** — skin hue moves with the light, so
   one person's temperature spreads across photos. The eye-white Lab offset (commit `1d28b3d`) was
