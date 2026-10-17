@@ -254,42 +254,46 @@ function conflicts(plan: DeltaEntry[]): Set<string> {
  * the walk; a pair is refused when its old name is not held or its new name already is; an
  * accepted pair renames in the copy, so a chain succeeds. Archive skips a pair whose old name
  * is gone and new name held as already applied; that pair is refused here too, since it
- * renames nothing.
+ * renames nothing. `held` is the copy after the walk: the main spec's names minus the accepted
+ * old names plus the accepted new ones.
  */
 function appliedRenames(
   plan: DeltaEntry[],
   existing: ReadonlySet<string>,
   dropped: ReadonlySet<string>,
-): { from: string; to: string }[] {
-  const names = new Set(existing);
-  return plan
+): { pairs: { from: string; to: string }[]; held: Set<string> } {
+  const held = new Set(existing);
+  const pairs = plan
     .flatMap((e) => (e.kind === "renamed" ? [e] : []))
     .filter(({ from, to }) => {
-      if (dropped.has(from) || dropped.has(to) || names.has(to) || !names.has(from)) return false;
-      names.delete(from);
-      names.add(to);
+      if (dropped.has(from) || dropped.has(to) || held.has(to) || !held.has(from)) return false;
+      held.delete(from);
+      held.add(to);
       return true;
     });
+  return { pairs, held };
 }
 
 /**
- * Anchors a change delta makes citable before archive: RENAMED targets archive would apply,
- * then its ADDED requirements and scenarios and MODIFIED requirements and scenarios in document
- * order — a MODIFIED one only when its requirement's name already exists in the main spec
- * (`existing`, main-spec names) or is renamed to in the same delta, since archive refuses any other.
+ * Anchors a change delta makes citable before archive: the new names of the renames archive
+ * would apply, in pair order, then its ADDED requirements and scenarios and MODIFIED
+ * requirements and scenarios in document order. Archive applies RENAMED, then REMOVED, then
+ * MODIFIED, so a rename's new name counts only when no later pair renames it again and the
+ * delta does not remove it, and a MODIFIED block only when its name is still held after both
+ * steps: in the main spec (`existing`, main-spec names) or renamed to, and not renamed away
+ * from or removed.
  */
 function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): string[] {
   const plan = deltaPlan(text);
   const dropped = conflicts(plan);
-  const renamed = appliedRenames(plan, existing, dropped).map((p) => p.to);
-  const anchors = renamed.map(slugify);
+  const { pairs, held } = appliedRenames(plan, existing, dropped);
+  for (const e of plan) if (e.kind === "removed" && !dropped.has(e.name)) held.delete(e.name);
+  const anchors = pairs.filter((p) => held.has(p.to)).map((p) => slugify(p.to));
   for (const e of plan) {
     if (e.kind !== "added" && e.kind !== "modified") continue;
     const r = e.block;
     if (dropped.has(r.name)) continue;
-    if (e.kind === "added" || existing.has(r.name) || renamed.includes(r.name)) {
-      anchors.push(...anchorsOf(r));
-    }
+    if (e.kind === "added" || held.has(r.name)) anchors.push(...anchorsOf(r));
   }
   return anchors;
 }
@@ -315,7 +319,7 @@ function deltaProof(
 ): OpenDelta {
   const plan = deltaPlan(text);
   const dropped = conflicts(plan);
-  const renamedFrom = new Set(appliedRenames(plan, existing, dropped).map((p) => p.from));
+  const renamedFrom = new Set(appliedRenames(plan, existing, dropped).pairs.map((p) => p.from));
   for (const e of plan) {
     if (e.kind === "removed") {
       if (!dropped.has(e.name)) into.gone.add(e.name);
@@ -1184,5 +1188,35 @@ describe("spec citation rules", () => {
     const citations = extractCitations("a.test.ts", cite("cap", "scenario-added-both"));
     const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
     expect(unprovenRequirements(main, citations, open)).toEqual(["cap: Requirement: Both"]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-renames-new-name-the-same-delta-moves-on-or-removes} */
+  it("a rename's new name that the same delta renames again is not citable", () => {
+    const delta = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: A`",
+      "- TO: `### Requirement: B`",
+      "- FROM: `### Requirement: B`",
+      "- TO: `### Requirement: C`",
+    ].join("\n");
+    const anchors = deltaAnchors(delta, new Set(["Requirement: A"]));
+    expect(anchors).not.toContain("requirement-b");
+    expect(anchors).toContain("requirement-c");
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-renames-new-name-the-same-delta-moves-on-or-removes} */
+  it("a rename's new name that the same delta removes is not citable, and its old name is gone", () => {
+    const main = new Map([["cap", parseRequirements(["### Requirement: A"])]]);
+    const delta = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: A`",
+      "- TO: `### Requirement: B`",
+      "## REMOVED Requirements",
+      "### Requirement: B",
+    ].join("\n");
+    const names = new Set(["Requirement: A"]);
+    expect(deltaAnchors(delta, names)).not.toContain("requirement-b");
+    const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
+    expect(unprovenRequirements(main, [], open)).not.toContain("cap: Requirement: A");
   });
 });
