@@ -147,7 +147,7 @@ touches it, not as a precondition for the migration.
 
 The citation checks the constitution requires — every anchored citation resolves, and every requirement is proven by a citing test or marked unenforced — SHALL run in the unit test suite, and therefore in the pre-commit gate, and SHALL also run in CI (`ci.yml`) on every push, so a commit made outside the agent's hook is gated too. They SHALL scan the source and test files under `apps/`, `packages/`, `scripts/`, `e2e/` and `evals/`, and SHALL count end-to-end specs as tests, since several requirements are proven only in the browser. A failure SHALL name every offending citation by file and line and every unproven requirement by capability and name, not only the first.
 
-A citation SHALL also resolve against a requirement or scenario that an unarchived change adds, modifies or renames under `openspec/changes/<change>/specs/<capability>/spec.md` — a modified one only when its requirement exists in the permanent spec or is renamed to in the same delta, since archive refuses any other — so a test written before its change is archived can already cite the permanent spec path. Only archived requirements SHALL be subject to the proven-by-a-test check, and an unarchived change's delta SHALL apply to that check as it applies to citations: a requirement the change removes, or renames to another name, SHALL no longer need a citing test, a requirement the change modifies SHALL count as proven when a test cites a scenario the delta adds to it, and a requirement the change modifies and marks unenforced SHALL no longer need a citing test. A renamed requirement's new name SHALL be read whole, whatever characters it holds. A rename's old and new names SHALL be read in every spelling OpenSpec's archive accepts — with or without a list bullet, backticks around the heading, or extra spaces — and a line that is not a rename line SHALL NOT be read as one. A requirement SHALL count as marked unenforced only when a line of its own body starts with the flag; a sentence that merely names the flag SHALL NOT mark it. A delta SHALL be read as OpenSpec's archive reads it. A rename's old name SHALL count as renamed only when a new-name line follows it in the same renamed section, and a new name with no old name before it SHALL NOT become citable. A section heading SHALL be matched trimmed and in any letter case, its whole title compared, and a requirement heading in any letter case. A line inside a code fence SHALL NOT be read as a heading or a rename line. A removed requirement's name SHALL be read in every spelling OpenSpec's archive accepts — as a requirement heading, or as one behind a list bullet, with or without backticks. A scenario heading SHALL be read with a space or tab after `####` and with `Scenario:` in any letter case, and its anchor SHALL be the slug of its text as GitHub renders it, any spaces inside kept and a closing `#` sequence dropped. A requirement heading's anchor SHALL likewise be the slug of its text as GitHub renders it, while its name stays as archive reads it; a requirement heading with no space or tab after `###` SHALL have no anchor, since GitHub renders no heading there, so no citation reaches it. Where a delta meets the permanent spec — a requirement it modifies, removes or renames — names SHALL be compared trimmed, whole and in their letter case, as archive compares them, never by anchor. Renames SHALL be taken in order, as archive applies them, each against the permanent spec's names with the earlier renames of the same delta applied; a rename whose old name does not exist at that point, or whose new name already does, SHALL make nothing citable that the permanent spec does not, and SHALL leave its old name needing a citing test. A delta whose sections conflict in a way archive's pre-validate refuses SHALL make nothing the conflict names citable or exempt: a requirement it both modifies and removes, or both modifies and renames away from, together with that rename's new name; a name it both adds and modifies; an added name that is also a rename's new name; a rename whose old name a removed name matches with letter case and spacing folded; every rename that repeats an old or new name; and a name repeated within its added, modified or removed section.
+A citation SHALL also resolve against a requirement or scenario that an unarchived change adds, modifies or renames under `openspec/changes/<change>/specs/<capability>/spec.md` — a modified one only when its requirement exists in the permanent spec or is renamed to in the same delta, since archive refuses any other — so a test written before its change is archived can already cite the permanent spec path. Only archived requirements SHALL be subject to the proven-by-a-test check, and an unarchived change's delta SHALL apply to that check as it applies to citations: a requirement the change removes, or renames to another name, SHALL no longer need a citing test, a requirement the change modifies SHALL count as proven when a test cites a scenario the delta adds to it, and a requirement the change modifies and marks unenforced SHALL no longer need a citing test. A renamed requirement's new name SHALL be read whole, whatever characters it holds. A rename's old and new names SHALL be read in every spelling OpenSpec's archive accepts — with or without a list bullet, backticks around the heading, or extra spaces — and a line that is not a rename line SHALL NOT be read as one. A requirement SHALL count as marked unenforced only when a line of its own body starts with the flag; a sentence that merely names the flag SHALL NOT mark it. A delta SHALL be read as OpenSpec's archive reads it. A rename's old name SHALL count as renamed only when a new-name line follows it in the same renamed section, and a new name with no old name before it SHALL NOT become citable. A section heading SHALL be matched trimmed and in any letter case, its whole title compared, and a requirement heading in any letter case. A line inside a code fence SHALL NOT be read as a heading or a rename line. A removed requirement's name SHALL be read in every spelling OpenSpec's archive accepts — as a requirement heading, or as one behind a list bullet, with or without backticks. A scenario heading SHALL be read with a space or tab after `####` and with `Scenario:` in any letter case, and its anchor SHALL be the slug of its text as GitHub renders it, any spaces inside kept and a closing `#` sequence dropped. A requirement heading's anchor SHALL likewise be the slug of its text as GitHub renders it, while its name stays as archive reads it; a requirement heading with no space or tab after `###` SHALL have no anchor, since GitHub renders no heading there, so no citation reaches it. Where a delta meets the permanent spec — a requirement it modifies, removes or renames — names SHALL be compared trimmed, whole and in their letter case, as archive compares them, never by anchor. Renames SHALL be taken in order, as archive applies them, each against the permanent spec's names with the earlier renames of the same delta applied; a rename whose old name does not exist at that point, or whose new name already does, SHALL make nothing citable that the permanent spec does not, and SHALL leave its old name needing a citing test. A rename's new name SHALL be citable only when the delta still holds it after all its renames and its removals, since archive applies renames before removals; a new name that a later rename of the same delta moves on, or that the delta removes, SHALL NOT become citable. A delta whose sections conflict in a way archive's pre-validate refuses SHALL make nothing the conflict names citable or exempt: a requirement it both modifies and removes, or both modifies and renames away from, together with that rename's new name; a name it both adds and modifies; an added name that is also a rename's new name; a rename whose old name a removed name matches with letter case and spacing folded; every rename that repeats an old or new name; a name it both adds and removes; and a name repeated within its added, modified or removed section. An added requirement whose name the permanent spec still holds, after the delta's renames are applied, SHALL make nothing citable that the permanent spec does not, since archive refuses it unless its block is identical to the permanent one. A requirement an unarchived change modifies, where archive accepts the modification, SHALL resolve and be proven through the delta's own requirement and scenario headings in place of the permanent ones, since archive writes the delta's block over the permanent block: the permanent requirement's anchor and its scenarios' anchors SHALL NOT resolve unless the delta's headings give the same anchors, the requirement SHALL count as proven only when a delta heading for it has an anchor, and it SHALL count as marked unenforced only when the delta's block is. A requirement a change renames and then modifies SHALL be citable by the anchor of the delta's modified heading, not by the plain slug of its new name. When several unarchived changes modify one requirement, the headings of every one of them SHALL count.
 
 #### Scenario: A commit with a stale citation
 
@@ -273,6 +273,56 @@ A citation SHALL also resolve against a requirement or scenario that an unarchiv
 
 - **WHEN** an unarchived change adds and modifies the same name, adds a rename's new name, renames a requirement it also removes, or repeats a name within one section, and tests cite the names involved while no test cites the permanent requirements they touch
 - **THEN** none of those citations resolves and the proof check reports each of those permanent requirements as unproven
+
+#### Scenario: A name added and removed in one delta
+
+- **WHEN** an unarchived change adds and removes the same name, tests cite the added block's anchors, and no test cites the permanent requirement of that name
+- **THEN** none of those citations resolves and the proof check reports that permanent requirement as unproven
+
+#### Scenario: A rename's new name the same delta moves on or removes
+
+- **WHEN** an unarchived change renames a requirement and then renames its new name again, or renames a requirement and removes its new name, and a test cites that intermediate or removed new name
+- **THEN** the citation does not resolve and the commit is blocked
+
+#### Scenario: An added name the permanent spec already holds
+
+- **WHEN** an unarchived change adds a requirement under a name the permanent spec holds, with a block that differs from the permanent one, and a test cites a scenario only that added block has
+- **THEN** the citation does not resolve and the commit is blocked
+
+#### Scenario: An added name a rename of the same delta frees
+
+- **WHEN** an unarchived change renames a permanent requirement away and adds a new requirement under its old name, and a test cites a scenario of the added requirement
+- **THEN** the citation resolves and the commit is allowed
+
+#### Scenario: A modified requirement whose heading archive rewrites
+
+- **WHEN** an unarchived change modifies a requirement under a heading archive matches to the permanent one but GitHub anchors differently, and a test cites the permanent requirement's anchor
+- **THEN** the citation does not resolve and the commit is blocked
+
+#### Scenario: A requirement heading with no space that a change fixes
+
+- **WHEN** the permanent spec writes a requirement heading with no space after `###`, an unarchived change modifies it under a heading with the space and adds a scenario, and a test cites that scenario
+- **THEN** the proof check counts the requirement as proven and the commit is allowed
+
+#### Scenario: A scenario heading archive keeps under another anchor
+
+- **WHEN** an unarchived change modifies a requirement and rewrites one of its scenario headings in a spelling archive reads as the same scenario but GitHub anchors differently, such as without `Scenario:` or with other spacing after it, and a test cites the permanent scenario's anchor
+- **THEN** the citation does not resolve and the commit is blocked
+
+#### Scenario: A modified requirement that drops its unenforced flag
+
+- **WHEN** the permanent spec marks a requirement unenforced, an unarchived change modifies it without the flag, and no test cites it
+- **THEN** the proof check reports it as unproven
+
+#### Scenario: A renamed requirement modified under another spelling
+
+- **WHEN** an unarchived change renames a requirement and modifies the new name under a heading GitHub anchors differently from the plain new name, and a test cites the plain new name's anchor
+- **THEN** the citation does not resolve and the commit is blocked
+
+#### Scenario: Two changes modifying one requirement
+
+- **WHEN** two unarchived changes modify the same requirement under differently anchored headings, and a test cites either heading
+- **THEN** the citation resolves and the commit is allowed
 
 ### Requirement: Mapping rows never overlap
 
