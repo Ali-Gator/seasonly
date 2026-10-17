@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-94**
+_Next id:_ **BL-95**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -150,6 +150,13 @@ fold items in.
   (fails open until archive). Add to `gone` only an accepted FROM the walk no longer holds
   (`backlog-12` apply; approved-only gate test file).
   _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`deltaProof`) · _Status:_ open — `backlog-12` apply, 2026-10-17
+
+- **[BL-94] `resolvableAnchors` repeats `openChanges`' per-capability `deltaProof` loop** — the
+  citation side and the proof side each build the open changes' `OpenDelta` map, so a fix to one
+  (BL-93) must be mirrored by hand or they drift. Give `openChanges` a trailing optional `deltas`
+  and call it from `resolvableAnchors`; `backlog-12` Non-Goals froze that signature
+  (`backlog-12` review).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — `backlog-12` review, 2026-10-17
 
 - **[BL-85] `slugify` drops combining marks that GitHub keeps** — github-slugger keeps `\p{M}`,
   the gate's `slugify` drops it, so a heading with a combining accent anchors differently. No
