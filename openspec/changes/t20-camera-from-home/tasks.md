@@ -67,7 +67,7 @@
 
 ## 4. Gate and checks
 
-- [ ] 4.1 `pnpm fix`, then `pnpm test`, then `pnpm test:eval`. The analysis is untouched, so `results.json` should not be stale. If it is, run `pnpm eval:run` and commit `evals/results.json` (CLAUDE.md). Verify: all three pass.
+- [x] 4.1 `pnpm fix`, then `pnpm test`, then `pnpm test:eval`. The analysis is untouched, so `results.json` should not be stale. If it is, run `pnpm eval:run` and commit `evals/results.json` (CLAUDE.md). Verify: all three pass.
 - [x] 4.2 `pnpm e2e` locally, at least `analysis-flow.spec.ts`, `funnel.spec.ts` and `design-review.spec.ts`. Verify: green.
 - [ ] 4.3 Manual check in the browser pane on `pnpm dev`:
   - the landing's Take a selfie paints the capture step with no guide frame (screenshot);
@@ -76,6 +76,9 @@
   - the email step at desktop width has the cursor in the field.
 
   Then ask the user to try Take a selfie from the landing on their iPhone on the preview deployment: the camera prompt appears directly, and the notice is below. Verify: results recorded here.
+  - 4.1 done 2026-10-17: `pnpm fix`, `pnpm test` (948 unit, 74 E2E) and `pnpm test:eval` green; `results.json` was not stale.
+  - Browser pane, 2026-10-17, on `pnpm dev`. At 375 wide, the landing's Take a selfie painted the capture step with no guide frame (a MutationObserver flag stayed false). The URL read `/analyze` and nothing had focus. Back showed the landing, and a reload showed the guide. At desktop width (`(hover: hover) and (pointer: fine)` matched), the email step put focus in the email field; `/api/analyze` was stubbed in the page, so nothing was spent.
+  - iPhone check on the preview deployment: asked of the user with the PR; pending.
 
 ## 5. After archive
 
