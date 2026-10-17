@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-95**
+_Next id:_ **BL-97**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -127,6 +127,15 @@ fold items in.
   _Status:_ deferred — until Sentry shows `crop upload timed out` events, or storage-js adds a
   signal to `upload()`
 
+- **[BL-95] The camera start leaves Next's router on `?start=camera`** — `flow.tsx` strips
+  `start` with the entry's own state, so Next's router keeps the old address; a later
+  `router.refresh` or server action on `/analyze` would write it back, and a reload would reopen
+  the camera. Re-sync once Next has patched history (a deferred `replaceState` without `__NA`).
+  Also keep any other query or hash instead of the hard-coded `/analyze`.
+  _Refs:_ `t20-camera-from-home` design decision 1, `apps/web/src/app/(flow)/analyze/flow.tsx` ·
+  _Status:_ deferred — first router refresh or server action on `/analyze`, or a second query
+  parameter (BL-32)
+
 ## Testing
 
 - **[BL-91] A removal that folds onto a rename's new name aborts archive** — archive applies
@@ -171,6 +180,12 @@ fold items in.
   check lets through.
   _Refs:_ `apps/web/src/app/api/analyze/route.ts` (`checkBotId`), Launch plan step 3 · _Status:_
   deferred — until the TikTok account has 1,000 followers and its bio link
+
+- **[BL-96] The camera pageview test cannot see a second strip** — PostHog counts only pathname
+  changes, so `funnel.spec.ts`'s "sends one /analyze page view when the landing opens the camera"
+  passes with any same-path strip or none. Also assert the `/analyze` pageview's `$current_url`
+  carries `?start=camera`. _Refs:_ `e2e/funnel.spec.ts`, analytics "Starting on the camera" ·
+  _Status:_ open
 
 ## Design / UX
 

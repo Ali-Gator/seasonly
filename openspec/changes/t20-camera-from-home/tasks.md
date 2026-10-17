@@ -86,7 +86,7 @@
   - the focus bullet gains the email-field exception and the camera opening screen;
   - a new bullet describes `?start=camera` (mount-time layout effect, `replaceState`, replace not push);
   - the guide bullet notes `UploadNotice` is shared with the capture step;
-  - Edge Cases gains "A hard load of `/analyze?start=camera` shows the guide for one frame".
+  - Edge Cases gains "A hard load of `/analyze?start=camera` shows the guide until the flow hydrates" and "Forward onto the camera entry after Back to the landing opens the guide: the entry no longer carries `start`".
 
   Public Interface gains `{ type: "start-camera" }`. Verify: `openspec validate --specs` passes.
 

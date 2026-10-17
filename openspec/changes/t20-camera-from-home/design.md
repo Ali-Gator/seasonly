@@ -19,7 +19,7 @@ See proposal.md (Why). The current state that shapes the approach:
 
 **Non-Goals:**
 
-- A flash-free camera start on a hard load of `/analyze?start=camera`. Nobody links there except the landing's own soft navigation. A pasted URL shows the guide for one frame, then the camera.
+- A flash-free camera start on a hard load of `/analyze?start=camera`: a pasted URL, the link opened in a new tab, or a tap before the landing hydrates. The server-rendered guide shows until `/analyze` hydrates, up to a few seconds on a slow phone, then the camera. The guide's actions are disabled until hydration, so no tap or picked file is lost.
 - Remembering the start across a reload. The parameter is stripped on purpose (capture-flow: a reload starts at the guide).
 
 ## Decisions
@@ -41,7 +41,7 @@ The reducer's new event sets `step` to `{ name: "capture" }` and leaves `trail` 
 
 ### 3. The opening-screen focus rule follows the replaced step
 
-The `focused` ref starts as the initial guide step. `start-camera` changes the step, so the focus effect would focus the capture heading and scroll, which breaks "the screen the flow opens on does not take focus". The mount-time effect therefore sets `focused.current` to the step it dispatches. In practice `reduce` is called once by hand to get the new step, which is then both dispatched and stored. The existing comparison then skips it like the opening guide. StrictMode's double mount runs the layout effect twice. The second run finds no parameter, because the first stripped it, so it does nothing.
+The `focused` ref starts as the initial guide step. `start-camera` changes the step, so the focus effect would focus the capture heading and scroll, which breaks "the screen the flow opens on does not take focus". `start-camera` therefore puts one module constant, `CAMERA_START`, in place of the guide, and the mount-time effect records it in a one-shot `opening` ref; the focus effect skips that step once, then clears the ref, so Back onto the capture step later still focuses its heading. Setting `focused.current` instead fails: React re-runs the reducer, so a hand-computed step is never the stored object, and the mount's own focus effect, which runs after the layout effect, then sees the guide and moves the ref on. StrictMode's double mount runs the layout effect twice. The second run finds no parameter, because the first stripped it, so it does nothing.
 
 ### 4. One `UploadNotice` for the guide and the capture step
 
@@ -68,9 +68,9 @@ The optional call `matchMedia?.` keeps jsdom, which has no `matchMedia`, on the 
 ## Risks / Trade-offs
 
 - [Photos get worse without the guide's examples] → The capture caption now names window light, no makeup and no filter. The landing above the tapped button already showed the tip card. `photo_checked` carries the attempt number and the failure reason, so if retakes rise after launch, BL-style follow-up can bring a compact tip strip to the camera. No new event: the landing pageview's `$current_url` already carries `?start=camera`.
-- [Next changes when it writes the URL (insertion effect)] → The E2E test taps the landing button and asserts that the guide heading is never visible: a `waitFor` on the capture heading, with the guide asserted absent first. A regression then fails CI rather than flashing the guide.
+- [Next changes when it writes the URL (insertion effect)] → The E2E test taps the landing button and asserts that the guide heading is never visible: a `MutationObserver` added before the landing loads sets a flag if the guide's heading ever enters the DOM, and the flag must stay false. A regression then fails CI rather than flashing the guide.
 - [`replaceState` behind Next's router] → Next 16 syncs native `pushState`/`replaceState` into its router, and the flow already relies on raw `pushState`. Passing `history.state` through keeps Next's own keys in the entry.
-- [The hard load of `?start=camera` flashes the guide for one frame] → Accepted (Non-Goals). Nothing links there except the soft navigation.
+- [A hard load of `?start=camera` shows the guide until hydration] → Accepted (Non-Goals). The landing's own soft navigation, the common path, never shows it.
 - [A screen-reader user on a desktop lands in the field, not on the heading] → The field's label "Where should we send your report?" and its hint are read on focus, and the heading stays one Shift+Tab or heading-jump away. This trade is limited to fine-pointer devices on purpose.
 
 ## Migration Plan

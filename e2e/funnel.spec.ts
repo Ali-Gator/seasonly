@@ -242,12 +242,6 @@ test("sends one analysis_failed when the analysis times out", async ({ page }) =
   expect(posthog.find("analysis_failed")).toHaveLength(1);
 });
 
-/**
- * A visitor whose first page is a report, as from the email link: the id stays out of every
- * request, and no flags request carries the first page's URL.
- *
- * {@link openspec/specs/analytics/spec.md#requirement-no-report-id-reaches-posthog}
- */
 /** {@link openspec/specs/analytics/spec.md#scenario-starting-on-the-camera} */
 test("sends one /analyze page view when the landing opens the camera", async ({ page }) => {
   const posthog = await recordPostHog(page);
@@ -263,6 +257,12 @@ test("sends one /analyze page view when the landing opens the camera", async ({ 
   expect(posthog.errors).toEqual([]);
 });
 
+/**
+ * A visitor whose first page is a report, as from the email link: the id stays out of every
+ * request, and no flags request carries the first page's URL.
+ *
+ * {@link openspec/specs/analytics/spec.md#requirement-no-report-id-reaches-posthog}
+ */
 test("keeps the id out when a report is the first page", async ({ page }) => {
   const posthog = await recordPostHog(page);
   await page.goto(`/r/${ID}`);

@@ -2,7 +2,7 @@
 
 ### Requirement: The landing's camera link opens the flow on the camera
 
-`/analyze?start=camera` SHALL open the flow on the capture step instead of the photo guide. The capture step SHALL then be the flow's first entry, so the browser's Back from it leaves the flow for the page before it. Once the flow has opened, the address SHALL read `/analyze` without the parameter, so a reload starts at the photo guide as on any other visit. Any other value of `start`, or none, SHALL open the photo guide.
+`/analyze?start=camera` SHALL open the flow on the capture step instead of the photo guide. The capture step SHALL then be the flow's first entry, so the browser's Back from it leaves the flow for the page before it. Once the flow has opened, the address SHALL read `/analyze` without the parameter, so a reload starts at the photo guide as on any other visit. Any other value of `start`, or none, SHALL open the photo guide. This opening is the one step change that adds no history entry, and removing `start` the one change to the address inside the flow; both exceptions hold over "The flow stays on one URL" here and over site-structure's "without changing the URL".
 
 #### Scenario: Opening on the camera
 

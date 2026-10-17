@@ -102,7 +102,7 @@ export function Flow() {
   // address drops `start`, so a reload opens the guide. StrictMode's second run finds no `start`.
   // The state is kept: on a fresh load this runs before Next patches history, and an entry without
   // Next's keys reloads the page on Back. Next's router keeps its own copy of the old address,
-  // which nothing here reads.
+  // which nothing here reads; a router refresh on /analyze would write it back (BL-95).
   // {@link openspec/specs/capture-flow/spec.md#requirement-the-landings-camera-link-opens-the-flow-on-the-camera}
   useLayoutEffect(() => {
     if (new URLSearchParams(location.search).get("start") !== "camera") return;
