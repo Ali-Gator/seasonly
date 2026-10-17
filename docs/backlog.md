@@ -157,13 +157,13 @@ fold items in.
   _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ deferred — until a spec heading
   holds a combining mark (`backlog-11` triage, 2026-10-17)
 
-- **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
-  403 now shows the blocked screen, but nobody has opened seasonly.me inside either app and run a
-  photo. Run it once on a phone after `t18-design-review` ships (one paid vision call), and if the
-  check refuses them, decide what the bot check lets through.
-  _Refs:_ `apps/web/src/app/api/analyze/route.ts` (`checkBotId`), `t18-design-review` tasks.md
-  8.3 · _Status:_ gated — Oleg's phone run inside TikTok and Instagram, one photo each (two paid vision
-  calls, his yes first); t18 is live on seasonly.me since 2026-10-13 (`backlog-9` triage, 2026-10-16)
+- **[BL-54] TikTok's in-app browser is untested against the bot check** — Instagram's passed on
+  2026-10-17 (camera, analysis and report email on an iPhone, no 403). TikTok shows no tappable bio
+  link below 1,000 followers, so nobody reaches its browser yet. Once the link exists, open
+  seasonly.me from it on a phone and run one photo; if the check refuses it, decide what the bot
+  check lets through.
+  _Refs:_ `apps/web/src/app/api/analyze/route.ts` (`checkBotId`), Launch plan step 3 · _Status:_
+  deferred — until the TikTok account has 1,000 followers and its bio link
 
 ## Design / UX
 
