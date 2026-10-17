@@ -43,7 +43,8 @@ const CITATION = /(?:\{@link |@see )openspec\/specs\/([a-z0-9-]+)\/spec\.md(?:#(
 
 interface Requirement {
   name: string;
-  anchor: string;
+  /** Absent when GitHub renders no heading: no space or tab after `###`. */
+  anchor?: string;
   scenarios: string[];
   unenforced: boolean;
 }
@@ -94,6 +95,10 @@ function splitLines(text: string): string[] {
 /** A requirement's name as archive's `normalizeRequirementName` builds it: the captured title, trimmed. */
 const requirementName = (title: string) => `Requirement: ${title.trim()}`;
 
+/** A heading's text as GitHub renders it: spaces and tabs trimmed, a closing `#` run after a space or tab dropped. */
+const headingText = (text: string) =>
+  text.replace(/^[ \t]+|[ \t]+$/g, "").replace(/[ \t]+#+[ \t]*$/, "");
+
 /** `mask` is the lines' slice of the whole delta's fence mask, when they are one section's body. */
 function parseRequirements(lines: string[], mask: boolean[] = fenceMask(lines)): Requirement[] {
   const requirements: Requirement[] = [];
@@ -102,22 +107,27 @@ function parseRequirements(lines: string[], mask: boolean[] = fenceMask(lines)):
     if (mask[i]) continue;
     // Archive's `REQUIREMENT_HEADER_REGEX`: the keyword in any letter case.
     const req = /^###\s*Requirement:\s*(.+)\s*$/i.exec(line);
-    // Any spacing after `####`, `Scenario:` in any letter case; the anchor is its text as written.
-    const scenario = /^####\s+(scenario:.*\S.*)$/i.exec(line);
+    // A space or tab after `####`, `Scenario:` in any letter case; the anchor is its text as GitHub renders it.
+    const scenario = /^####[ \t]+(scenario:.*\S.*)$/i.exec(line);
     if (req?.[1]) {
-      const name = requirementName(req[1]);
-      current = { name, anchor: slugify(name), scenarios: [], unenforced: false };
+      // The name is archive's; the anchor is GitHub's, which needs a space or tab after `###`.
+      const heading = /^###[ \t](.*)$/.exec(line)?.[1];
+      current = { name: requirementName(req[1]), scenarios: [], unenforced: false };
+      if (heading !== undefined) current.anchor = slugify(headingText(heading));
       requirements.push(current);
     } else if (/^#{1,3} /.test(line)) {
       current = undefined;
     } else if (current && scenario?.[1]) {
-      current.scenarios.push(slugify(scenario[1]));
+      current.scenarios.push(slugify(headingText(scenario[1])));
     } else if (current && line.startsWith("**Unenforced:**")) {
       current.unenforced = true;
     }
   }
   return requirements;
 }
+
+/** A requirement's citable anchors: its own, when it has one, and its scenarios'. */
+const anchorsOf = (r: Requirement) => (r.anchor ? [r.anchor, ...r.scenarios] : r.scenarios);
 
 const renameLine = (keyword: "FROM" | "TO") =>
   new RegExp(
@@ -179,23 +189,86 @@ function deltaSections(
   return sections;
 }
 
+/** Archive's `parseRemovedNames`: a REMOVED body's requirement headings, then those behind a list bullet. */
+function removedNames(body: string[], mask: boolean[]): string[] {
+  const names = parseRequirements(body, mask).map((r) => r.name);
+  for (const [i, line] of body.entries()) {
+    const m = mask[i] ? null : REMOVED_BULLET.exec(line);
+    if (m?.[1]) names.push(requirementName(m[1]));
+  }
+  return names;
+}
+
+/**
+ * Names archive's pre-validate refuses within one delta (`specs-apply.js`): a name repeated
+ * within ADDED, MODIFIED or REMOVED, or as a rename's FROM or TO; a MODIFIED name also added,
+ * removed or renamed from; an ADDED name equal to a rename's TO, compared exactly; and a rename
+ * FROM with every REMOVED name that matches it folded (`foldRequirementName`). A conflicting
+ * name's blocks, REMOVED entries and rename pairs all count for nothing.
+ */
+function conflicts(sections: ReturnType<typeof deltaSections>): Set<string> {
+  const of = (kind: (typeof SECTION_KINDS)[number]) => sections.filter((s) => s.kind === kind);
+  const names = (kind: "added" | "modified") =>
+    of(kind).flatMap((s) => parseRequirements(s.body, s.mask).map((r) => r.name));
+  const [added, modified] = [names("added"), names("modified")];
+  const removed = of("removed").flatMap((s) => removedNames(s.body, s.mask));
+  const pairs = of("renamed").flatMap((s) => renamedPairs(s.body, s.mask));
+  const [froms, tos] = [pairs.map((p) => p.from), pairs.map((p) => p.to)];
+  const fold = (name: string) => name.toLowerCase().replace(/\s+/g, " ");
+  const repeated = (list: string[]) => list.filter((n, i) => list.indexOf(n) !== i);
+  return new Set([
+    ...[added, modified, removed, froms, tos].flatMap(repeated),
+    ...modified.filter((n) => added.includes(n) || removed.includes(n) || froms.includes(n)),
+    ...added.filter((n) => tos.includes(n)),
+    ...froms.flatMap((from) => {
+      const match = removed.filter((r) => fold(r) === fold(from));
+      return match.length > 0 ? [from, ...match] : [];
+    }),
+  ]);
+}
+
+/**
+ * The rename pairs archive applies, walked in document order against a running copy of the
+ * main spec's names (`specs-apply.js` RENAMED): a pair naming a `dropped` name never enters the
+ * walk; a pair is refused when its new name is already held, or, with `checkFrom`, when its old
+ * name is not; an accepted pair renames in the copy, so a chain succeeds.
+ */
+function appliedRenames(
+  sections: ReturnType<typeof deltaSections>,
+  existing: ReadonlySet<string>,
+  checkFrom: boolean,
+  dropped: ReadonlySet<string>,
+): { from: string; to: string }[] {
+  const names = new Set(existing);
+  return sections
+    .filter((s) => s.kind === "renamed")
+    .flatMap((s) => renamedPairs(s.body, s.mask))
+    .filter(({ from, to }) => {
+      if (dropped.has(from) || dropped.has(to) || names.has(to) || (checkFrom && !names.has(from)))
+        return false;
+      names.delete(from);
+      names.add(to);
+      return true;
+    });
+}
+
 /**
  * Anchors a change delta makes citable before archive: its ADDED requirements and scenarios,
- * RENAMED targets, and MODIFIED requirements and scenarios — a MODIFIED one only when its
- * requirement's name already exists in the main spec (`existing`, main-spec names) or is
- * renamed to in the same delta, since archive refuses any other.
+ * RENAMED targets archive would apply, and MODIFIED requirements and scenarios — a MODIFIED one
+ * only when its requirement's name already exists in the main spec (`existing`, main-spec names)
+ * or is renamed to in the same delta, since archive refuses any other.
  */
 function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): string[] {
   const sections = deltaSections(text);
-  const renamed = sections
-    .filter((s) => s.kind === "renamed")
-    .flatMap((s) => renamedPairs(s.body, s.mask).map((p) => p.to));
+  const dropped = conflicts(sections);
+  const renamed = appliedRenames(sections, existing, true, dropped).map((p) => p.to);
   const anchors = renamed.map(slugify);
   for (const { kind, body, mask } of sections) {
     if (kind !== "added" && kind !== "modified") continue;
     for (const r of parseRequirements(body, mask)) {
+      if (dropped.has(r.name)) continue;
       if (kind === "added" || existing.has(r.name) || renamed.includes(r.name)) {
-        anchors.push(r.anchor, ...r.scenarios);
+        anchors.push(...anchorsOf(r));
       }
     }
   }
@@ -210,23 +283,31 @@ interface OpenDelta {
   scenarios: Map<string, string[]>;
 }
 
-/** Reads a change delta into `into`, so several changes to one capability accumulate. */
+/**
+ * Reads a change delta into `into`, so several changes to one capability accumulate. A rename
+ * onto a name `existing` (main-spec names) or an earlier rename holds is refused, so its old
+ * name still needs a citing test.
+ */
 function deltaProof(
   text: string,
   into: OpenDelta = { gone: new Set(), scenarios: new Map() },
+  existing: ReadonlySet<string> = new Set(),
 ): OpenDelta {
-  for (const { kind, body, mask } of deltaSections(text)) {
+  const sections = deltaSections(text);
+  const dropped = conflicts(sections);
+  const renamedFrom = new Set(
+    appliedRenames(sections, existing, false, dropped).map((p) => p.from),
+  );
+  for (const { kind, body, mask } of sections) {
     if (kind === "removed") {
-      for (const r of parseRequirements(body, mask)) into.gone.add(r.name);
-      // Archive's `parseRemovedNames` also reads a requirement heading behind a list bullet.
-      for (const [i, line] of body.entries()) {
-        const m = mask[i] ? null : REMOVED_BULLET.exec(line);
-        if (m?.[1]) into.gone.add(requirementName(m[1]));
-      }
+      for (const name of removedNames(body, mask)) if (!dropped.has(name)) into.gone.add(name);
     } else if (kind === "renamed") {
-      for (const { from } of renamedPairs(body, mask)) into.gone.add(from);
+      for (const { from } of renamedPairs(body, mask)) {
+        if (renamedFrom.has(from)) into.gone.add(from);
+      }
     } else if (kind === "modified") {
       for (const r of parseRequirements(body, mask)) {
+        if (dropped.has(r.name)) continue;
         if (r.unenforced) into.gone.add(r.name);
         into.scenarios.set(r.name, [...(into.scenarios.get(r.name) ?? []), ...r.scenarios]);
       }
@@ -271,8 +352,9 @@ function unprovenRequirements(
     const delta = openChanges.get(capability);
     for (const r of requirements) {
       if (delta?.gone.has(r.name)) continue;
-      const anchors = [r.anchor, ...r.scenarios, ...(delta?.scenarios.get(r.name) ?? [])];
-      const proven = anchors.some((a) => cited.has(`${capability}#${a}`));
+      const anchors = [...anchorsOf(r), ...(delta?.scenarios.get(r.name) ?? [])];
+      // A requirement GitHub renders no heading for is never proven: its heading needs fixing.
+      const proven = r.anchor !== undefined && anchors.some((a) => cited.has(`${capability}#${a}`));
       if (!proven && !r.unenforced) out.push(`${capability}: ${r.name}`);
     }
   }
@@ -282,7 +364,7 @@ function unprovenRequirements(
 function duplicateHeadings(specs: Map<string, Requirement[]>): string[] {
   const out: string[] = [];
   for (const [capability, requirements] of specs) {
-    const anchors = requirements.flatMap((r) => [r.anchor, ...r.scenarios]);
+    const anchors = requirements.flatMap(anchorsOf);
     for (const a of new Set(anchors.filter((a, i) => anchors.indexOf(a) !== i))) {
       out.push(`${capability}#${a}`);
     }
@@ -340,7 +422,7 @@ function openDeltas(): [cap: string, text: string][] {
 function resolvableAnchors(specs: Map<string, Requirement[]>): Map<string, Set<string>> {
   const known = new Map<string, Set<string>>();
   for (const [cap, requirements] of specs) {
-    known.set(cap, new Set(requirements.flatMap((r) => [r.anchor, ...r.scenarios])));
+    known.set(cap, new Set(requirements.flatMap(anchorsOf)));
   }
   for (const [cap, text] of openDeltas()) {
     const main = new Set(specs.get(cap)?.map((r) => r.name) ?? []);
@@ -351,9 +433,12 @@ function resolvableAnchors(specs: Map<string, Requirement[]>): Map<string, Set<s
   return known;
 }
 
-function openChanges(): Map<string, OpenDelta> {
+function openChanges(specs: Map<string, Requirement[]> = mainSpecs()): Map<string, OpenDelta> {
   const out = new Map<string, OpenDelta>();
-  for (const [cap, text] of openDeltas()) out.set(cap, deltaProof(text, out.get(cap)));
+  for (const [cap, text] of openDeltas()) {
+    const main = new Set(specs.get(cap)?.map((r) => r.name) ?? []);
+    out.set(cap, deltaProof(text, out.get(cap), main));
+  }
   return out;
 }
 
@@ -532,7 +617,8 @@ describe("spec citation rules", () => {
       "- FROM: `### Requirement: Before`",
       "- TO: `### Requirement: After`",
     ].join("\n");
-    expect(deltaAnchors(delta, new Set(["Requirement: Old thing"]))).toEqual([
+    const existing = new Set(["Requirement: Old thing", "Requirement: Before"]);
+    expect(deltaAnchors(delta, existing)).toEqual([
       "requirement-after",
       "requirement-new-thing",
       "scenario-it-works",
@@ -560,7 +646,9 @@ describe("spec citation rules", () => {
       "- FROM: `### Requirement: Old flag`",
       "- TO: `### Requirement: The `foo` flag`",
     ];
-    expect(deltaAnchors(delta.join("\n"))).toEqual(["requirement-the-foo-flag"]);
+    expect(deltaAnchors(delta.join("\n"), new Set(["Requirement: Old flag"]))).toEqual([
+      "requirement-the-foo-flag",
+    ]);
   });
 
   /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-written-in-another-spelling-openspec-accepts} */
@@ -577,7 +665,12 @@ describe("spec citation rules", () => {
       "Moved here, then TO: `### Requirement: Mid sentence`",
       "Taken FROM: `### Requirement: Mid from`",
     ].join("\n");
-    expect(deltaAnchors(delta)).toEqual([
+    const old = new Set([
+      "Requirement: Old thing",
+      "Requirement: Second old",
+      "Requirement: Third old",
+    ]);
+    expect(deltaAnchors(delta, old)).toEqual([
       "requirement-new-thing",
       "requirement-second-new",
       "requirement-third-new",
@@ -655,7 +748,8 @@ describe("spec citation rules", () => {
       "- FROM: `### Requirement: Untested`",
       "- T0: `### Requirement: Misspelled new`",
     ].join("\n");
-    expect(deltaAnchors(delta)).toEqual([]);
+    const untested = new Set(["Requirement: Untested"]);
+    expect(deltaAnchors(delta, untested)).toEqual([]);
     expect(unprovenRequirements(specs, [], new Map([["cap", deltaProof(delta)]]))).toEqual([
       "cap: Requirement: `plan_shared` fires on a slug-mint, never: on open",
       "cap: Requirement: Untested",
@@ -670,7 +764,7 @@ describe("spec citation rules", () => {
       "- FROM: `### Requirement: Untested`",
       "- TO: `### Requirement: Overwritten new`",
     ].join("\n");
-    expect(deltaAnchors(split)).toEqual(["requirement-overwritten-new"]);
+    expect(deltaAnchors(split, untested)).toEqual(["requirement-overwritten-new"]);
     expect([...deltaProof(split).gone]).toEqual(["Requirement: Untested"]);
   });
 
@@ -687,7 +781,8 @@ describe("spec citation rules", () => {
       "### Requirement: Draft thing",
       "#### Scenario: Draft works",
     ].join("\n");
-    expect(deltaAnchors(delta)).toEqual([
+    const before = new Set(["Requirement: Before"]);
+    expect(deltaAnchors(delta, before)).toEqual([
       "requirement-after",
       "requirement-after",
       "scenario-case-free-heading",
@@ -697,7 +792,7 @@ describe("spec citation rules", () => {
     expect([...proof.scenarios]).toEqual([["Requirement: After", ["scenario-case-free-heading"]]]);
     // Archive drops a BOM and reads CRLF line endings as LF.
     const crlf = "\uFEFF" + delta.replace(/\n/g, "\r\n");
-    expect(deltaAnchors(crlf)).toEqual(deltaAnchors(delta));
+    expect(deltaAnchors(crlf, before)).toEqual(deltaAnchors(delta, before));
     expect([...deltaProof(crlf).gone]).toEqual(["Requirement: Before"]);
   });
 
@@ -719,6 +814,53 @@ describe("spec citation rules", () => {
       "scenario-lower-case",
       "scenario--wide",
     ]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-heading-github-anchors-with-its-spaces-kept} */
+  it("a heading is anchored as GitHub renders it, inner spaces kept and a closing # run dropped", () => {
+    const body = [
+      "### Requirement:  Two spaces",
+      "### Requirement: Closed ###",
+      "#### Scenario: Closed too ####",
+    ];
+    const parsed = parseRequirements(body);
+    expect(parsed.map((r) => r.name)).toEqual([
+      "Requirement: Two spaces",
+      "Requirement: Closed ###",
+    ]);
+    const anchors = resolvableAnchors(new Map([["cap", parsed]]));
+    const text = [
+      "requirement--two-spaces",
+      "requirement-closed",
+      "scenario-closed-too",
+      "requirement-two-spaces",
+      "requirement-closed-",
+    ];
+    const citations = extractCitations("a.test.ts", text.map((a) => cite("cap", a)).join("\n"));
+    expect(staleCitations(citations, anchors)).toEqual([
+      "a.test.ts:4 cap#requirement-two-spaces",
+      "a.test.ts:5 cap#requirement-closed-",
+    ]);
+    expect(deltaAnchors(["## ADDED Requirements", ...body].join("\n"))).toEqual([
+      "requirement--two-spaces",
+      "requirement-closed",
+      "scenario-closed-too",
+    ]);
+    // CommonMark closes a heading only before spaces or tabs, so a trailing no-break space keeps the run.
+    expect(parseRequirements(["### Requirement: X #\u00a0"])[0]?.anchor).toBe("requirement-x-");
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-heading-with-no-space-after-its-marker} */
+  it("a heading with no space after its marker has no anchor, and its requirement needs a citing test", () => {
+    const glued = new Map([["cap", parseRequirements(["###Requirement: Glued"])]]);
+    const citations = extractCitations("a.test.ts", cite("cap", "requirement-glued"));
+    expect(staleCitations(citations, resolvableAnchors(glued))).toEqual([
+      "a.test.ts:1 cap#requirement-glued",
+    ]);
+    expect(unprovenRequirements(glued, citations)).toEqual(["cap: Requirement: Glued"]);
+    expect(deltaAnchors("## ADDED Requirements\n###Requirement: Glued")).toEqual([]);
+    const nbsp = parseRequirements(["### Requirement: Spaced", "####\u00a0Scenario: No-break"]);
+    expect(nbsp[0]?.scenarios).toEqual([]);
   });
 
   it("a repeated scenario name within a capability is reported", () => {
@@ -800,7 +942,7 @@ describe("spec citation rules", () => {
     const open = new Map([["cap", deltaProof(delta)]]);
     expect(unprovenRequirements(specs, [], open)).toEqual(both);
     const main = new Set(specs.get("cap")?.map((r) => r.name));
-    expect(deltaAnchors(delta, main)).toEqual(["requirement-shared"]);
+    expect(deltaAnchors(delta, main)).toEqual([]);
     const citations = extractCitations("a.test.ts", cite("cap", "scenario-case-only"));
     expect(unprovenRequirements(specs, citations, open)).toEqual(both);
   });
@@ -827,5 +969,168 @@ describe("spec citation rules", () => {
       "cap: Requirement: Third",
     ]);
     expect([...deltaProof(delta).gone]).toEqual(["Requirement: Untested", "Requirement: Second"]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-whose-old-name-matches-nothing} */
+  it("a rename from a name the main spec does not hold makes nothing citable", () => {
+    const delta = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: Never there`",
+      "- TO: `### Requirement: Fresh`",
+      "## MODIFIED Requirements",
+      "### Requirement: Fresh",
+      "#### Scenario: Ghost rename",
+    ].join("\n");
+    const main = new Set(specs.get("cap")?.map((r) => r.name));
+    expect(deltaAnchors(delta, main)).toEqual([]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-chain-of-renames-in-one-delta} */
+  it("a chain of renames in one delta is applied in order", () => {
+    const main = new Map([["cap", parseRequirements(["### Requirement: A"])]]);
+    const delta = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: A`",
+      "- TO: `### Requirement: B`",
+      "- FROM: `### Requirement: B`",
+      "- TO: `### Requirement: C`",
+    ].join("\n");
+    const names = new Set(["Requirement: A"]);
+    expect(deltaAnchors(delta, names)).toContain("requirement-c");
+    const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
+    expect(unprovenRequirements(main, [], open)).toEqual([]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-onto-a-name-the-permanent-spec-already-holds} */
+  it("a rename onto a name the main spec already holds leaves its old name needing a citing test", () => {
+    const main = new Map([
+      ["cap", parseRequirements(["### Requirement: Untested", "### Requirement: Taken"])],
+    ]);
+    const delta = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: Untested`",
+      "- TO: `### Requirement: Taken`",
+    ].join("\n");
+    const names = new Set(["Requirement: Untested", "Requirement: Taken"]);
+    const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
+    expect(unprovenRequirements(main, [], open)).toEqual([
+      "cap: Requirement: Untested",
+      "cap: Requirement: Taken",
+    ]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-modified-and-also-removed-or-renamed-away} */
+  it("a requirement modified and also removed or renamed away in one delta makes nothing citable", () => {
+    const main = new Map([
+      ["cap", parseRequirements(["### Requirement: Removed one", "### Requirement: Renamed one"])],
+    ]);
+    const delta = [
+      "## REMOVED Requirements",
+      "### Requirement: Removed one",
+      "## MODIFIED Requirements",
+      "### Requirement: Removed one",
+      "#### Scenario: Modified then removed",
+      "### Requirement: Renamed one",
+      "#### Scenario: Modified then renamed",
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: Renamed one`",
+      "- TO: `### Requirement: Fresh`",
+    ].join("\n");
+    const names = new Set(["Requirement: Removed one", "Requirement: Renamed one"]);
+    expect(deltaAnchors(delta, names)).toEqual([]);
+    const text = [
+      "scenario-modified-then-removed",
+      "scenario-modified-then-renamed",
+      "requirement-fresh",
+    ];
+    const citations = extractCitations("a.test.ts", text.map((a) => cite("cap", a)).join("\n"));
+    const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
+    expect(unprovenRequirements(main, citations, open)).toEqual([
+      "cap: Requirement: Removed one",
+      "cap: Requirement: Renamed one",
+    ]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-delta-names-archives-pre-validate-refuses} */
+  it("delta names archive's pre-validate refuses make nothing citable or exempt", () => {
+    // [main names, delta, anchors a test cites]
+    const shapes: [string[], string[], string[]][] = [
+      [
+        ["Both"],
+        [
+          "## ADDED Requirements",
+          "### Requirement: Both",
+          "#### Scenario: Added both",
+          "## MODIFIED Requirements",
+          "### Requirement: Both",
+          "#### Scenario: Modified both",
+        ],
+        ["scenario-added-both", "scenario-modified-both"],
+      ],
+      [
+        ["Old name"],
+        [
+          "## RENAMED Requirements",
+          "- FROM: `### Requirement: Old name`",
+          "- TO: `### Requirement: New name`",
+          "## ADDED Requirements",
+          "### Requirement: New name",
+          "#### Scenario: Added new",
+        ],
+        ["requirement-new-name", "scenario-added-new"],
+      ],
+      [
+        ["Folded one", "FOLDED  one"],
+        [
+          "## REMOVED Requirements",
+          "### Requirement: FOLDED  one",
+          "## RENAMED Requirements",
+          "- FROM: `### Requirement: Folded one`",
+          "- TO: `### Requirement: Folded new`",
+        ],
+        ["requirement-folded-new"],
+      ],
+      [
+        ["Twice from", "Other", "Third"],
+        [
+          "## RENAMED Requirements",
+          "- FROM: `### Requirement: Twice from`",
+          "- TO: `### Requirement: Target a`",
+          "- FROM: `### Requirement: Twice from`",
+          "- TO: `### Requirement: Target b`",
+          "- FROM: `### Requirement: Other`",
+          "- TO: `### Requirement: Same to`",
+          "- FROM: `### Requirement: Third`",
+          "- TO: `### Requirement: Same to`",
+        ],
+        ["requirement-target-a", "requirement-target-b", "requirement-same-to"],
+      ],
+      [
+        ["Mod twice", "Rem twice"],
+        [
+          "## ADDED Requirements",
+          "### Requirement: Add twice",
+          "### Requirement: Add twice",
+          "## MODIFIED Requirements",
+          "### Requirement: Mod twice",
+          "#### Scenario: First copy",
+          "### Requirement: Mod twice",
+          "#### Scenario: Second copy",
+          "## REMOVED Requirements",
+          "- ### Requirement: Rem twice",
+          "- ### Requirement: Rem twice",
+        ],
+        ["requirement-add-twice", "scenario-first-copy", "scenario-second-copy"],
+      ],
+    ];
+    const got = shapes.map(([held, lines, cited]) => {
+      const main = new Map([["cap", parseRequirements(held.map((n) => "### Requirement: " + n))]]);
+      const names = new Set(main.get("cap")?.map((r) => r.name));
+      const delta = lines.join("\n");
+      const citations = extractCitations("a.test.ts", cited.map((a) => cite("cap", a)).join("\n"));
+      const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
+      return [deltaAnchors(delta, names), unprovenRequirements(main, citations, open)];
+    });
+    expect(got).toEqual(shapes.map(([held]) => [[], held.map((n) => "cap: Requirement: " + n)]));
   });
 });
