@@ -82,7 +82,7 @@
 
 ## 5. After archive
 
-- [ ] 5.1 `openspec/specs/capture-flow/spec.md` Behavior and Edge Cases, which archive does not touch:
+- [x] 5.1 `openspec/specs/capture-flow/spec.md` Behavior and Edge Cases, which archive does not touch:
   - the focus bullet gains the email-field exception and the camera opening screen;
   - a new bullet describes `?start=camera` (mount-time layout effect, `replaceState`, replace not push);
   - the guide bullet notes `UploadNotice` is shared with the capture step;

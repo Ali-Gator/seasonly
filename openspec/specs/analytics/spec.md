@@ -55,7 +55,7 @@ Each step from landing to share SHALL be recorded by exactly one PostHog event p
 | Step             | Event                                                      | Fires when                                           |
 | ---------------- | ---------------------------------------------------------- | ---------------------------------------------------- |
 | Landing          | `$pageview` with a path other than `/analyze` and `/r/:id` | a site page is shown                                 |
-| Flow start       | `$pageview` with path `/analyze`                           | the photo guide is shown                             |
+| Flow start       | `$pageview` with path `/analyze`                           | the flow opens, on the guide or on the camera        |
 | Photo checked    | `photo_checked`                                            | as `capture-flow` requires                           |
 | Quiz done        | `quiz_completed`                                           | the person leaves the last question with an answer   |
 | Result           | `analysis_result`, `quiz_no_result` or `analysis_failed`   | as `season-reveal` requires; `analysis_failed` below |
@@ -71,6 +71,11 @@ An event SHALL fire from the person's action or from the outcome it reports, nev
 
 - **WHEN** a person opens the landing page, starts the flow, uploads a photo that passes, answers the quiz, gets a result, chooses "Get my full report" and gives an address
 - **THEN** PostHog receives, in order, `$pageview` (`/`), `$pageview` (`/analyze`), `photo_checked`, `quiz_completed`, `analysis_result`, `report_requested`, `email_submitted` and `$pageview` (`/r/:id`), each once, and no `consent_answered`
+
+#### Scenario: Starting on the camera
+
+- **WHEN** a person taps "Take a selfie" on the landing and the flow opens on the camera
+- **THEN** PostHog receives `$pageview` (`/analyze`) exactly once, and removing the `start` parameter from the address sends no second one
 
 #### Scenario: Back to a step already seen
 
