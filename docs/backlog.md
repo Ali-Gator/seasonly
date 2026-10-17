@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-86**
+_Next id:_ **BL-88**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -129,47 +129,19 @@ fold items in.
 
 ## Testing
 
-- **[BL-80] The gate folds spaces inside a requirement name that GitHub keeps** — `parseRequirements`
-  stores `Requirement: ${name.trim()}`, and its `\s*` eats every space after `Requirement:`, so
-  `### Requirement:  X` (two spaces) gets the gate anchor `requirement-x` while GitHub's slug is
-  `requirement--x`. A citation of `#requirement-x` then passes the gate as a broken link (fails
-  open). No spec has such a heading today. Slug the heading text as written (edits the
-  approved-only gate test file). Same family, scenario headings (`backlog-10` review): a closing
-  `####` sequence (`#### Scenario: X ####`) anchors `scenario-x-` where GitHub's is `scenario-x`
-  (fails closed), and `\s+` accepts a no-break space after `####`, which CommonMark renders as no
-  heading (fails open).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/constitution/spec.md` (Behavior) · _Status:_ open — `backlog-10` triage, 2026-10-16
+- **[BL-86] A chain rename's middle name stays citable** — for a rename A to B then B to C in
+  one delta, `deltaAnchors` makes both `requirement-b` and `requirement-c` citable, but B no
+  longer exists after archive, so a test citing B passes the gate and goes stale at archive
+  (fails open). Make citable only the names still held at the end of the rename walk
+  (approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-11` apply, 2026-10-17
 
-- **[BL-81] A rename's new name is citable even when archive would refuse the rename** —
-  `deltaAnchors` makes every RENAMED `TO` citable without checking that its `FROM` names a
-  main-spec requirement exactly. A FROM that drops backticks or a colon makes archive throw
-  "RENAMED failed … source not found", while a test citing the TO anchor stays green as long as
-  the change is open (fails open until archive). Guard renames as MODIFIED is guarded; the
-  `backlog-10` rule test asserting `["requirement-shared"]` changes with it (approved-only gate
-  test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-10` review, 2026-10-16
-
-- **[BL-82] A MODIFIED requirement under a renamed-away or removed name still resolves** —
-  `deltaAnchors` accepts a MODIFIED requirement whose name is a rename's old name or one the
-  same delta removes, both of which archive's pre-validate refuses ("MODIFIED must reference the
-  NEW header"; a MODIFIED/REMOVED conflict). Its scenarios resolve, and under REMOVED+MODIFIED
-  the requirement is also exempt from the proof check (fails open until archive). Reject both
-  shapes as archive does (approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-10` review, 2026-10-16
-
-- **[BL-83] A rename archive refuses for an existing target still exempts its old name** — when a
-  RENAMED pair's TO already exists in the main spec and its FROM does too, archive refuses
-  ("target already exists", applied in order), yet `deltaProof` puts FROM in `gone`, so the old
-  requirement needs no citing test until archive. `openspec validate` reports it only as INFO.
-  Drive `gone` from the same in-order rename walk BL-81 adds (approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-11` triage, 2026-10-17
-
-- **[BL-84] The gate accepts delta names archive's pre-validate refuses across sections** — the
-  same name in MODIFIED and ADDED, an ADDED name equal to a rename's TO, a rename FROM that a
-  REMOVED name folds to, a repeated FROM or TO, and a repeated name inside ADDED, MODIFIED or
-  REMOVED all make archive refuse the delta, but the gate makes their anchors citable or exempts
-  the requirement. `openspec validate` reports each as an ERROR, so the window is commit to push.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-11` triage, 2026-10-17
+- **[BL-87] A name both added and removed in one delta still counts** — archive's pre-validate
+  refuses a name in ADDED and REMOVED (`specs-apply.js` "ADDED and REMOVED" conflict), but the
+  gate's `conflicts` omits that shape: the ADDED anchors resolve and the REMOVED name is exempt.
+  `openspec validate` reports it, so the window is commit to push. Add it to the spec's conflict
+  list and to `conflicts` (approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-11` apply, 2026-10-17
 
 - **[BL-85] `slugify` drops combining marks that GitHub keeps** — github-slugger keeps `\p{M}`,
   the gate's `slugify` drops it, so a heading with a combining accent anchors differently. No
