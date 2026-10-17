@@ -199,6 +199,27 @@ function removedNames(body: string[], mask: boolean[]): string[] {
   return names;
 }
 
+/** One entry of a delta's plan: a requirement block, a removed name or a rename pair. */
+type DeltaEntry =
+  | { kind: "added" | "modified"; block: Requirement }
+  | { kind: "removed"; name: string }
+  | { kind: "renamed"; from: string; to: string };
+
+/**
+ * A delta read once, as archive reads it: every ADDED and MODIFIED block, REMOVED name and
+ * RENAMED pair, section by section in document order. Within a section the order is the
+ * section parser's, and each RENAMED body pairs its lines on its own.
+ */
+function deltaPlan(text: string): DeltaEntry[] {
+  return deltaSections(text).flatMap(({ kind, body, mask }): DeltaEntry[] => {
+    if (kind === "added" || kind === "modified")
+      return parseRequirements(body, mask).map((block) => ({ kind, block }));
+    if (kind === "removed") return removedNames(body, mask).map((name) => ({ kind, name }));
+    if (kind === "renamed") return renamedPairs(body, mask).map((p) => ({ kind, ...p }));
+    return [];
+  });
+}
+
 /**
  * Names archive's pre-validate refuses within one delta (`specs-apply.js`): a name repeated
  * within ADDED, MODIFIED or REMOVED, or as a rename's FROM or TO; a MODIFIED name also added,
@@ -206,13 +227,12 @@ function removedNames(body: string[], mask: boolean[]): string[] {
  * FROM with every REMOVED name that matches it folded (`foldRequirementName`). A conflicting
  * name's blocks, REMOVED entries and rename pairs all count for nothing.
  */
-function conflicts(sections: ReturnType<typeof deltaSections>): Set<string> {
-  const of = (kind: (typeof SECTION_KINDS)[number]) => sections.filter((s) => s.kind === kind);
+function conflicts(plan: DeltaEntry[]): Set<string> {
   const names = (kind: "added" | "modified") =>
-    of(kind).flatMap((s) => parseRequirements(s.body, s.mask).map((r) => r.name));
+    plan.flatMap((e) => (e.kind === kind ? [e.block.name] : []));
   const [added, modified] = [names("added"), names("modified")];
-  const removed = of("removed").flatMap((s) => removedNames(s.body, s.mask));
-  const pairs = of("renamed").flatMap((s) => renamedPairs(s.body, s.mask));
+  const removed = plan.flatMap((e) => (e.kind === "removed" ? [e.name] : []));
+  const pairs = plan.flatMap((e) => (e.kind === "renamed" ? [e] : []));
   const [froms, tos] = [pairs.map((p) => p.from), pairs.map((p) => p.to)];
   const fold = (name: string) => name.toLowerCase().replace(/\s+/g, " ");
   const repeated = (list: string[]) => list.filter((n, i) => list.indexOf(n) !== i);
@@ -228,24 +248,23 @@ function conflicts(sections: ReturnType<typeof deltaSections>): Set<string> {
 }
 
 /**
- * The rename pairs archive applies, walked in document order against a running copy of the
- * main spec's names (`specs-apply.js` RENAMED): a pair naming a `dropped` name never enters the
- * walk; a pair is refused when its new name is already held, or, with `checkFrom`, when its old
- * name is not; an accepted pair renames in the copy, so a chain succeeds.
+ * The rename pairs archive applies, walked once in document order against a running copy of
+ * the main spec's names (`specs-apply.js` RENAMED): a pair naming a `dropped` name never enters
+ * the walk; a pair is refused when its old name is not held or its new name already is; an
+ * accepted pair renames in the copy, so a chain succeeds. Archive skips a pair whose old name
+ * is gone and new name held as already applied; that pair is refused here too, since it
+ * renames nothing.
  */
 function appliedRenames(
-  sections: ReturnType<typeof deltaSections>,
+  plan: DeltaEntry[],
   existing: ReadonlySet<string>,
-  checkFrom: boolean,
   dropped: ReadonlySet<string>,
 ): { from: string; to: string }[] {
   const names = new Set(existing);
-  return sections
-    .filter((s) => s.kind === "renamed")
-    .flatMap((s) => renamedPairs(s.body, s.mask))
+  return plan
+    .flatMap((e) => (e.kind === "renamed" ? [e] : []))
     .filter(({ from, to }) => {
-      if (dropped.has(from) || dropped.has(to) || names.has(to) || (checkFrom && !names.has(from)))
-        return false;
+      if (dropped.has(from) || dropped.has(to) || names.has(to) || !names.has(from)) return false;
       names.delete(from);
       names.add(to);
       return true;
@@ -253,23 +272,22 @@ function appliedRenames(
 }
 
 /**
- * Anchors a change delta makes citable before archive: its ADDED requirements and scenarios,
- * RENAMED targets archive would apply, and MODIFIED requirements and scenarios — a MODIFIED one
- * only when its requirement's name already exists in the main spec (`existing`, main-spec names)
- * or is renamed to in the same delta, since archive refuses any other.
+ * Anchors a change delta makes citable before archive: RENAMED targets archive would apply,
+ * then its ADDED requirements and scenarios and MODIFIED requirements and scenarios in document
+ * order — a MODIFIED one only when its requirement's name already exists in the main spec
+ * (`existing`, main-spec names) or is renamed to in the same delta, since archive refuses any other.
  */
 function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): string[] {
-  const sections = deltaSections(text);
-  const dropped = conflicts(sections);
-  const renamed = appliedRenames(sections, existing, true, dropped).map((p) => p.to);
+  const plan = deltaPlan(text);
+  const dropped = conflicts(plan);
+  const renamed = appliedRenames(plan, existing, dropped).map((p) => p.to);
   const anchors = renamed.map(slugify);
-  for (const { kind, body, mask } of sections) {
-    if (kind !== "added" && kind !== "modified") continue;
-    for (const r of parseRequirements(body, mask)) {
-      if (dropped.has(r.name)) continue;
-      if (kind === "added" || existing.has(r.name) || renamed.includes(r.name)) {
-        anchors.push(...anchorsOf(r));
-      }
+  for (const e of plan) {
+    if (e.kind !== "added" && e.kind !== "modified") continue;
+    const r = e.block;
+    if (dropped.has(r.name)) continue;
+    if (e.kind === "added" || existing.has(r.name) || renamed.includes(r.name)) {
+      anchors.push(...anchorsOf(r));
     }
   }
   return anchors;
@@ -285,32 +303,28 @@ interface OpenDelta {
 
 /**
  * Reads a change delta into `into`, so several changes to one capability accumulate. A rename
- * onto a name `existing` (main-spec names) or an earlier rename holds is refused, so its old
- * name still needs a citing test.
+ * archive would refuse — from a name `existing` (main-spec names) or an earlier rename does not
+ * hold, or onto one it does — leaves its old name needing a citing test. A MODIFIED block's
+ * scenarios and unenforced flag count whatever its name.
  */
 function deltaProof(
   text: string,
   into: OpenDelta = { gone: new Set(), scenarios: new Map() },
   existing: ReadonlySet<string> = new Set(),
 ): OpenDelta {
-  const sections = deltaSections(text);
-  const dropped = conflicts(sections);
-  const renamedFrom = new Set(
-    appliedRenames(sections, existing, false, dropped).map((p) => p.from),
-  );
-  for (const { kind, body, mask } of sections) {
-    if (kind === "removed") {
-      for (const name of removedNames(body, mask)) if (!dropped.has(name)) into.gone.add(name);
-    } else if (kind === "renamed") {
-      for (const { from } of renamedPairs(body, mask)) {
-        if (renamedFrom.has(from)) into.gone.add(from);
-      }
-    } else if (kind === "modified") {
-      for (const r of parseRequirements(body, mask)) {
-        if (dropped.has(r.name)) continue;
-        if (r.unenforced) into.gone.add(r.name);
-        into.scenarios.set(r.name, [...(into.scenarios.get(r.name) ?? []), ...r.scenarios]);
-      }
+  const plan = deltaPlan(text);
+  const dropped = conflicts(plan);
+  const renamedFrom = new Set(appliedRenames(plan, existing, dropped).map((p) => p.from));
+  for (const e of plan) {
+    if (e.kind === "removed") {
+      if (!dropped.has(e.name)) into.gone.add(e.name);
+    } else if (e.kind === "renamed") {
+      if (renamedFrom.has(e.from)) into.gone.add(e.from);
+    } else if (e.kind === "modified") {
+      const r = e.block;
+      if (dropped.has(r.name)) continue;
+      if (r.unenforced) into.gone.add(r.name);
+      into.scenarios.set(r.name, [...(into.scenarios.get(r.name) ?? []), ...r.scenarios]);
     }
   }
   return into;
@@ -395,13 +409,18 @@ function repoCitations(): Citation[] {
   );
 }
 
+let mainSpecsCache: Map<string, Requirement[]> | undefined;
+
+/** Every permanent spec's requirements, by capability. Read from disk once per run; callers only read the map. */
 function mainSpecs(): Map<string, Requirement[]> {
+  if (mainSpecsCache) return mainSpecsCache;
   const specs = new Map<string, Requirement[]>();
   for (const cap of fs.readdirSync(SPECS_DIR)) {
     const file = path.join(SPECS_DIR, cap, "spec.md");
     if (fs.existsSync(file))
       specs.set(cap, parseRequirements(splitLines(fs.readFileSync(file, "utf-8"))));
   }
+  mainSpecsCache = specs;
   return specs;
 }
 
