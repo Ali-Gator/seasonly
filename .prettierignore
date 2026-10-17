@@ -5,3 +5,5 @@ pnpm-lock.yaml
 .claude/skills/ai-sdk
 .claude/commands
 .claude/skills/openspec-*
+# Pinterest domain check reads this file byte for byte.
+apps/web/public/pinterest-*.html
