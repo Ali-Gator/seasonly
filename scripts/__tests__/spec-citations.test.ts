@@ -188,23 +188,49 @@ function deltaSections(
   return sections;
 }
 
+/** Archive's `parseRemovedNames`: a REMOVED body's requirement headings, then those behind a list bullet. */
+function removedNames(body: string[], mask: boolean[]): string[] {
+  const names = parseRequirements(body, mask).map((r) => r.name);
+  for (const [i, line] of body.entries()) {
+    const m = mask[i] ? null : REMOVED_BULLET.exec(line);
+    if (m?.[1]) names.push(requirementName(m[1]));
+  }
+  return names;
+}
+
+/**
+ * Names archive's pre-validate refuses within one delta (`specs-apply.js`), compared exactly: a
+ * MODIFIED name the same delta also removes or renames from, in any parsed rename pair. A
+ * conflicting name's MODIFIED block, REMOVED entry and rename from it all count for nothing.
+ */
+function conflicts(sections: ReturnType<typeof deltaSections>): Set<string> {
+  const of = (kind: (typeof SECTION_KINDS)[number]) => sections.filter((s) => s.kind === kind);
+  const away = new Set([
+    ...of("removed").flatMap((s) => removedNames(s.body, s.mask)),
+    ...of("renamed").flatMap((s) => renamedPairs(s.body, s.mask).map((p) => p.from)),
+  ]);
+  const modified = of("modified").flatMap((s) => parseRequirements(s.body, s.mask));
+  return new Set(modified.map((r) => r.name).filter((name) => away.has(name)));
+}
+
 /**
  * The rename pairs archive applies, walked in document order against a running copy of the
- * main spec's names (`specs-apply.js` RENAMED): a pair is refused when its new name is already
- * held, or, with `checkFrom`, when its old name is not; an accepted pair renames in the copy,
- * so a chain succeeds.
+ * main spec's names (`specs-apply.js` RENAMED): a pair from a `dropped` name never enters the
+ * walk; a pair is refused when its new name is already held, or, with `checkFrom`, when its old
+ * name is not; an accepted pair renames in the copy, so a chain succeeds.
  */
 function appliedRenames(
   sections: ReturnType<typeof deltaSections>,
   existing: ReadonlySet<string>,
   checkFrom: boolean,
+  dropped: ReadonlySet<string>,
 ): { from: string; to: string }[] {
   const names = new Set(existing);
   return sections
     .filter((s) => s.kind === "renamed")
     .flatMap((s) => renamedPairs(s.body, s.mask))
     .filter(({ from, to }) => {
-      if (names.has(to) || (checkFrom && !names.has(from))) return false;
+      if (dropped.has(from) || names.has(to) || (checkFrom && !names.has(from))) return false;
       names.delete(from);
       names.add(to);
       return true;
@@ -219,11 +245,13 @@ function appliedRenames(
  */
 function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): string[] {
   const sections = deltaSections(text);
-  const renamed = appliedRenames(sections, existing, true).map((p) => p.to);
+  const dropped = conflicts(sections);
+  const renamed = appliedRenames(sections, existing, true, dropped).map((p) => p.to);
   const anchors = renamed.map(slugify);
   for (const { kind, body, mask } of sections) {
     if (kind !== "added" && kind !== "modified") continue;
     for (const r of parseRequirements(body, mask)) {
+      if (kind === "modified" && dropped.has(r.name)) continue;
       if (kind === "added" || existing.has(r.name) || renamed.includes(r.name)) {
         anchors.push(...anchorsOf(r));
       }
@@ -251,21 +279,20 @@ function deltaProof(
   existing: ReadonlySet<string> = new Set(),
 ): OpenDelta {
   const sections = deltaSections(text);
-  const renamedFrom = new Set(appliedRenames(sections, existing, false).map((p) => p.from));
+  const dropped = conflicts(sections);
+  const renamedFrom = new Set(
+    appliedRenames(sections, existing, false, dropped).map((p) => p.from),
+  );
   for (const { kind, body, mask } of sections) {
     if (kind === "removed") {
-      for (const r of parseRequirements(body, mask)) into.gone.add(r.name);
-      // Archive's `parseRemovedNames` also reads a requirement heading behind a list bullet.
-      for (const [i, line] of body.entries()) {
-        const m = mask[i] ? null : REMOVED_BULLET.exec(line);
-        if (m?.[1]) into.gone.add(requirementName(m[1]));
-      }
+      for (const name of removedNames(body, mask)) if (!dropped.has(name)) into.gone.add(name);
     } else if (kind === "renamed") {
       for (const { from } of renamedPairs(body, mask)) {
         if (renamedFrom.has(from)) into.gone.add(from);
       }
     } else if (kind === "modified") {
       for (const r of parseRequirements(body, mask)) {
+        if (dropped.has(r.name)) continue;
         if (r.unenforced) into.gone.add(r.name);
         into.scenarios.set(r.name, [...(into.scenarios.get(r.name) ?? []), ...r.scenarios]);
       }
@@ -972,6 +999,38 @@ describe("spec citation rules", () => {
     expect(unprovenRequirements(main, [], open)).toEqual([
       "cap: Requirement: Untested",
       "cap: Requirement: Taken",
+    ]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-modified-and-also-removed-or-renamed-away} */
+  it("a requirement modified and also removed or renamed away in one delta makes nothing citable", () => {
+    const main = new Map([
+      ["cap", parseRequirements(["### Requirement: Removed one", "### Requirement: Renamed one"])],
+    ]);
+    const delta = [
+      "## REMOVED Requirements",
+      "### Requirement: Removed one",
+      "## MODIFIED Requirements",
+      "### Requirement: Removed one",
+      "#### Scenario: Modified then removed",
+      "### Requirement: Renamed one",
+      "#### Scenario: Modified then renamed",
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: Renamed one`",
+      "- TO: `### Requirement: Fresh`",
+    ].join("\n");
+    const names = new Set(["Requirement: Removed one", "Requirement: Renamed one"]);
+    expect(deltaAnchors(delta, names)).toEqual([]);
+    const text = [
+      "scenario-modified-then-removed",
+      "scenario-modified-then-renamed",
+      "requirement-fresh",
+    ];
+    const citations = extractCitations("a.test.ts", text.map((a) => cite("cap", a)).join("\n"));
+    const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
+    expect(unprovenRequirements(main, citations, open)).toEqual([
+      "cap: Requirement: Removed one",
+      "cap: Requirement: Renamed one",
     ]);
   });
 });
