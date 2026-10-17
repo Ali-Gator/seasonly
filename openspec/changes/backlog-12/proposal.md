@@ -28,7 +28,7 @@ _None._ No investigated item is lane D. Triage logged two new items, not members
 
 ## Base branch
 
-`origin/main` at `34d4c9a` (`backlog-11` merged). It carries BL-86 to BL-90 and `_Next id:_ BL-91`. Triage logged BL-91 and BL-92 and bumped the counter to BL-93.
+`origin/main` at `d78324e` (`backlog-11` and the Pinterest verification file merged; triage read the backlog at `34d4c9a`, identical there). It carries BL-86 to BL-90 and `_Next id:_ BL-91`. Triage logged BL-91 and BL-92 and bumped the counter to BL-93.
 
 ## Approved test edits
 
