@@ -43,7 +43,8 @@ const CITATION = /(?:\{@link |@see )openspec\/specs\/([a-z0-9-]+)\/spec\.md(?:#(
 
 interface Requirement {
   name: string;
-  anchor: string;
+  /** Absent when GitHub renders no heading: no space or tab after `###`. */
+  anchor?: string;
   scenarios: string[];
   unenforced: boolean;
 }
@@ -94,6 +95,9 @@ function splitLines(text: string): string[] {
 /** A requirement's name as archive's `normalizeRequirementName` builds it: the captured title, trimmed. */
 const requirementName = (title: string) => `Requirement: ${title.trim()}`;
 
+/** A heading's text as GitHub renders it: trimmed, a closing `#` run after a space or tab dropped. */
+const headingText = (text: string) => text.trim().replace(/[ \t]+#+$/, "");
+
 /** `mask` is the lines' slice of the whole delta's fence mask, when they are one section's body. */
 function parseRequirements(lines: string[], mask: boolean[] = fenceMask(lines)): Requirement[] {
   const requirements: Requirement[] = [];
@@ -102,22 +106,27 @@ function parseRequirements(lines: string[], mask: boolean[] = fenceMask(lines)):
     if (mask[i]) continue;
     // Archive's `REQUIREMENT_HEADER_REGEX`: the keyword in any letter case.
     const req = /^###\s*Requirement:\s*(.+)\s*$/i.exec(line);
-    // Any spacing after `####`, `Scenario:` in any letter case; the anchor is its text as written.
-    const scenario = /^####\s+(scenario:.*\S.*)$/i.exec(line);
+    // A space or tab after `####`, `Scenario:` in any letter case; the anchor is its text as GitHub renders it.
+    const scenario = /^####[ \t]+(scenario:.*\S.*)$/i.exec(line);
     if (req?.[1]) {
-      const name = requirementName(req[1]);
-      current = { name, anchor: slugify(name), scenarios: [], unenforced: false };
+      // The name is archive's; the anchor is GitHub's, which needs a space or tab after `###`.
+      const heading = /^###[ \t](.*)$/.exec(line)?.[1];
+      current = { name: requirementName(req[1]), scenarios: [], unenforced: false };
+      if (heading !== undefined) current.anchor = slugify(headingText(heading));
       requirements.push(current);
     } else if (/^#{1,3} /.test(line)) {
       current = undefined;
     } else if (current && scenario?.[1]) {
-      current.scenarios.push(slugify(scenario[1]));
+      current.scenarios.push(slugify(headingText(scenario[1])));
     } else if (current && line.startsWith("**Unenforced:**")) {
       current.unenforced = true;
     }
   }
   return requirements;
 }
+
+/** A requirement's citable anchors: its own, when it has one, and its scenarios'. */
+const anchorsOf = (r: Requirement) => (r.anchor ? [r.anchor, ...r.scenarios] : r.scenarios);
 
 const renameLine = (keyword: "FROM" | "TO") =>
   new RegExp(
@@ -195,7 +204,7 @@ function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): 
     if (kind !== "added" && kind !== "modified") continue;
     for (const r of parseRequirements(body, mask)) {
       if (kind === "added" || existing.has(r.name) || renamed.includes(r.name)) {
-        anchors.push(r.anchor, ...r.scenarios);
+        anchors.push(...anchorsOf(r));
       }
     }
   }
@@ -271,8 +280,9 @@ function unprovenRequirements(
     const delta = openChanges.get(capability);
     for (const r of requirements) {
       if (delta?.gone.has(r.name)) continue;
-      const anchors = [r.anchor, ...r.scenarios, ...(delta?.scenarios.get(r.name) ?? [])];
-      const proven = anchors.some((a) => cited.has(`${capability}#${a}`));
+      const anchors = [...anchorsOf(r), ...(delta?.scenarios.get(r.name) ?? [])];
+      // A requirement GitHub renders no heading for is never proven: its heading needs fixing.
+      const proven = r.anchor !== undefined && anchors.some((a) => cited.has(`${capability}#${a}`));
       if (!proven && !r.unenforced) out.push(`${capability}: ${r.name}`);
     }
   }
@@ -282,7 +292,7 @@ function unprovenRequirements(
 function duplicateHeadings(specs: Map<string, Requirement[]>): string[] {
   const out: string[] = [];
   for (const [capability, requirements] of specs) {
-    const anchors = requirements.flatMap((r) => [r.anchor, ...r.scenarios]);
+    const anchors = requirements.flatMap(anchorsOf);
     for (const a of new Set(anchors.filter((a, i) => anchors.indexOf(a) !== i))) {
       out.push(`${capability}#${a}`);
     }
@@ -340,7 +350,7 @@ function openDeltas(): [cap: string, text: string][] {
 function resolvableAnchors(specs: Map<string, Requirement[]>): Map<string, Set<string>> {
   const known = new Map<string, Set<string>>();
   for (const [cap, requirements] of specs) {
-    known.set(cap, new Set(requirements.flatMap((r) => [r.anchor, ...r.scenarios])));
+    known.set(cap, new Set(requirements.flatMap(anchorsOf)));
   }
   for (const [cap, text] of openDeltas()) {
     const main = new Set(specs.get(cap)?.map((r) => r.name) ?? []);
@@ -719,6 +729,51 @@ describe("spec citation rules", () => {
       "scenario-lower-case",
       "scenario--wide",
     ]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-heading-github-anchors-with-its-spaces-kept} */
+  it("a heading is anchored as GitHub renders it, inner spaces kept and a closing # run dropped", () => {
+    const body = [
+      "### Requirement:  Two spaces",
+      "### Requirement: Closed ###",
+      "#### Scenario: Closed too ####",
+    ];
+    const parsed = parseRequirements(body);
+    expect(parsed.map((r) => r.name)).toEqual([
+      "Requirement: Two spaces",
+      "Requirement: Closed ###",
+    ]);
+    const anchors = resolvableAnchors(new Map([["cap", parsed]]));
+    const text = [
+      "requirement--two-spaces",
+      "requirement-closed",
+      "scenario-closed-too",
+      "requirement-two-spaces",
+      "requirement-closed-",
+    ];
+    const citations = extractCitations("a.test.ts", text.map((a) => cite("cap", a)).join("\n"));
+    expect(staleCitations(citations, anchors)).toEqual([
+      "a.test.ts:4 cap#requirement-two-spaces",
+      "a.test.ts:5 cap#requirement-closed-",
+    ]);
+    expect(deltaAnchors(["## ADDED Requirements", ...body].join("\n"))).toEqual([
+      "requirement--two-spaces",
+      "requirement-closed",
+      "scenario-closed-too",
+    ]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-heading-with-no-space-after-its-marker} */
+  it("a heading with no space after its marker has no anchor, and its requirement needs a citing test", () => {
+    const glued = new Map([["cap", parseRequirements(["###Requirement: Glued"])]]);
+    const citations = extractCitations("a.test.ts", cite("cap", "requirement-glued"));
+    expect(staleCitations(citations, resolvableAnchors(glued))).toEqual([
+      "a.test.ts:1 cap#requirement-glued",
+    ]);
+    expect(unprovenRequirements(glued, citations)).toEqual(["cap: Requirement: Glued"]);
+    expect(deltaAnchors("## ADDED Requirements\n###Requirement: Glued")).toEqual([]);
+    const nbsp = parseRequirements(["### Requirement: Spaced", "####\u00a0Scenario: No-break"]);
+    expect(nbsp[0]?.scenarios).toEqual([]);
   });
 
   it("a repeated scenario name within a capability is reported", () => {
