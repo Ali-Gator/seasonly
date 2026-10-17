@@ -141,7 +141,7 @@ describe("/", () => {
 
   /** {@link openspec/specs/site-content/spec.md#requirement-the-landing-shows-a-sample-result-and-how-the-photo-is-handled} */
   it("has the hero, the three steps, the light tip and the deletion note", () => {
-    expect(out).toMatch(/<a [^>]*href="\/analyze"[^>]*>.*?Take a selfie<\/a>/);
+    expect(out).toMatch(/<a [^>]*href="\/analyze\?start=camera"[^>]*>.*?Take a selfie<\/a>/);
     expect(out).toMatch(/<a [^>]*href="\/analyze"[^>]*>.*?Upload a photo<\/a>/);
     expect(out).not.toMatch(/>Find my colors</);
     expect(text(out)).toContain("Free while we are in early access. No account needed.");
@@ -149,6 +149,14 @@ describe("/", () => {
       expect(text(out)).toContain(step);
     expect(imgs(out)).toEqual([TIP_PHOTOS.light.good, TIP_PHOTOS.light.bad]);
     expect(text(out)).toContain("Your photo is deleted within 24 hours");
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-heros-actions} */
+  it("sends the hero's Take a selfie to the camera and its Upload a photo to the guide", () => {
+    const link = (name: string) =>
+      new RegExp(`<a [^>]*href="([^"]*)"[^>]*>(?:(?!</a>).)*${name}</a>`).exec(out)?.[1];
+    expect(link("Take a selfie")).toBe("/analyze?start=camera");
+    expect(link("Upload a photo")).toBe("/analyze");
   });
 
   /** {@link openspec/specs/site-content/spec.md#scenario-the-sample-result} */

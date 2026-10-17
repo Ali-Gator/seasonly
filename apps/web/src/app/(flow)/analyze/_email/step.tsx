@@ -98,6 +98,8 @@ export function EmailForm({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           ref={inputRef}
+          // The flow focuses it on a mouse or trackpad, the heading elsewhere.
+          data-autofocus
         />
         {/* Announced: focus stays on the button, so a screen reader hears nothing else. */}
         <div role="alert">
