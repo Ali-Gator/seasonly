@@ -6,7 +6,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { Guide, Retake } from "./steps";
+import { Capture, Guide, Retake } from "./steps";
 
 const words = (html: string) =>
   html
@@ -37,6 +37,22 @@ describe("Guide", () => {
     expect(words(html)).toContain(
       "Only a crop of your face is sent, once you finish the quiz. An AI model from Google, through Vercel, reads its colors and doesn't train on it. We delete our copy within 24 hours. Google may keep one up to 90 days for abuse checks. Privacy policy",
     );
+    expect(html).toContain('href="/privacy"');
+  });
+});
+
+describe("Capture", () => {
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-the-capture-step-names-who-reads-the-crop} */
+  it("shows the light, makeup and filter caption, and the guide's upload notice below its actions", () => {
+    const html = renderToStaticMarkup(<Capture onPhoto={() => {}} />);
+    const text = words(html);
+    expect(text).toContain(
+      "Face a window, no makeup or filter. Fit your face in the oval and hold still.",
+    );
+    const notice =
+      "Only a crop of your face is sent, once you finish the quiz. An AI model from Google, through Vercel, reads its colors and doesn't train on it. We delete our copy within 24 hours. Google may keep one up to 90 days for abuse checks. Privacy policy";
+    expect(text).toContain(notice);
+    expect(text.indexOf("Upload a photo instead")).toBeLessThan(text.indexOf(notice));
     expect(html).toContain('href="/privacy"');
   });
 });

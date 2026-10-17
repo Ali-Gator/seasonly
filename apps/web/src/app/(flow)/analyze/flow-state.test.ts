@@ -425,3 +425,23 @@ describe("the checked types", () => {
     expect(darkWithCrop.crop).toBe(crop);
   });
 });
+
+describe("opening on the camera", () => {
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-opening-on-the-camera} */
+  it("replaces the opening guide with the capture step, adding no history entry", () => {
+    const opened = reduce(initialState(), { type: "start-camera" });
+    expect(opened.step).toEqual({ name: "capture" });
+    expect(opened.trail).toEqual([]);
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#requirement-the-landings-camera-link-opens-the-flow-on-the-camera} */
+  it("changes nothing once the flow has left the opening guide", () => {
+    const quiz = run([{ type: "checking", id: 1 }, passed]);
+    expect(quiz.step.name).toBe("quiz");
+    expect(reduce(quiz, { type: "start-camera" })).toBe(quiz);
+    const opened = reduce(initialState(), { type: "start-camera" });
+    expect(reduce(opened, { type: "start-camera" })).toBe(opened);
+    const deeper = run([{ type: "open-camera" }]);
+    expect(reduce(deeper, { type: "start-camera" })).toBe(deeper);
+  });
+});

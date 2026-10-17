@@ -1,7 +1,7 @@
 "use client";
 
 import * as Sentry from "@sentry/nextjs";
-import { useCallback, useEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
 
 import { StepProgress } from "@/components/ds";
 import type { AnalyzeResponse } from "@/lib/analysis/request";
@@ -15,6 +15,7 @@ import { EmailStep } from "./_email/step";
 import { QuizStep } from "./_quiz/quiz";
 import { AnalysisError, Analyzing, Blocked, NoResult, Reveal } from "./_reveal/steps";
 import {
+  CAMERA_START,
   initialState,
   type Question,
   QUESTIONS,
@@ -77,15 +78,38 @@ export function Flow() {
     return () => removeEventListener("popstate", onPop);
   }, []);
 
-  // Each new screen starts at the top, with focus on its heading. The screen the flow opens on
-  // keeps focus where the page put it, StrictMode's second run included (BL-41).
+  // Each new screen starts at the top, with focus on its heading; with a mouse or trackpad, on its
+  // `data-autofocus` field instead. The screen the flow opens on keeps focus where the page put
+  // it, StrictMode's second run included (BL-41).
+  // {@link openspec/specs/capture-flow/spec.md#requirement-a-new-step-moves-focus-to-its-heading-the-first-screen-does-not}
   const focused = useRef(step);
+  // The capture step the flow opened on from the landing: it takes no focus, once.
+  const opening = useRef<typeof step | null>(null);
   useEffect(() => {
     if (focused.current === step) return;
     focused.current = step;
+    if (step === opening.current) return void (opening.current = null);
     scrollTo(0, 0);
-    document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true });
+    const main = document.querySelector("main");
+    const fine = window.matchMedia?.("(hover: hover) and (pointer: fine)").matches;
+    const target =
+      (fine && main?.querySelector<HTMLElement>("[data-autofocus]")) ||
+      main?.querySelector<HTMLElement>("h1");
+    target?.focus({ preventScroll: true });
   }, [step]);
+
+  // The landing's camera link: before the first paint, the camera replaces the guide and the
+  // address drops `start`, so a reload opens the guide. StrictMode's second run finds no `start`.
+  // The state is kept: on a fresh load this runs before Next patches history, and an entry without
+  // Next's keys reloads the page on Back. Next's router keeps its own copy of the old address,
+  // which nothing here reads.
+  // {@link openspec/specs/capture-flow/spec.md#requirement-the-landings-camera-link-opens-the-flow-on-the-camera}
+  useLayoutEffect(() => {
+    if (new URLSearchParams(location.search).get("start") !== "camera") return;
+    opening.current = CAMERA_START;
+    dispatch({ type: "start-camera" });
+    history.replaceState(history.state, "", "/analyze");
+  }, []);
 
   // The models download while the guide is read. The photo's object URLs end with the page.
   useEffect(() => {
