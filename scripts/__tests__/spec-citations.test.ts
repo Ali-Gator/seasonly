@@ -223,9 +223,10 @@ function deltaPlan(text: string): DeltaEntry[] {
 /**
  * Names archive's pre-validate refuses within one delta (`specs-apply.js`): a name repeated
  * within ADDED, MODIFIED or REMOVED, or as a rename's FROM or TO; a MODIFIED name also added,
- * removed or renamed from; an ADDED name equal to a rename's TO, compared exactly; and a rename
- * FROM with every REMOVED name that matches it folded (`foldRequirementName`). A conflicting
- * name's blocks, REMOVED entries and rename pairs all count for nothing.
+ * removed or renamed from; an ADDED name also removed or equal to a rename's TO, compared
+ * exactly; and a rename FROM with every REMOVED name that matches it folded
+ * (`foldRequirementName`). A conflicting name's blocks, REMOVED entries and rename pairs all
+ * count for nothing.
  */
 function conflicts(plan: DeltaEntry[]): Set<string> {
   const names = (kind: "added" | "modified") =>
@@ -239,7 +240,7 @@ function conflicts(plan: DeltaEntry[]): Set<string> {
   return new Set([
     ...[added, modified, removed, froms, tos].flatMap(repeated),
     ...modified.filter((n) => added.includes(n) || removed.includes(n) || froms.includes(n)),
-    ...added.filter((n) => tos.includes(n)),
+    ...added.filter((n) => removed.includes(n) || tos.includes(n)),
     ...froms.flatMap((from) => {
       const match = removed.filter((r) => fold(r) === fold(from));
       return match.length > 0 ? [from, ...match] : [];
@@ -1164,5 +1165,24 @@ describe("spec citation rules", () => {
       return [deltaAnchors(delta, names), unprovenRequirements(main, citations, open)];
     });
     expect(got).toEqual(shapes.map(([held]) => [[], held.map((n) => "cap: Requirement: " + n)]));
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-name-added-and-removed-in-one-delta} */
+  it("a name added and removed in one delta makes nothing citable or exempt", () => {
+    const main = new Map([
+      ["cap", parseRequirements(["### Requirement: Both", "#### Scenario: Permanent both"])],
+    ]);
+    const delta = [
+      "## ADDED Requirements",
+      "### Requirement: Both",
+      "#### Scenario: Added both",
+      "## REMOVED Requirements",
+      "### Requirement: Both",
+    ].join("\n");
+    const names = new Set(["Requirement: Both"]);
+    expect(deltaAnchors(delta, names)).not.toContain("scenario-added-both");
+    const citations = extractCitations("a.test.ts", cite("cap", "scenario-added-both"));
+    const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
+    expect(unprovenRequirements(main, citations, open)).toEqual(["cap: Requirement: Both"]);
   });
 });
