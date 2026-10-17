@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-83**
+_Next id:_ **BL-86**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -156,6 +156,26 @@ fold items in.
   the requirement is also exempt from the proof check (fails open until archive). Reject both
   shapes as archive does (approved-only gate test file).
   _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-10` review, 2026-10-16
+
+- **[BL-83] A rename archive refuses for an existing target still exempts its old name** — when a
+  RENAMED pair's TO already exists in the main spec and its FROM does too, archive refuses
+  ("target already exists", applied in order), yet `deltaProof` puts FROM in `gone`, so the old
+  requirement needs no citing test until archive. `openspec validate` reports it only as INFO.
+  Drive `gone` from the same in-order rename walk BL-81 adds (approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-11` triage, 2026-10-17
+
+- **[BL-84] The gate accepts delta names archive's pre-validate refuses across sections** — the
+  same name in MODIFIED and ADDED, an ADDED name equal to a rename's TO, a rename FROM that a
+  REMOVED name folds to, a repeated FROM or TO, and a repeated name inside ADDED, MODIFIED or
+  REMOVED all make archive refuse the delta, but the gate makes their anchors citable or exempts
+  the requirement. `openspec validate` reports each as an ERROR, so the window is commit to push.
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-11` triage, 2026-10-17
+
+- **[BL-85] `slugify` drops combining marks that GitHub keeps** — github-slugger keeps `\p{M}`,
+  the gate's `slugify` drops it, so a heading with a combining accent anchors differently. No
+  spec heading has one.
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ deferred — until a spec heading
+  holds a combining mark (`backlog-11` triage, 2026-10-17)
 
 - **[BL-54] TikTok's and Instagram's in-app browsers are untested against the bot check** — a
   403 now shows the blocked screen, but nobody has opened seasonly.me inside either app and run a
