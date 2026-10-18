@@ -94,6 +94,9 @@ interface Post {
   note?: string;
 }
 
+const IG_NO_LABEL =
+  "Scheduled without Instagram's AI label: Meta Business Suite has no switch for it. The first caption line and the on-video badge say AI-generated model.";
+
 const files = new Map<string, string>();
 const use = (file: string) => (files.set(file, path.join("marketing/out", file)), file);
 
@@ -126,6 +129,9 @@ function videoPosts(v: Video, n: string, reel: boolean): Post[] {
       platform: "Instagram",
       kind: "Reel",
       caption: `${body}\n\nLink in bio.\n\n#coloranalysis #seasonalcoloranalysis #colorpalette #colorseason${tag(c.season)}`,
+      // Meta Business Suite schedules Reels but has no AI-label switch; the caption and on-video badge disclose it.
+      aiLabel: false,
+      note: [c.changed, v.generated && IG_NO_LABEL].filter(Boolean).join(" ") || undefined,
     });
   return posts;
 }
@@ -159,7 +165,7 @@ const sections = BATCH.days.map(([date, videoId, ig, pinSlug], i) => {
   if (!v) throw new Error(`no video ${videoId}`);
   if (!SEASON_SLUGS.includes(pinSlug)) throw new Error(`no season ${pinSlug}`);
   const vp = videoPosts(v, n, ig === "reel");
-  changed.push(...vp.filter((p) => p.note).map((p) => p.id));
+  if (VIDEO_COPY[videoId]?.changed) changed.push(...vp.map((p) => p.id));
   const units = [
     `<div class="unit"><div class="media"><video src="${use(`videos/${v.id}.mp4`)}" controls muted playsinline preload="metadata"></video></div>
       <div class="posts">${vp.map(caption).join("")}</div></div>`,
@@ -248,7 +254,7 @@ nav a:hover, nav a:focus-visible { border-color:var(--ink); }
   <p class="eyebrow">Launch plan step 6 · review page</p>
   <h1>Seasonly ${BATCH.name}</h1>
   <p class="lead">${count} posts, one a day per platform from ${first} to ${last}, each at 18:00 US Eastern. Answer in chat with yes, or name the posts to drop (for example "drop IG-04, PIN-07"). Your yes covers exactly these posts, captions, titles and links.</p>
-  <p class="lead">Claude schedules them in your Chrome on Oct 18, so TikTok's last post stays inside its 10-day limit. Music is picked from each platform's commercial library at upload; posts marked "AI label on" get the platform's AI-generated content setting.</p>
+  <p class="lead">You approved all 40 on Oct 17; Claude scheduled them in your Chrome on Oct 18, so TikTok's last post stays inside its 10-day limit. No music was added. Posts marked "AI label on" carry the platform's AI-generated content setting.</p>
   <div class="facts"><span><b>${count}</b> posts</span><span><b>10</b> days</span><span><b>4</b> platforms</span><span><b>${files.size}</b> files</span><span>New captions, not from the content pack: <b>${changed.join(", ")}</b></span></div>
   <nav aria-label="Days">${BATCH.days.map((d, i) => `<a href="#day-${String(i + 1).padStart(2, "0")}">${dayLabel(d[0])}</a>`).join("")}</nav>
   ${sections.join("\n")}
