@@ -75,7 +75,7 @@ An event SHALL fire from the person's action or from the outcome it reports, nev
 #### Scenario: Starting on the camera
 
 - **WHEN** a person taps "Take a selfie" on the landing and the flow opens on the camera
-- **THEN** PostHog receives `$pageview` (`/analyze`) exactly once, and removing the `start` parameter from the address sends no second one
+- **THEN** PostHog receives `$pageview` (`/analyze`) exactly once, its URL still carrying `?start=camera`, and removing the `start` parameter from the address sends no second one
 
 #### Scenario: Back to a step already seen
 
