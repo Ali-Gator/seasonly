@@ -259,12 +259,12 @@ function conflicts(plan: DeltaEntry[]): Set<string> {
  * longer sees it; a name not held whose fold matches a held one drops both, and every name of
  * the accepted chain that ends at the held one, since archive applies none of it. The renames
  * are then walked again without any pair naming a dropped name, so the chain's old name stays
- * held, until nothing more drops.
+ * held, until nothing more drops. `left` is the names held after the walk and the removals.
  */
 function nearMisses(
   plan: DeltaEntry[],
   existing: ReadonlySet<string>,
-): ReturnType<typeof appliedRenames> & { dropped: Set<string> } {
+): ReturnType<typeof appliedRenames> & { dropped: Set<string>; left: Set<string> } {
   const dropped = conflicts(plan);
   for (;;) {
     const size = dropped.size;
@@ -277,7 +277,7 @@ function nearMisses(
       dropped.add(e.name).add(near);
       for (const p of walk.pairs.toReversed()) if (p.to === near) dropped.add((near = p.from));
     }
-    if (dropped.size === size) return { ...walk, dropped };
+    if (dropped.size === size) return { ...walk, dropped, left: held };
   }
 }
 
@@ -324,9 +324,7 @@ function appliedRenames(
  */
 function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): string[] {
   const plan = deltaPlan(text);
-  const { dropped, pairs, held: renamed } = nearMisses(plan, existing);
-  const held = new Set(renamed);
-  for (const e of plan) if (e.kind === "removed" && !dropped.has(e.name)) held.delete(e.name);
+  const { dropped, pairs, held: renamed, left: held } = nearMisses(plan, existing);
   const modified = new Map(
     plan.flatMap((e) =>
       e.kind === "modified" && !dropped.has(e.block.name) ? [[e.block.name, e.block] as const] : [],
@@ -1456,8 +1454,13 @@ describe("spec citation rules", () => {
       "- TO: `### Requirement: B`",
       "- FROM: `### Requirement: B`",
       "- TO: `### Requirement: C`",
+      "- FROM: `### Requirement: C`",
+      "- TO: `### Requirement: D`",
+      "## MODIFIED Requirements",
+      "### Requirement: D",
+      "#### Scenario: Modified d",
       "## REMOVED Requirements",
-      "### Requirement: c",
+      "### Requirement: d",
     ].join("\n");
     const names = new Set(["Requirement: A"]);
     expect(deltaAnchors(delta, names)).toEqual([]);

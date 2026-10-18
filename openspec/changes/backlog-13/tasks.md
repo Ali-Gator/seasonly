@@ -18,5 +18,5 @@ Each task leaves the suite green before the next starts. Tasks 2.1–2.5 edit `s
 
 - [x] 3.1 `pnpm fix`, then `pnpm test`; both green
 - [x] 3.2 delete shipped bullets BL-91, BL-93, BL-94, BL-96 from `docs/backlog.md`
-- [ ] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
-- [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge
+- [x] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
+- [x] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge

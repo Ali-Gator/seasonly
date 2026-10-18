@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-99**
+_Next id:_ **BL-100**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -158,6 +158,12 @@ fold items in.
   a MODIFIED block on the TO, or the folded name's proof, stays as if the delta applied. Drop the
   names involved, as `nearMisses` does for REMOVED (`backlog-13` apply; approved-only gate test file).
   _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`nearMisses`, `appliedRenames`) · _Status:_ open — `backlog-13` apply, 2026-10-18
+
+- **[BL-99] Rename chains are followed in two places** — `nearMisses` walks `appliedRenames`'
+  pairs backward to drop a chain, and `deltaProof` builds its own `origin` map from the same
+  pairs for `carried`, so a fix to chain following must land twice. Have `appliedRenames` return
+  each held name's chain origin and use it in both (`backlog-13` review; approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`nearMisses`, `deltaProof`) · _Status:_ open — `backlog-13` review, 2026-10-18
 
 - **[BL-85] `slugify` drops combining marks that GitHub keeps** — github-slugger keeps `\p{M}`,
   the gate's `slugify` drops it, so a heading with a combining accent anchors differently. No
