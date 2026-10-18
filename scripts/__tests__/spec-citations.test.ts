@@ -319,7 +319,10 @@ function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): 
 
 /** What open changes do to the proof check, per capability, keyed by requirement name. */
 interface OpenDelta {
-  /** Requirements a delta removes, renames away from or marks unenforced: they need no citing test. */
+  /**
+   * Requirements a delta removes, renames away from for good or marks unenforced: they need no
+   * citing test. A name a later rename of the same delta moves back onto stays out.
+   */
   gone: Set<string>;
   /** Scenarios of a modified requirement's delta blocks: citing one proves it. */
   scenarios: Map<string, string[]>;
@@ -343,7 +346,9 @@ interface OpenDelta {
  * hold, or onto one it does — leaves its old name needing a citing test. A MODIFIED block's
  * scenarios, unenforced flag and place in `replaced` count whatever its name; only a main-spec
  * requirement of that name is ever looked up. A rename's main-spec name enters `carried` only
- * when a MODIFIED block of the same delta names where its chain ends.
+ * when a MODIFIED block of the same delta names where its chain ends. An accepted rename's old
+ * name joins `gone` only when the walk no longer holds it: a round trip, or another
+ * requirement renamed onto it, leaves it held, so it still needs a citing test.
  */
 function deltaProof(
   text: string,
@@ -357,7 +362,7 @@ function deltaProof(
 ): OpenDelta {
   const plan = deltaPlan(text);
   const dropped = conflicts(plan);
-  const { pairs } = appliedRenames(plan, existing, dropped);
+  const { pairs, held } = appliedRenames(plan, existing, dropped);
   const renamedFrom = new Set(pairs.map((p) => p.from));
   // The name each accepted chain of renames ends at, and the main-spec name it starts from.
   const origin = new Map<string, string>();
@@ -369,7 +374,7 @@ function deltaProof(
     if (e.kind === "removed") {
       if (!dropped.has(e.name)) into.gone.add(e.name);
     } else if (e.kind === "renamed") {
-      if (renamedFrom.has(e.from)) into.gone.add(e.from);
+      if (renamedFrom.has(e.from) && !held.has(e.from)) into.gone.add(e.from);
     } else if (e.kind === "modified") {
       const r = e.block;
       if (dropped.has(r.name)) continue;
@@ -1122,6 +1127,35 @@ describe("spec citation rules", () => {
     expect(deltaAnchors(delta, names)).toContain("requirement-c");
     const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
     expect(unprovenRequirements(main, [], open)).toEqual([]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-round-trip-in-one-delta} */
+  it("a name a rename round trip gives back still needs a citing test", () => {
+    const roundTrip = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: A`",
+      "- TO: `### Requirement: B`",
+      "- FROM: `### Requirement: B`",
+      "- TO: `### Requirement: A`",
+    ].join("\n");
+    const onlyA = new Map([["cap", parseRequirements(["### Requirement: A"])]]);
+    const a = new Set(["Requirement: A"]);
+    const back = new Map([["cap", deltaProof(roundTrip, undefined, a)]]);
+    expect(unprovenRequirements(onlyA, [], back)).toEqual(["cap: Requirement: A"]);
+
+    const moveOnto = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: A`",
+      "- TO: `### Requirement: B`",
+      "- FROM: `### Requirement: C`",
+      "- TO: `### Requirement: A`",
+    ].join("\n");
+    const aAndC = new Map([
+      ["cap", parseRequirements(["### Requirement: A", "### Requirement: C"])],
+    ]);
+    const ac = new Set(["Requirement: A", "Requirement: C"]);
+    const onto = new Map([["cap", deltaProof(moveOnto, undefined, ac)]]);
+    expect(unprovenRequirements(aAndC, [], onto)).toEqual(["cap: Requirement: A"]);
   });
 
   /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-onto-a-name-the-permanent-spec-already-holds} */
