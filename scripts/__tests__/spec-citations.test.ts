@@ -517,8 +517,7 @@ function resolvableAnchors(
   deltas: [cap: string, text: string][] = openDeltas(),
 ): Map<string, Set<string>> {
   const names = (cap: string) => new Set(specs.get(cap)?.map((r) => r.name) ?? []);
-  const open = new Map<string, OpenDelta>();
-  for (const [cap, text] of deltas) open.set(cap, deltaProof(text, open.get(cap), names(cap)));
+  const open = openChanges(specs, deltas);
   const known = new Map<string, Set<string>>();
   for (const [cap, requirements] of specs) {
     const delta = open.get(cap);
@@ -541,9 +540,12 @@ function resolvableAnchors(
   return known;
 }
 
-function openChanges(specs: Map<string, Requirement[]> = mainSpecs()): Map<string, OpenDelta> {
+function openChanges(
+  specs: Map<string, Requirement[]> = mainSpecs(),
+  deltas: [cap: string, text: string][] = openDeltas(),
+): Map<string, OpenDelta> {
   const out = new Map<string, OpenDelta>();
-  for (const [cap, text] of openDeltas()) {
+  for (const [cap, text] of deltas) {
     const main = new Set(specs.get(cap)?.map((r) => r.name) ?? []);
     out.set(cap, deltaProof(text, out.get(cap), main));
   }
