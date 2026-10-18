@@ -255,6 +255,7 @@ test("sends one /analyze page view when the landing opens the camera", async ({ 
     .poll(posthog.named, POLL)
     .toEqual(["$pageview /", "$pageview /analyze", "$pageview /"]);
   expect(posthog.errors).toEqual([]);
+  expect(posthog.find("$pageview")[1]?.properties.$current_url).toMatch(/\/analyze\?start=camera$/);
 });
 
 /**
