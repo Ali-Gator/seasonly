@@ -221,6 +221,9 @@ function deltaPlan(text: string): DeltaEntry[] {
   });
 }
 
+/** Archive's `foldRequirementName`: a name in lower case with each whitespace run one space. */
+const fold = (name: string) => name.toLowerCase().replace(/\s+/g, " ");
+
 /**
  * Names archive's pre-validate refuses within one delta (`specs-apply.js`): a name repeated
  * within ADDED, MODIFIED or REMOVED, or as a rename's FROM or TO; a MODIFIED name also added,
@@ -236,7 +239,6 @@ function conflicts(plan: DeltaEntry[]): Set<string> {
   const removed = plan.flatMap((e) => (e.kind === "removed" ? [e.name] : []));
   const pairs = plan.flatMap((e) => (e.kind === "renamed" ? [e] : []));
   const [froms, tos] = [pairs.map((p) => p.from), pairs.map((p) => p.to)];
-  const fold = (name: string) => name.toLowerCase().replace(/\s+/g, " ");
   const repeated = (list: string[]) => list.filter((n, i) => list.indexOf(n) !== i);
   return new Set([
     ...[added, modified, removed, froms, tos].flatMap(repeated),
@@ -247,6 +249,31 @@ function conflicts(plan: DeltaEntry[]): Set<string> {
       return match.length > 0 ? [from, ...match] : [];
     }),
   ]);
+}
+
+/**
+ * `dropped` grown by the removals archive's REMOVED step aborts on (`specs-apply.js:318-324`).
+ * After the rename walk, removals are taken in document order against a running copy of the
+ * names held: an exact match is deleted, so a later removal no longer sees it; a name not held
+ * whose fold matches a held one drops both. The renames are then walked again without any pair
+ * naming a dropped name, so that pair's old name stays held, until nothing more drops.
+ */
+function nearMisses(
+  plan: DeltaEntry[],
+  existing: ReadonlySet<string>,
+  conflicting: ReadonlySet<string>,
+): Set<string> {
+  const dropped = new Set(conflicting);
+  for (let size = -1; size !== dropped.size;) {
+    size = dropped.size;
+    const { held } = appliedRenames(plan, existing, dropped);
+    for (const e of plan) {
+      if (e.kind !== "removed" || dropped.has(e.name) || held.delete(e.name)) continue;
+      const near = [...held].find((k) => fold(k) === fold(e.name));
+      if (near !== undefined) dropped.add(e.name).add(near);
+    }
+  }
+  return dropped;
 }
 
 /**
@@ -292,7 +319,7 @@ function appliedRenames(
  */
 function deltaAnchors(text: string, existing: ReadonlySet<string> = new Set()): string[] {
   const plan = deltaPlan(text);
-  const dropped = conflicts(plan);
+  const dropped = nearMisses(plan, existing, conflicts(plan));
   const { pairs, held: renamed } = appliedRenames(plan, existing, dropped);
   const held = new Set(renamed);
   for (const e of plan) if (e.kind === "removed" && !dropped.has(e.name)) held.delete(e.name);
@@ -361,7 +388,7 @@ function deltaProof(
   existing: ReadonlySet<string> = new Set(),
 ): OpenDelta {
   const plan = deltaPlan(text);
-  const dropped = conflicts(plan);
+  const dropped = nearMisses(plan, existing, conflicts(plan));
   const { pairs, held } = appliedRenames(plan, existing, dropped);
   const renamedFrom = new Set(pairs.map((p) => p.from));
   // The name each accepted chain of renames ends at, and the main-spec name it starts from.
@@ -1338,6 +1365,63 @@ describe("spec citation rules", () => {
     expect(deltaAnchors(delta, names)).not.toContain("requirement-b");
     const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
     expect(unprovenRequirements(main, [], open)).not.toContain("cap: Requirement: A");
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-removal-archive-aborts-on-as-a-near-miss} */
+  it("a removal that near-misses a rename's new name makes it not citable, and its old name needs a citing test", () => {
+    const main = new Map([["cap", parseRequirements(["### Requirement: A"])]]);
+    const delta = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: A`",
+      "- TO: `### Requirement: B`",
+      "## REMOVED Requirements",
+      "### Requirement: b",
+    ].join("\n");
+    const names = new Set(["Requirement: A"]);
+    const citations = extractCitations("a.test.ts", cite("cap", "requirement-b"));
+    expect(staleCitations(citations, resolvableAnchors(main, [["cap", delta]]))).toEqual([
+      "a.test.ts:1 cap#requirement-b",
+    ]);
+    const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
+    expect(unprovenRequirements(main, citations, open)).toEqual(["cap: Requirement: A"]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-removal-archive-aborts-on-as-a-near-miss} */
+  it("a removal that near-misses a modified requirement makes its new scenarios not citable", () => {
+    const main = new Map([
+      ["cap", parseRequirements(["### Requirement: Foo", "#### Scenario: Permanent foo"])],
+    ]);
+    const delta = [
+      "## MODIFIED Requirements",
+      "### Requirement: Foo",
+      "#### Scenario: Modified foo",
+      "## REMOVED Requirements",
+      "### Requirement: foo",
+    ].join("\n");
+    const names = new Set(["Requirement: Foo"]);
+    const citations = extractCitations("a.test.ts", cite("cap", "scenario-modified-foo"));
+    expect(staleCitations(citations, resolvableAnchors(main, [["cap", delta]]))).toEqual([
+      "a.test.ts:1 cap#scenario-modified-foo",
+    ]);
+    const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
+    expect(unprovenRequirements(main, citations, open)).toEqual(["cap: Requirement: Foo"]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-removal-archive-aborts-on-as-a-near-miss} */
+  it("a removal is checked for a near-miss only after earlier removals of the same delta", () => {
+    const main = new Map([["cap", parseRequirements(["### Requirement: A"])]]);
+    const delta = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: A`",
+      "- TO: `### Requirement: B`",
+      "## REMOVED Requirements",
+      "### Requirement: B",
+      "### Requirement: b",
+    ].join("\n");
+    const names = new Set(["Requirement: A"]);
+    expect(deltaAnchors(delta, names)).toEqual([]);
+    const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
+    expect(unprovenRequirements(main, [], open)).toEqual([]);
   });
 
   /**
