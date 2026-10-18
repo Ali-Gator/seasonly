@@ -19,6 +19,8 @@ type Step =
   | { name: "no-result"; reason: "no-answers" | "answers-cancel" }
   | { name: "error"; blocked?: true }; // blocked: the route answered 403
 function initialState(): FlowState;
+type FlowEvent = { type: "start-camera" } | { type: "open-camera" } | /* … */; // start-camera: guide → capture in place, only on the opening guide
+const CAMERA_START: Step; // the capture step start-camera puts in place, one object
 function reduce(s: FlowState, e: FlowEvent): FlowState; // push = new history entry, replace = same entry, back = pop
 function stepProgress(step: Step): number | null; // Photo 0, Quiz 1, Result 2; none on the reveal
 function toFormData(r: AnalysisRequest): FormData; // answers always; traits + crop only with a photo; mask (mask.png) only when the photo has one
@@ -59,8 +61,10 @@ function photoCheckedProps(o: {
 - MediaPipe's wasm comes from jsDelivr at the exact installed `@mediapipe/tasks-vision` version, the models from Google's versioned paths; both start loading on the guide. The person segmenter (0.25 MB) starts once the other two have loaded, since MediaPipe's loaders share one global.
 - After a pass, `checkImage` waits at most 3 s for the person segmenter and runs it on the crop canvas. The outline is black with alpha `round(confidence × 255)`, the crop's size, encoded `toBlob("image/png")`. It is dropped (`mask: null`) when the segmenter is late or fails, or when the mean confidence over the crop's middle third is below 0.5, so it never empties the oval. Measured 2026-10-15 on a real selfie: 13.6 KB.
 - A check that throws (an undecodable file, models that failed to load) shows the no-face retake and goes to Sentry.
-- Each new step scrolls to the top and focuses its `main h1`. The effect skips while the step is the one it last handled, which is the opening guide on mount and on StrictMode's second run, so `/analyze` opens without moving focus; Back to the guide still moves it. `globals.css` draws no outline on `h1[tabindex="-1"]:focus`.
+- Each new step scrolls to the top and focuses its `main h1`; when `matchMedia("(hover: hover) and (pointer: fine)")` matches, a `main [data-autofocus]` element takes it instead (only the email step's field has one). The effect skips while the step is the one it last handled, which is the opening guide on mount and on StrictMode's second run, so `/analyze` opens without moving focus; Back to the guide still moves it. A camera start skips `CAMERA_START` once through a one-shot `opening` ref, so Back onto the capture step later still moves focus. `globals.css` draws no outline on `h1[tabindex="-1"]:focus`.
+- `?start=camera` is read in a mount-only `useLayoutEffect`, before the first paint of the landing's soft navigation. It dispatches `start-camera` (a replace, not a push, so the capture step owns the entry the flow mounted on and Back leaves the flow) and calls `history.replaceState(history.state, "", "/analyze")`. The state keeps Next's `__NA` key: on a fresh load this runs before Next patches history, and entries without it reload the page on Back. Next's router therefore keeps `?start=camera` as its own URL (BL-95). StrictMode's second run finds no `start`.
 - The retake screen takes the second-failure layout when `offerQuizOnly` is set: the photo as a 96 px thumbnail beside an `h1` styled `h2`, then the notes, then "Retake photo", "Continue with the quiz only" (secondary) and "Upload a different photo".
+- `UploadNotice`, the lock-icon paragraph, is shared by the guide and the capture step, so both say the same thing about the crop.
 - The guide shows one `PhotoTipCard` with the good reference and three bad examples; its actions stack `lg:flex-col-reverse` with `.sn-btn--lg-swap`, so upload is on top and primary from 1024 px while the DOM keeps "Take a selfie" first.
 
 ## Edge Cases
@@ -69,6 +73,8 @@ function photoCheckedProps(o: {
 - A blurred person behind, narrower than the core's minimum face width, is ignored rather than `several-faces`.
 - A camera already blocked for the site still shows "Take a selfie" on the guide; the capture step then offers upload with the blocked caption.
 - A reload starts again at the guide; answers and photo are not kept across visits.
+- A hard load of `/analyze?start=camera` (a pasted link, a new tab, a tap before the landing hydrates) shows the server-rendered guide until the flow hydrates, then the camera; the guide's actions are disabled until then.
+- Forward onto the camera's entry after Back to the landing opens the guide: the entry no longer carries `start`.
 - iOS 16 lacks `AbortSignal.any`, so Back and the 45 s timeout share one controller.
 
 ## Requirements
@@ -94,7 +100,7 @@ Every step of the analysis flow SHALL render at `/analyze` without changing the 
 
 ### Requirement: The photo guide and capture follow the canvas
 
-The flow SHALL open on the photo guide of canvas artboard 02: the heading "Three things before your selfie", one card with the three tips and two actions, "Take a selfie" and "Upload a photo". The card SHALL show one good reference photo and three bad examples, one per tip: under a ceiling lamp, foundation and bronzer, and a beauty filter. Each SHALL be a photo with alt text, never a labeled placeholder. On a 375 × 812 screen, both actions SHALL be visible without scrolling. Below 1024 px wide, "Take a selfie" SHALL be the primary action. From 1024 px, "Upload a photo" SHALL be the primary action and "Take a selfie" the secondary.
+Unless the address asks for the camera, the flow SHALL open on the photo guide of canvas artboard 02: the heading "Three things before your selfie", one card with the three tips and two actions, "Take a selfie" and "Upload a photo". The card SHALL show one good reference photo and three bad examples, one per tip: under a ceiling lamp, foundation and bronzer, and a beauty filter. Each SHALL be a photo with alt text, never a labeled placeholder. On a 375 × 812 screen, both actions SHALL be visible without scrolling. Below 1024 px wide, "Take a selfie" SHALL be the primary action. From 1024 px, "Upload a photo" SHALL be the primary action and "Take a selfie" the secondary.
 
 Under the two actions, the guide SHALL show the upload notice in the canvas's words. The notice SHALL say:
 
@@ -104,9 +110,9 @@ Under the two actions, the guide SHALL show the upload notice in the canvas's wo
 
 It SHALL link to `/privacy`.
 
-The capture step SHALL show the front camera's live view in the camera frame, with the caption "Fit your face in the oval, at eye level. Hold still." It SHALL offer "Take photo" and "Upload a photo instead". When the camera cannot be opened, the capture step SHALL keep the upload action and show "Camera blocked or not working? Upload a selfie you took in daylight."
+The capture step of canvas artboard 03 SHALL show the front camera's live view in the camera frame, with the caption "Face a window, no makeup or filter. Fit your face in the oval and hold still." It SHALL offer "Take photo" and "Upload a photo instead". When the camera cannot be opened, the capture step SHALL keep the upload action and show "Camera blocked or not working? Upload a selfie you took in daylight." Below its actions, the capture step SHALL show the same upload notice as the guide, with its link to `/privacy`, however the person reached it.
 
-**Unenforced:** the live camera needs a camera device, which CI's browser lacks. Task 8.3's manual check on a phone covers it; the upload path is covered by E2E.
+**Unenforced:** the live camera needs a camera device, which CI's browser lacks. A manual check on a phone covers it; the upload path is covered by E2E.
 
 #### Scenario: The guide
 
@@ -127,6 +133,11 @@ The capture step SHALL show the front camera's live view in the camera frame, wi
 
 - **WHEN** the photo guide is shown
 - **THEN** below the two actions it says only a face crop is sent, once the quiz is finished. It also says an AI model from Google, through Vercel, reads it and does not train on it, that Seasonly deletes its copy within 24 hours, and that Google may keep one up to 90 days for abuse checks. It links to `/privacy`.
+
+#### Scenario: The capture step names who reads the crop
+
+- **WHEN** the capture step is shown, whether reached from the guide or from `/analyze?start=camera`
+- **THEN** below its actions it shows the guide's upload notice with its link to `/privacy`, and the caption "Face a window, no makeup or filter. Fit your face in the oval and hold still."
 
 #### Scenario: A desktop window
 
@@ -273,14 +284,53 @@ The photo, its face crop, the crop's outline and its traits SHALL NOT be sent an
 
 ### Requirement: A new step moves focus to its heading, the first screen does not
 
-When the flow moves to a new step, focus SHALL move to that step's main heading, so a screen reader announces the new screen. The guide, shown when `/analyze` opens, SHALL NOT take focus, so the page opens like any other. A heading that takes focus SHALL draw no focus outline, because it is not a control.
+When the flow moves to a new step, focus SHALL move to that step's main heading, so a screen reader announces the new screen. One step is the exception: on a device whose primary pointer is fine and can hover (a mouse or trackpad), the email step SHALL move focus to its email field instead, so the address can be typed at once. On every other device the email step SHALL focus its heading like the rest. The screen the flow opens on, the guide or the capture step from `/analyze?start=camera`, SHALL NOT take focus, so the page opens like any other. A heading that takes focus SHALL draw no focus outline, because it is not a control.
 
 #### Scenario: Opening the flow
 
 - **WHEN** `/analyze` opens
 - **THEN** no element inside the page has focus, and no outline is drawn around the heading
 
+#### Scenario: Opening the flow on the camera
+
+- **WHEN** `/analyze?start=camera` opens
+- **THEN** no element inside the page has focus
+
 #### Scenario: A new step
 
 - **WHEN** the person moves from the guide to the capture step
 - **THEN** focus is on the capture step's heading, and the heading draws no outline
+
+#### Scenario: The email step with a mouse
+
+- **WHEN** a person on a device with a fine, hovering pointer chooses "Get my full report"
+- **THEN** focus is on the email field
+
+#### Scenario: The email step on a phone
+
+- **WHEN** a person on a touch device chooses "Get my full report"
+- **THEN** focus is on the email step's heading, not on the email field
+
+### Requirement: The landing's camera link opens the flow on the camera
+
+`/analyze?start=camera` SHALL open the flow on the capture step instead of the photo guide. The capture step SHALL then be the flow's first entry, so the browser's Back from it leaves the flow for the page before it. Once the flow has opened, the address SHALL read `/analyze` without the parameter, so a reload starts at the photo guide as on any other visit. Any other value of `start`, or none, SHALL open the photo guide. This opening is the one step change that adds no history entry, and removing `start` the one change to the address inside the flow; both exceptions hold over "The flow stays on one URL" here and over site-structure's "without changing the URL".
+
+#### Scenario: Opening on the camera
+
+- **WHEN** `/analyze?start=camera` opens
+- **THEN** the capture step is shown, the photo guide is not, and the address reads `/analyze`
+
+#### Scenario: Back from the camera
+
+- **WHEN** a person taps "Take a selfie" on the landing and then presses the browser's Back on the capture step
+- **THEN** the landing is shown
+
+#### Scenario: Reload after opening on the camera
+
+- **WHEN** a person who opened `/analyze?start=camera` reloads the page
+- **THEN** the photo guide is shown
+
+#### Scenario: An unknown start
+
+- **WHEN** `/analyze?start=quiz` opens
+- **THEN** the photo guide is shown

@@ -145,6 +145,72 @@ test("Back stays inside the flow, also after a reload", async ({ page }) => {
 });
 
 /**
+ * {@link openspec/specs/capture-flow/spec.md#scenario-opening-on-the-camera}
+ * {@link openspec/specs/capture-flow/spec.md#scenario-back-from-the-camera}
+ * {@link openspec/specs/capture-flow/spec.md#scenario-reload-after-opening-on-the-camera}
+ */
+test("the landing's Take a selfie opens the camera, Back returns to the landing", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  // Set when the guide's heading ever enters the page, so a guide painted for one frame fails.
+  await page.addInitScript(() => {
+    new MutationObserver(() => {
+      if (document.body?.textContent?.includes("Three things before your selfie"))
+        (window as { sawGuide?: boolean }).sawGuide = true;
+    }).observe(document, { childList: true, subtree: true, characterData: true });
+  });
+  await page.goto("/");
+  const landing = await page.locator("h1").textContent();
+  await page.getByRole("link", { name: "Take a selfie", exact: true }).click();
+  // CI's browser has no camera, so the capture step shows its blocked caption.
+  await expect(page.getByRole("heading", { name: "Take your selfie" })).toBeAttached();
+  await expect(page).toHaveURL(/\/analyze$/);
+  expect(await page.evaluate(() => (window as { sawGuide?: boolean }).sawGuide ?? false)).toBe(
+    false,
+  );
+  await expect(page.getByText("Only a crop of your face is sent")).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator("h1")).toHaveText(landing ?? "");
+
+  await page.getByRole("link", { name: "Take a selfie", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Take your selfie" })).toBeAttached();
+  // The router keeps the stripped address: going on into the quiz brings no parameter back.
+  const upload = page.getByLabel("Upload a photo instead");
+  await expect(upload).toBeEnabled();
+  await upload.setInputFiles(FACE);
+  await expect(page.getByText("Question 1 of 4")).toBeVisible({ timeout: 30_000 });
+  expect(new URL(page.url()).search).toBe("");
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Three things before your selfie" }),
+  ).toBeVisible();
+});
+
+/** {@link openspec/specs/capture-flow/spec.md#scenario-opening-on-the-camera} */
+test("a fresh load of the camera link keeps Back inside the flow, with no reload", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  await page.goto("/analyze?start=camera");
+  await expect(page.getByRole("heading", { name: "Take your selfie" })).toBeAttached();
+  await expect(page).toHaveURL(/\/analyze$/);
+  // Gone after a reload, so a Back that reloads the page fails below.
+  await page.evaluate(() => ((window as { loaded?: boolean }).loaded = true));
+  const upload = page.getByLabel("Upload a photo instead");
+  await expect(upload).toBeEnabled();
+  await upload.setInputFiles(FACE);
+  await expect(page.getByText("Question 1 of 4")).toBeVisible({ timeout: 30_000 });
+  await page.getByText("Green or olive", { exact: true }).click();
+  await expect(page.getByText("Question 2 of 4")).toBeVisible();
+  // Onto an entry the flow pushed, which needs Next's keys.
+  await page.goBack();
+  await expect(page.getByText("Question 1 of 4")).toBeVisible();
+  expect(await page.evaluate(() => (window as { loaded?: boolean }).loaded)).toBe(true);
+});
+
+/**
  * {@link openspec/specs/capture-flow/spec.md#requirement-the-photo-guide-and-capture-follow-the-canvas}
  * (scenario "The guide's example photos")
  */

@@ -101,22 +101,31 @@ export function Guide({ onCamera, onPhoto }: { onCamera: () => void; onPhoto: On
           Upload a photo
         </UploadButton>
       </div>
-      <p className="caption flex items-start gap-(--space-2) text-(--ink-muted)">
-        <Icon name="lock" size={16} className="mt-0.5 flex-none" />
-        <span>
-          Only a crop of your face is sent, once you finish the quiz. An AI model from Google,
-          through Vercel, reads its colors and doesn&apos;t train on it. We delete our copy within
-          24 hours. Google may keep one up to 90 days for abuse checks.{" "}
-          <Link href="/privacy" className="text-(--ink) underline">
-            Privacy policy
-          </Link>
-        </span>
-      </p>
+      <UploadNotice />
     </>
   );
 }
 
-const CAMERA_CAPTION = "Fit your face in the oval, at eye level. Hold still.";
+/** Under the guide's actions and the capture step's: who reads the crop, and when. */
+function UploadNotice() {
+  return (
+    <p className="caption flex items-start gap-(--space-2) text-(--ink-muted)">
+      <Icon name="lock" size={16} className="mt-0.5 flex-none" />
+      <span>
+        Only a crop of your face is sent, once you finish the quiz. An AI model from Google, through
+        Vercel, reads its colors and doesn&apos;t train on it. We delete our copy within 24 hours.
+        Google may keep one up to 90 days for abuse checks.{" "}
+        <Link href="/privacy" className="text-(--ink) underline">
+          Privacy policy
+        </Link>
+      </span>
+    </p>
+  );
+}
+
+/** The guide's tips, for a person who opened the camera from the landing. */
+const CAMERA_CAPTION =
+  "Face a window, no makeup or filter. Fit your face in the oval and hold still.";
 
 /** {@link openspec/specs/capture-flow/spec.md#requirement-the-photo-guide-and-capture-follow-the-canvas} */
 export function Capture({ onPhoto }: { onPhoto: OnPhoto }) {
@@ -179,6 +188,7 @@ export function Capture({ onPhoto }: { onPhoto: OnPhoto }) {
       <p className="caption text-center text-(--ink-muted)">
         Camera blocked or not working? Upload a selfie you took in daylight.
       </p>
+      <UploadNotice />
     </>
   );
 }

@@ -74,7 +74,8 @@ export default function Page() {
           </p>
           <div className="sn-stack mt-(--space-4) lg:flex-row">
             {/* From 1024 px upload takes the primary fill (t18-design-review decision 6). */}
-            <Button href="/analyze" block className="sn-btn--lg-swap lg:w-auto">
+            {/* {@link openspec/specs/site-content/spec.md#scenario-the-heros-actions} */}
+            <Button href="/analyze?start=camera" block className="sn-btn--lg-swap lg:w-auto">
               <Icon name="camera" size={18} />
               Take a selfie
             </Button>

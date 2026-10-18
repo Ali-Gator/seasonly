@@ -242,6 +242,22 @@ test("sends one analysis_failed when the analysis times out", async ({ page }) =
   expect(posthog.find("analysis_failed")).toHaveLength(1);
 });
 
+/** {@link openspec/specs/analytics/spec.md#scenario-starting-on-the-camera} */
+test("sends one /analyze page view when the landing opens the camera", async ({ page }) => {
+  const posthog = await recordPostHog(page);
+  await page.goto("/");
+  await page.getByRole("link", { name: "Take a selfie", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Take your selfie" })).toBeAttached();
+  await expect(page).toHaveURL(/\/analyze$/);
+  // Back to the landing: its page view is queued after the flow's, so the list is final.
+  await page.getByRole("link", { name: "Seasonly" }).click();
+  await expect
+    .poll(posthog.named, POLL)
+    .toEqual(["$pageview /", "$pageview /analyze", "$pageview /"]);
+  expect(posthog.errors).toEqual([]);
+  expect(posthog.find("$pageview")[1]?.properties.$current_url).toMatch(/\/analyze\?start=camera$/);
+});
+
 /**
  * A visitor whose first page is a report, as from the email link: the id stays out of every
  * request, and no flags request carries the first page's URL.

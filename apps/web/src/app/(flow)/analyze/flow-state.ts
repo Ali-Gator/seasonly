@@ -63,6 +63,8 @@ export type Question = (typeof QUESTIONS)[number];
 
 export type FlowEvent =
   | { type: "open-camera" }
+  /** `/analyze?start=camera`: the capture step takes the opening guide's place. */
+  | { type: "start-camera" }
   | { type: "checking"; id: number }
   | ({ type: "checked"; id: number; previewUrl: string | null } & (
       { problem: null; photo: PassedPhoto } | { problem: RetakeReason; photo: null }
@@ -99,6 +101,12 @@ const push = (s: FlowState, step: Step): FlowState => ({
 });
 const replace = (s: FlowState, step: Step): FlowState => ({ ...s, step });
 
+/**
+ * The capture step the flow opens on from `?start=camera`, one object, so the component can tell
+ * it from a step reached later: React re-runs the reducer, which would make a fresh one.
+ */
+export const CAMERA_START: Step = { name: "capture" };
+
 /** Sends the request, as a new entry from the last question or in place of a spinner. */
 const analyze = (s: FlowState, to: typeof push): FlowState => ({
   ...to(s, { name: "analyzing" }),
@@ -115,6 +123,10 @@ export function reduce(s: FlowState, e: FlowEvent): FlowState {
   switch (e.type) {
     case "open-camera":
       return push(s, { name: "capture" });
+    case "start-camera":
+      // Replaced, so Back from the camera leaves the flow; never once the person has moved on.
+      // {@link openspec/specs/capture-flow/spec.md#requirement-the-landings-camera-link-opens-the-flow-on-the-camera}
+      return step.name === "guide" && s.trail.length === 0 ? replace(s, CAMERA_START) : s;
     case "checking":
       // A second tap while checking adds no entry; its result is dropped by id.
       return step.name === "checking" ? s : push(s, { name: "checking", id: e.id });

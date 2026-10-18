@@ -28,6 +28,8 @@ vi.mock("@/lib/capture/photo", () => ({
 }));
 vi.mock("@/lib/capture/events", () => ({ track: vi.fn(), photoCheckedProps: () => ({}) }));
 vi.mock("@sentry/nextjs", () => ({ captureException: vi.fn() }));
+// The email step's router; only its push on a sent address would use it.
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 vi.mock("next/link", () => ({
   default: ({ href, children, ...rest }: { href: string; children: ReactNode }) => (
     <a href={href} {...rest}>
@@ -282,5 +284,88 @@ describe("a refused request", () => {
     expect(heading()).toBe("Something went wrong");
     expect(button("Try again")).toBeDefined();
     expect(button("Copy the link")).toBeUndefined();
+  });
+});
+
+/** Unmounts the flow `beforeEach` opened and opens it again at `url`, StrictMode included. */
+async function reopenAt(url: string) {
+  act(() => root.unmount());
+  history.replaceState(null, "", url);
+  root = createRoot(container);
+  await act(async () =>
+    root.render(
+      <StrictMode>
+        <Flow />
+      </StrictMode>,
+    ),
+  );
+}
+
+describe("opening on the camera", () => {
+  /**
+   * {@link openspec/specs/capture-flow/spec.md#scenario-opening-on-the-camera}
+   * {@link openspec/specs/capture-flow/spec.md#scenario-opening-the-flow-on-the-camera}
+   */
+  it("opens /analyze?start=camera on the capture step, strips the parameter and takes no focus", async () => {
+    await reopenAt("/analyze?start=camera");
+    expect(heading()).toBe("Take your selfie");
+    expect(container.textContent).not.toContain("Three things before your selfie");
+    expect(location.pathname + location.search).toBe("/analyze");
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-an-unknown-start} */
+  it("opens the guide for any other start", async () => {
+    await reopenAt("/analyze?start=quiz");
+    expect(heading()).toBe("Three things before your selfie");
+  });
+});
+
+describe("the email step's focus", () => {
+  const FINE = "(hover: hover) and (pointer: fine)";
+  /** Stubs the pointer query, then reaches the email step through a saved result. */
+  async function toEmail(fine: boolean) {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn((query: string) => ({ matches: fine && query === FINE, media: query })),
+    );
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve(
+          Response.json({
+            kind: "result",
+            reportId: "k7m2qxAAAAAAAAAAAAAAAA",
+            season: "soft-autumn",
+            agreement: "agree",
+            confidence: 0.6,
+            photo: "ok",
+            text: "personal",
+          }),
+        ),
+      ),
+    );
+    await toQuiz();
+    for (const label of ["Green or olive", "Gold", "Tans easily, rarely burns"]) {
+      await key(label);
+      await act(async () => button("Next")?.click());
+    }
+    await key("Medium or light brown");
+    await act(async () => button("See my result")?.click());
+    await act(async () => {});
+    await act(async () => button("Get my full report")?.click());
+    expect(heading()).toBe("Get your full report");
+  }
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-the-email-step-with-a-mouse} */
+  it("focuses the email field with a fine, hovering pointer", async () => {
+    await toEmail(true);
+    expect(document.activeElement).toBe(container.querySelector('main input[type="email"]'));
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-the-email-step-on-a-phone} */
+  it("focuses the heading on a touch device", async () => {
+    await toEmail(false);
+    expect(document.activeElement).toBe(container.querySelector("main h1"));
   });
 });

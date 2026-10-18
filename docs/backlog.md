@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-97**
+_Next id:_ **BL-100**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -140,15 +140,16 @@ fold items in.
   _Status:_ deferred — until Sentry shows `crop upload timed out` events, or storage-js adds a
   signal to `upload()`
 
-## Testing
+- **[BL-95] The camera start leaves Next's router on `?start=camera`** — `flow.tsx` strips
+  `start` with the entry's own state, so Next's router keeps the old address; a later
+  `router.refresh` or server action on `/analyze` would write it back, and a reload would reopen
+  the camera. Re-sync once Next has patched history (a deferred `replaceState` without `__NA`).
+  Also keep any other query or hash instead of the hard-coded `/analyze`.
+  _Refs:_ `t20-camera-from-home` design decision 1, `apps/web/src/app/(flow)/analyze/flow.tsx` ·
+  _Status:_ deferred — first router refresh or server action on `/analyze`, or a second query
+  parameter (BL-32)
 
-- **[BL-91] A removal that folds onto a rename's new name aborts archive** — archive applies
-  renames before removals, and a REMOVED name that matches a rename's new name only once letter
-  case and spacing are folded (`Requirement: b` against `Requirement: B`) hits the near-miss throw
-  in `specs-apply.js` (~:321), which aborts the whole archive. The gate does not model that
-  apply-time abort, so the new name stays citable. Drop both names, as the pre-validate
-  conflicts are dropped (`backlog-12` triage; approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts`, `openspec/specs/spec-workflow/spec.md` · _Status:_ open — `backlog-12` triage, 2026-10-17
+## Testing
 
 - **[BL-92] The gate reads requirement headings outside `## Requirements`** — `mainSpecs` parses
   the whole spec file, but archive reads only the `## Requirements` section, so a
@@ -157,19 +158,25 @@ fold items in.
   _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`mainSpecs`, `parseRequirements`) · _Status:_ deferred —
   until a spec holds a `### Requirement:` heading outside `## Requirements` (`backlog-12` triage, 2026-10-17)
 
-- **[BL-93] A rename round trip in one delta exempts the name it ends on** — for A to B then B to
-  A, archive's pre-validate passes (no FROM or TO repeats) and the walk ends holding A, but
-  `deltaProof` puts both accepted FROMs in `gone`, so `Requirement: A` needs no citing test
-  (fails open until archive). Add to `gone` only an accepted FROM the walk no longer holds
-  (`backlog-12` apply; approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`deltaProof`) · _Status:_ open — `backlog-12` apply, 2026-10-17
+- **[BL-97] A rename onto a freed name keeps the old body's scenarios as its proof** — for A to B
+  plus C to A in one delta, archive leaves A holding C's block, but A's permanent scenario anchors
+  still resolve and prove A, so a test citing only A's old scenario passes until the archive
+  commit, where that scenario sits under B. Treat a requirement a rename writes over as replaced,
+  as an accepted MODIFIED block is (`backlog-13` triage; approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`deltaProof`, `resolvableAnchors`) · _Status:_ open — `backlog-13` triage, 2026-10-18
 
-- **[BL-94] `resolvableAnchors` repeats `openChanges`' per-capability `deltaProof` loop** — the
-  citation side and the proof side each build the open changes' `OpenDelta` map, so a fix to one
-  (BL-93) must be mirrored by hand or they drift. Give `openChanges` a trailing optional `deltas`
-  and call it from `resolvableAnchors`; `backlog-12` Non-Goals froze that signature
-  (`backlog-12` review).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — `backlog-12` review, 2026-10-17
+- **[BL-98] A rename near-miss that archive aborts on stays citable** — archive's RENAMED step
+  throws when a FROM is not held, its TO is held, and a held name other than the TO folds onto the
+  FROM (`specs-apply.js:274-282`), aborting the whole archive. The gate only refuses that pair, so
+  a MODIFIED block on the TO, or the folded name's proof, stays as if the delta applied. Drop the
+  names involved, as `nearMisses` does for REMOVED (`backlog-13` apply; approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`nearMisses`, `appliedRenames`) · _Status:_ open — `backlog-13` apply, 2026-10-18
+
+- **[BL-99] Rename chains are followed in two places** — `nearMisses` walks `appliedRenames`'
+  pairs backward to drop a chain, and `deltaProof` builds its own `origin` map from the same
+  pairs for `carried`, so a fix to chain following must land twice. Have `appliedRenames` return
+  each held name's chain origin and use it in both (`backlog-13` review; approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`nearMisses`, `deltaProof`) · _Status:_ open — `backlog-13` review, 2026-10-18
 
 - **[BL-85] `slugify` drops combining marks that GitHub keeps** — github-slugger keeps `\p{M}`,
   the gate's `slugify` drops it, so a heading with a combining accent anchors differently. No

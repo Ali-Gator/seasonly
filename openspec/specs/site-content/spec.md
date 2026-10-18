@@ -71,7 +71,7 @@ The six core routes (`/`, `/seasons`, `/seasons/<slug>`, `/how-it-works`, `/samp
 
 The landing SHALL show:
 
-- the hero with "Take a selfie" and "Upload a photo" actions to `/analyze` and the line "Free while we are in early access. No account needed." The header's "Find my colors" stays the page's only link of that name. Below 1024 px wide, the hero SHALL show, between the headline and the lead, a swatch strip of the 12 sample Soft Autumn colors with the caption "A Soft Autumn result: 12 of 30 colors." and a link to `/sample-report`, so color is in the first phone screen. Below 1024 px, "Take a selfie" SHALL be the primary action; from 1024 px, "Upload a photo" SHALL be the primary action and "Take a selfie" the secondary;
+- the hero with a "Take a selfie" action to `/analyze?start=camera`, which opens the flow on the camera, an "Upload a photo" action to `/analyze`, and the line "Free while we are in early access. No account needed." The header's "Find my colors" stays the page's only link of that name. Below 1024 px wide, the hero SHALL show, between the headline and the lead, a swatch strip of the 12 sample Soft Autumn colors with the caption "A Soft Autumn result: 12 of 30 colors." and a link to `/sample-report`, so color is in the first phone screen. Below 1024 px, "Take a selfie" SHALL be the primary action; from 1024 px, "Upload a photo" SHALL be the primary action and "Take a selfie" the secondary;
 - a sample result: "This is a Soft Autumn" with the 12 Soft Autumn colors of the approved board, each with its name and hex code. Each is one of the 30 Soft Autumn colors (24 best colors and 6 neutrals) in the shared season palettes, and a link to `/sample-report`;
 - the three how-it-works steps;
 - the light photo tip, with its good and bad example photos;
@@ -98,6 +98,11 @@ The landing SHALL show:
 
 - **WHEN** the landing opens 1280 px wide
 - **THEN** the hero's primary action is "Upload a photo", and the hero shows no chip strip beside the sample result
+
+#### Scenario: The hero's actions
+
+- **WHEN** the landing is rendered
+- **THEN** the hero's "Take a selfie" links to `/analyze?start=camera` and its "Upload a photo" links to `/analyze`
 
 #### Scenario: The closing action
 
