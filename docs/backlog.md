@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-97**
+_Next id:_ **BL-98**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -166,6 +166,13 @@ fold items in.
   and call it from `resolvableAnchors`; `backlog-12` Non-Goals froze that signature
   (`backlog-12` review).
   _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — `backlog-12` review, 2026-10-17
+
+- **[BL-97] A rename onto a freed name keeps the old body's scenarios as its proof** — for A to B
+  plus C to A in one delta, archive leaves A holding C's block, but A's permanent scenario anchors
+  still resolve and prove A, so a test citing only A's old scenario passes until the archive
+  commit, where that scenario sits under B. Treat a requirement a rename writes over as replaced,
+  as an accepted MODIFIED block is (`backlog-13` triage; approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`deltaProof`, `resolvableAnchors`) · _Status:_ open — `backlog-13` triage, 2026-10-18
 
 - **[BL-85] `slugify` drops combining marks that GitHub keeps** — github-slugger keeps `\p{M}`,
   the gate's `slugify` drops it, so a heading with a combining accent anchors differently. No
