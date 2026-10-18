@@ -59,20 +59,20 @@ const VIDEO_COPY: Record<string, { caption: string; season?: SeasonSlug; changed
   "10-gpt-retires": { caption: CAPTION.gpt, season: "deep-winter" },
 };
 
-/** Batch 1: Tue Oct 20 to Thu Oct 29, 18:00 US Eastern (EDT). Instagram alternates Reel and carousel. */
+/** Batch 1: Sun Oct 18 to Tue Oct 27, 18:00 US Eastern (EDT). Instagram alternates Reel and carousel. */
 const BATCH = {
   name: "Batch 1",
   days: [
-    ["2026-10-20", "01-draping-same-face", "reel", "soft-summer"],
-    ["2026-10-21", "05-twelve-palettes", "soft-autumn", "soft-autumn"],
-    ["2026-10-22", "07-filter-changes-season", "reel", "deep-winter"],
-    ["2026-10-23", "03-veins", "true-winter", "true-winter"],
-    ["2026-10-24", "10-gpt-retires", "reel", "light-summer"],
-    ["2026-10-25", "02-draping-worst-first", "deep-autumn", "deep-autumn"],
-    ["2026-10-26", "04-soft-autumn-palette", "reel", "true-autumn"],
-    ["2026-10-27", "08-indoor-light", "light-spring", "light-spring"],
-    ["2026-10-28", "06-wear-skip", "reel", "bright-spring"],
-    ["2026-10-29", "09-jet-black", "true-summer", "true-summer"],
+    ["2026-10-18", "01-draping-same-face", "reel", "soft-summer"],
+    ["2026-10-19", "05-twelve-palettes", "soft-autumn", "soft-autumn"],
+    ["2026-10-20", "07-filter-changes-season", "reel", "deep-winter"],
+    ["2026-10-21", "03-veins", "true-winter", "true-winter"],
+    ["2026-10-22", "10-gpt-retires", "reel", "light-summer"],
+    ["2026-10-23", "02-draping-worst-first", "deep-autumn", "deep-autumn"],
+    ["2026-10-24", "04-soft-autumn-palette", "reel", "true-autumn"],
+    ["2026-10-25", "08-indoor-light", "light-spring", "light-spring"],
+    ["2026-10-26", "06-wear-skip", "reel", "bright-spring"],
+    ["2026-10-27", "09-jet-black", "true-summer", "true-summer"],
   ] as [string, string, "reel" | SeasonSlug, SeasonSlug][],
 };
 
@@ -195,8 +195,8 @@ const sections = BATCH.days.map(([date, videoId, ig, pinSlug], i) => {
   return `<section class="day" id="day-${n}"><h2><span class="dn">Day ${i + 1}</span> ${dayLabel(date)}, 18:00 ET</h2>${units.join("")}</section>`;
 });
 
-const first = dayLabel(BATCH.days[0][0]);
-const last = dayLabel(BATCH.days[BATCH.days.length - 1][0]);
+const first = dayLabel(BATCH.days.at(0)?.[0] ?? "");
+const last = dayLabel(BATCH.days.at(-1)?.[0] ?? "");
 const html = `<title>Seasonly ${BATCH.name}</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -248,7 +248,7 @@ nav a:hover, nav a:focus-visible { border-color:var(--ink); }
   <p class="eyebrow">Launch plan step 6 · review page</p>
   <h1>Seasonly ${BATCH.name}</h1>
   <p class="lead">${count} posts, one a day per platform from ${first} to ${last}, each at 18:00 US Eastern. Answer in chat with yes, or name the posts to drop (for example "drop IG-04, PIN-07"). Your yes covers exactly these posts, captions, titles and links.</p>
-  <p class="lead">Claude schedules them in your Chrome on Oct 20, so TikTok's last post stays inside its 10-day limit. Music is picked from each platform's commercial library at upload; posts marked "AI label on" get the platform's AI-generated content setting.</p>
+  <p class="lead">Claude schedules them in your Chrome on Oct 18, so TikTok's last post stays inside its 10-day limit. Music is picked from each platform's commercial library at upload; posts marked "AI label on" get the platform's AI-generated content setting.</p>
   <div class="facts"><span><b>${count}</b> posts</span><span><b>10</b> days</span><span><b>4</b> platforms</span><span><b>${files.size}</b> files</span><span>New captions, not from the content pack: <b>${changed.join(", ")}</b></span></div>
   <nav aria-label="Days">${BATCH.days.map((d, i) => `<a href="#day-${String(i + 1).padStart(2, "0")}">${dayLabel(d[0])}</a>`).join("")}</nav>
   ${sections.join("\n")}
