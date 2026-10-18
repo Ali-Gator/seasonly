@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-100**
+_Next id:_ **BL-103**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -28,13 +28,19 @@ fold items in.
 
 ## Analysis
 
-- **[BL-95] The photo check passes the photo guide's own filter example** — `images/examples/filter.webp`
+- **[BL-100] The photo check passes the photo guide's own filter example** — `images/examples/filter.webp`
   (the guide's "filtered" photo) passes `checkPhoto` and classifies Light Summer, while the same
   face unfiltered (`base.webp`) is Deep Autumn. The guide promises a filter retake, so tune the
   filter check until this example is caught, or swap the example. Found by
   `scripts/marketing/faces.ts analyze` (launch plan step 5).
   _Refs:_ `openspec/specs/photo-check/spec.md`, `packages/analysis/src/photo-check/` · _Status:_ open
-- **[BL-96] The sample report drapes its model in a season the core does not give her** —
+- **[BL-102] Beauty filters pass the photo check** — the `filter` check flags only skin no
+  natural skin has (near-gray, very saturated, or hue outside −10° to 100°), so a soft beauty
+  filter that brightens and desaturates skin, like the guide's `filter.webp`, reads as lighter
+  natural skin. The eval has no beauty-filtered photo, so no detector can be measured yet.
+  _Refs:_ `packages/analysis/src/photo-check/index.ts` (`isFiltered`), `evals/variants.ts`, `backlog-14` design (BL-100) · _Status:_ gated —
+  labeled beauty-filtered photos in the eval, or an approved beauty-filter eval variant (`backlog-14` triage, 2026-10-18)
+- **[BL-101] The sample report drapes its model in a season the core does not give her** —
   `/sample-report` shows `examples/face.webp` on Soft Autumn's draping (hard-coded
   `PALETTES["soft-autumn"]`), but the core classifies that photo Deep Autumn (and production gave
   her example twin Deep Autumn on Oct 17). A visitor who runs the same photo sees another season.
