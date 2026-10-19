@@ -104,11 +104,6 @@ fold items in.
 
 ## Privacy
 
-- **[BL-68] Outline misses on the phone go uncounted** — `outline()` in `photo.ts` returns null
-  silently on a slow or failed person segmenter, a size mismatch or a face it missed, so nobody
-  learns how often reports show an uncut face. Send the outcome with `photo_checked`.
-  _Refs:_ `apps/web/src/lib/capture/photo.ts`, t19-draping-cutout phase review · _Status:_ open —
-  the old trigger ("uncut faces seen") could not fire without this count (backlog-15 triage, 2026-10-19)
 - **[BL-104] Tune the 3 s person-segmenter wait** — `outline()` gives up after a fixed 3 s. Once
   `photo_checked` carries the outline outcome and time (BL-68), set the wait from the late rate and
   the made-time spread.
@@ -149,27 +144,6 @@ fold items in.
 
 ## Testing
 
-- **[BL-92] The gate reads requirement headings outside `## Requirements`** — `mainSpecs` parses
-  the whole spec file, but archive reads only the `## Requirements` section, so a
-  `### Requirement:` heading under Behavior or Edge Cases would be held as a name (an ADDED of it
-  fails closed) and need a citing test. No spec has one today.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`mainSpecs`, `parseRequirements`) · _Status:_
-  open — planned in `backlog-15` ahead of its trigger, Oleg's choice (2026-10-19)
-
-- **[BL-103] A rename archive aborts on as "source not found" leaves a folded name citable** —
-  archive's RENAMED step throws when neither the FROM nor the TO is held (`specs-apply.js:290`).
-  The gate only refuses that pair, so a held name that folds onto the FROM keeps its MODIFIED
-  block citable: main {Foo}, `foo` to `Bar` plus MODIFIED Foo with a cited scenario passes the
-  gate while archive aborts. Drop the FROM and the folded held name, as BL-98 did for a held TO
-  (`backlog-14` review; approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`appliedRenames`) · _Status:_ open — `backlog-14` review, 2026-10-19
-
-- **[BL-85] `slugify` drops combining marks that GitHub keeps** — github-slugger keeps `\p{M}`,
-  the gate's `slugify` drops it, so a heading with a combining accent anchors differently. No
-  spec heading has one.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — planned in `backlog-15`
-  ahead of its trigger, Oleg's choice (2026-10-19)
-
 - **[BL-54] TikTok's in-app browser is untested against the bot check** — Instagram's passed on
   2026-10-17 (camera, analysis and report email on an iPhone, no 403). TikTok shows no tappable bio
   link below 1,000 followers, so nobody reaches its browser yet. Once the link exists, open
@@ -179,16 +153,6 @@ fold items in.
   deferred — until the TikTok account has 1,000 followers and its bio link
 
 ## Design / UX
-
-- **[BL-61] "Watermelon" still runs into the gap at 375–399 px** — a 4-column cell is
-  (W − 100) / 4, so at 375 px Watermelon (74.9 px at 13 px) runs about 6 px into the 12 px gap in
-  columns 1–3 (Light Spring best #6, Bright Winter #1, Light Summer #20); it fits from about 400 px.
-  The approved 375 board shows Soft Autumn, whose names fit, so the fix changes the approved 375
-  layout: a 375 board with a Light Spring palette first. `backlog-3` covers only below 375; a
-  container query on cell width, not viewport width, would cover both in one rule.
-  _Refs:_ `apps/web/src/components/ds/ds.css` (`.sn-swatch__name`), MVP canvas board 10 · _Status:_ open — board 16b approved on canvas v64 (3 columns below ~404 px); also hit:
-  390/393 px iPhones, True Summer best #16, Champagne in Light Spring metals, and "Light Warm Aqua" /
-  "Light Warm Navy" wrapping to 3 lines at 375 (`backlog-15` triage, 2026-10-19)
 
 - **[BL-04] The design system's ShareCard overflows on long names** — the approved
   `bundle.css` sets post-card names at 0.75 em, and "Bright Turquoise" needs about 379 px of a

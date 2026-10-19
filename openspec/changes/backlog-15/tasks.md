@@ -42,7 +42,7 @@ Each task leaves the suite green before the next starts. Only the edits named he
 
 ## 3. Verify, delete, review, archive, ship
 
-- [ ] 3.1 `pnpm fix`, then `pnpm test`, then `pnpm test:eval`; all green
-- [ ] 3.2 delete shipped bullets BL-61, BL-68, BL-85, BL-92 and BL-103 from `docs/backlog.md` (BL-104 stays)
+- [x] 3.1 `pnpm fix`, then `pnpm test`, then `pnpm test:eval`; all green
+- [x] 3.2 delete shipped bullets BL-61, BL-68, BL-85, BL-92 and BL-103 from `docs/backlog.md` (BL-104 stays)
 - [ ] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
 - [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge
