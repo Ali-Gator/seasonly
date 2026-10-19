@@ -6,7 +6,7 @@ The citation gate still fails open in one rename corner. Archive aborts on a ren
 
 ## What Changes
 
-- **BL-61:** a 4-column swatch grid switches to 3 columns whenever a cell would be narrower than 76 px, which means a window under about 404 px. The rule follows the grid's own width, not the viewport, so the canvas and the app agree. Approved on canvas v64, board 16b.
+- **BL-61:** a 4-column swatch grid switches to 3 columns whenever a cell would be narrower than 76 px, which means a window under about 404 px. The rule follows the grid's own width, not the viewport, so the canvas and the app agree. Approved on canvas v64, with board 16b redrawn in v65. On `/sample-report` at 375×812 the first chip is now only partly in the first screen, so that promise relaxes to at least half (Decision 6).
 - **BL-68:** for a photo that passes, `photo_checked` carries how the outline ended (`made`, `late`, `failed`, `mismatch` or `missed`) and, when one was made, how long it took. Tuning the 3 s wait is split out as BL-104, deferred until the data exists.
 - **BL-103:** a rename whose old and new names are both unheld at its turn drops its old name, its new name and any held name folding onto the old name, the same way an aborting rename already does.
 - **BL-85:** `slugify` keeps combining marks (`\p{M}`) and connector punctuation (`\p{Pc}`), as github-slugger does.
@@ -49,6 +49,7 @@ Statuses corrected in `docs/backlog.md`:
 
 - **BL-61** (design.md Decision 4): `e2e/site-structure.spec.ts` "a 4-column grid keeps 4 columns at 375 px" flips to 3 columns at 375 px. A 4-column check moves to 414 px.
 - **BL-103, BL-85, BL-92** (design.md Decisions 1–2): helper code and JSDoc in `scripts/__tests__/spec-citations.test.ts`, plus new rule `it`s. No existing `it`'s assertion, fixture or call changes.
+- **BL-61** (design.md Decision 6): `e2e/design-review.spec.ts` "shows the sample report's first swatch in the first screen" asserts at least half of the first chip in view instead of all of it. The season-page test is unchanged.
 - **BL-68:** new `it`s only. No existing test changes.
 
 ## Capabilities
@@ -60,6 +61,7 @@ _None._
 ### Modified Capabilities
 
 - `ui-components`: "A swatch grid shows every color of a list in order". The narrow rule follows grid width (cells under 76 px), not a viewport under 375 px.
+- `site-content`: "The sample report puts the palette first on a phone". At least half of the first swatch shows in the first screen.
 - `capture-flow`: "Each photo check is reported without photo data". A passing photo's event carries the outline outcome and time.
 - `spec-workflow`: "Citations are gated at every commit". A rename with neither name held aborts like the others, slugs keep combining marks, and permanent names are read from `## Requirements` only.
 
@@ -68,5 +70,5 @@ _None._
 - **App:** `apps/web/src/components/ds/ds.css` and `swatch.tsx` (doc), `apps/web/src/lib/capture/photo.ts` and `events.ts`, and their tests. `e2e/site-structure.spec.ts` (approved flip, plus a new check).
 - **Gate:** `scripts/__tests__/spec-citations.test.ts` (approved).
 - **Specs:** `openspec/specs/ui-components/spec.md`, `capture-flow/spec.md` and `spec-workflow/spec.md`, through the deltas. Their Behavior and Public Interface text is edited by hand.
-- **Off repo:** MVP canvas v64, where the canvas's design-system copy of `bundle.js` takes the same rule. The design-system artifact itself is not synced.
+- **Off repo:** MVP canvas v64–v65, where the canvas's design-system copy of `bundle.js` takes the same rule. The design-system artifact itself is not synced.
 - **Backlog:** `docs/backlog.md` deletes BL-61, BL-68, BL-85, BL-92 and BL-103 when they ship. Triage split off BL-104 and corrected six statuses.

@@ -62,7 +62,7 @@ Tests, in `e2e/site-structure.spec.ts`:
 
 - The approved flip: "a 4-column grid keeps 4 columns at 375 px" becomes 3 columns at 375 px on `/seasons/light-spring`. It also asserts that no `.sn-swatch__name` in the palette list has `scrollWidth > clientWidth` and none is taller than 36 px. Keep the test's citation of `#scenario-a-4-column-grid-at-375-px` and rename its title to match.
 - A new test: 4 columns at 414 px.
-- `e2e/design-review.spec.ts` (first chip fully in view at 375×812) must still pass. Run it; do not edit it.
+- `e2e/design-review.spec.ts`: the season-page test (first chip at 667 px, fully in view) is unchanged. The sample-report test drops to `ratio: 0.5` (Decision 6): at 3 columns its first chip spans 735–831 px against an 812 px screen.
 
 **Permanent-spec text** (exempt from the hook, edit by hand): `ui-components/spec.md` Behavior bullet and the BL-57/BL-63 paragraph (:150-154). They describe the old below-375 rule, the canvas `bundle.css` "keeps 4" note, and the BL-61 leftover sentence.
 
@@ -164,6 +164,15 @@ The gate's code lives inside an existing test file with no exports, so no new fi
 - Existing test edit under (1): `e2e/site-structure.spec.ts` "a 4-column grid keeps 4 columns at 375 px" flips to 3 columns at 375, and a 4-column check moves to a width of at least 404 px.
 - **Answer:** (1), 3 columns below ~404 px; this approves flipping the `e2e/site-structure.spec.ts` 375 px four-column test (Oleg, 2026-10-19).
 
+### 6. BL-61 — the sample report's first swatch at 375×812
+
+With 3 columns, `/sample-report`'s first chip spans 735–831 px against an 812 px screen, so about 80% of it is visible. The season page's chip ends at 667 px.
+
+- Options: relax the test and the scenario to at least half of the first chip / shave about 20 px above the palette on `/sample-report` and redraw board 18 / make chips 4:3 on narrow grids.
+- Trade-off: relaxing changes nothing visible and still puts the palette first. Shaving changes an approved board. Shorter chips change every narrow grid's look.
+- **Recommendation:** relax.
+- **Answer:** Relax the test (Oleg, 2026-10-19). This approves editing `e2e/design-review.spec.ts` "shows the sample report's first swatch in the first screen" to `ratio: 0.5`, and the site-content delta.
+
 ### 5. BL-68 — outcome names and where they go (technical)
 
 The outcome goes on `photo_checked` as a PostHog property, not to Sentry. The rate needs the pass count that `photo_checked` already gives, and capture-flow sends only crashes to Sentry.
@@ -173,14 +182,14 @@ The keys are `outline` and `outline_ms`, because `mask_*` would trip the privacy
 ## Canvas
 
 - **Board:** "16b Swatch grids on narrow phones · Light Spring · 375, 390, 414" (`project/NarrowSwatches.dc.html`, x 10820, y 15780). It shows the Light Spring palette and metals at three widths, with copy from the live Light Spring page.
-- **DS copy:** the canvas's design-system copy `project/ds/seasonly/components/bundle.js`, where `SwatchGrid` takes the same template for 4 columns and has a new `keepColumns` prop. Board 16 Season's neighbour strips pass that prop.
+- **DS copy:** the canvas's design-system copy `project/ds/seasonly/components/bundle.js`, where `SwatchGrid` takes the same template for 4 columns and has a new `keepColumns` prop. Every board that mirrors an app `SeasonLink` passes it: 15 Seasons 375 (12 strips), and 16 Season 375 and 16 Season 1280 (neighbours). Without it, the 1280 neighbour strips, with 68 px cells, would also drop to 3.
 - **Redrawn boards:** every 375 board with a 4-column grid (10, 16, 18, 01, 19) now draws 3 columns.
-- **Version:** canvas v64 (1792419375-a4ed).
+- **Version:** canvas v64 (1792419375-a4ed) approved. v65 (1792420166-7f3f) unrolled board 16b's loop (an `sc-for` body sees only its item, so v64's board likely drew empty grids) and added `keepColumns` to the season strips. The look did not change.
 - **Approved:** Oleg, 2026-10-19 ("as drawn"). The rule was checked on the live page, because the browser pane rendered the canvas blank at its size.
 
 ## Risks / Trade-offs
 
 - **[A Safari quirk with `max()` inside `minmax()`]** → Both are supported since Safari 13.1/14. The e2e runs in WebKit too if the project config includes it; otherwise check on a real iPhone during `/backlog-fix` verify.
-- **[3 columns make palettes on common iPhones 8 rows tall]** → Accepted in Decision 4. `design-review.spec.ts` guards the first screen.
+- **[3 columns make palettes on common iPhones 8 rows tall]** → Accepted in Decision 4. `design-review.spec.ts` guards the first screen, at half a chip on `/sample-report` (Decision 6).
 - **[BL-92 could hide a mistyped spec]** → A requirement written under the wrong section stops being gated, which is what archive does with it anyway. Triage found none today.
 - **[BL-68's outcome exits are browser-only]** → Pin the mapping with a mocked `loadPerson` unit test. The real segmenter path stays covered only by manual phone tests.

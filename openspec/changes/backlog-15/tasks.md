@@ -3,7 +3,8 @@
 - [x] 1.1 ui-components delta ("A swatch grid shows every color of a list in order": 3 columns below a 76 px cell, grid-width rule; scenario "A 4-column grid at 375 px" now 3 columns; new "A 4-column grid on a wide phone") — written in triage
 - [x] 1.2 capture-flow delta ("Each photo check is reported without photo data": outline outcome and time on a pass; two new scenarios) — written in triage
 - [x] 1.3 spec-workflow delta ("Citations are gated at every commit": a rename with neither name held aborts; slugs keep combining marks; permanent names read from `## Requirements` only; three new scenarios) — written in triage
-- [x] 1.4 canvas v64 board 16b and the canvas DS `SwatchGrid` rule approved (design.md Canvas) — done in triage
+- [x] 1.4 site-content delta ("The sample report puts the palette first on a phone": at least half of the first swatch in the first screen, Decision 6) — written in triage
+- [x] 1.5 canvas v64/v65 board 16b, the canvas DS `SwatchGrid` rule and `keepColumns` on the season strips approved (design.md Canvas) — done in triage
 
 ## 2. Fixes — one subagent at a time, serially
 
@@ -15,8 +16,9 @@ Each task leaves the suite green before the next starts. Only the edits named he
 
   Verify the 375 test fails.
 
-- [ ] 2.2 BL-61 — replace the `@media (max-width: 374.98px)` rule in `apps/web/src/components/ds/ds.css` with the media-free `minmax(max(76px, …))` template on `.sn-swatch-grid[data-columns="4"]`, still in `@layer components`. Update the rule's comment and `swatch.tsx`'s `keepColumns` doc (design.md BL-61). Done when 2.1 passes, `e2e/design-review.spec.ts` passes unchanged and `ds.test.tsx` passes unchanged.
-- [ ] 2.3 BL-61 — hand-edit `openspec/specs/ui-components/spec.md` Behavior (:150-154): the grid-width rule replaces the below-375 rule, the canvas DS copy draws it (v64), and the BL-61 leftover sentence is dropped.
+- [ ] 2.2 BL-61 — replace the `@media (max-width: 374.98px)` rule in `apps/web/src/components/ds/ds.css` with the media-free `minmax(max(76px, …))` template on `.sn-swatch-grid[data-columns="4"]`, still in `@layer components`. Update the rule's comment and `swatch.tsx`'s `keepColumns` doc (design.md BL-61). Done when 2.1 and 2.2a pass and `ds.test.tsx` passes unchanged.
+- [ ] 2.2a BL-61 — edit `e2e/design-review.spec.ts` (approved, Decision 6): "shows the sample report's first swatch in the first screen" asserts the first chip `toBeInViewport({ ratio: 0.5 })`, keeping its citations ({@link openspec/specs/site-content/spec.md#scenario-the-sample-on-a-phone}); `firstSwatchInView` takes the ratio as a parameter, so the season-page test keeps `ratio: 1`. Done when both design-review tests pass.
+- [ ] 2.3 BL-61 — hand-edit `openspec/specs/ui-components/spec.md` Behavior (:150-154): the grid-width rule replaces the below-375 rule, the canvas DS copy draws it (v65), and the BL-61 leftover sentence is dropped.
 - [ ] 2.4 BL-68 — failing tests:
   - new `it`s in `apps/web/src/lib/capture/capture.test.ts`: a passing photo's `photoCheckedProps` carry `outline: "late"` with no `outline_ms` key ({@link openspec/specs/capture-flow/spec.md#scenario-a-passing-photo-whose-outline-is-late}), and carry `outline: "made"` with a whole-number `outline_ms` ({@link openspec/specs/capture-flow/spec.md#scenario-a-passing-photo-whose-outline-is-made}); a rejected photo's props carry neither key;
   - a new `apps/web/src/lib/capture/photo.test.ts` with a mocked `loadPerson` covering `outline()`'s five outcomes.
