@@ -353,6 +353,14 @@ describe("/color-analysis-gpt-alternative", () => {
     );
     expect(imgs(out)).toEqual([SAMPLE_FACE, SAMPLE_FACE]);
   });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-photo-checks-filter-claim} */
+  it("names only the strong color filters the photo check catches", () => {
+    expect(text(out)).toContain(
+      "low light, tinted light, strong color filters, a missing face and more than one face",
+    );
+    expect(text(out)).not.toContain("tinted light, filters,");
+  });
 });
 
 describe("example photos", () => {
@@ -460,6 +468,17 @@ describe("the sample face's cut-out", () => {
     for (const slot of slots) {
       expect(slot).toContain("sn-drape__face--cut");
       expect(slot).toContain(`--sn-face-mask:url(&quot;${MASK}&quot;)`);
+    }
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-sample-draping-pair-is-captioned} */
+  it("captions the sample draping pair as an example face on both pages", () => {
+    for (const out of [html(<SampleReport />), html(<GptAlternative />)]) {
+      const after = out.slice(out.lastIndexOf("sn-drape"));
+      const next = after.search(/<h[23]|<section/);
+      expect(text(next < 0 ? after : after.slice(0, next))).toContain(
+        "An AI-made example face, to show how draping looks. These colors are not her analyzed result.",
+      );
     }
   });
 

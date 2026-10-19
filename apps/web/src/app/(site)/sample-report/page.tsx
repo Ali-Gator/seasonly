@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { Button, DrapingPair, Icon } from "@/components/ds";
 import { ReportSections } from "@/lib/report/sections";
-import { SAMPLE_FACE, SAMPLE_FACE_MASK } from "@/lib/site-content/images";
+import { SAMPLE_FACE, SAMPLE_FACE_CAPTION, SAMPLE_FACE_MASK } from "@/lib/site-content/images";
 import { pageMetadata } from "@/lib/site/routes";
 
 export const metadata = pageMetadata("/sample-report");
@@ -47,14 +47,17 @@ export default function Page() {
             subtitle="A sample color analysis report"
             agreementNote="Green veins and gold jewelry point warm. Your soft brown hair and hazel eyes point muted."
             draping={
-              <DrapingPair
-                best={draping.best}
-                worst={draping.worst}
-                faceSrc={SAMPLE_FACE.src}
-                faceAlt={SAMPLE_FACE.alt}
-                faceMaskSrc={SAMPLE_FACE_MASK}
-                className="lg:max-w-[560px]"
-              />
+              <>
+                <DrapingPair
+                  best={draping.best}
+                  worst={draping.worst}
+                  faceSrc={SAMPLE_FACE.src}
+                  faceAlt={SAMPLE_FACE.alt}
+                  faceMaskSrc={SAMPLE_FACE_MASK}
+                  className="lg:max-w-[560px]"
+                />
+                <p className="caption text-(--ink-muted)">{SAMPLE_FACE_CAPTION}</p>
+              </>
             }
           />
         </div>

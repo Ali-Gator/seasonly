@@ -49,6 +49,10 @@ export const SAMPLE_FACE: Photo = {
   alt: "Sample face: a fictional woman with light brown hair and hazel eyes",
 };
 
+/** Under every draping pair on the sample face: the core reads her another season. */
+export const SAMPLE_FACE_CAPTION =
+  "An AI-made example face, to show how draping looks. These colors are not her analyzed result.";
+
 /**
  * The sample face's outline, made once by `scripts/sample-face-mask.ts` with the phone's person
  * segmenter, so the sample is cut out like a real report. Static, so it never reaches `/api/`.

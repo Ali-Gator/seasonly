@@ -2,7 +2,7 @@ import { PALETTES, RETAKE_TIPS } from "@seasonly/analysis";
 import Link from "next/link";
 
 import { Button, DrapingPair, Icon, Note, SwatchGrid } from "@/components/ds";
-import { SAMPLE_FACE, SAMPLE_FACE_MASK } from "@/lib/site-content/images";
+import { SAMPLE_FACE, SAMPLE_FACE_CAPTION, SAMPLE_FACE_MASK } from "@/lib/site-content/images";
 import { softAutumnColors } from "@/lib/site-content/sample";
 import { ORIGIN, pageMetadata } from "@/lib/site/routes";
 
@@ -108,9 +108,9 @@ export default function Page() {
         <div className="flex flex-col gap-(--space-3)">
           <h3 className="h3">A photo check</h3>
           <p className="text-(--ink-muted)">
-            Before your photo is read, your phone checks it for low light, tinted light, filters, a
-            missing face and more than one face. A bad photo gets one retake tip instead of a season
-            read from it.
+            Before your photo is read, your phone checks it for low light, tinted light, strong
+            color filters, a missing face and more than one face. A bad photo gets one retake tip
+            instead of a season read from it.
           </p>
           <Note tone="danger" title={RETAKE_TIPS.tint.title}>
             {RETAKE_TIPS.tint.message}
@@ -133,6 +133,7 @@ export default function Page() {
             faceAlt={SAMPLE_FACE.alt}
             faceMaskSrc={SAMPLE_FACE_MASK}
           />
+          <p className="caption text-(--ink-muted)">{SAMPLE_FACE_CAPTION}</p>
         </div>
 
         <div className="flex flex-col gap-(--space-3)">
