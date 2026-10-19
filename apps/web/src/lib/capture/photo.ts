@@ -26,7 +26,14 @@ export type CheckedPhoto = {
       outline: OutlineOutcome;
       outlineMs?: number;
     }
-  | { problem: RetakeReason; traits?: never; crop?: never; mask?: never; outline?: never }
+  | {
+      problem: RetakeReason;
+      traits?: never;
+      crop?: never;
+      mask?: never;
+      outline?: never;
+      outlineMs?: never;
+    }
 );
 
 /**

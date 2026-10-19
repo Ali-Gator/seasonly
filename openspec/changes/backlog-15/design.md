@@ -181,6 +181,10 @@ Found in `/backlog-fix`: `apps/web/src/components/ds/ds.test.tsx` "lays a 4-colu
 - **Recommendation:** rewrite — the e2e tests at 375 and 414 px pin the layout itself.
 - **Answer:** Approve the edit (Oleg, 2026-10-19).
 
+### 8. BL-61 — below about 316 px the grid takes 2 (technical)
+
+Found in the `/backlog-fix` review: the `auto-fill` template drops to 2 columns once even 3 cells would be under 76 px, a window under about 316 px (a fold's cover screen, or a 360 px phone zoomed past 115%). Clamping it to 3 would push "Watermelon" past a 64 px cell, against this batch's goal that no name overflows on any phone width. Kept as built; the delta and Behavior text say "3, or 2 below about 316 px". No board is narrower than 375 px, so the canvas is unaffected.
+
 ### 5. BL-68 — outcome names and where they go (technical)
 
 The outcome goes on `photo_checked` as a PostHog property, not to Sentry. The rate needs the pass count that `photo_checked` already gives, and capture-flow sends only crashes to Sentry.

@@ -184,7 +184,7 @@
   /* A 4-column grid takes 3 while a cell would be under 76 px, so a name like Watermelon fits its
      cell and Light Warm Aqua takes two lines (BL-57, BL-61). The track minimum is at least a quarter
      of the grid less its 3 column gaps, so auto-fill never makes more than 4; on a phone 4 start at
-     about a 404 px window. It follows the grid's width, not the window's, so the canvas draws it too.
+     about a 404 px window, and below about 316 px it takes 2 so names still fit. It follows the grid's width, not the window's, so the canvas draws it too.
      It sets the template, not --sn-cols, which the inline count would beat; grids with keepColumns
      carry no marker, and a page's column utility still wins (BL-63). */
   .sn-swatch-grid[data-columns="4"] {

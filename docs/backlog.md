@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-105**
+_Next id:_ **BL-106**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -143,6 +143,13 @@ fold items in.
   parameter (BL-32)
 
 ## Testing
+
+- **[BL-105] The gate's `slugify` keeps superscripts and fractions GitHub drops** — its kept set
+  takes every number (`\p{N}`), so ², ³, ½ and ¼ stay in the gate's anchor while github-slugger
+  1.5.0 drops them: a heading such as "76 px²" would pass the gate and be a dead link on GitHub.
+  Use `\p{Nd}\p{Nl}`. No spec heading has one today; the helper sits in the approved-only gate file.
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`slugify`), `backlog-15` review · _Status:_
+  deferred — until a spec heading holds a superscript or fraction, or the next gate-file change
 
 - **[BL-54] TikTok's in-app browser is untested against the bot check** — Instagram's passed on
   2026-10-17 (camera, analysis and report email on an iPhone, no 403). TikTok shows no tappable bio
