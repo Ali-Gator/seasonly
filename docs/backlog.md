@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-104**
+_Next id:_ **BL-105**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -79,10 +79,9 @@ fold items in.
   a fresh run instead of the committed result.
   _Refs:_ `.github/workflows/eval-weekly.yml`, `evals/gate.ts` · _Status:_ deferred — until four
   consecutive weekly runs fetch cleanly and match the committed metrics within the drift the
-  analysis-eval spec allows another machine; 0 of 4 so far (the one run, manual `38420860039` on
-  2026-10-13, failed its fetch on Commons 429s before the BL-52 retry fix), first scheduled run
-  2026-10-19, and the spec's drift ("may move a metric slightly") needs a number before this can
-  close (backlog-8 triage, 2026-10-15)
+  analysis-eval spec allows another machine; 1 of 4 so far (the first scheduled run, `39233860137`
+  on 2026-10-19, fetched and passed; its metric match was not checked), and the spec's drift ("may
+  move a metric slightly") needs a number before this can close (backlog-15 triage, 2026-10-19)
 
 - **[BL-50] Re-sweep the eye-white tint limit on the new measure** — `MAX_EYE_WHITE_CHROMA`
   (C\*ab 22) was tuned on the old brightest-40% eye white; tuning `tint` false rejects are 12 of 27.
@@ -101,16 +100,20 @@ fold items in.
   requirement "Eye whites that cannot be measured do not reject a photo".
   _Refs:_ `packages/analysis/src/sampling/index.ts`, `openspec/changes/archive/*-backlog-1/design.md` · _Status:_ deferred —
   until about 50 production `photo_checked` events (PostHog, excluding preview hosts and Oleg's own
-  sessions) reach the eye-white step after the backlog-1 deploy; 3 so far, 0 null (backlog-8 triage, 2026-10-15)
+  sessions) reach the eye-white step after the backlog-1 deploy; 9 so far from 4 people, 0 null (backlog-15 triage, 2026-10-19)
 
 ## Privacy
 
 - **[BL-68] Outline misses on the phone go uncounted** — `outline()` in `photo.ts` returns null
   silently on a slow or failed person segmenter, a size mismatch or a face it missed, so nobody
-  learns how often reports show an uncut face. Send the reason with `photo_checked` (or to Sentry)
-  and tune the 3 s wait from it.
-  _Refs:_ `apps/web/src/lib/capture/photo.ts`, t19-draping-cutout phase review · _Status:_ deferred —
-  until reports with an uncut face are seen after launch
+  learns how often reports show an uncut face. Send the outcome with `photo_checked`.
+  _Refs:_ `apps/web/src/lib/capture/photo.ts`, t19-draping-cutout phase review · _Status:_ open —
+  the old trigger ("uncut faces seen") could not fire without this count (backlog-15 triage, 2026-10-19)
+- **[BL-104] Tune the 3 s person-segmenter wait** — `outline()` gives up after a fixed 3 s. Once
+  `photo_checked` carries the outline outcome and time (BL-68), set the wait from the late rate and
+  the made-time spread.
+  _Refs:_ `apps/web/src/lib/capture/photo.ts` · _Status:_ deferred — until about 50 production
+  `photo_checked` passes (excluding preview hosts and Oleg's own sessions) carry the outline outcome
 - **[BL-18] A crop can stay about 49 h while the pages say 24 h** — the retention job runs once a
   day (Vercel Hobby) with a 24 h cutoff, so a crop stored just after a run lasts until the run
   after next. Move to an hourly scheduler (Vercel Pro, or `pg_cron` + `pg_net` calling the same
@@ -131,8 +134,9 @@ fold items in.
   already sent. Wire an `AbortController` through the client's `global.fetch`, or a newer
   storage-js that takes a signal.
   _Refs:_ `apps/web/src/lib/draping/crops.ts`, `openspec/specs/draping-preview/spec.md` ·
-  _Status:_ deferred — until Sentry shows `crop upload timed out` events, or storage-js adds a
-  signal to `upload()`
+  _Status:_ deferred — until Sentry shows `crop upload failed` or `outline upload failed` events
+  whose cause is `timed out after 3 s`, or storage-js adds a signal to `upload()`; none in 90 days,
+  and 2.118.0 and 3.0.0-next.29 still take none (backlog-15 triage, 2026-10-19)
 
 - **[BL-95] The camera start leaves Next's router on `?start=camera`** — `flow.tsx` strips
   `start` with the entry's own state, so Next's router keeps the old address; a later
@@ -149,8 +153,8 @@ fold items in.
   the whole spec file, but archive reads only the `## Requirements` section, so a
   `### Requirement:` heading under Behavior or Edge Cases would be held as a name (an ADDED of it
   fails closed) and need a citing test. No spec has one today.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`mainSpecs`, `parseRequirements`) · _Status:_ deferred —
-  until a spec holds a `### Requirement:` heading outside `## Requirements` (`backlog-12` triage, 2026-10-17)
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`mainSpecs`, `parseRequirements`) · _Status:_
+  open — planned in `backlog-15` ahead of its trigger, Oleg's choice (2026-10-19)
 
 - **[BL-103] A rename archive aborts on as "source not found" leaves a folded name citable** —
   archive's RENAMED step throws when neither the FROM nor the TO is held (`specs-apply.js:290`).
@@ -163,8 +167,8 @@ fold items in.
 - **[BL-85] `slugify` drops combining marks that GitHub keeps** — github-slugger keeps `\p{M}`,
   the gate's `slugify` drops it, so a heading with a combining accent anchors differently. No
   spec heading has one.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ deferred — until a spec heading
-  holds a combining mark (`backlog-11` triage, 2026-10-17)
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` · _Status:_ open — planned in `backlog-15`
+  ahead of its trigger, Oleg's choice (2026-10-19)
 
 - **[BL-54] TikTok's in-app browser is untested against the bot check** — Instagram's passed on
   2026-10-17 (camera, analysis and report email on an iPhone, no 403). TikTok shows no tappable bio
@@ -182,9 +186,9 @@ fold items in.
   The approved 375 board shows Soft Autumn, whose names fit, so the fix changes the approved 375
   layout: a 375 board with a Light Spring palette first. `backlog-3` covers only below 375; a
   container query on cell width, not viewport width, would cover both in one rule.
-  _Refs:_ `apps/web/src/components/ds/ds.css` (`.sn-swatch__name`), MVP canvas board 10 · _Status:_ gated — a Light Spring 375/390 board (`backlog-3`'s below-375 column rule
-  is the base; option 1 moves that breakpoint to ~404 px). Also hit:
-  390/393 px iPhones, True Summer best #16, Champagne in Light Spring metals (`backlog-4` triage, 2026-10-14)
+  _Refs:_ `apps/web/src/components/ds/ds.css` (`.sn-swatch__name`), MVP canvas board 10 · _Status:_ open — board 16b approved on canvas v64 (3 columns below ~404 px); also hit:
+  390/393 px iPhones, True Summer best #16, Champagne in Light Spring metals, and "Light Warm Aqua" /
+  "Light Warm Navy" wrapping to 3 lines at 375 (`backlog-15` triage, 2026-10-19)
 
 - **[BL-04] The design system's ShareCard overflows on long names** — the approved
   `bundle.css` sets post-card names at 0.75 em, and "Bright Turquoise" needs about 379 px of a
@@ -194,8 +198,9 @@ fold items in.
   so a DOM ShareCard preview on the report matches the PNG.
   _Refs:_ `openspec/specs/share-card/spec.md` (Behavior), MVP canvas board 11
   (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3) · _Status:_ deferred — until a page renders a
-  DOM card preview (`t5-report-delivery` shows the PNGs themselves); check whether the 2026-10-07
-  redesign session already updated the canvas
+  DOM card preview (none as of `backlog-15` triage, 2026-10-19). The canvas `bundle.css` already has
+  the post-card sizes (0.55 em, nowrap, hex 0.5 em); only the story rows sharing the list height are
+  still missing
 
 - **[BL-27] The GPT-alternative page goes stale on December 11** — its title, description, h1
   and lead say the GPT "is retiring" on December 11, 2026. Re-check OpenAI's FAQ and switch the
@@ -216,7 +221,8 @@ fold items in.
 
 - **[BL-33] Rate-limit `/api/mcp`** — the endpoint is public and unauthenticated; a call is pure
   computation, so no limit ships. Add a Vercel firewall rate-limit rule for `/api/mcp`, no code.
-  _Refs:_ `apps/web/src/app/api/mcp/route.ts` · _Status:_ deferred — if Vercel usage shows abuse
+  _Refs:_ `apps/web/src/app/api/mcp/route.ts` · _Status:_ deferred — if Vercel usage shows abuse;
+  about 15 calls in 14 days by Sentry traces, no firewall config yet (backlog-15 triage, 2026-10-19)
 
 - **[BL-34] Claude calls the plugin only after a per-chat "Use"** — in claude.ai, a first prompt
   makes Claude search the connector directory, offer a "Use" button and answer from its own
