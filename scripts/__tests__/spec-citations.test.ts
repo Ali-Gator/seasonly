@@ -256,10 +256,10 @@ function conflicts(plan: DeltaEntry[]): Set<string> {
  * the pre-validate `conflicts` and grows by the removals archive's REMOVED step aborts on
  * (`specs-apply.js:318-324`). After the rename walk, removals are taken in document order
  * against a running copy of the names held: an exact match is deleted, so a later removal no
- * longer sees it; a name not held whose fold matches a held one drops both, and every name of
- * the accepted chain that ends at the held one, since archive applies none of it. The renames
- * are then walked again without any pair naming a dropped name, so the chain's old name stays
- * held, until nothing more drops. `left` is the names held after the walk and the removals.
+ * longer sees it; a name not held whose fold matches a held one drops both, and the held one's
+ * whole chain (`chains`), since archive applies none of it. The renames are then walked again
+ * without any pair naming a dropped name, so the chain's old name stays held, until nothing
+ * more drops. `left` is the names held after the walk and the removals.
  */
 function nearMisses(
   plan: DeltaEntry[],
@@ -272,10 +272,10 @@ function nearMisses(
     const held = new Set(walk.held);
     for (const e of plan) {
       if (e.kind !== "removed" || dropped.has(e.name) || held.delete(e.name)) continue;
-      let near = [...held].find((k) => fold(k) === fold(e.name));
+      const near = [...held].find((k) => fold(k) === fold(e.name));
       if (near === undefined) continue;
       dropped.add(e.name).add(near);
-      for (const p of walk.pairs.toReversed()) if (p.to === near) dropped.add((near = p.from));
+      for (const name of walk.chains.get(near) ?? []) dropped.add(name);
     }
     if (dropped.size === size) return { ...walk, dropped, left: held };
   }
@@ -288,23 +288,28 @@ function nearMisses(
  * accepted pair renames in the copy, so a chain succeeds. Archive skips a pair whose old name
  * is gone and new name held as already applied; that pair is refused here too, since it
  * renames nothing. `held` is the copy after the walk: the main spec's names minus the accepted
- * old names plus the accepted new ones.
+ * old names plus the accepted new ones. `chains` maps every new name an accepted pair produced,
+ * held at the end or moved away by a later pair, to the names its block carried up to then,
+ * first name (a main-spec name) first and that new name last; a name produced again maps to its
+ * latest chain.
  */
 function appliedRenames(
   plan: DeltaEntry[],
   existing: ReadonlySet<string>,
   dropped: ReadonlySet<string>,
-): { pairs: { from: string; to: string }[]; held: Set<string> } {
+): { pairs: { from: string; to: string }[]; held: Set<string>; chains: Map<string, string[]> } {
   const held = new Set(existing);
+  const chains = new Map<string, string[]>();
   const pairs = plan
     .flatMap((e) => (e.kind === "renamed" ? [e] : []))
     .filter(({ from, to }) => {
       if (dropped.has(from) || dropped.has(to) || held.has(to) || !held.has(from)) return false;
       held.delete(from);
       held.add(to);
+      chains.set(to, [...(chains.get(from) ?? [from]), to]);
       return true;
     });
-  return { pairs, held };
+  return { pairs, held, chains };
 }
 
 /**
@@ -374,10 +379,11 @@ interface OpenDelta {
  * archive would refuse — from a name `existing` (main-spec names) or an earlier rename does not
  * hold, or onto one it does — leaves its old name needing a citing test. A MODIFIED block's
  * scenarios, unenforced flag and place in `replaced` count whatever its name; only a main-spec
- * requirement of that name is ever looked up. A rename's main-spec name enters `carried` only
- * when a MODIFIED block of the same delta names where its chain ends. An accepted rename's old
- * name joins `gone` only when the walk no longer holds it: a round trip, or another
- * requirement renamed onto it, leaves it held, so it still needs a citing test.
+ * requirement of that name is ever looked up. A rename's main-spec name, the first of its
+ * chain (`chains`), enters `carried` only when a MODIFIED block of the same delta names where
+ * that chain ends. An accepted rename's old name joins `gone` only when the walk no longer
+ * holds it: a round trip, or another requirement renamed onto it, leaves it held, so it still
+ * needs a citing test.
  */
 function deltaProof(
   text: string,
@@ -390,14 +396,8 @@ function deltaProof(
   existing: ReadonlySet<string> = new Set(),
 ): OpenDelta {
   const plan = deltaPlan(text);
-  const { dropped, pairs, held } = nearMisses(plan, existing);
+  const { dropped, pairs, held, chains } = nearMisses(plan, existing);
   const renamedFrom = new Set(pairs.map((p) => p.from));
-  // The name each accepted chain of renames ends at, and the main-spec name it starts from.
-  const origin = new Map<string, string>();
-  for (const { from, to } of pairs) {
-    origin.set(to, origin.get(from) ?? from);
-    origin.delete(from);
-  }
   for (const e of plan) {
     if (e.kind === "removed") {
       if (!dropped.has(e.name)) into.gone.add(e.name);
@@ -409,7 +409,7 @@ function deltaProof(
       if (r.unenforced) into.gone.add(r.name);
       into.scenarios.set(r.name, [...(into.scenarios.get(r.name) ?? []), ...r.scenarios]);
       into.replaced.set(r.name, [...(into.replaced.get(r.name) ?? []), r]);
-      const from = origin.get(r.name);
+      const from = chains.get(r.name)?.[0];
       if (from) into.carried.add(from);
     }
   }
@@ -1155,6 +1155,30 @@ describe("spec citation rules", () => {
     expect(deltaAnchors(delta, names)).toContain("requirement-c");
     const open = new Map([["cap", deltaProof(delta, undefined, names)]]);
     expect(unprovenRequirements(main, [], open)).toEqual([]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-chain-of-renames-in-one-delta} */
+  it("a chain of renames ending at a modified name keeps none of the first name's anchors", () => {
+    const main = new Map([
+      ["cap", parseRequirements(["### Requirement: A", "#### Scenario: Opening"])],
+    ]);
+    const delta = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: A`",
+      "- TO: `### Requirement: B`",
+      "- FROM: `### Requirement: B`",
+      "- TO: `### Requirement: C`",
+      "## MODIFIED Requirements",
+      "### Requirement: C",
+      "#### Scenario: Closing",
+    ].join("\n");
+    const names = new Set(["Requirement: A"]);
+    expect([...deltaProof(delta, undefined, names).carried]).toEqual(["Requirement: A"]);
+    const anchors = ["scenario-opening", "scenario-closing"];
+    const citations = extractCitations("a.test.ts", anchors.map((a) => cite("cap", a)).join("\n"));
+    expect(staleCitations(citations, resolvableAnchors(main, [["cap", delta]]))).toEqual([
+      "a.test.ts:1 cap#scenario-opening",
+    ]);
   });
 
   /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-round-trip-in-one-delta} */
