@@ -30,7 +30,10 @@ function checkImage(source: Blob | ImageBitmap): Promise<CheckedPhoto>; // decod
 interface CheckedPhoto {
   /* … */ crop: Blob | null;
   mask: Blob | null;
+  outline?: OutlineOutcome; // a pass only
+  outlineMs?: number; // on `made` only, whole ms from the start of the outline
 } // mask: the crop's PNG outline, null without a pass or a segmenter
+type OutlineOutcome = "made" | "late" | "failed" | "mismatch" | "missed";
 function pickFace(
   faces: readonly Landmarks[],
   width: number,
@@ -50,7 +53,9 @@ function photoCheckedProps(o: {
   measures;
   attempt;
   source;
-}): Record<string, unknown>;
+  outline?;
+  outlineMs?;
+}): Record<string, unknown>; // outline and outline_ms only when given, never null
 ```
 
 ## Behavior
@@ -59,7 +64,7 @@ function photoCheckedProps(o: {
 - The check and the analysis replace their spinner with the outcome, so Back never lands on a spinner. Each check carries an id; a result whose id is not the shown `checking` step is dropped and not reported.
 - The camera frame is taken before `checking` unmounts the camera. The photo is checked at ≤ 1280 px on its longer side; the crop is the face box plus 30 % per side, ≤ 512 px, JPEG 0.85.
 - MediaPipe's wasm comes from jsDelivr at the exact installed `@mediapipe/tasks-vision` version, the models from Google's versioned paths; both start loading on the guide. The person segmenter (0.25 MB) starts once the other two have loaded, since MediaPipe's loaders share one global.
-- After a pass, `checkImage` waits at most 3 s for the person segmenter and runs it on the crop canvas. The outline is black with alpha `round(confidence × 255)`, the crop's size, encoded `toBlob("image/png")`. It is dropped (`mask: null`) when the segmenter is late or fails, or when the mean confidence over the crop's middle third is below 0.5, so it never empties the oval. Measured 2026-10-15 on a real selfie: 13.6 KB.
+- After a pass, `checkImage` waits at most 3 s for the person segmenter and runs it on the crop canvas. The outline is black with alpha `round(confidence × 255)`, the crop's size, encoded `toBlob("image/png")`. It is dropped (`mask: null`) when the segmenter is late (`late`) or fails (`failed`), when the mask is missing or of another size (`mismatch`), or when the mean confidence over the crop's middle third is below 0.5 (`missed`), so it never empties the oval; `photo_checked` carries the outcome, and on `made` the time. The 3 s wait stays fixed until those outcomes show how often it is late (BL-104). Measured 2026-10-15 on a real selfie: 13.6 KB.
 - A check that throws (an undecodable file, models that failed to load) shows the no-face retake and goes to Sentry.
 - Each new step scrolls to the top and focuses its `main h1`; when `matchMedia("(hover: hover) and (pointer: fine)")` matches, a `main [data-autofocus]` element takes it instead (only the email step's field has one). The effect skips while the step is the one it last handled, which is the opening guide on mount and on StrictMode's second run, so `/analyze` opens without moving focus; Back to the guide still moves it. A camera start skips `CAMERA_START` once through a one-shot `opening` ref, so Back onto the capture step later still moves focus. `globals.css` draws no outline on `h1[tabindex="-1"]:focus`.
 - `?start=camera` is read in a mount-only `useLayoutEffect`, before the first paint of the landing's soft navigation. It dispatches `start-camera` (a replace, not a push, so the capture step owns the entry the flow mounted on and Back leaves the flow) and calls `history.replaceState(history.state, "", "/analyze")`. The state keeps Next's `__NA` key: on a fresh load this runs before Next patches history, and entries without it reload the page on Back. Next's router therefore keeps `?start=camera` as its own URL (BL-95). StrictMode's second run finds no `start`.

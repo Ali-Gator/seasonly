@@ -123,6 +123,38 @@ describe("events", () => {
     });
     expect(Object.keys(props).join(" ")).not.toMatch(/pixel|landmark|image|crop|mask/);
   });
+
+  const pass = {
+    problem: null,
+    faceCount: 1,
+    measures: { faceWidth: 300, eyeWhite: { L: 80, a: 0, b: 2 }, skin: { L: 62, a: 14, b: 20 } },
+    attempt: 1,
+    source: "camera",
+  } as const;
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-a-passing-photo-whose-outline-is-late} */
+  it("reports a late outline with no outline time", () => {
+    const props = photoCheckedProps({ ...pass, outline: "late" });
+    expect(props.outline).toBe("late");
+    expect(props).not.toHaveProperty("outline_ms");
+    expect(Object.keys(props).join(" ")).not.toMatch(/pixel|landmark|image|crop|mask/);
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-a-passing-photo-whose-outline-is-made} */
+  it("reports a made outline with its time in whole milliseconds", () => {
+    const props = photoCheckedProps({ ...pass, outline: "made", outlineMs: 412 });
+    expect(props.outline).toBe("made");
+    expect(props.outline_ms).toBe(412);
+    expect(Number.isInteger(props.outline_ms)).toBe(true);
+    expect(Object.keys(props).join(" ")).not.toMatch(/pixel|landmark|image|crop|mask/);
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#requirement-each-photo-check-is-reported-without-photo-data} */
+  it("reports neither outline property for a rejected photo", () => {
+    const props = photoCheckedProps({ ...pass, problem: "dark" });
+    expect(props).not.toHaveProperty("outline");
+    expect(props).not.toHaveProperty("outline_ms");
+  });
 });
 
 describe("MediaPipe assets", () => {
