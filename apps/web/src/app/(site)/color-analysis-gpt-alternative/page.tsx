@@ -108,9 +108,9 @@ export default function Page() {
         <div className="flex flex-col gap-(--space-3)">
           <h3 className="h3">A photo check</h3>
           <p className="text-(--ink-muted)">
-            Before your photo is read, your phone checks it for low light, tinted light, filters, a
-            missing face and more than one face. A bad photo gets one retake tip instead of a season
-            read from it.
+            Before your photo is read, your phone checks it for low light, tinted light, strong
+            color filters, a missing face and more than one face. A bad photo gets one retake tip
+            instead of a season read from it.
           </p>
           <Note tone="danger" title={RETAKE_TIPS.tint.title}>
             {RETAKE_TIPS.tint.message}

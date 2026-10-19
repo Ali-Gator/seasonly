@@ -353,6 +353,14 @@ describe("/color-analysis-gpt-alternative", () => {
     );
     expect(imgs(out)).toEqual([SAMPLE_FACE, SAMPLE_FACE]);
   });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-photo-checks-filter-claim} */
+  it("names only the strong color filters the photo check catches", () => {
+    expect(text(out)).toContain(
+      "low light, tinted light, strong color filters, a missing face and more than one face",
+    );
+    expect(text(out)).not.toContain("tinted light, filters,");
+  });
 });
 
 describe("example photos", () => {
