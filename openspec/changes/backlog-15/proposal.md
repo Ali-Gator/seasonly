@@ -50,6 +50,7 @@ Statuses corrected in `docs/backlog.md`:
 - **BL-61** (design.md Decision 4): `e2e/site-structure.spec.ts` "a 4-column grid keeps 4 columns at 375 px" flips to 3 columns at 375 px. A 4-column check moves to 414 px.
 - **BL-103, BL-85, BL-92** (design.md Decisions 1–2): helper code and JSDoc in `scripts/__tests__/spec-citations.test.ts`, plus new rule `it`s. No existing `it`'s assertion, fixture or call changes.
 - **BL-61** (design.md Decision 6): `e2e/design-review.spec.ts` "shows the sample report's first swatch in the first screen" asserts at least half of the first chip in view instead of all of it. The season-page test is unchanged.
+- **BL-61** (design.md Decision 7, found in `/backlog-fix`): `apps/web/src/components/ds/ds.test.tsx` "lays a 4-column grid out in 3 below 375 px" matches the new 76 px template instead of the old media query, and is retitled. Its citation stays.
 - **BL-68:** new `it`s only. No existing test changes.
 
 ## Capabilities

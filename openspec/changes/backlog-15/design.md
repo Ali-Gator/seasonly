@@ -173,6 +173,14 @@ With 3 columns, `/sample-report`'s first chip spans 735–831 px against an 812 
 - **Recommendation:** relax.
 - **Answer:** Relax the test (Oleg, 2026-10-19). This approves editing `e2e/design-review.spec.ts` "shows the sample report's first swatch in the first screen" to `ratio: 0.5`, and the site-content delta.
 
+### 7. BL-61 — the stylesheet test that pinned the old media query
+
+Found in `/backlog-fix`: `apps/web/src/components/ds/ds.test.tsx` "lays a 4-column grid out in 3 below 375 px" matches the old rule's text (`374.98px … repeat(3,`), so the media-free rule fails it. Triage covered only the markup regexes.
+
+- Options: rewrite its assertion to match the new `minmax(max(76px, …))` template and retitle it, keeping its citation / park BL-61.
+- **Recommendation:** rewrite — the e2e tests at 375 and 414 px pin the layout itself.
+- **Answer:** Approve the edit (Oleg, 2026-10-19).
+
 ### 5. BL-68 — outcome names and where they go (technical)
 
 The outcome goes on `photo_checked` as a PostHog property, not to Sentry. The rate needs the pass count that `photo_checked` already gives, and capture-flow sends only crashes to Sentry.
