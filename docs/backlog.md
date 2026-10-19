@@ -28,24 +28,12 @@ fold items in.
 
 ## Analysis
 
-- **[BL-100] The photo check passes the photo guide's own filter example** — `images/examples/filter.webp`
-  (the guide's "filtered" photo) passes `checkPhoto` and classifies Light Summer, while the same
-  face unfiltered (`base.webp`) is Deep Autumn. The guide promises a filter retake, so tune the
-  filter check until this example is caught, or swap the example. Found by
-  `scripts/marketing/faces.ts analyze` (launch plan step 5).
-  _Refs:_ `openspec/specs/photo-check/spec.md`, `packages/analysis/src/photo-check/` · _Status:_ open
 - **[BL-102] Beauty filters pass the photo check** — the `filter` check flags only skin no
   natural skin has (near-gray, very saturated, or hue outside −10° to 100°), so a soft beauty
   filter that brightens and desaturates skin, like the guide's `filter.webp`, reads as lighter
   natural skin. The eval has no beauty-filtered photo, so no detector can be measured yet.
   _Refs:_ `packages/analysis/src/photo-check/index.ts` (`isFiltered`), `evals/variants.ts`, `backlog-14` design (BL-100) · _Status:_ gated —
   labeled beauty-filtered photos in the eval, or an approved beauty-filter eval variant (`backlog-14` triage, 2026-10-18)
-- **[BL-101] The sample report drapes its model in a season the core does not give her** —
-  `/sample-report` shows `examples/face.webp` on Soft Autumn's draping (hard-coded
-  `PALETTES["soft-autumn"]`), but the core classifies that photo Deep Autumn (and production gave
-  her example twin Deep Autumn on Oct 17). A visitor who runs the same photo sees another season.
-  Use the core's result for the sample, or relabel the page as an illustration.
-  _Refs:_ `apps/web/src/app/(site)/sample-report/page.tsx` · _Status:_ open
 
 - **[BL-13] Temperature reads cool and moves with the light** — skin hue moves with the light, so
   one person's temperature spreads across photos. The eye-white Lab offset (commit `1d28b3d`) was
@@ -163,26 +151,6 @@ fold items in.
   fails closed) and need a citing test. No spec has one today.
   _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`mainSpecs`, `parseRequirements`) · _Status:_ deferred —
   until a spec holds a `### Requirement:` heading outside `## Requirements` (`backlog-12` triage, 2026-10-17)
-
-- **[BL-97] A rename onto a freed name keeps the old body's scenarios as its proof** — for A to B
-  plus C to A in one delta, archive leaves A holding C's block, but A's permanent scenario anchors
-  still resolve and prove A, so a test citing only A's old scenario passes until the archive
-  commit, where that scenario sits under B. Treat a requirement a rename writes over as replaced,
-  as an accepted MODIFIED block is (`backlog-13` triage; approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`deltaProof`, `resolvableAnchors`) · _Status:_ open — `backlog-13` triage, 2026-10-18
-
-- **[BL-98] A rename near-miss that archive aborts on stays citable** — archive's RENAMED step
-  throws when a FROM is not held, its TO is held, and a held name other than the TO folds onto the
-  FROM (`specs-apply.js:274-282`), aborting the whole archive. The gate only refuses that pair, so
-  a MODIFIED block on the TO, or the folded name's proof, stays as if the delta applied. Drop the
-  names involved, as `nearMisses` does for REMOVED (`backlog-13` apply; approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`nearMisses`, `appliedRenames`) · _Status:_ open — `backlog-13` apply, 2026-10-18
-
-- **[BL-99] Rename chains are followed in two places** — `nearMisses` walks `appliedRenames`'
-  pairs backward to drop a chain, and `deltaProof` builds its own `origin` map from the same
-  pairs for `carried`, so a fix to chain following must land twice. Have `appliedRenames` return
-  each held name's chain origin and use it in both (`backlog-13` review; approved-only gate test file).
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`nearMisses`, `deltaProof`) · _Status:_ open — `backlog-13` review, 2026-10-18
 
 - **[BL-85] `slugify` drops combining marks that GitHub keeps** — github-slugger keeps `\p{M}`,
   the gate's `slugify` drops it, so a heading with a combining accent anchors differently. No
