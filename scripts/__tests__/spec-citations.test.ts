@@ -3,7 +3,7 @@
  *
  * Scans `apps/`, `packages/`, `scripts/`, `e2e/` and `evals/` for `{@link openspec/specs/<cap>/spec.md#<anchor>}`
  * and `@see openspec/specs/<cap>/spec.md` links. Anchors are GitHub heading slugs of a
- * `### Requirement:` or `#### Scenario:` heading. A citation resolves against the main
+ * `### Requirement:` or `#### Scenario:` heading in a main spec's `## Requirements` section. A citation resolves against the main
  * specs plus the ADDED/MODIFIED/RENAMED headings of unarchived changes, a modified
  * requirement through its delta's headings in place of the main spec's; only main-spec
  * requirements must be proven, minus those an unarchived change removes, renames away
@@ -57,12 +57,15 @@ interface Citation {
   anchor?: string;
 }
 
-/** GitHub heading slug: lowercase, drop all but letters/digits/space/hyphen/underscore, spaces to hyphens. */
+/**
+ * GitHub heading slug (github-slugger): lowercase, drop all but letters, combining marks, digits,
+ * connector punctuation (`_`, U+203F `‿`), space and hyphen, spaces to hyphens. No Unicode normalisation.
+ */
 function slugify(heading: string): string {
   return heading
     .trim()
     .toLowerCase()
-    .replace(/[^\p{L}\p{N} _-]/gu, "")
+    .replace(/[^\p{L}\p{M}\p{N}\p{Pc} -]/gu, "")
     .replace(/ /g, "-");
 }
 
@@ -171,10 +174,11 @@ const SECTION_KINDS = ["added", "modified", "removed", "renamed"] as const;
  * whole to `<kind> requirements`. Any other title is a section of no kind that still ends the
  * one before it. Repeated headings stay separate bodies. The fence mask is built once for the
  * whole delta and each body carries its slice, so a fenced `## ` line opens no section.
+ * `title` is that trimmed, lowercased title; `mainRequirements` splits a permanent spec here too.
  */
 function deltaSections(
   text: string,
-): { kind?: (typeof SECTION_KINDS)[number]; body: string[]; mask: boolean[] }[] {
+): { title: string; kind?: (typeof SECTION_KINDS)[number]; body: string[]; mask: boolean[] }[] {
   const sections: ReturnType<typeof deltaSections> = [];
   const lines = splitLines(text);
   const masked = fenceMask(lines);
@@ -183,7 +187,7 @@ function deltaSections(
     if (m) {
       const title = (m[1] ?? "").trim().toLowerCase();
       const kind = SECTION_KINDS.find((k) => title === `${k} requirements`);
-      sections.push({ kind, body: [], mask: [] });
+      sections.push({ title, kind, body: [], mask: [] });
     } else {
       sections.at(-1)?.body.push(line);
       sections.at(-1)?.mask.push(masked[i] ?? false);
@@ -546,16 +550,25 @@ function repoCitations(): Citation[] {
   );
 }
 
+/**
+ * A permanent spec's requirements as archive's `extractRequirementsSection` reads them: from the
+ * first `## Requirements` section's body only, with its slice of the fence mask. A requirement or
+ * scenario heading under any other section is not read.
+ */
+function mainRequirements(text: string): Requirement[] {
+  const section = deltaSections(text).find((s) => s.title === "requirements");
+  return section ? parseRequirements(section.body, section.mask) : [];
+}
+
 let mainSpecsCache: Map<string, Requirement[]> | undefined;
 
-/** Every permanent spec's requirements, by capability. Read from disk once per run; callers only read the map. */
+/** Every permanent spec's requirements (`mainRequirements`), by capability. Read from disk once per run; callers only read the map. */
 function mainSpecs(): Map<string, Requirement[]> {
   if (mainSpecsCache) return mainSpecsCache;
   const specs = new Map<string, Requirement[]>();
   for (const cap of fs.readdirSync(SPECS_DIR)) {
     const file = path.join(SPECS_DIR, cap, "spec.md");
-    if (fs.existsSync(file))
-      specs.set(cap, parseRequirements(splitLines(fs.readFileSync(file, "utf-8"))));
+    if (fs.existsSync(file)) specs.set(cap, mainRequirements(fs.readFileSync(file, "utf-8")));
   }
   mainSpecsCache = specs;
   return specs;
@@ -696,6 +709,49 @@ describe("spec citation rules", () => {
   it("slugs keep letters, digits, hyphens and underscores, and drop backticks and colons", () => {
     expect(specs.get("cap")?.[0]?.anchor).toBe(REQ);
     expect(specs.get("cap")?.[0]?.scenarios).toEqual([SCENARIO]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-heading-that-holds-a-combining-mark} */
+  it("slugs keep combining marks and connector punctuation", () => {
+    const parsed = parseRequirements([
+      "### Requirement: Marks",
+      "#### Scenario: Cafe\u0301 \u203f tie",
+    ]);
+    const slug = "scenario-cafe\u0301-\u203f-tie";
+    expect(parsed[0]?.scenarios).toEqual([slug]);
+    const citations = extractCitations("a.test.ts", cite("cap", slug));
+    expect(staleCitations(citations, resolvableAnchors(new Map([["cap", parsed]]), []))).toEqual(
+      [],
+    );
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-heading-outside-the-requirements-section} */
+  it("a requirement heading outside the Requirements section is not held, proven or citable", () => {
+    const text = [
+      "## Purpose",
+      "```md",
+      "## Requirements",
+      "### Requirement: Fenced",
+      "```",
+      "##  requirements ",
+      "### Requirement: Held",
+      "#### Scenario: Inside",
+      "## Behavior",
+      "### Requirement: Stray",
+      "#### Scenario: Outside",
+    ].join("\n");
+    const main = new Map([["cap", mainRequirements(text)]]);
+    expect(unprovenRequirements(main, [])).toEqual(["cap: Requirement: Held"]);
+    const anchors = ["requirement-held", "requirement-stray", "scenario-outside"];
+    const citations = extractCitations("a.test.ts", anchors.map((a) => cite("cap", a)).join("\n"));
+    expect(staleCitations(citations, resolvableAnchors(main, []))).toEqual([
+      "a.test.ts:2 cap#requirement-stray",
+      "a.test.ts:3 cap#scenario-outside",
+    ]);
+    // Not held: archive accepts an ADDED of the same name, so its block becomes citable.
+    const added = ["## ADDED Requirements", "### Requirement: Stray", "#### Scenario: New"];
+    const names = new Set(main.get("cap")?.map((r) => r.name));
+    expect(deltaAnchors(added.join("\n"), names)).toEqual(["requirement-stray", "scenario-new"]);
   });
 
   /** {@link openspec/specs/constitution/spec.md#scenario-a-test-cites-a-scenario} */

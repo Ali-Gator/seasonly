@@ -27,10 +27,10 @@ Each task leaves the suite green before the next starts. Only the edits named he
 
 - [x] 2.5 BL-68 — `outline()` returns `{ mask, outcome, ms }`. `CheckedPhoto`'s pass branch gains `outline` and `outlineMs?`, and its rejection branch gets `outline?: never`. `photoCheckedProps` emits `outline` and `outline_ms` only when present. Drop the `ponytail:` note (design.md BL-68, Decision 5). Files: `apps/web/src/lib/capture/photo.ts`, `events.ts`. Done when 2.4 passes and the existing `capture.test.ts` and `flow-state.test.ts` pass unchanged.
 - [x] 2.6 BL-68 — hand-edit `openspec/specs/capture-flow/spec.md` Public Interface (`CheckedPhoto` :33-36, `photoCheckedProps` :47-53) and the Behavior bullet on the 3 s wait (:62), naming BL-104 for the tuning.
-- [ ] 2.7 BL-85 — failing rule `it`: a scenario heading with `e` followed by U+0301 slugs with the mark kept, and `‿` (U+203F) is kept ({@link openspec/specs/spec-workflow/spec.md#scenario-a-heading-that-holds-a-combining-mark}). Verify it fails.
-- [ ] 2.8 BL-85 — add `\p{M}` and `\p{Pc}` to `slugify`'s class (design.md BL-85, Decision 2). Done when 2.7 passes and every other `it` passes unchanged.
-- [ ] 2.9 BL-92 — failing rule `it`: a fixture spec with a `### Requirement:` under `## Behavior`. The requirement is not held, it is not reported unproven, and a citation of its anchor is stale ({@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-heading-outside-the-requirements-section}). Verify it fails.
-- [ ] 2.10 BL-92 — `mainSpecs` passes only the `## Requirements` section body and its fence-mask slice to `parseRequirements` (design.md BL-92, Decision 2). Done when 2.9 passes and the four repo-wide gate `it`s pass unchanged.
+- [x] 2.7 BL-85 — failing rule `it`: a scenario heading with `e` followed by U+0301 slugs with the mark kept, and `‿` (U+203F) is kept ({@link openspec/specs/spec-workflow/spec.md#scenario-a-heading-that-holds-a-combining-mark}). Verify it fails.
+- [x] 2.8 BL-85 — add `\p{M}` and `\p{Pc}` to `slugify`'s class (design.md BL-85, Decision 2). Done when 2.7 passes and every other `it` passes unchanged.
+- [x] 2.9 BL-92 — failing rule `it`: a fixture spec with a `### Requirement:` under `## Behavior`. The requirement is not held, it is not reported unproven, and a citation of its anchor is stale ({@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-heading-outside-the-requirements-section}). Verify it fails.
+- [x] 2.10 BL-92 — `mainSpecs` passes only the `## Requirements` section body and its fence-mask slice to `parseRequirements` (design.md BL-92, Decision 2). Done when 2.9 passes and the four repo-wide gate `it`s pass unchanged.
 - [ ] 2.11 BL-103 — failing rule `it`s:
   - (a) permanent {Foo}: `foo` to `Bar`, plus MODIFIED `Foo` with a cited new scenario; the citation is stale and Foo is unproven;
   - (b) permanent {A}: `Ghost` to `Fresh`, then `A` to `Ghost`; a citation of `Ghost` is stale and A is unproven;
