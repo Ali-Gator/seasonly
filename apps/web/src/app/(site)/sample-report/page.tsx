@@ -47,14 +47,20 @@ export default function Page() {
             subtitle="A sample color analysis report"
             agreementNote="Green veins and gold jewelry point warm. Your soft brown hair and hazel eyes point muted."
             draping={
-              <DrapingPair
-                best={draping.best}
-                worst={draping.worst}
-                faceSrc={SAMPLE_FACE.src}
-                faceAlt={SAMPLE_FACE.alt}
-                faceMaskSrc={SAMPLE_FACE_MASK}
-                className="lg:max-w-[560px]"
-              />
+              <>
+                <DrapingPair
+                  best={draping.best}
+                  worst={draping.worst}
+                  faceSrc={SAMPLE_FACE.src}
+                  faceAlt={SAMPLE_FACE.alt}
+                  faceMaskSrc={SAMPLE_FACE_MASK}
+                  className="lg:max-w-[560px]"
+                />
+                <p className="caption text-(--ink-muted)">
+                  An AI-made example face, to show how draping looks. These colors are not her
+                  analyzed result.
+                </p>
+              </>
             }
           />
         </div>

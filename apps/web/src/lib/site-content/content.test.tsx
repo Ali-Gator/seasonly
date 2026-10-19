@@ -463,6 +463,14 @@ describe("the sample face's cut-out", () => {
     }
   });
 
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-sample-draping-pair-is-captioned} */
+  it("captions the sample draping pair as an example face on both pages", () => {
+    for (const out of [html(<SampleReport />), html(<GptAlternative />)])
+      expect(text(out.slice(out.lastIndexOf("sn-drape")))).toContain(
+        "An AI-made example face, to show how draping looks. These colors are not her analyzed result.",
+      );
+  });
+
   /** {@link openspec/specs/site-content/spec.md#requirement-the-sample-face-is-cut-out-like-a-real-reports} */
   it("ships the outline as a PNG beside the sample face", () => {
     const file = path.resolve(import.meta.dirname, "../../../public", MASK.slice(1));

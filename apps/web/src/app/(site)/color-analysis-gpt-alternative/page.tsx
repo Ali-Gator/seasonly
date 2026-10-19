@@ -133,6 +133,10 @@ export default function Page() {
             faceAlt={SAMPLE_FACE.alt}
             faceMaskSrc={SAMPLE_FACE_MASK}
           />
+          <p className="caption text-(--ink-muted)">
+            An AI-made example face, to show how draping looks. These colors are not her analyzed
+            result.
+          </p>
         </div>
 
         <div className="flex flex-col gap-(--space-3)">
