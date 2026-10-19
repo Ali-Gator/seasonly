@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { Button, DrapingPair, Icon } from "@/components/ds";
 import { ReportSections } from "@/lib/report/sections";
-import { SAMPLE_FACE, SAMPLE_FACE_MASK } from "@/lib/site-content/images";
+import { SAMPLE_FACE, SAMPLE_FACE_CAPTION, SAMPLE_FACE_MASK } from "@/lib/site-content/images";
 import { pageMetadata } from "@/lib/site/routes";
 
 export const metadata = pageMetadata("/sample-report");
@@ -56,10 +56,7 @@ export default function Page() {
                   faceMaskSrc={SAMPLE_FACE_MASK}
                   className="lg:max-w-[560px]"
                 />
-                <p className="caption text-(--ink-muted)">
-                  An AI-made example face, to show how draping looks. These colors are not her
-                  analyzed result.
-                </p>
+                <p className="caption text-(--ink-muted)">{SAMPLE_FACE_CAPTION}</p>
               </>
             }
           />

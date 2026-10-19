@@ -299,8 +299,7 @@ function nearMisses(
  * pair may move the held name away. `held` is the copy after the walk: the main spec's names
  * minus the accepted old names plus the accepted new ones. `chains` maps every new name an
  * accepted pair produced, held at the end or moved away by a later pair, to the names its block
- * carried up to then, first name (a main-spec name) first and that new name last; a name
- * produced again maps to its latest chain.
+ * carried up to then, first name (a main-spec name) first and that new name last.
  */
 function appliedRenames(
   plan: DeltaEntry[],
@@ -447,12 +446,9 @@ function deltaProof(
       if (from) into.carried.add(from);
     }
   }
-  const modified = new Set(plan.flatMap((e) => (e.kind === "modified" ? [e.block.name] : [])));
-  for (const [name, [first]] of chains) {
-    if (first === undefined || first === name || !existing.has(name)) continue;
-    if (held.has(name) && !dropped.has(name) && !modified.has(name))
-      into.writtenOver.set(name, first);
-  }
+  // A MODIFIED or dropped written-over name never gets here: it is a renamed FROM, so a conflict.
+  for (const [name, [first = name]] of chains)
+    if (first !== name && existing.has(name) && held.has(name)) into.writtenOver.set(name, first);
   return into;
 }
 
@@ -503,7 +499,8 @@ function unprovenRequirements(
       const replaced = delta?.replaced.get(r.name);
       const first = delta?.writtenOver.get(r.name);
       const moved = (first !== undefined && requirements.find((x) => x.name === first)) || r;
-      const blocks = replaced ?? [r];
+      // Archive writes the moved block under `### Requirement: <name>`, so its anchor is the slug.
+      const blocks = replaced ?? [first !== undefined ? { anchor: slugify(r.name) } : r];
       const heads = blocks.flatMap((b) => (b.anchor ? [b.anchor] : []));
       const scenarios = replaced ? (delta?.scenarios.get(r.name) ?? []) : moved.scenarios;
       // A requirement GitHub renders no heading for is never proven: its heading needs fixing.
@@ -1396,6 +1393,24 @@ describe("spec citation rules", () => {
     });
     expect(gate(main(false, true), delta, []).unproven).toEqual([]);
     expect(gate(main(true, false), delta, []).unproven).toEqual(["cap: Requirement: A"]);
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-onto-a-name-the-same-delta-frees} */
+  it("a written-over name is proven through the heading archive writes, not its old one", () => {
+    const main = new Map([
+      [
+        "cap",
+        parseRequirements(["###Requirement: A", "### Requirement: C", "#### Scenario: Old c"]),
+      ],
+    ]);
+    const delta = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: A`",
+      "- TO: `### Requirement: B`",
+      "- FROM: `### Requirement: C`",
+      "- TO: `### Requirement: A`",
+    ].join("\n");
+    expect(gate(main, delta, ["requirement-a"])).toEqual({ stale: [], unproven: [] });
   });
 
   /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-modified-and-also-removed-or-renamed-away} */

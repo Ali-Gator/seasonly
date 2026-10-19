@@ -183,7 +183,7 @@ A citation SHALL also resolve against a requirement or scenario that an unarchiv
 
 #### Scenario: A rename round trip in one delta
 
-- **WHEN** an unarchived change renames a requirement and a later rename of the same delta gives it back its name, or moves another requirement onto that name, and no test cites it
+- **WHEN** an unarchived change renames a requirement and a later rename of the same delta gives it back its name, or moves another requirement onto that name, and no test cites it, and the requirement now under that name is not marked unenforced
 - **THEN** the proof check reports that requirement as unproven
 
 #### Scenario: A removal archive aborts on as a near-miss

@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-103**
+_Next id:_ **BL-104**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -151,6 +151,14 @@ fold items in.
   fails closed) and need a citing test. No spec has one today.
   _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`mainSpecs`, `parseRequirements`) · _Status:_ deferred —
   until a spec holds a `### Requirement:` heading outside `## Requirements` (`backlog-12` triage, 2026-10-17)
+
+- **[BL-103] A rename archive aborts on as "source not found" leaves a folded name citable** —
+  archive's RENAMED step throws when neither the FROM nor the TO is held (`specs-apply.js:290`).
+  The gate only refuses that pair, so a held name that folds onto the FROM keeps its MODIFIED
+  block citable: main {Foo}, `foo` to `Bar` plus MODIFIED Foo with a cited scenario passes the
+  gate while archive aborts. Drop the FROM and the folded held name, as BL-98 did for a held TO
+  (`backlog-14` review; approved-only gate test file).
+  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`appliedRenames`) · _Status:_ open — `backlog-14` review, 2026-10-19
 
 - **[BL-85] `slugify` drops combining marks that GitHub keeps** — github-slugger keeps `\p{M}`,
   the gate's `slugify` drops it, so a heading with a combining accent anchors differently. No

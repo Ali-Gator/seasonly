@@ -48,7 +48,7 @@ const VIDEO_COPY: Record<string, { caption: string; season?: SeasonSlug; changed
     caption:
       "Same face, two selfies: one with a beauty filter, one without. The filter moved her result from Deep Autumn to Light Summer. Take yours in daylight, no filter.",
     changed:
-      "New caption: the pack's Myth-busting caption says the photo check catches color cast, and this filter passes it (BL-95).",
+      "New caption: the pack's Myth-busting caption says the photo check catches color cast, and this filter passes it (BL-102).",
   },
   "08-indoor-light": { caption: CAPTION.myth, season: "deep-autumn" },
   "09-jet-black": {
