@@ -31,14 +31,14 @@ Each task leaves the suite green before the next starts. Only the edits named he
 - [x] 2.8 BL-85 — add `\p{M}` and `\p{Pc}` to `slugify`'s class (design.md BL-85, Decision 2). Done when 2.7 passes and every other `it` passes unchanged.
 - [x] 2.9 BL-92 — failing rule `it`: a fixture spec with a `### Requirement:` under `## Behavior`. The requirement is not held, it is not reported unproven, and a citation of its anchor is stale ({@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-heading-outside-the-requirements-section}). Verify it fails.
 - [x] 2.10 BL-92 — `mainSpecs` passes only the `## Requirements` section body and its fence-mask slice to `parseRequirements` (design.md BL-92, Decision 2). Done when 2.9 passes and the four repo-wide gate `it`s pass unchanged.
-- [ ] 2.11 BL-103 — failing rule `it`s:
+- [x] 2.11 BL-103 — failing rule `it`s:
   - (a) permanent {Foo}: `foo` to `Bar`, plus MODIFIED `Foo` with a cited new scenario; the citation is stale and Foo is unproven;
   - (b) permanent {A}: `Ghost` to `Fresh`, then `A` to `Ghost`; a citation of `Ghost` is stale and A is unproven;
   - (c) the case-only `foo` to `Foo` no-op is unchanged.
 
   All cite {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-archive-aborts-on-with-neither-name-held}. Verify (a) and (b) fail.
 
-- [ ] 2.12 BL-103 — when neither the old nor the new name of a pair is held at its turn, `appliedRenames` adds the old name, the new name and every held name folding onto the old name to `aborted`. Update the JSDoc on `nearMisses`, `appliedRenames` and `deltaProof`, citing `specs-apply.js:285` (design.md BL-103, Decision 1). Done when 2.11 passes and every other `it` passes unchanged.
+- [x] 2.12 BL-103 — when neither the old nor the new name of a pair is held at its turn, `appliedRenames` adds the old name, the new name and every held name folding onto the old name to `aborted`. Update the JSDoc on `nearMisses`, `appliedRenames` and `deltaProof`, citing `specs-apply.js:285` (design.md BL-103, Decision 1). Done when 2.11 passes and every other `it` passes unchanged.
 
 ## 3. Verify, delete, review, archive, ship
 

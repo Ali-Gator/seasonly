@@ -258,7 +258,9 @@ function conflicts(plan: DeltaEntry[]): Set<string> {
 /**
  * The names a delta's plan drops and the rename walk left without them. `dropped` starts as
  * the pre-validate `conflicts` and grows by the names of the renames archive's RENAMED step
- * aborts on (`aborted`), each with the whole chain ending at it (`chains`), and by the removals
+ * aborts on (`aborted`: a new name held with its old name held, or with another held name
+ * folding onto its old name, or neither name held, `specs-apply.js:271-288`, 1.13.0, the last
+ * at :285), each with the whole chain ending at it (`chains`), and by the removals
  * its REMOVED step aborts on (`specs-apply.js:318-324`). After the rename walk, removals are
  * taken in document order against a running copy of the names held: an exact match is
  * deleted, so a later removal no longer sees it; a name not held whose fold matches a held one
@@ -299,8 +301,11 @@ function nearMisses(
  * renames nothing. A refused pair whose new name is held makes archive abort instead
  * (`specs-apply.js:275-288`) when its old name is held too ("target already exists"), or when a
  * held name other than its new name matches its old name folded; `aborted` collects the old
- * name, the new name and that held name, each checked at the pair's own turn, since a later
- * pair may move the held name away. `held` is the copy after the walk: the main spec's names
+ * name, the new name and that held name. A pair with neither name held makes archive abort
+ * too ("source not found", `specs-apply.js:285`, 1.13.0), whatever folds onto it; `aborted`
+ * collects its old name, its new name and every held name that matches the old name folded.
+ * Each shape is checked at the pair's own turn, since a later pair may move a held name away
+ * or onto the old name. `held` is the copy after the walk: the main spec's names
  * minus the accepted old names plus the accepted new ones. `chains` maps every new name an
  * accepted pair produced, held at the end or moved away by a later pair, to the names its block
  * carried up to then, first name (a main-spec name) first and that new name last.
@@ -329,7 +334,11 @@ function appliedRenames(
         if (near !== undefined) aborted.add(from).add(to).add(near);
         return false;
       }
-      if (!held.has(from)) return false;
+      if (!held.has(from)) {
+        aborted.add(from).add(to);
+        for (const k of held) if (fold(k) === fold(from)) aborted.add(k);
+        return false;
+      }
       held.delete(from);
       held.add(to);
       chains.set(to, [...(chains.get(from) ?? [from]), to]);
@@ -411,7 +420,11 @@ interface OpenDelta {
 /**
  * Reads a change delta into `into`, so several changes to one capability accumulate. A rename
  * archive would refuse — from a name `existing` (main-spec names) or an earlier rename does not
- * hold, or onto one it does — leaves its old name needing a citing test. A MODIFIED block's
+ * hold, or onto one it does — leaves its old name needing a citing test. A rename archive
+ * aborts on (`nearMisses`: both names held, a held name other than the new one folding onto
+ * the old one, or neither name held, `specs-apply.js:285`, 1.13.0) drops its names, every held
+ * name folding onto its old name and the chain ending at each, so none is gone, modified or
+ * written over, and the chain's first name still needs a citing test. A MODIFIED block's
  * scenarios, unenforced flag and place in `replaced` count whatever its name; only a main-spec
  * requirement of that name is ever looked up. A rename's main-spec name, the first of its
  * chain (`chains`), enters `carried` only when a MODIFIED block of the same delta names where
@@ -1402,6 +1415,53 @@ describe("spec citation rules", () => {
 
   /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-archive-aborts-on} */
   it("a case-only rename onto its own held name stays a no-op archive skips", () => {
+    const main = new Map([["cap", parseRequirements(["### Requirement: Foo"])]]);
+    const delta = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: foo`",
+      "- TO: `### Requirement: Foo`",
+      "## MODIFIED Requirements",
+      "### Requirement: Foo",
+      "#### Scenario: New foo",
+    ].join("\n");
+    expect(gate(main, delta, ["scenario-new-foo"])).toEqual({ stale: [], unproven: [] });
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-archive-aborts-on-with-neither-name-held} */
+  it("a rename with neither name held drops the held name its old name folds onto", () => {
+    const main = new Map([["cap", parseRequirements(["### Requirement: Foo"])]]);
+    const delta = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: foo`",
+      "- TO: `### Requirement: Bar`",
+      "## MODIFIED Requirements",
+      "### Requirement: Foo",
+      "#### Scenario: New foo",
+    ].join("\n");
+    expect(gate(main, delta, ["scenario-new-foo"])).toEqual({
+      stale: ["a.test.ts:1 cap#scenario-new-foo"],
+      unproven: ["cap: Requirement: Foo"],
+    });
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-archive-aborts-on-with-neither-name-held} */
+  it("a rename with neither name held drops the chain a later rename moves onto its old name", () => {
+    const main = new Map([["cap", parseRequirements(["### Requirement: A"])]]);
+    const delta = [
+      "## RENAMED Requirements",
+      "- FROM: `### Requirement: Ghost`",
+      "- TO: `### Requirement: Fresh`",
+      "- FROM: `### Requirement: A`",
+      "- TO: `### Requirement: Ghost`",
+    ].join("\n");
+    expect(gate(main, delta, ["requirement-ghost"])).toEqual({
+      stale: ["a.test.ts:1 cap#requirement-ghost"],
+      unproven: ["cap: Requirement: A"],
+    });
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-rename-archive-aborts-on-with-neither-name-held} */
+  it("a case-only rename onto its own held name is not a rename with neither name held", () => {
     const main = new Map([["cap", parseRequirements(["### Requirement: Foo"])]]);
     const delta = [
       "## RENAMED Requirements",
