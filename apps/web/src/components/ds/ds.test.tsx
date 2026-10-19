@@ -340,8 +340,11 @@ describe("Stylesheets", () => {
   });
 
   /** {@link openspec/specs/ui-components/spec.md#scenario-a-4-column-grid-on-a-narrow-phone} */
-  it("lays a 4-column grid out in 3 below 375 px", () => {
-    expect(ds()).toMatch(/374\.98px[^}]*\.sn-swatch-grid\[data-columns="4"\][^}]*repeat\(3,/);
+  it("lays a 4-column grid out in 3 while a cell would be under 76 px", () => {
+    expect(ds()).toMatch(
+      /\.sn-swatch-grid\[data-columns="4"\]\s*\{\s*grid-template-columns:\s*repeat\(\s*auto-fill,\s*minmax\(max\(76px, calc\(\(100% - 3 \* var\(--space-3\)\) \/ 4\)\), 1fr\)/,
+    );
+    expect(ds()).not.toMatch(/374\.98px/);
   });
 
   /** {@link openspec/specs/ui-components/spec.md#scenario-a-stylesheet-loads-an-external-resource} */

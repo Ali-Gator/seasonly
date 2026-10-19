@@ -22,9 +22,26 @@ export type CheckedPhoto = {
       crop: Blob;
       /** The crop's outline, a PNG whose alpha is the person; null without a segmenter. */
       mask: Blob | null;
+      /** How cutting the outline ended, and on `made` how long it took, for `photo_checked`. */
+      outline: OutlineOutcome;
+      outlineMs?: number;
     }
-  | { problem: RetakeReason; traits?: never; crop?: never; mask?: never }
+  | {
+      problem: RetakeReason;
+      traits?: never;
+      crop?: never;
+      mask?: never;
+      outline?: never;
+      outlineMs?: never;
+    }
 );
+
+/**
+ * `late`: no segmenter within the wait. `failed`: it failed to load or threw, or the encode
+ * failed. `mismatch`: no mask, or one of another size. `missed`: too little of the middle is a
+ * person.
+ */
+export type OutlineOutcome = "made" | "late" | "failed" | "mismatch" | "missed";
 
 /** Longer side, in pixels, the photo is checked at. */
 export const MAX_SIDE = 1280;
@@ -62,22 +79,22 @@ function middleConfidence(confidence: Float32Array, width: number, height: numbe
 }
 
 /**
- * The crop's outline: black, with the person segmenter's confidence as alpha. Null when the
+ * The crop's outline: black, with the person segmenter's confidence as alpha. No mask when the
  * segmenter fails to load in time or to run, or misses the face (the middle of a crop is the face
- * box), so an outline never empties the oval; the pass stands either way.
+ * box), so an outline never empties the oval; the pass stands either way. `ms` is set on `made`.
  *
  * {@link openspec/specs/capture-flow/spec.md#scenario-no-person-segmenter}
  */
-async function outline(crop: HTMLCanvasElement): Promise<Blob | null> {
+export async function outline(
+  crop: HTMLCanvasElement,
+): Promise<{ mask: Blob | null; outcome: OutlineOutcome; ms?: number }> {
+  const start = performance.now();
   try {
-    // ponytail: a fixed wait, failures unreported; the model usually loaded during the guide.
-    // Count misses (an analytics reason) if reports show uncut faces.
     const segmenter = await Promise.race([
       loadPerson(),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("person segmenter timed out")), PERSON_WAIT_MS),
-      ),
+      new Promise<null>((resolve) => setTimeout(resolve, PERSON_WAIT_MS, null)),
     ]);
+    if (!segmenter) return { mask: null, outcome: "late" };
     const segmented = segmenter.segment(crop);
     const mask = segmented.confidenceMasks?.[0];
     // Copied: the mask's memory belongs to MediaPipe until close().
@@ -86,16 +103,18 @@ async function outline(crop: HTMLCanvasElement): Promise<Blob | null> {
         ? mask.getAsFloat32Array().slice()
         : null;
     segmented.close();
-    if (!confidence || middleConfidence(confidence, crop.width, crop.height) < MIN_FACE_CONFIDENCE)
-      return null;
+    if (!confidence) return { mask: null, outcome: "mismatch" };
+    if (middleConfidence(confidence, crop.width, crop.height) < MIN_FACE_CONFIDENCE)
+      return { mask: null, outcome: "missed" };
     const out = canvasOf(crop.width, crop.height);
     const image = out.context.createImageData(crop.width, crop.height);
     for (let i = 0; i < confidence.length; i++)
       image.data[i * 4 + 3] = Math.round((confidence[i] ?? 0) * 255);
     out.context.putImageData(image, 0, 0);
-    return await encode(out.canvas, "image/png");
+    const png = await encode(out.canvas, "image/png");
+    return { mask: png, outcome: "made", ms: Math.round(performance.now() - start) };
   } catch {
-    return null;
+    return { mask: null, outcome: "failed" };
   }
 }
 
@@ -145,12 +164,16 @@ export async function checkImage(source: Blob | ImageBitmap): Promise<CheckedPho
     box.outWidth,
     box.outHeight,
   );
+  const crop = await jpeg(out.canvas);
+  const cut = await outline(out.canvas);
   return {
     ...outcome,
     problem: null,
     measures: check.measures,
     traits: check.traits,
-    crop: await jpeg(out.canvas),
-    mask: await outline(out.canvas),
+    crop,
+    mask: cut.mask,
+    outline: cut.outcome,
+    outlineMs: cut.ms,
   };
 }

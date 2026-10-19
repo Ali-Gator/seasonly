@@ -158,8 +158,26 @@ test.describe("swatch grids on narrow phones", () => {
   });
 
   /** {@link openspec/specs/ui-components/spec.md#scenario-a-4-column-grid-at-375-px} */
-  test("a 4-column grid keeps 4 columns at 375 px", async ({ page }) => {
+  test("a 4-column grid lays out in 3 at 375 px and no name overflows or takes a third line", async ({
+    page,
+  }) => {
     await open(page, "/seasons/light-spring", 375, 812);
+    const grid = page.getByRole("list", { name: "The Light Spring palette" });
+    const names = grid.locator(".sn-swatch__name");
+    await expect(names).toHaveCount(24);
+    expect.soft(await columns(grid)).toBe(3);
+    // Two 18 px lines are 36 px; a third line makes a name taller.
+    const misfits = await names.evaluateAll((els) =>
+      els
+        .filter((el) => el.scrollWidth > el.clientWidth || el.getBoundingClientRect().height > 36)
+        .map((el) => el.textContent),
+    );
+    expect(misfits).toEqual([]);
+  });
+
+  /** {@link openspec/specs/ui-components/spec.md#scenario-a-4-column-grid-on-a-wide-phone} */
+  test("a 4-column grid keeps 4 columns at 414 px", async ({ page }) => {
+    await open(page, "/seasons/light-spring", 414, 896);
     expect(await columns(page.getByRole("list", { name: "The Light Spring palette" }))).toBe(4);
   });
 

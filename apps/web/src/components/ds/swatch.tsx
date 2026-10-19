@@ -33,7 +33,10 @@ export interface SwatchGridProps {
   columns?: number;
   label?: string;
   className?: string;
-  /** Keep the column count below 375 px, where a 4-column grid otherwise lays out in 3 (BL-57). */
+  /**
+   * Keep the column count while a cell would be under 76 px, where a 4-column grid otherwise lays
+   * out in 3 (BL-61).
+   */
   keepColumns?: boolean;
 }
 
