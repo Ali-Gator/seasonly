@@ -111,21 +111,27 @@ export function Flow() {
     const rest = location.search
       .slice(1)
       .split("&")
-      .filter((pair) => pair && pair.split("=")[0] !== "start")
+      .filter((pair) => pair && !new URLSearchParams(pair).has("start"))
       .join("&");
-    routerSync.current = location.pathname + (rest && `?${rest}`) + location.hash;
-    history.replaceState(history.state, "", routerSync.current);
+    history.replaceState(
+      history.state,
+      "",
+      location.pathname + (rest && `?${rest}`) + location.hash,
+    );
+    routerSync.current = location.pathname + location.search + location.hash;
   }, []);
   // Then the same address goes through Next's history patch without Next's keys, so the router
   // holds it too and a refresh does not write `start` back. The patch is a passive effect of an
   // ancestor, in this commit or an earlier one; React runs a commit's passive effects in one pass,
   // so a timer set here fires after it. Without Next (jsdom) it is a plain replace. StrictMode's
-  // second run finds no `start`: the ref carries the target, and the cleanup clears the timer.
+  // second run finds no `start`: the ref carries the target, and the cleanup clears the timer. An
+  // address that moved first (Back, a link) is left alone: the entry is no longer this one.
   useEffect(() => {
     const target = routerSync.current;
     if (target === null) return;
     const timer = setTimeout(() => {
       routerSync.current = null;
+      if (location.pathname + location.search + location.hash !== target) return;
       const { __NA, _N, __PRIVATE_NEXTJS_INTERNALS_TREE, ...state } = history.state ?? {};
       history.replaceState(state, "", target);
     });

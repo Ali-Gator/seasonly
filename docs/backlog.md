@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-108**
+_Next id:_ **BL-109**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -117,6 +117,13 @@ fold items in.
   apart, so the count includes them (backlog-16 triage, 2026-10-20)
 
 ## Code quality
+
+- **[BL-108] The camera start's router sync can drop a tap made during hydration** — the sync's
+  `replaceState` reaches Next as `ACTION_RESTORE`, which discards any pending router action
+  (`app-router-instance.js` ~:147). On a slow fresh load of `/analyze?start=camera`, a link tap
+  replayed as `router.push` before the 0 ms timer, to a route not yet prefetched, is lost. Try
+  `queueMicrotask` with a cancel flag instead of `setTimeout`, proven by the router-refresh e2e.
+  _Refs:_ `apps/web/src/app/(flow)/analyze/flow.tsx`, `backlog-16` review · _Status:_ open
 
 - **[BL-02] A hung crop upload is abandoned, not cancelled** — `upload()` in
   `@supabase/storage-js` 2.117 takes no abort signal, so after the 3 s timeout the request keeps

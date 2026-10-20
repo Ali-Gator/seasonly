@@ -329,6 +329,13 @@ describe("opening on the camera", () => {
     );
   });
 
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-opening-on-the-camera} */
+  it("strips a percent-encoded start too, so a reload opens the guide", async () => {
+    await reopenAt("/analyze?%73tart=camera&a=1");
+    expect(heading()).toBe("Take your selfie");
+    expect(location.pathname + location.search).toBe("/analyze?a=1");
+  });
+
   /**
    * {@link openspec/specs/capture-flow/spec.md#scenario-other-parameters-and-the-hash-are-kept}
    * {@link openspec/specs/capture-flow/spec.md#scenario-a-router-refresh-after-opening-on-the-camera}
