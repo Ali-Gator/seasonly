@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-106**
+_Next id:_ **BL-109**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -33,7 +33,9 @@ fold items in.
   filter that brightens and desaturates skin, like the guide's `filter.webp`, reads as lighter
   natural skin. The eval has no beauty-filtered photo, so no detector can be measured yet.
   _Refs:_ `packages/analysis/src/photo-check/index.ts` (`isFiltered`), `evals/variants.ts`, `backlog-14` design (BL-100) · _Status:_ gated —
-  labeled beauty-filtered photos in the eval, or an approved beauty-filter eval variant (`backlog-14` triage, 2026-10-18)
+  labeled real beauty-filtered photos in the eval. A synthetic variant cannot unblock it: a detector
+  fitted to a transform we wrote measures only that transform, and on medium and deep skin it would
+  trip the catch or false-reject ratchet (`backlog-16` triage, 2026-10-20)
 
 - **[BL-13] Temperature reads cool and moves with the light** — skin hue moves with the light, so
   one person's temperature spreads across photos. The eye-white Lab offset (commit `1d28b3d`) was
@@ -100,7 +102,9 @@ fold items in.
   requirement "Eye whites that cannot be measured do not reject a photo".
   _Refs:_ `packages/analysis/src/sampling/index.ts`, `openspec/changes/archive/*-backlog-1/design.md` · _Status:_ deferred —
   until about 50 production `photo_checked` events (PostHog, excluding preview hosts and Oleg's own
-  sessions) reach the eye-white step after the backlog-1 deploy; 9 so far from 4 people, 0 null (backlog-15 triage, 2026-10-19)
+  sessions) reach the eye-white step after the backlog-1 deploy; 9 so far from 4 people, 0 null, none since
+  2026-10-18. Counted on host `seasonly.me` only: Oleg's own sessions cannot be told apart (the
+  internal cohort is empty), so 9 is an upper bound (backlog-16 triage, 2026-10-20)
 
 ## Privacy
 
@@ -108,20 +112,18 @@ fold items in.
   `photo_checked` carries the outline outcome and time (BL-68), set the wait from the late rate and
   the made-time spread.
   _Refs:_ `apps/web/src/lib/capture/photo.ts` · _Status:_ deferred — until about 50 production
-  `photo_checked` passes (excluding preview hosts and Oleg's own sessions) carry the outline outcome
-- **[BL-18] A crop can stay about 49 h while the pages say 24 h** — the retention job runs once a
-  day (Vercel Hobby) with a 24 h cutoff, so a crop stored just after a run lasts until the run
-  after next. Move to an hourly scheduler (Vercel Pro, or `pg_cron` + `pg_net` calling the same
-  route); no other code changes.
-  _Refs:_ `apps/web/vercel.json`, `openspec/specs/data-retention/spec.md` · _Status:_ deferred —
-  Vercel Pro or before paid promotion (T15); the user's choice, 2026-10-09
-
-- **[BL-19] The PostHog cookie is set without consent** — an ePrivacy risk for EU visitors,
-  disclosed on `/privacy`. Turn on `cookieless_mode`, or add a banner with `on_reject`.
-  _Refs:_ `apps/web/src/lib/observability/posthog.ts`, `openspec/specs/analytics/spec.md` ·
-  _Status:_ deferred — before paid promotion or a complaint; the user's choice, 2026-10-09
+  `photo_checked` passes on host `seasonly.me` carry the outline outcome; 0 so far, no
+  `photo_checked` at all since the BL-68 deploy on 2026-10-19. Oleg's own sessions cannot be told
+  apart, so the count includes them (backlog-16 triage, 2026-10-20)
 
 ## Code quality
+
+- **[BL-108] The camera start's router sync can drop a tap made during hydration** — the sync's
+  `replaceState` reaches Next as `ACTION_RESTORE`, which discards any pending router action
+  (`app-router-instance.js` ~:147). On a slow fresh load of `/analyze?start=camera`, a link tap
+  replayed as `router.push` before the 0 ms timer, to a route not yet prefetched, is lost. Try
+  `queueMicrotask` with a cancel flag instead of `setTimeout`, proven by the router-refresh e2e.
+  _Refs:_ `apps/web/src/app/(flow)/analyze/flow.tsx`, `backlog-16` review · _Status:_ open
 
 - **[BL-02] A hung crop upload is abandoned, not cancelled** — `upload()` in
   `@supabase/storage-js` 2.117 takes no abort signal, so after the 3 s timeout the request keeps
@@ -133,23 +135,14 @@ fold items in.
   whose cause is `timed out after 3 s`, or storage-js adds a signal to `upload()`; none in 90 days,
   and 2.118.0 and 3.0.0-next.29 still take none (backlog-15 triage, 2026-10-19)
 
-- **[BL-95] The camera start leaves Next's router on `?start=camera`** — `flow.tsx` strips
-  `start` with the entry's own state, so Next's router keeps the old address; a later
-  `router.refresh` or server action on `/analyze` would write it back, and a reload would reopen
-  the camera. Re-sync once Next has patched history (a deferred `replaceState` without `__NA`).
-  Also keep any other query or hash instead of the hard-coded `/analyze`.
-  _Refs:_ `t20-camera-from-home` design decision 1, `apps/web/src/app/(flow)/analyze/flow.tsx` ·
-  _Status:_ deferred — first router refresh or server action on `/analyze`, or a second query
-  parameter (BL-32)
-
 ## Testing
 
-- **[BL-105] The gate's `slugify` keeps superscripts and fractions GitHub drops** — its kept set
-  takes every number (`\p{N}`), so ², ³, ½ and ¼ stay in the gate's anchor while github-slugger
-  1.5.0 drops them: a heading such as "76 px²" would pass the gate and be a dead link on GitHub.
-  Use `\p{Nd}\p{Nl}`. No spec heading has one today; the helper sits in the approved-only gate file.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`slugify`), `backlog-15` review · _Status:_
-  deferred — until a spec heading holds a superscript or fraction, or the next gate-file change
+- **[BL-107] The router-refresh e2e can read the page before the refresh commits** — `refreshRouter`
+  captures `history.state`'s tree once the sync timer has fired, not after its restore commits; if
+  that commit lands between the capture and the refresh, the tree-identity wait passes early and the
+  address and heading checks run before the refresh. BL-95 itself stays covered by the request-URL
+  `start` check. Capture the tree after the restore commits, or wait for the refresh's own commit.
+  _Refs:_ `e2e/analysis-flow.spec.ts` (`refreshRouter`), `backlog-16` review · _Status:_ open
 
 - **[BL-54] TikTok's in-app browser is untested against the bot check** — Instagram's passed on
   2026-10-17 (camera, analysis and report email on an iPhone, no 403). TikTok shows no tappable bio
@@ -177,13 +170,17 @@ fold items in.
   and lead say the GPT "is retiring" on December 11, 2026. Re-check OpenAI's FAQ and switch the
   copy to the past tense ("has retired") on that date, or sooner if OpenAI moves it.
   _Refs:_ `apps/web/src/lib/site/routes.ts`, `apps/web/src/app/(site)/color-analysis-gpt-alternative/page.tsx`
-  · _Status:_ deferred — December 11, 2026 (t9 SEO audit, 2026-10-10)
+  · _Status:_ deferred — December 11, 2026. Still the date on 2026-10-20 (OpenAI help article
+  20001519 via search; the page itself answers 403). Enterprise workspaces retire on February 11,
+  2027, so "has retired" must not read as universal (backlog-16 triage)
 
 - **[BL-28] Two redirect hops on legacy URL shapes** — `http://www.seasonly.me/seasons` and
   `/seasons/warm-autumn/` each take two 308s to reach the canonical URL. Harmless on a new domain
   with no inbound links; collapse them at the Vercel domain level if links ever point there.
   _Refs:_ `apps/web/next.config.ts`, Vercel domain settings · _Status:_ deferred — inbound links
-  to those shapes (t9 SEO audit, 2026-10-10)
+  to those shapes. PostHog never sees them (pageviews fire after the 308s) and Vercel Web Analytics
+  is off; measuring needs Search Console or Vercel request logs. No external referrer reached
+  `/seasons*` by 2026-10-20 (backlog-16 triage)
 
 - **[BL-32] Pre-fill `/analyze` from the plugin's answers** — the plugin's link opens the quiz
   fresh, so a chat user answers the four questions twice.

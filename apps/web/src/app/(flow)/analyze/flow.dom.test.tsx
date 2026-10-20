@@ -319,6 +319,57 @@ describe("opening on the camera", () => {
     await reopenAt("/analyze?start=quiz");
     expect(heading()).toBe("Three things before your selfie");
   });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-other-parameters-and-the-hash-are-kept} */
+  it("keeps other parameters and the hash when it strips the parameter", async () => {
+    await reopenAt("/analyze?start=camera&utm_source=tiktok#guide");
+    expect(heading()).toBe("Take your selfie");
+    expect(location.pathname + location.search + location.hash).toBe(
+      "/analyze?utm_source=tiktok#guide",
+    );
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-opening-on-the-camera} */
+  it("strips a percent-encoded start too, so a reload opens the guide", async () => {
+    await reopenAt("/analyze?%73tart=camera&a=1");
+    expect(heading()).toBe("Take your selfie");
+    expect(location.pathname + location.search).toBe("/analyze?a=1");
+  });
+
+  /**
+   * {@link openspec/specs/capture-flow/spec.md#scenario-other-parameters-and-the-hash-are-kept}
+   * {@link openspec/specs/capture-flow/spec.md#scenario-a-router-refresh-after-opening-on-the-camera}
+   */
+  it("strips keeping Next's keys, then replaces once more without them, pairs kept as written", async () => {
+    act(() => root.unmount());
+    const next = { __NA: true, _N: 1, __PRIVATE_NEXTJS_INTERNALS_TREE: {} };
+    history.replaceState(next, "", "/analyze?start=camera&debug&q=a%20b/c#x");
+    // An own-property replaceState, as Next's history patch installs.
+    const native = History.prototype.replaceState;
+    const calls: [unknown, string | URL | null | undefined][] = [];
+    history.replaceState = function (state, unused, url) {
+      calls.push([state, url]);
+      native.call(this, state, unused, url);
+    };
+    try {
+      root = createRoot(container);
+      await act(async () =>
+        root.render(
+          <StrictMode>
+            <Flow />
+          </StrictMode>,
+        ),
+      );
+      await act(() => new Promise((done) => setTimeout(done)));
+      const target = "/analyze?debug&q=a%20b/c#x";
+      expect(calls[0]).toEqual([next, target]);
+      const synced = calls.filter(([state]) => !(state as { __NA?: true } | null)?.__NA);
+      expect(synced).toEqual([[{}, target]]);
+      expect(location.pathname + location.search + location.hash).toBe(target);
+    } finally {
+      delete (history as { replaceState?: unknown }).replaceState;
+    }
+  });
 });
 
 describe("the email step's focus", () => {

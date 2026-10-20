@@ -58,14 +58,16 @@ interface Citation {
 }
 
 /**
- * GitHub heading slug (github-slugger): lowercase, drop all but letters, combining marks, digits,
- * connector punctuation (`_`, U+203F `‿`), space and hyphen, spaces to hyphens. No Unicode normalisation.
+ * GitHub heading slug (github-slugger 1.5.0): lowercase, drop all but letters, combining marks,
+ * decimal digits, letter numbers (Roman numerals), connector punctuation (`_`, U+203F `‿`), space
+ * and hyphen, spaces to hyphens. Other numbers (superscripts, fractions) are dropped. No Unicode
+ * normalisation.
  */
 function slugify(heading: string): string {
   return heading
     .trim()
     .toLowerCase()
-    .replace(/[^\p{L}\p{M}\p{N}\p{Pc} -]/gu, "")
+    .replace(/[^\p{L}\p{M}\p{Nd}\p{Nl}\p{Pc} -]/gu, "")
     .replace(/ /g, "-");
 }
 
@@ -736,6 +738,21 @@ describe("spec citation rules", () => {
     expect(staleCitations(citations, resolvableAnchors(new Map([["cap", parsed]]), []))).toEqual(
       [],
     );
+  });
+
+  /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-heading-that-holds-a-superscript-or-a-fraction} */
+  it("slugs drop superscripts and fractions and keep letter numbers", () => {
+    const parsed = parseRequirements(["### Requirement: Numbers", "#### Scenario: m² ½ Ⅻ"]);
+    const slug = "scenario-m--ⅻ";
+    expect(parsed[0]?.scenarios).toEqual([slug]);
+    const kept = "scenario-m²-½-ⅻ";
+    const citations = extractCitations(
+      "a.test.ts",
+      [cite("cap", slug), cite("cap", kept)].join("\n"),
+    );
+    expect(staleCitations(citations, resolvableAnchors(new Map([["cap", parsed]]), []))).toEqual([
+      "a.test.ts:2 cap#" + kept,
+    ]);
   });
 
   /** {@link openspec/specs/spec-workflow/spec.md#scenario-a-requirement-heading-outside-the-requirements-section} */

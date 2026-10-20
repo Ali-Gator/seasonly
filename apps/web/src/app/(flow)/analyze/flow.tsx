@@ -99,16 +99,43 @@ export function Flow() {
   }, [step]);
 
   // The landing's camera link: before the first paint, the camera replaces the guide and the
-  // address drops `start`, so a reload opens the guide. StrictMode's second run finds no `start`.
-  // The state is kept: on a fresh load this runs before Next patches history, and an entry without
-  // Next's keys reloads the page on Back. Next's router keeps its own copy of the old address,
-  // which nothing here reads; a router refresh on /analyze would write it back (BL-95).
+  // address drops `start`, keeping the other pairs as written, so a reload opens the guide. The
+  // state is kept: on a fresh load this runs before Next patches history, and an entry without
+  // Next's keys reloads the page on Back.
   // {@link openspec/specs/capture-flow/spec.md#requirement-the-landings-camera-link-opens-the-flow-on-the-camera}
+  const routerSync = useRef<string | null>(null);
   useLayoutEffect(() => {
     if (new URLSearchParams(location.search).get("start") !== "camera") return;
     opening.current = CAMERA_START;
     dispatch({ type: "start-camera" });
-    history.replaceState(history.state, "", "/analyze");
+    const rest = location.search
+      .slice(1)
+      .split("&")
+      .filter((pair) => pair && !new URLSearchParams(pair).has("start"))
+      .join("&");
+    history.replaceState(
+      history.state,
+      "",
+      location.pathname + (rest && `?${rest}`) + location.hash,
+    );
+    routerSync.current = location.pathname + location.search + location.hash;
+  }, []);
+  // Then the same address goes through Next's history patch without Next's keys, so the router
+  // holds it too and a refresh does not write `start` back. The patch is a passive effect of an
+  // ancestor, in this commit or an earlier one; React runs a commit's passive effects in one pass,
+  // so a timer set here fires after it. Without Next (jsdom) it is a plain replace. StrictMode's
+  // second run finds no `start`: the ref carries the target, and the cleanup clears the timer. An
+  // address that moved first (Back, a link) is left alone: the entry is no longer this one.
+  useEffect(() => {
+    const target = routerSync.current;
+    if (target === null) return;
+    const timer = setTimeout(() => {
+      routerSync.current = null;
+      if (location.pathname + location.search + location.hash !== target) return;
+      const { __NA, _N, __PRIVATE_NEXTJS_INTERNALS_TREE, ...state } = history.state ?? {};
+      history.replaceState(state, "", target);
+    });
+    return () => clearTimeout(timer);
   }, []);
 
   // The models download while the guide is read. The photo's object URLs end with the page.
