@@ -64,5 +64,5 @@ _None._
 
 - `apps/web/src/app/(flow)/analyze/flow.tsx` (the mount-only strip effect), new tests in `flow.dom.test.tsx` and `e2e/analysis-flow.spec.ts`.
 - `scripts/__tests__/spec-citations.test.ts` (`slugify` and one new `it`).
-- `openspec/specs/capture-flow/spec.md` Behavior bullet and `openspec/specs/data-retention/spec.md` edge case, edited directly after archive.
+- `openspec/specs/capture-flow/spec.md` Behavior bullet and `openspec/specs/data-retention/spec.md` edge case, edited directly in the fix group (exempt markdown outside the requirements archive replaces).
 - `docs/backlog.md`: BL-18, BL-19, BL-95, BL-105 deleted.
