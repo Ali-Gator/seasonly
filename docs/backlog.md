@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-107**
+_Next id:_ **BL-108**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -129,6 +129,13 @@ fold items in.
   and 2.118.0 and 3.0.0-next.29 still take none (backlog-15 triage, 2026-10-19)
 
 ## Testing
+
+- **[BL-107] The router-refresh e2e can read the page before the refresh commits** — `refreshRouter`
+  captures `history.state`'s tree once the sync timer has fired, not after its restore commits; if
+  that commit lands between the capture and the refresh, the tree-identity wait passes early and the
+  address and heading checks run before the refresh. BL-95 itself stays covered by the request-URL
+  `start` check. Capture the tree after the restore commits, or wait for the refresh's own commit.
+  _Refs:_ `e2e/analysis-flow.spec.ts` (`refreshRouter`), `backlog-16` review · _Status:_ open
 
 - **[BL-54] TikTok's in-app browser is untested against the bot check** — Instagram's passed on
   2026-10-17 (camera, analysis and report email on an iPhone, no 403). TikTok shows no tappable bio
