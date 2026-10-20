@@ -14,7 +14,7 @@
 
 ## 3. Verify, delete, review, archive, ship
 
-- [ ] 3.1 `pnpm fix`, then `pnpm test`, then `pnpm test:eval`; all green. Run the BL-95 e2e cases locally (`pnpm test:e2e`) since only the browser proves the router sync
-- [ ] 3.2 delete shipped and dropped bullets BL-18, BL-19, BL-95 and BL-105 from `docs/backlog.md`
+- [x] 3.1 `pnpm fix`, then `pnpm test`, then `pnpm test:eval`; all green. Run the BL-95 e2e cases locally (`pnpm test:e2e`) since only the browser proves the router sync
+- [x] 3.2 delete shipped and dropped bullets BL-18, BL-19, BL-95 and BL-105 from `docs/backlog.md`
 - [ ] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
 - [ ] 3.4 archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge

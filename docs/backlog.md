@@ -115,19 +115,6 @@ fold items in.
   `photo_checked` passes on host `seasonly.me` carry the outline outcome; 0 so far, no
   `photo_checked` at all since the BL-68 deploy on 2026-10-19. Oleg's own sessions cannot be told
   apart, so the count includes them (backlog-16 triage, 2026-10-20)
-- **[BL-18] A crop can stay about 49 h while the pages say 24 h** — the retention job runs once a
-  day (Vercel Hobby) with a 24 h cutoff, so a crop stored just after a run lasts until the run
-  after next. Move to an hourly scheduler (Vercel Pro, or `pg_cron` + `pg_net` calling the same
-  route); no other code changes.
-  _Refs:_ `apps/web/vercel.json`, `openspec/specs/data-retention/spec.md` · _Status:_ deferred —
-  Vercel Pro or before paid promotion (T15); the user's choice, 2026-10-09. Dropped by Oleg on
-  2026-10-20; `backlog-16` deletes it
-
-- **[BL-19] The PostHog cookie is set without consent** — an ePrivacy risk for EU visitors,
-  disclosed on `/privacy`. Turn on `cookieless_mode`, or add a banner with `on_reject`.
-  _Refs:_ `apps/web/src/lib/observability/posthog.ts`, `openspec/specs/analytics/spec.md` ·
-  _Status:_ deferred — before paid promotion or a complaint; the user's choice, 2026-10-09. Dropped by
-  Oleg on 2026-10-20; `backlog-16` deletes it
 
 ## Code quality
 
@@ -141,23 +128,7 @@ fold items in.
   whose cause is `timed out after 3 s`, or storage-js adds a signal to `upload()`; none in 90 days,
   and 2.118.0 and 3.0.0-next.29 still take none (backlog-15 triage, 2026-10-19)
 
-- **[BL-95] The camera start leaves Next's router on `?start=camera`** — `flow.tsx` strips
-  `start` with the entry's own state, so Next's router keeps the old address; a later
-  `router.refresh` or server action on `/analyze` would write it back, and a reload would reopen
-  the camera. Re-sync once Next has patched history (a deferred `replaceState` without `__NA`).
-  Also keep any other query or hash instead of the hard-coded `/analyze`.
-  _Refs:_ `t20-camera-from-home` design decision 1, `apps/web/src/app/(flow)/analyze/flow.tsx` ·
-  _Status:_ open — Oleg chose to fix it before its trigger (first router refresh or server action
-  on `/analyze`, or a second query parameter) fires; planned in `backlog-16` (2026-10-20)
-
 ## Testing
-
-- **[BL-105] The gate's `slugify` keeps superscripts and fractions GitHub drops** — its kept set
-  takes every number (`\p{N}`), so ², ³, ½ and ¼ stay in the gate's anchor while github-slugger
-  1.5.0 drops them: a heading such as "76 px²" would pass the gate and be a dead link on GitHub.
-  Use `\p{Nd}\p{Nl}`. No spec heading has one today; the helper sits in the approved-only gate file.
-  _Refs:_ `scripts/__tests__/spec-citations.test.ts` (`slugify`), `backlog-15` review · _Status:_
-  open — Oleg approved the gate-file edit; planned in `backlog-16` (2026-10-20)
 
 - **[BL-54] TikTok's in-app browser is untested against the bot check** — Instagram's passed on
   2026-10-17 (camera, analysis and report email on an iPhone, no 403). TikTok shows no tappable bio
