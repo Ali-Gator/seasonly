@@ -211,6 +211,83 @@ test("a fresh load of the camera link keeps Back inside the flow, with no reload
 });
 
 /**
+ * Refreshes Next's router once the page has settled and waits for the refresh to land. The address
+ * already reads right before it, so only a finished refresh can show the parameter written back.
+ * Returns the URL the refresh fetched: the router's own copy of the address.
+ */
+async function refreshRouter(page: Page): Promise<URL> {
+  await page.waitForFunction(() => (window as { next?: { router?: unknown } }).next?.router);
+  // Lets any router sync and its own fetch finish, so the wait below sees only the refresh.
+  await page.waitForTimeout(500);
+  const refreshed = page.waitForResponse((r) => {
+    const headers = r.request().headers();
+    return (
+      headers.rsc === "1" &&
+      !headers["next-router-prefetch"] &&
+      !headers["next-router-segment-prefetch"] &&
+      new URL(r.url()).pathname === "/analyze"
+    );
+  });
+  await page.evaluate(() =>
+    (window as unknown as { next: { router: { refresh(): void } } }).next.router.refresh(),
+  );
+  const response = await refreshed;
+  await response.finished();
+  // The refreshed tree commits, and its history update runs, after the response ends.
+  await page.evaluate(
+    () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
+  );
+  await page.waitForTimeout(300);
+  return new URL(response.url());
+}
+
+/** {@link openspec/specs/capture-flow/spec.md#scenario-a-router-refresh-after-opening-on-the-camera} */
+test("a router refresh after the landing's Take a selfie keeps the address and the camera", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Take a selfie", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Take your selfie" })).toBeAttached();
+  await expect(page).toHaveURL(/\/analyze$/);
+  const fetched = await refreshRouter(page);
+  expect(fetched.searchParams.get("start")).toBeNull();
+  expect(new URL(page.url()).search).toBe("");
+  await expect(page.getByRole("heading", { name: "Take your selfie" })).toBeAttached();
+});
+
+/** {@link openspec/specs/capture-flow/spec.md#scenario-a-router-refresh-after-opening-on-the-camera} */
+test("a router refresh after a fresh load of the camera link keeps the address and the camera", async ({
+  page,
+}) => {
+  await page.goto("/analyze?start=camera");
+  await expect(page.getByRole("heading", { name: "Take your selfie" })).toBeAttached();
+  await expect(page).toHaveURL(/\/analyze$/);
+  const fetched = await refreshRouter(page);
+  expect(fetched.searchParams.get("start")).toBeNull();
+  expect(new URL(page.url()).search).toBe("");
+  await expect(page.getByRole("heading", { name: "Take your selfie" })).toBeAttached();
+});
+
+/**
+ * {@link openspec/specs/capture-flow/spec.md#scenario-other-parameters-and-the-hash-are-kept}
+ * {@link openspec/specs/capture-flow/spec.md#scenario-a-router-refresh-after-opening-on-the-camera}
+ */
+test("a fresh load of the camera link keeps other parameters and the hash, also after a router refresh", async ({
+  page,
+}) => {
+  await page.goto("/analyze?start=camera&utm_source=tiktok#guide");
+  await expect(page.getByRole("heading", { name: "Take your selfie" })).toBeAttached();
+  const address = () => {
+    const url = new URL(page.url());
+    return url.pathname + url.search + url.hash;
+  };
+  expect(address()).toBe("/analyze?utm_source=tiktok#guide");
+  await refreshRouter(page);
+  expect(address()).toBe("/analyze?utm_source=tiktok#guide");
+  await expect(page.getByRole("heading", { name: "Take your selfie" })).toBeAttached();
+});
+
+/**
  * {@link openspec/specs/capture-flow/spec.md#requirement-the-photo-guide-and-capture-follow-the-canvas}
  * (scenario "The guide's example photos")
  */

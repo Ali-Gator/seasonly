@@ -99,16 +99,37 @@ export function Flow() {
   }, [step]);
 
   // The landing's camera link: before the first paint, the camera replaces the guide and the
-  // address drops `start`, so a reload opens the guide. StrictMode's second run finds no `start`.
-  // The state is kept: on a fresh load this runs before Next patches history, and an entry without
-  // Next's keys reloads the page on Back. Next's router keeps its own copy of the old address,
-  // which nothing here reads; a router refresh on /analyze would write it back (BL-95).
+  // address drops `start`, keeping the rest, so a reload opens the guide. The state is kept: on a
+  // fresh load this runs before Next patches history, and an entry without Next's keys reloads the
+  // page on Back. Once Next has patched history (after this commit on a fresh load), the same
+  // address goes through its patch without Next's keys, so the router holds it too and a refresh
+  // does not write `start` back. StrictMode's second run finds no `start`; the ref keeps the sync.
   // {@link openspec/specs/capture-flow/spec.md#requirement-the-landings-camera-link-opens-the-flow-on-the-camera}
+  const routerSync = useRef<string | null>(null);
   useLayoutEffect(() => {
-    if (new URLSearchParams(location.search).get("start") !== "camera") return;
-    opening.current = CAMERA_START;
-    dispatch({ type: "start-camera" });
-    history.replaceState(history.state, "", "/analyze");
+    const query = new URLSearchParams(location.search);
+    if (query.get("start") === "camera") {
+      opening.current = CAMERA_START;
+      dispatch({ type: "start-camera" });
+      query.delete("start");
+      const rest = query.toString();
+      routerSync.current = location.pathname + (rest && `?${rest}`) + location.hash;
+      history.replaceState(history.state, "", routerSync.current);
+    }
+    const target = routerSync.current;
+    if (target === null) return;
+    // Without Next (jsdom) the patch never comes: the strip stands alone after about a second.
+    let tries = 20;
+    let timer = setTimeout(function sync() {
+      if (!Object.hasOwn(history, "replaceState")) {
+        if (--tries) timer = setTimeout(sync, 50);
+        return;
+      }
+      routerSync.current = null;
+      const { __NA, _N, __PRIVATE_NEXTJS_INTERNALS_TREE, ...state } = history.state ?? {};
+      history.replaceState(state, "", target);
+    });
+    return () => clearTimeout(timer);
   }, []);
 
   // The models download while the guide is read. The photo's object URLs end with the page.

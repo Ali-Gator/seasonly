@@ -319,6 +319,15 @@ describe("opening on the camera", () => {
     await reopenAt("/analyze?start=quiz");
     expect(heading()).toBe("Three things before your selfie");
   });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-other-parameters-and-the-hash-are-kept} */
+  it("keeps other parameters and the hash when it strips the parameter", async () => {
+    await reopenAt("/analyze?start=camera&utm_source=tiktok#guide");
+    expect(heading()).toBe("Take your selfie");
+    expect(location.pathname + location.search + location.hash).toBe(
+      "/analyze?utm_source=tiktok#guide",
+    );
+  });
 });
 
 describe("the email step's focus", () => {

@@ -47,7 +47,7 @@ Proven on 2026-10-10 on a preview against the production project: 200 `{"crops":
 
 ## Edge Cases
 
-- Vercel Hobby runs a cron once a day, ±59 min, so a crop can stay up to about 49 h while the pages say 24 h (BL-18, deferred until Vercel Pro or before paid promotion).
+- Vercel Hobby runs a cron once a day, ±59 min, so a crop can stay up to about 49 h while the pages say 24 h (accepted, 2026-10-20).
 - A run that fails leaves the rest for the next one: selection is by age alone.
 - Vercel can deliver a cron twice; the second run finds nothing old, or tolerates a crop the first removed.
 - Supabase's default privileges already gave `service_role` delete on `reports`; the migration states the grant explicitly.
