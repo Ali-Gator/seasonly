@@ -328,6 +328,41 @@ describe("opening on the camera", () => {
       "/analyze?utm_source=tiktok#guide",
     );
   });
+
+  /**
+   * {@link openspec/specs/capture-flow/spec.md#scenario-other-parameters-and-the-hash-are-kept}
+   * {@link openspec/specs/capture-flow/spec.md#scenario-a-router-refresh-after-opening-on-the-camera}
+   */
+  it("strips keeping Next's keys, then replaces once more without them, pairs kept as written", async () => {
+    act(() => root.unmount());
+    const next = { __NA: true, _N: 1, __PRIVATE_NEXTJS_INTERNALS_TREE: {} };
+    history.replaceState(next, "", "/analyze?start=camera&debug&q=a%20b/c#x");
+    // An own-property replaceState, as Next's history patch installs.
+    const native = History.prototype.replaceState;
+    const calls: [unknown, string | URL | null | undefined][] = [];
+    history.replaceState = function (state, unused, url) {
+      calls.push([state, url]);
+      native.call(this, state, unused, url);
+    };
+    try {
+      root = createRoot(container);
+      await act(async () =>
+        root.render(
+          <StrictMode>
+            <Flow />
+          </StrictMode>,
+        ),
+      );
+      await act(() => new Promise((done) => setTimeout(done)));
+      const target = "/analyze?debug&q=a%20b/c#x";
+      expect(calls[0]).toEqual([next, target]);
+      const synced = calls.filter(([state]) => !(state as { __NA?: true } | null)?.__NA);
+      expect(synced).toEqual([[{}, target]]);
+      expect(location.pathname + location.search + location.hash).toBe(target);
+    } finally {
+      delete (history as { replaceState?: unknown }).replaceState;
+    }
+  });
 });
 
 describe("the email step's focus", () => {

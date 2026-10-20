@@ -211,14 +211,15 @@ test("a fresh load of the camera link keeps Back inside the flow, with no reload
 });
 
 /**
- * Refreshes Next's router once the page has settled and waits for the refresh to land. The address
- * already reads right before it, so only a finished refresh can show the parameter written back.
- * Returns the URL the refresh fetched: the router's own copy of the address.
+ * Refreshes Next's router once the camera start has settled and waits for the refresh to land. The
+ * address already reads right before it, so only a finished refresh can show the parameter written
+ * back. Returns the URL the refresh fetched: the router's own copy of the address.
  */
 async function refreshRouter(page: Page): Promise<URL> {
   await page.waitForFunction(() => (window as { next?: { router?: unknown } }).next?.router);
-  // Lets any router sync and its own fetch finish, so the wait below sees only the refresh.
-  await page.waitForTimeout(500);
+  // The capture step the caller waited for renders after the flow's mount commit, so its passive
+  // effects, and the sync timer they set, came first; a timer set now fires after that one.
+  await page.evaluate(() => new Promise((done) => setTimeout(done)));
   const refreshed = page.waitForResponse((r) => {
     const headers = r.request().headers();
     return (
@@ -228,16 +229,18 @@ async function refreshRouter(page: Page): Promise<URL> {
       new URL(r.url()).pathname === "/analyze"
     );
   });
-  await page.evaluate(() =>
-    (window as unknown as { next: { router: { refresh(): void } } }).next.router.refresh(),
-  );
+  await page.evaluate(() => {
+    const w = window as unknown as { treeBefore: unknown; next: { router: { refresh(): void } } };
+    w.treeBefore = history.state?.__PRIVATE_NEXTJS_INTERNALS_TREE;
+    w.next.router.refresh();
+  });
   const response = await refreshed;
-  await response.finished();
-  // The refreshed tree commits, and its history update runs, after the response ends.
-  await page.evaluate(
-    () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
+  // The refreshed tree commits after the response, and Next's history updater writes a new tree.
+  await page.waitForFunction(
+    () =>
+      history.state?.__PRIVATE_NEXTJS_INTERNALS_TREE !==
+      (window as unknown as { treeBefore: unknown }).treeBefore,
   );
-  await page.waitForTimeout(300);
   return new URL(response.url());
 }
 
