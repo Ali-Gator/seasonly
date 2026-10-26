@@ -59,20 +59,25 @@ const VIDEO_COPY: Record<string, { caption: string; season?: SeasonSlug; changed
   "10-gpt-retires": { caption: CAPTION.gpt, season: "deep-winter" },
 };
 
-/** Batch 1: Sun Oct 18 to Tue Oct 27, 18:00 US Eastern (EDT). Instagram alternates Reel and carousel. */
+/**
+ * Batch 2: Wed Oct 28 (Product Hunt day) to Fri Nov 6, 18:00 US Eastern. Same 10 videos in a new order
+ * (step 10 kept every format: batch 1 brought no completed analysis to rank them by); Instagram
+ * alternates Reel and the 5 carousels batch 1 did not use; pins start with the 2 seasons it did not pin.
+ */
 const BATCH = {
-  name: "Batch 1",
+  name: "Batch 2",
+  note: 'Batch 1 (Oct 18 to 27) brought no completed analysis, so every format stays. New here: TikTok captions point to seasonly.me/tt, which opens the site tagged utm_source=tiktok. Schedule TikTok from Oct 27 on, so Nov 6 stays inside its 10-day limit. No music. Posts marked "AI label on" carry the platform\'s AI-generated content setting.',
   days: [
-    ["2026-10-18", "01-draping-same-face", "reel", "soft-summer"],
-    ["2026-10-19", "05-twelve-palettes", "soft-autumn", "soft-autumn"],
-    ["2026-10-20", "07-filter-changes-season", "reel", "deep-winter"],
-    ["2026-10-21", "03-veins", "true-winter", "true-winter"],
-    ["2026-10-22", "10-gpt-retires", "reel", "light-summer"],
-    ["2026-10-23", "02-draping-worst-first", "deep-autumn", "deep-autumn"],
-    ["2026-10-24", "04-soft-autumn-palette", "reel", "true-autumn"],
-    ["2026-10-25", "08-indoor-light", "light-spring", "light-spring"],
-    ["2026-10-26", "06-wear-skip", "reel", "bright-spring"],
-    ["2026-10-27", "09-jet-black", "true-summer", "true-summer"],
+    ["2026-10-28", "01-draping-same-face", "reel", "true-spring"],
+    ["2026-10-29", "03-veins", "bright-spring", "bright-spring"],
+    ["2026-10-30", "05-twelve-palettes", "reel", "bright-winter"],
+    ["2026-10-31", "08-indoor-light", "deep-winter", "deep-winter"],
+    ["2026-11-01", "10-gpt-retires", "reel", "true-winter"],
+    ["2026-11-02", "02-draping-worst-first", "light-summer", "light-summer"],
+    ["2026-11-03", "04-soft-autumn-palette", "reel", "soft-autumn"],
+    ["2026-11-04", "07-filter-changes-season", "soft-summer", "soft-summer"],
+    ["2026-11-05", "06-wear-skip", "reel", "deep-autumn"],
+    ["2026-11-06", "09-jet-black", "true-autumn", "true-autumn"],
   ] as [string, string, "reel" | SeasonSlug, SeasonSlug][],
 };
 
@@ -111,7 +116,7 @@ function videoPosts(v: Video, n: string, reel: boolean): Post[] {
       id: `TT-${n}`,
       platform: "TikTok",
       kind: "Video",
-      caption: `${body}\n\nType seasonly.me in your browser.\n\n#coloranalysis #seasonalcoloranalysis #colorseason #whatseasonami${tag(c.season)}`,
+      caption: `${body}\n\nType seasonly.me/tt in your browser.\n\n#coloranalysis #seasonalcoloranalysis #colorseason #whatseasonami${tag(c.season)}`,
     },
     {
       ...base,
@@ -254,7 +259,7 @@ nav a:hover, nav a:focus-visible { border-color:var(--ink); }
   <p class="eyebrow">Launch plan step 6 · review page</p>
   <h1>Seasonly ${BATCH.name}</h1>
   <p class="lead">${count} posts, one a day per platform from ${first} to ${last}, each at 18:00 US Eastern. Answer in chat with yes, or name the posts to drop (for example "drop IG-04, PIN-07"). Your yes covers exactly these posts, captions, titles and links.</p>
-  <p class="lead">You approved all 40 on Oct 17; Claude scheduled them in your Chrome on Oct 18, so TikTok's last post stays inside its 10-day limit. No music was added. Posts marked "AI label on" carry the platform's AI-generated content setting.</p>
+  <p class="lead">${BATCH.note}</p>
   <div class="facts"><span><b>${count}</b> posts</span><span><b>10</b> days</span><span><b>4</b> platforms</span><span><b>${files.size}</b> files</span><span>New captions, not from the content pack: <b>${changed.join(", ")}</b></span></div>
   <nav aria-label="Days">${BATCH.days.map((d, i) => `<a href="#day-${String(i + 1).padStart(2, "0")}">${dayLabel(d[0])}</a>`).join("")}</nav>
   ${sections.join("\n")}
