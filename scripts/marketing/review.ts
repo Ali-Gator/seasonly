@@ -66,7 +66,7 @@ const VIDEO_COPY: Record<string, { caption: string; season?: SeasonSlug; changed
  */
 const BATCH = {
   name: "Batch 2",
-  note: 'Batch 1 (Oct 18 to 27) brought no completed analysis, so every format stays. New here: TikTok captions point to seasonly.me/tt, which opens the site tagged utm_source=tiktok. Schedule TikTok from Oct 27 on, so Nov 6 stays inside its 10-day limit. No music. Posts marked "AI label on" carry the platform\'s AI-generated content setting.',
+  note: "Batch 1 (Oct 18 to 27) brought no completed analysis, so every format stays. New here: TikTok captions point to seasonly.me/tt, which opens the site tagged utm_source=tiktok. Schedule TikTok from Oct 27 on, so Nov 6 stays inside its 10-day limit. Music: one track per video from each platform's own commercial music library (TikTok, Instagram, YouTube), picked while scheduling; business accounts cannot use other tracks. Posts marked \"AI label on\" carry the platform's AI-generated content setting.",
   days: [
     ["2026-10-28", "01-draping-same-face", "reel", "true-spring"],
     ["2026-10-29", "03-veins", "bright-spring", "bright-spring"],
