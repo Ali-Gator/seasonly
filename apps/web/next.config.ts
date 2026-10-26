@@ -10,11 +10,15 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@seasonly/analysis"],
   // permanent: true answers 308, at the edge with no page render.
   async redirects() {
-    return Object.entries(SEASON_ALIASES).map(([alias, slug]) => ({
-      source: `/seasons/${alias}`,
-      destination: `/seasons/${slug}`,
-      permanent: true,
-    }));
+    return [
+      ...Object.entries(SEASON_ALIASES).map(([alias, slug]) => ({
+        source: `/seasons/${alias}`,
+        destination: `/seasons/${slug}`,
+        permanent: true,
+      })),
+      // TikTok captions carry no link, so its videos ask viewers to type seasonly.me/tt.
+      { source: "/tt", destination: "/?utm_source=tiktok", permanent: false },
+    ];
   },
   // OpenAI's domain check reads the token as plain text; the file has no extension.
   async headers() {
