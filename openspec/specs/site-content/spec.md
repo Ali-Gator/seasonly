@@ -20,6 +20,7 @@ Fixes what each core public page of seasonly.me shows and where its words, color
 - `seasons.ts`: `SEASON_CONTENT: Record<SeasonSlug, SeasonContent>`, with `about` (paragraphs), three `neighbours` (`{ slug, why }`) and three `famous` (`{ name, image, credit: { author, license, licenseUrl, commonsUrl }, source: { title, url } }`); `famousIntro(plural)` and `FAMOUS_NOTE`.
 - `images.ts`: `TIP_PHOTOS` (light, makeup and filter, each a good and a bad `{ src, alt }`), `SAMPLE_FACE`, `SAMPLE_FACE_MASK` (its outline, `/images/examples/face-mask.png`) and `QUIZ_PHOTOS` (quiz).
 - `sample.ts`: `softAutumnColors(names)`, the sample palettes picked by name from `PALETTES["soft-autumn"]`.
+- `faq.tsx`: `Faq({ id, title, items })`, the expandable question list How it works and every season page share (a section, its h2, one `<details>` per `FaqItem` `[question, answer]`, the first open); `MoreLink({ href, children })`, a text link with an arrow; and `seasonFaq(slug)`, a season page's five or six questions built from `SEASON_COPY` and `PALETTES`.
 - `season-link.tsx`: `SeasonLink({ slug, line?, wide?, compact? })`, a season's name as an `h3` holding its link, an optional line and its first highlight colors (four, or six from 1024 px with `wide`). `compact`, the landing's, shows the four as a chip-only `SwatchStrip` whose names are visually hidden.
 
 Images are WebP under `apps/web/public/images/examples/` (the generated model) and `apps/web/public/images/famous/<slug>/` (Commons photos cropped to 3:4), each at most about 80 KB. The sample report renders `ReportSections` from `lib/report/sections.tsx` (report-page) with a static `DrapingPair` on `SAMPLE_FACE`, cut out with `SAMPLE_FACE_MASK`, as the GPT-alternative page does. The outline is a 384 × 512 PNG made once by `scripts/sample-face-mask.ts` with the phone's person segmenter (t19-draping-cutout).
@@ -30,12 +31,15 @@ Every color and every shared season word comes from the analysis core: `PALETTES
 
 Each page is one DOM in phone reading order, rearranged from 1024 px with `lg:` classes, as the report is. A season page puts its palette straight after the head on a phone; from 1024 px the head and the copy float left and the sections right (`LEFT`, `RIGHT` from `lib/report/sections.tsx`), in a flow root. The landing hero adds a 12-chip `SwatchStrip` below 1024 px and swaps its action fills from 1024 px; its closing "Start with a selfie" is primary. The sample report's banner action is secondary, the season has no overline, and the banner sits 16 px above it on a phone. The famous people come from Four Seasons Studio's "<Season> Celebrities" posts, one source per season, linked once under the three photos; each photo carries "Photo: <author>, <license>, cropped", linking to its Commons page and its license. The GPT page's facts are OpenAI's retirement FAQ, checked 2026-10-10.
 
+A season page's h1 is `searchName` ("Deep (Dark) Autumn") and its summary paragraph opens "Also called Dark Autumn." for the eight seasons with a second name (site-structure). Its "Questions about <Season>" section sits between the neighbours and "Is this you?". The answers name no new color or claim: the first three avoid colors, the hair tip, the makeup line and the metals line with the metal names, lowercased in prose. No `FAQPage` structured data: Google shows FAQ rich results only for government and health sites since August 2023.
+
 ## Edge Cases
 
 - A season's three famous people share one source URL; the page links it once. A figure with another source needs its own link (the unit test fails first).
 - The landing's sample palette and the GPT page's are picked from the Soft Autumn palette by name: a renamed color throws at build time.
 - `/sample-report` shares its colors with `/seasons/soft-autumn`. Its h1 names it a sample report and it links to the season page, so the two do not compete for the season's name.
 - The GPT page states a future date; it goes stale on December 11, 2026 (BL-27).
+- Soft Summer's and Soft Autumn's shared makeup line names no shade, so their makeup answer names none either (BL-110).
 - Vercel previews send `X-Robots-Tag: noindex` at the platform level; only production is indexed.
 
 ## Requirements
@@ -291,3 +295,45 @@ The photo check turns back a filter only from skin color no natural skin has, so
 
 - **WHEN** `/color-analysis-gpt-alternative` is rendered
 - **THEN** its photo check section says the phone checks for "low light, tinted light, strong color filters, a missing face and more than one face", and holds no "tinted light, filters,"
+
+### Requirement: A season page names its second name
+
+A season page whose season has a second name (site-structure) SHALL show "<first word> (<second name>) <family>" as its h1, for example "Deep (Dark) Autumn". The first paragraph after the palette SHALL open with "Also called <second name> <family>." before the shared summary. The rest of the page (the palette heading, the "Find out if you're a <Season>" actions, the neighbours) SHALL keep the one name. A season page without a second name SHALL show neither.
+
+#### Scenario: A page with a second name
+
+- **WHEN** `/seasons/deep-autumn` is rendered
+- **THEN** its one h1 reads "Deep (Dark) Autumn", "Also called Dark Autumn." comes before the shared Deep Autumn summary, and its actions read "Find out if you're a Deep Autumn"
+
+#### Scenario: A page without one
+
+- **WHEN** `/seasons/soft-autumn` is rendered
+- **THEN** its h1 reads "Soft Autumn" and no "Also called" line appears
+
+### Requirement: A season page answers common questions from the shared copy
+
+Each season page SHALL show a "Questions about <Season>" section after the neighbouring seasons and before "Is this you?". It SHALL list its questions as expandable items, the first one open, in the style of How it works' questions. In this order, the questions SHALL be:
+
+1. Only for a season with a second name: "Is <Season> the same as <second name> <family>?", answered yes: two names for the same season and the same palette.
+2. "What colors should a <Season> avoid?", naming the first three of the season's colors to avoid from the shared palettes, and saying to keep them away from the face.
+3. "What hair color suits a <Season>?", answered with the season's shared hair tip.
+4. "What makeup suits a <Season>?", answered with the season's shared makeup line.
+5. "Which metals suit a <Season>?", answered with the season's shared metals line and the names of the metals to wear and to go easy on from the shared palettes.
+6. "How do I find out if I'm a <Season>?", answered with one daylight selfie and four quick questions, linking to `/analyze`.
+
+Every color, metal, hair and makeup word in an answer SHALL come from the shared season copy and palettes, so a season page and a report for that season never disagree.
+
+#### Scenario: The questions on a page with a second name
+
+- **WHEN** `/seasons/deep-autumn` is rendered
+- **THEN** its "Questions about Deep Autumn" section lists the six questions in order, the first is "Is Deep Autumn the same as Dark Autumn?" and is open, and the section comes after "Neighbouring seasons" and before "Is this you?"
+
+#### Scenario: The questions on a page without one
+
+- **WHEN** `/seasons/soft-autumn` is rendered
+- **THEN** its section lists five questions, the first is "What colors should a Soft Autumn avoid?" and is open
+
+#### Scenario: Answers match the shared copy
+
+- **WHEN** any season page is rendered
+- **THEN** its avoid answer names the first three of that season's colors to avoid, its hair answer is that season's shared hair tip, its makeup answer is its shared makeup line, its metals answer names each of its metals, and its last answer links to `/analyze`
