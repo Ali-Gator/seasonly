@@ -1,8 +1,8 @@
 import { AGREEMENT_COPY, RETAKE_TIPS, type RetakeReason } from "@seasonly/analysis";
-import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { Button, Icon, Note } from "@/components/ds";
+import { Faq, type FaqItem, MoreLink } from "@/lib/site-content/faq";
 import { pageMetadata } from "@/lib/site/routes";
 
 export const metadata = pageMetadata("/how-it-works");
@@ -10,7 +10,7 @@ export const metadata = pageMetadata("/how-it-works");
 /** The order the board lists them in. */
 const REJECTIONS: RetakeReason[] = ["dark", "tint", "filter", "no-face", "several-faces"];
 
-const FAQ: [string, ReactNode][] = [
+const FAQ: FaqItem[] = [
   [
     "Do I need an account?",
     "No. Seasonly is free while we are in early access, and no account is needed.",
@@ -36,15 +36,6 @@ const FAQ: [string, ReactNode][] = [
     </>,
   ],
 ];
-
-function MoreLink({ href, children }: { href: string; children: string }) {
-  return (
-    <Link href={href} className="label sn-navlink flex">
-      {children}
-      <Icon name="arrow-right" size={18} />
-    </Link>
-  );
-}
 
 function Step({ n, title, children }: { n: number; title: string; children: ReactNode }) {
   return (
@@ -178,21 +169,7 @@ export default function Page() {
         <MoreLink href="/privacy">Read the privacy policy</MoreLink>
       </section>
 
-      <section aria-labelledby="faq-title" className={SECTION}>
-        <h2 className="h2" id="faq-title">
-          Questions
-        </h2>
-        <div className="flex flex-col border-b border-(--line)">
-          {FAQ.map(([question, answer], i) => (
-            <details key={question} className="border-t border-(--line)" open={i === 0}>
-              <summary className="label cursor-pointer py-[14px]">{question}</summary>
-              <div className="flex flex-col gap-(--space-3) pb-(--space-4) text-(--ink-muted)">
-                {answer}
-              </div>
-            </details>
-          ))}
-        </div>
-      </section>
+      <Faq id="faq-title" title="Questions" items={FAQ} />
 
       <section className={SECTION}>
         <h2 className="h2">Ready when you are</h2>

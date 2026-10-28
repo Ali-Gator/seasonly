@@ -275,6 +275,82 @@ describe("/seasons/<slug>", () => {
   });
 });
 
+describe("/seasons/<slug> under its searched names", () => {
+  const h1 = (html: string) => text(/<h1[^>]*>(.*?)<\/h1>/.exec(html)?.[1] ?? "").trim();
+  /** The "Questions about <Season>" section's markup. */
+  const faq = (html: string) => {
+    const section = /<section[^>]*aria-labelledby="faq-title"[^>]*>(.*?)<\/section>/.exec(
+      html,
+    )?.[1];
+    if (section === undefined) throw new Error("No questions section");
+    return section;
+  };
+  const questions = (section: string) =>
+    [...section.matchAll(/<summary[^>]*>(.*?)<\/summary>/g)].map(([, q]) => text(q ?? "").trim());
+  const firstOpen = (section: string) => /<details[^>]*>/.exec(section)?.[0].includes(" open=");
+  const ask = (name: string) => [
+    `What colors should a ${name} avoid?`,
+    `What hair color suits a ${name}?`,
+    `What makeup suits a ${name}?`,
+    `Which metals suit a ${name}?`,
+    `How do I find out if I'm a ${name}?`,
+  ];
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-a-page-with-a-second-name} */
+  it("names the second name in the h1 and before the summary", async () => {
+    const out = await seasonPage("deep-autumn");
+    expect(h1(out)).toBe("Deep (Dark) Autumn");
+    expect(text(out)).toContain(`Also called Dark Autumn. ${SEASON_COPY["deep-autumn"].summary}`);
+    expect(text(out)).toContain("Find out if you're a Deep Autumn");
+    expect(text(out)).toContain("The Deep Autumn palette");
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-a-page-without-one} */
+  it("keeps one name on a page without a second one", async () => {
+    const out = await seasonPage("soft-autumn");
+    expect(h1(out)).toBe("Soft Autumn");
+    expect(text(out)).not.toContain("Also called");
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-questions-on-a-page-with-a-second-name} */
+  it("asks six questions on a page with a second name, between the neighbours and Is this you?", async () => {
+    const out = await seasonPage("deep-autumn");
+    const section = faq(out);
+    expect(text(section)).toContain("Questions about Deep Autumn");
+    expect(questions(section)).toEqual([
+      "Is Deep Autumn the same as Dark Autumn?",
+      ...ask("Deep Autumn"),
+    ]);
+    expect(firstOpen(section)).toBe(true);
+    expect(section.match(/<details[^>]*open=/g)).toHaveLength(1);
+    const at = out.indexOf('aria-labelledby="faq-title"');
+    expect(out.indexOf("Neighbouring seasons")).toBeLessThan(at);
+    expect(at).toBeLessThan(out.indexOf("Is this you?"));
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-questions-on-a-page-without-one} */
+  it("asks five questions on a page without one, the avoid question open", async () => {
+    const section = faq(await seasonPage("soft-autumn"));
+    expect(questions(section)).toEqual(ask("Soft Autumn"));
+    expect(firstOpen(section)).toBe(true);
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-answers-match-the-shared-copy} */
+  it.each(SEASON_SLUGS)("%s answers from the shared copy and palettes", async (slug) => {
+    const section = faq(await seasonPage(slug));
+    const answers = text(section);
+    const copy = SEASON_COPY[slug];
+    const palette = PALETTES[slug];
+    const [a, b, c] = palette.avoid.map((s) => s.name);
+    expect(answers).toContain(`${a}, ${b} and ${c}.`);
+    for (const line of [copy.hairTip, copy.makeupIntro, copy.metalsIntro])
+      expect(answers).toContain(line);
+    for (const metal of [...palette.metals, ...palette.metalsAvoid])
+      expect(answers).toContain(metal.name);
+    expect(section).toContain('href="/analyze"');
+  });
+});
+
 describe("/how-it-works", () => {
   const out = html(<HowItWorks />);
 

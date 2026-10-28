@@ -29,7 +29,7 @@ See proposal.md for why. Today `routes.ts` (site-structure) fills the one season
 
 4. **One `Faq` component, shared.** `lib/site-content/faq.tsx` exports `Faq({ id, title, items })`: the section, its h2, and the `<details>` list with the first item open. The markup and classes come from How it works unchanged, and How it works switches to it, so both pages look the same and How it works' output does not change. The season page passes `SECTION`-like classes matching its other bottom sections (`border-t border-(--line) pt-(--space-6)`).
 
-5. **Questions are built in `lib/site-content/seasons.ts`.** `seasonFaq(slug): [string, ReactNode][]` composes the answers from `SEASON_COPY` and `PALETTES`:
+5. **Questions are built in `lib/site-content/faq.tsx`, beside `Faq`** (`seasons.ts` is a plain `.ts` data file, and the last answer holds a link). `seasonFaq(slug): [string, ReactNode][]` composes the answers from `SEASON_COPY` and `PALETTES`:
    - Same as (second name only): "Yes. <Second> <Family> and <Season> are two names for the same season, with the same palette."
    - Avoid: "<A>, <B> and <C>. They compete with <Season> coloring, so keep them away from the face. Trousers, shoes and bags in them are fine." (the first three `palette.avoid` names; the closing words echo the page's own "Colors to avoid" intro)
    - Hair: `copy.hairTip`.

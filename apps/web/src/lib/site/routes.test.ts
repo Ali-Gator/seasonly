@@ -12,6 +12,9 @@ import {
   ROUTES,
   SEASON_ALIASES,
   SEASON_SLUGS,
+  searchName,
+  seasonName,
+  secondName,
   type Route,
 } from "./routes";
 
@@ -60,16 +63,31 @@ describe("route map", () => {
     expect(routeAt("/pricing")).toBeUndefined();
   });
 
-  /** {@link openspec/specs/site-structure/spec.md#requirement-alternative-season-names-redirect-to-the-fixed-slug} */
-  it("maps the six alternative names to fixed slugs", () => {
+  /**
+   * {@link openspec/specs/site-structure/spec.md#requirement-alternative-season-names-redirect-to-the-fixed-slug}
+   * {@link openspec/specs/site-structure/spec.md#scenario-a-dark-name}
+   */
+  it("maps the eight alternative names to fixed slugs", () => {
     expect(SEASON_ALIASES).toEqual({
       "warm-spring": "true-spring",
       "clear-spring": "bright-spring",
       "cool-summer": "true-summer",
       "warm-autumn": "true-autumn",
+      "dark-autumn": "deep-autumn",
+      "dark-winter": "deep-winter",
       "cool-winter": "true-winter",
       "clear-winter": "bright-winter",
     });
+  });
+
+  /** {@link openspec/specs/site-structure/spec.md#requirement-alternative-season-names-redirect-to-the-fixed-slug} */
+  it("gives every second name exactly one redirect, and no redirect without one", () => {
+    const fromNames = SEASON_SLUGS.flatMap((slug) => {
+      const second = secondName(slug);
+      return second ? [[second.toLowerCase().replaceAll(" ", "-"), slug]] : [];
+    });
+    expect(Object.entries(SEASON_ALIASES)).toEqual(fromNames);
+    expect(fromNames).toHaveLength(8);
   });
 
   /** {@link openspec/specs/site-structure/spec.md#requirement-the-public-routes-are-fixed} */
@@ -138,6 +156,26 @@ describe("pageMetadata", () => {
     const meta = pageMetadata("/seasons/soft-autumn");
     expect(meta.title).toMatch(/Soft Autumn/);
     expect(meta.description).toBe(routeAt("/seasons/soft-autumn")?.description);
+  });
+
+  /** {@link openspec/specs/site-structure/spec.md#scenario-a-season-with-a-second-name} */
+  it("names a season's second name in its title and description", () => {
+    const meta = pageMetadata("/seasons/deep-autumn");
+    expect(meta.title).toBe("Deep (Dark) Autumn color palette and colors to avoid · Seasonly");
+    expect(meta.description).toContain("Deep (Dark) Autumn");
+    expect(searchName("bright-winter")).toBe("Bright (Clear) Winter");
+    expect(secondName("true-summer")).toBe("Cool Summer");
+  });
+
+  /** {@link openspec/specs/site-structure/spec.md#scenario-a-season-without-one} */
+  it("keeps one name for a season without a second one", () => {
+    expect(pageMetadata("/seasons/soft-autumn").title).toBe(
+      "Soft Autumn color palette and colors to avoid · Seasonly",
+    );
+    for (const slug of ["light-spring", "light-summer", "soft-summer", "soft-autumn"] as const) {
+      expect(secondName(slug), slug).toBeUndefined();
+      expect(searchName(slug), slug).toBe(seasonName(slug));
+    }
   });
 
   it("throws for a path outside the map", () => {
