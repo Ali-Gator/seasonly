@@ -82,12 +82,16 @@ describe("route map", () => {
 
   /** {@link openspec/specs/site-structure/spec.md#requirement-alternative-season-names-redirect-to-the-fixed-slug} */
   it("gives every second name exactly one redirect, and no redirect without one", () => {
-    const fromNames = SEASON_SLUGS.flatMap((slug) => {
-      const second = secondName(slug);
-      return second ? [[second.toLowerCase().replaceAll(" ", "-"), slug]] : [];
-    });
-    expect(Object.entries(SEASON_ALIASES)).toEqual(fromNames);
-    expect(fromNames).toHaveLength(8);
+    // Each alias is its slug with the first word swapped for the second name's.
+    const title = (word: string) => word.charAt(0).toUpperCase() + word.slice(1);
+    for (const [alias, slug] of Object.entries(SEASON_ALIASES)) {
+      const [word = "", family = ""] = alias.split("-");
+      expect(slug.endsWith(`-${family}`), alias).toBe(true);
+      expect(secondName(slug), alias).toBe(`${title(word)} ${title(family)}`);
+    }
+    const named = SEASON_SLUGS.filter((slug) => secondName(slug));
+    expect(Object.values(SEASON_ALIASES).sort()).toEqual([...named].sort());
+    expect(named).toHaveLength(8);
   });
 
   /** {@link openspec/specs/site-structure/spec.md#requirement-the-public-routes-are-fixed} */

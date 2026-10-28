@@ -46,9 +46,15 @@ export function Faq({ id, title, items }: { id: string; title: string; items: Fa
   );
 }
 
-/** ["a", "b", "c"] → "a, b and c". */
-const list = (names: readonly string[]) =>
-  names.length < 2 ? (names[0] ?? "") : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+/** Swatch names as prose: ["Yellow Gold", "Copper"] → "yellow gold and copper". */
+const list = (swatches: readonly { name: string }[]) => {
+  const names = swatches.map((s) => s.name.toLowerCase());
+  return names.length < 2
+    ? (names[0] ?? "")
+    : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+};
+
+const capitalized = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /**
  * A season page's questions, every answer built from the shared season copy and palettes, so the
@@ -61,7 +67,6 @@ export function seasonFaq(slug: SeasonSlug): FaqItem[] {
   const second = secondName(slug);
   const copy = SEASON_COPY[slug];
   const palette = PALETTES[slug];
-  const names = (swatches: readonly { name: string }[]) => list(swatches.map((s) => s.name));
   return [
     ...(second
       ? [
@@ -73,13 +78,13 @@ export function seasonFaq(slug: SeasonSlug): FaqItem[] {
       : []),
     [
       `What colors should a ${name} avoid?`,
-      `${names(palette.avoid.slice(0, 3))}. They compete with ${name} coloring, so keep them away from the face. Trousers, shoes and bags in them are fine.`,
+      `${capitalized(list(palette.avoid.slice(0, 3)))}. They compete with ${name} coloring, so keep them away from the face. Trousers, shoes and bags in them are fine.`,
     ],
     [`What hair color suits a ${name}?`, copy.hairTip],
     [`What makeup suits a ${name}?`, copy.makeupIntro],
     [
       `Which metals suit a ${name}?`,
-      `${copy.metalsIntro} Wear ${names(palette.metals)}. Go easy on ${names(palette.metalsAvoid)}.`,
+      `${copy.metalsIntro} Wear ${list(palette.metals)}. Go easy on ${list(palette.metalsAvoid)}.`,
     ],
     [
       `How do I find out if I'm a ${name}?`,

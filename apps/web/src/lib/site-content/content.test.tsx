@@ -335,19 +335,46 @@ describe("/seasons/<slug> under its searched names", () => {
     expect(firstOpen(section)).toBe(true);
   });
 
+  /** Each question with its own answer's visible text. */
+  const answers = (section: string) =>
+    new Map(
+      [...section.matchAll(/<summary[^>]*>(.*?)<\/summary>(.*?)<\/details>/g)].map(([, q, a]) => [
+        text(q ?? "").trim(),
+        text(a ?? "").trim(),
+      ]),
+    );
+
   /** {@link openspec/specs/site-content/spec.md#scenario-answers-match-the-shared-copy} */
   it.each(SEASON_SLUGS)("%s answers from the shared copy and palettes", async (slug) => {
     const section = faq(await seasonPage(slug));
-    const answers = text(section);
+    const name = seasonName(slug);
+    const [avoid, hair, makeup, metals, findOut] = ask(name).map((q) => answers(section).get(q));
     const copy = SEASON_COPY[slug];
     const palette = PALETTES[slug];
-    const [a, b, c] = palette.avoid.map((s) => s.name);
-    expect(answers).toContain(`${a}, ${b} and ${c}.`);
-    for (const line of [copy.hairTip, copy.makeupIntro, copy.metalsIntro])
-      expect(answers).toContain(line);
-    for (const metal of [...palette.metals, ...palette.metalsAvoid])
-      expect(answers).toContain(metal.name);
-    expect(section).toContain('href="/analyze"');
+    const lower = (s: { name: string }) => s.name.toLowerCase();
+    const [a, b, c] = palette.avoid.map(lower);
+    expect(avoid?.toLowerCase()).toMatch(new RegExp(`^${escape(`${a}, ${b} and ${c}.`)}`));
+    expect(avoid).toContain("keep them away from the face");
+    expect(hair).toBe(copy.hairTip);
+    expect(makeup).toBe(copy.makeupIntro);
+    expect(metals).toMatch(new RegExp(`^${escape(copy.metalsIntro)} Wear `));
+    const [wear = "", easy = ""] = (metals ?? "")
+      .slice(copy.metalsIntro.length)
+      .split(" Go easy on ");
+    for (const metal of palette.metals.map(lower)) expect(wear).toContain(metal);
+    for (const metal of palette.metalsAvoid.map(lower)) expect(easy).toContain(metal);
+    expect(findOut).toContain("one daylight selfie and answer four quick questions");
+    expect(section).toMatch(
+      /<details[^>]*>(?:(?!<\/details>).)*href="\/analyze"(?:(?!<\/details>).)*<\/details>\s*<\/div>\s*$/,
+    );
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-questions-on-a-page-with-a-second-name} */
+  it("says a second name is the same season with the same palette", async () => {
+    const section = faq(await seasonPage("bright-winter"));
+    expect(answers(section).get("Is Bright Winter the same as Clear Winter?")).toBe(
+      "Yes. Clear Winter and Bright Winter are two names for the same season, with the same palette.",
+    );
   });
 });
 

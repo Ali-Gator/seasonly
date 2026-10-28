@@ -2,7 +2,7 @@
 
 ### Requirement: A season page names its second name
 
-A season page whose season has a second name (site-structure) SHALL show "<first word> (<second name>) <family>" as its h1, for example "Deep (Dark) Autumn". The first paragraph after the palette SHALL open with "Also called <second name> <family>." before the shared summary. The rest of the page (the palette heading, the "Find out if you're a <Season>" actions, the neighbours, the breadcrumb) SHALL keep the one name. A season page without a second name SHALL show neither.
+A season page whose season has a second name (site-structure) SHALL show "<first word> (<second name>) <family>" as its h1, for example "Deep (Dark) Autumn". The first paragraph after the palette SHALL open with "Also called <second name> <family>." before the shared summary. The rest of the page (the palette heading, the "Find out if you're a <Season>" actions, the neighbours) SHALL keep the one name. A season page without a second name SHALL show neither.
 
 #### Scenario: A page with a second name
 
