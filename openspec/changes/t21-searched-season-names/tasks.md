@@ -1,7 +1,8 @@
 ## 1. Plan and approvals
 
 - [ ] 1.1 Tracker (Claude Docs concept, https://claude.ai/code/artifact/23434923-c1ff-47d6-8ce6-7c86fd14856c): set T21 to "In progress" and add a Log line, newest first, naming `t21-searched-season-names`. Verify: the row's status and the Log line show.
-- [ ] 1.2 Existing-test edit, one, needs the user's yes (CLAUDE.md). In `apps/web/src/lib/site/routes.test.ts`, the `SEASON_ALIASES` `toEqual` gains `"dark-autumn": "deep-autumn"` and `"dark-winter": "deep-winter"`. No other existing test pins a season title, a season h1 other than Soft Autumn's, or How it works' FAQ markup. If another breaks anyway, stop and ask. Verify: the approval and its date are recorded here.
+- [x] 1.2 Existing-test edit, one, needs the user's yes (CLAUDE.md). In `apps/web/src/lib/site/routes.test.ts`, the `SEASON_ALIASES` `toEqual` gains `"dark-autumn": "deep-autumn"` and `"dark-winter": "deep-winter"`. No other existing test pins a season title, a season h1 other than Soft Autumn's, or How it works' FAQ markup. If another breaks anyway, stop and ask. Verify: the approval and its date are recorded here.
+  - Approved by the user on 2026-10-28: the alias `toEqual` gains `dark-autumn` and `dark-winter`.
 
 ## 2. Tests first (each cites its scenario at the permanent path)
 
