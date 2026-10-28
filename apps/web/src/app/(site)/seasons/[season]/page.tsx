@@ -5,9 +5,18 @@ import { notFound } from "next/navigation";
 
 import { Button, Icon, ReportSection, Slot } from "@/components/ds";
 import { Colors, Group, LEFT, RIGHT, SeasonTraits } from "@/lib/report/sections";
+import { Faq, seasonFaq } from "@/lib/site-content/faq";
 import { SeasonLink } from "@/lib/site-content/season-link";
 import { FAMOUS_NOTE, famousIntro, SEASON_CONTENT } from "@/lib/site-content/seasons";
-import { familyName, pageMetadata, SEASON_SLUGS, SEASONS, seasonName } from "@/lib/site/routes";
+import {
+  familyName,
+  pageMetadata,
+  SEASON_SLUGS,
+  SEASONS,
+  searchName,
+  seasonName,
+  secondName,
+} from "@/lib/site/routes";
 
 type Props = { params: Promise<{ season: string }> };
 
@@ -39,11 +48,13 @@ function FindOut({ name, className }: { name: string; className?: string }) {
  *
  * {@link openspec/specs/site-content/spec.md#requirement-a-season-page-shows-that-seasons-shared-palette-and-copy}
  * {@link openspec/specs/site-content/spec.md#requirement-famous-people-on-a-season-page-are-sourced-and-credited}
+ * {@link openspec/specs/site-content/spec.md#requirement-a-season-page-names-its-second-name}
  */
 export default async function Season({ params }: Props) {
   const { season: slug } = await params;
   const season = SEASONS.find((s) => s.slug === slug)?.slug ?? notFound();
   const name = seasonName(season);
+  const second = secondName(season);
   const copy = SEASON_COPY[season];
   const palette = PALETTES[season];
   const { about, neighbours, famous } = SEASON_CONTENT[season];
@@ -61,7 +72,7 @@ export default async function Season({ params }: Props) {
             </Link>
           </nav>
           <p className="overline">{familyName(season)} family</p>
-          <h1 className="display">{name}</h1>
+          <h1 className="display">{searchName(season)}</h1>
           <p className="quote text-(--ink-muted)">{copy.tagline}</p>
         </section>
 
@@ -76,7 +87,10 @@ export default async function Season({ params }: Props) {
         </div>
 
         <div className={`flex flex-col gap-(--space-4) lg:gap-(--space-5) ${LEFT}`}>
-          <p>{copy.summary}</p>
+          <p>
+            {second && <>Also called {second}. </>}
+            {copy.summary}
+          </p>
           {about.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
@@ -158,6 +172,8 @@ export default async function Season({ params }: Props) {
           ))}
         </ul>
       </section>
+
+      <Faq id="faq-title" title={`Questions about ${name}`} items={seasonFaq(season)} />
 
       <section className="flex flex-col gap-(--space-4) border-t border-(--line) pt-(--space-6) lg:flex-row lg:items-center lg:justify-between lg:gap-(--space-6) lg:py-(--space-8)">
         <div className="flex flex-col gap-(--space-4) lg:gap-(--space-2)">

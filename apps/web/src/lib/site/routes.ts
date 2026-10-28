@@ -40,15 +40,41 @@ export const SEASONS: readonly { slug: SeasonSlug; summary: string }[] = SEASON_
   (slug) => ({ slug, summary: SUMMARIES[slug] }),
 );
 
-/** Common alternative season names, each 308-redirected to its fixed slug. */
-export const SEASON_ALIASES: Readonly<Record<string, SeasonSlug>> = {
-  "warm-spring": "true-spring",
-  "clear-spring": "bright-spring",
-  "cool-summer": "true-summer",
-  "warm-autumn": "true-autumn",
-  "cool-winter": "true-winter",
-  "clear-winter": "bright-winter",
+/**
+ * The second name searchers also use, one word per season: Deep Autumn is also "Dark Autumn".
+ * Light Spring, Light Summer, Soft Summer and Soft Autumn have none.
+ */
+const SECOND_NAMES: Partial<Record<SeasonSlug, string>> = {
+  "true-spring": "Warm",
+  "bright-spring": "Clear",
+  "true-summer": "Cool",
+  "true-autumn": "Warm",
+  "deep-autumn": "Dark",
+  "deep-winter": "Dark",
+  "true-winter": "Cool",
+  "bright-winter": "Clear",
 };
+
+/** "deep-autumn" → "Dark Autumn"; undefined for a season without a second name. */
+export function secondName(slug: SeasonSlug): string | undefined {
+  const word = SECOND_NAMES[slug];
+  return word && `${word} ${familyName(slug)}`;
+}
+
+/** "deep-autumn" → "Deep (Dark) Autumn"; the one name for a season without a second. */
+export function searchName(slug: SeasonSlug): string {
+  const word = SECOND_NAMES[slug];
+  const [first, family] = seasonName(slug).split(" ");
+  return word ? `${first} (${word}) ${family}` : seasonName(slug);
+}
+
+/** Each second name, as a slug, 308-redirected to its fixed slug: "dark-autumn" → "deep-autumn". */
+export const SEASON_ALIASES: Readonly<Record<string, SeasonSlug>> = Object.fromEntries(
+  SEASON_SLUGS.flatMap((slug) => {
+    const second = secondName(slug);
+    return second ? [[second.toLowerCase().replaceAll(" ", "-"), slug]] : [];
+  }),
+);
 
 /** "soft-autumn" → "Autumn". */
 export function familyName(slug: SeasonSlug): string {
@@ -67,7 +93,7 @@ export function seasonName(slug: SeasonSlug): string {
 export interface Route {
   /** The URL path; `/seasons/[season]` and `/r/[id]` are patterns. */
   path: string;
-  /** In the season entry, `{season}` and `{summary}` are filled per slug. */
+  /** In the season entry, `{season}` (the search name) and `{summary}` are filled per slug. */
   title: string;
   description: string;
   /** Whether the route may ever be indexed. */
@@ -166,7 +192,7 @@ export function routeAt(path: string, routes: readonly Route[] = ROUTES): Route 
   if (!route) return undefined;
   const fill = (text: string) =>
     entry
-      ? text.replaceAll("{season}", seasonName(entry.slug)).replaceAll("{summary}", entry.summary)
+      ? text.replaceAll("{season}", searchName(entry.slug)).replaceAll("{summary}", entry.summary)
       : text;
   return { ...route, path, title: fill(route.title), description: fill(route.description) };
 }

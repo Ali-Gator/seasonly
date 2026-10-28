@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-109**
+_Next id:_ **BL-111**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -137,6 +137,12 @@ fold items in.
 
 ## Testing
 
+- **[BL-109] No request test cites the dark-name redirect** — the e2e alias loop does request
+  `/seasons/dark-autumn` and `dark-winter`, but cites only "An alternative name"; "A dark name" is
+  cited only by the unit test on the alias map, which makes no request. Add the scenario's link to
+  the loop's doc comment (an edit to an existing test, so it needs your yes).
+  _Refs:_ `e2e/site-structure.spec.ts` (alias loop), `t21-searched-season-names` review · _Status:_ open
+
 - **[BL-107] The router-refresh e2e can read the page before the refresh commits** — `refreshRouter`
   captures `history.state`'s tree once the sync timer has fired, not after its restore commits; if
   that commit lands between the capture and the refresh, the tree-identity wait passes early and the
@@ -153,6 +159,12 @@ fold items in.
   deferred — until the TikTok account has 1,000 followers and its bio link
 
 ## Design / UX
+
+- **[BL-110] Two season FAQs answer the makeup question with no makeup** — Soft Summer's and Soft
+  Autumn's shared `makeupIntro` is "Stay in the same cool, dusty family as your clothes.": right
+  inside a report, but as the season page's FAQ answer it names no shade. Add shades to those two
+  lines (report copy, needs your approval) or append palette-derived lips and blush to the answer.
+  _Refs:_ `apps/web/src/lib/site-content/faq.tsx` (`seasonFaq`), `packages/analysis/src/report-text/copy.ts`, `t21-searched-season-names` review · _Status:_ open
 
 - **[BL-04] The design system's ShareCard overflows on long names** — the approved
   `bundle.css` sets post-card names at 0.75 em, and "Bright Turquoise" needs about 379 px of a
