@@ -37,6 +37,16 @@ function pageFilePaths(dir = APP): { file: string; path: string }[] {
 const allReady = (routes: readonly Route[]) => routes.map((r) => ({ ...r, ready: true }));
 
 describe("route map", () => {
+  /** {@link openspec/specs/site-structure/spec.md#scenario-the-quiz-page-answers} */
+  it("holds the quiz page, indexable and ready, with its title and a description", () => {
+    expect(routeAt("/color-analysis-quiz")).toMatchObject({
+      title: "Color analysis quiz: what season am I? · Seasonly",
+      indexable: true,
+      ready: true,
+    });
+    expect(routeAt("/color-analysis-quiz")?.description).toMatch(/\w/);
+  });
+
   /** {@link openspec/specs/site-structure/spec.md#requirement-the-12-season-slugs-are-fixed} */
   it("has exactly the 12 season slugs", () => {
     expect(SEASON_SLUGS).toEqual([
@@ -104,6 +114,7 @@ describe("route map", () => {
         "/how-it-works",
         "/sample-report",
         "/color-analysis-gpt-alternative",
+        "/color-analysis-quiz",
         "/privacy",
         "/terms",
         "/analyze",

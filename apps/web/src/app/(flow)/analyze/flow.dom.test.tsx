@@ -420,3 +420,76 @@ describe("the email step's focus", () => {
     expect(document.activeElement).toBe(container.querySelector("main h1"));
   });
 });
+
+describe("opening with the quiz page's answers", () => {
+  const ANSWERS = "veins=green&jewelry=gold&sun=burn-tan&hair=dark";
+  const ANSWERED = { veins: "green", jewelry: "gold", sun: "burn-tan", hair: "dark" };
+  const sends = () => {
+    const send = vi.fn((url: string, init: { body: FormData }) => {
+      void url;
+      void init;
+      return new Promise<Response>(() => {});
+    });
+    vi.stubGlobal("fetch", send);
+    return send;
+  };
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-opening-with-the-quiz-pages-answers} */
+  it("shows the guide, drops the answers from the address, keeps the rest and takes no focus", async () => {
+    await reopenAt(`/analyze?${ANSWERS}&utm_source=tiktok`);
+    expect(heading()).toBe("Three things before your selfie");
+    expect(location.pathname + location.search).toBe("/analyze?utm_source=tiktok");
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-a-passing-photo-goes-straight-to-the-analysis} */
+  it("sends one request with the four answers when a photo passes, and shows no quiz", async () => {
+    const send = sends();
+    await reopenAt(`/analyze?${ANSWERS}`);
+    await toQuiz();
+    expect(container.textContent).not.toContain(QUESTION_1);
+    expect(send).toHaveBeenCalledTimes(1);
+    const body = send.mock.calls[0]?.[1].body;
+    expect(JSON.parse(String(body?.get("answers")))).toEqual(ANSWERED);
+    expect(body?.get("traits")).not.toBeNull();
+    expect(body?.get("crop")).not.toBeNull();
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-an-answer-the-core-does-not-accept} */
+  it("ignores all four when one is not accepted, and still drops them", async () => {
+    await reopenAt("/analyze?veins=purple&jewelry=gold&sun=burn-tan&hair=dark");
+    expect(location.pathname + location.search).toBe("/analyze");
+    await toQuiz();
+    expect(heading()).toBe(QUESTION_1);
+    expect(option("Green or olive")?.checked).toBe(false);
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#requirement-answers-from-the-quiz-page-skip-the-quiz} */
+  it("ignores all four when one is missing", async () => {
+    await reopenAt("/analyze?veins=green&jewelry=gold&sun=burn-tan");
+    expect(location.pathname + location.search).toBe("/analyze");
+    await toQuiz();
+    expect(heading()).toBe(QUESTION_1);
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-reload-after-opening-with-answers} */
+  it("starts the quiz with no answer after a reload", async () => {
+    await reopenAt(`/analyze?${ANSWERS}`);
+    await reopenAt(location.pathname + location.search);
+    await toQuiz();
+    expect(heading()).toBe(QUESTION_1);
+    expect(option("Green or olive")?.checked).toBe(false);
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-the-camera-link-with-the-quiz-pages-answers} */
+  it("opens on the camera with them, and a passing photo goes straight to the analysis", async () => {
+    const send = sends();
+    await reopenAt(`/analyze?start=camera&${ANSWERS}`);
+    expect(heading()).toBe("Take your selfie");
+    expect(location.pathname + location.search).toBe("/analyze");
+    await toQuiz();
+    expect(container.textContent).not.toContain(QUESTION_1);
+    expect(send).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(String(send.mock.calls[0]?.[1].body.get("answers")))).toEqual(ANSWERED);
+  });
+});

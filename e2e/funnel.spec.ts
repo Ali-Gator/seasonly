@@ -293,3 +293,41 @@ test("sends no analysis_failed when the person goes Back while analyzing", async
   await expect.poll(posthog.named, POLL).toContain("$pageview /");
   expect(posthog.find("analysis_failed")).toEqual([]);
 });
+
+/**
+ * Reached by the link, not a fresh load, so the page view fires before the flow strips the address.
+ *
+ * {@link openspec/specs/analytics/spec.md#scenario-from-the-quiz-page-to-the-photo}
+ * {@link openspec/specs/analytics/spec.md#scenario-a-result-on-the-quiz-page}
+ */
+test("counts the quiz page's result, then the hand-off as the /analyze page view", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  const posthog = await recordPostHog(page);
+  await answerAnalyze(page, "result");
+
+  await page.goto("/color-analysis-quiz");
+  await answerQuiz(page);
+  await expect(page.getByRole("heading", { name: "Autumn", exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Add a selfie for your exact season" }).click();
+  await page.waitForURL("**/analyze");
+  await uploadFace(page);
+  await expect(page.getByRole("button", { name: "Get my full report" })).toBeVisible(POLL);
+
+  await expect
+    .poll(posthog.named, POLL)
+    .toEqual([
+      "$pageview /color-analysis-quiz",
+      "$pageview /analyze",
+      "photo_checked",
+      "analysis_result",
+    ]);
+  expect(posthog.errors).toEqual([]);
+  const handoff = posthog.find("$pageview")[1]?.properties.$current_url;
+  expect(handoff).toContain("veins=green&jewelry=gold&sun=tan&hair=medium");
+  const [completed] = posthog.find("quiz_page_completed");
+  expect(completed?.properties).toMatchObject({ result: "autumn" });
+  expect(completed?.properties).not.toHaveProperty("answers");
+  expect(posthog.find("quiz_page_completed")).toHaveLength(1);
+});

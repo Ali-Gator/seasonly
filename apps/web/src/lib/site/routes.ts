@@ -154,6 +154,14 @@ export const ROUTES: readonly Route[] = [
     ready: true,
   },
   {
+    path: "/color-analysis-quiz",
+    title: "Color analysis quiz: what season am I? · Seasonly",
+    description:
+      "Four questions give your season family and 6 colors to wear, with no photo and no sign-up. Add a selfie for your exact season.",
+    indexable: true,
+    ready: true,
+  },
+  {
     path: "/privacy",
     title: "Privacy policy · Seasonly",
     description: "How Seasonly handles your photo and your data.",

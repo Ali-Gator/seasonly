@@ -13,6 +13,7 @@ import {
   type FlowState,
   initialState,
   type PassedPhoto,
+  presetAnswers,
   reduce,
   stepProgress,
   toFormData,
@@ -443,5 +444,69 @@ describe("opening on the camera", () => {
     expect(reduce(opened, { type: "start-camera" })).toBe(opened);
     const deeper = run([{ type: "open-camera" }]);
     expect(reduce(deeper, { type: "start-camera" })).toBe(deeper);
+  });
+});
+
+describe("answers from the quiz page", () => {
+  const ANSWERS = { veins: "green", jewelry: "gold", sun: "burn-tan", hair: "dark" } as const;
+  const preset: FlowEvent = { type: "preset-answers", answers: ANSWERS };
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-opening-with-the-quiz-pages-answers} */
+  it("reads the four answers from the address, unsure included, and ignores other pairs", () => {
+    expect(
+      presetAnswers("?veins=green&jewelry=gold&sun=burn-tan&hair=dark&utm_source=tiktok"),
+    ).toEqual(ANSWERS);
+    expect(presetAnswers("?veins=unsure&jewelry=unsure&sun=unsure&hair=unsure")).toEqual({
+      veins: "unsure",
+      jewelry: "unsure",
+      sun: "unsure",
+      hair: "unsure",
+    });
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-an-answer-the-core-does-not-accept} */
+  it("takes none of them when one is refused or missing", () => {
+    expect(presetAnswers("?veins=purple&jewelry=gold&sun=burn-tan&hair=dark")).toBeNull();
+    expect(presetAnswers("?veins=green&jewelry=gold&sun=burn-tan")).toBeNull();
+    expect(presetAnswers("")).toBeNull();
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-opening-with-the-quiz-pages-answers} */
+  it("keeps the guide on screen, with the answers kept and the quiz done", () => {
+    const opened = reduce(initialState(), preset);
+    expect(opened.step).toEqual({ name: "guide" });
+    expect(opened.trail).toEqual([]);
+    expect(opened.answers).toEqual(ANSWERS);
+    expect(opened.quizDone).toBe(true);
+    expect(opened.attempt).toBe(0);
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#requirement-answers-from-the-quiz-page-skip-the-quiz} */
+  it("changes nothing once the flow has left the opening guide", () => {
+    const deeper = run([{ type: "open-camera" }]);
+    expect(reduce(deeper, preset)).toBe(deeper);
+    const opened = reduce(initialState(), { type: "start-camera" });
+    expect(reduce(opened, preset)).toBe(opened);
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-a-passing-photo-goes-straight-to-the-analysis} */
+  it("sends the analysis with those answers when a photo passes", () => {
+    const sent = run([preset, { type: "checking", id: 1 }, passed]);
+    expect(sent.step).toEqual({ name: "analyzing" });
+    expect(sent.request).toEqual({ answers: ANSWERS, photo: PASS });
+  });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-the-quiz-only-path-keeps-the-answers} */
+  it("sends them with no crop on the quiz-only path", () => {
+    const sent = run([
+      preset,
+      { type: "checking", id: 1 },
+      failed(),
+      { type: "checking", id: 1 },
+      failed(),
+      { type: "quiz-only" },
+    ]);
+    expect(sent.step).toEqual({ name: "analyzing" });
+    expect(sent.request).toEqual({ answers: ANSWERS, photo: null });
   });
 });

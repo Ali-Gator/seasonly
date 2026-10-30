@@ -99,6 +99,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             title="More"
             links={[
               ["/sample-report", "Sample report"],
+              ["/color-analysis-quiz", "Color analysis quiz"],
               ["/color-analysis-gpt-alternative", "Color analysis GPT alternative"],
               ["/privacy", "Privacy"],
               ["/terms", "Terms"],

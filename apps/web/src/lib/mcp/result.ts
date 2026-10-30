@@ -43,7 +43,7 @@ const NO_RESULT_TITLE = "These answers don't point to one season";
 
 const NO_RESULT_MESSAGE: Record<NoResult["reason"], string> = {
   "no-answers":
-    "Every answer was “Not sure” or in between, so there is nothing to go on yet. Pick the closest answer to each question, or let a selfie read your colors.",
+    "Every answer was “Hard to tell” or in between, so there is nothing to go on yet. Pick the closest answer to each question, or let a selfie read your colors.",
   "answers-cancel":
     "Your answers point in opposite directions: some say warm, others say cool. Check your wrist and jewelry in daylight and answer again, or let a selfie read your colors.",
 };

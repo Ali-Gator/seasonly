@@ -37,7 +37,7 @@
 - `apps/web/src/lib/site/routes.ts`: one `ROUTES` entry, `ready: true` once the content ships in this change.
 - `apps/web/src/app/(flow)/analyze/flow-state.ts` and `flow.tsx`: a `preset-answers` event read from the address next to `start=camera`, and the address cleanup extended to the four answer keys.
 - `apps/web/src/app/(flow)/analyze/_quiz/quiz.tsx`: `QuizStep` takes a heading level, because the page's h1 is its title, and an optional Back.
-- `apps/web/src/lib/mcp/result.ts`: `quizResult` is reused by the page as it is. The plugin's behavior is unchanged.
+- `apps/web/src/lib/mcp/result.ts`: `quizResult` is reused by the page. One word of its `no-answers` message changes, “Not sure” to “Hard to tell”, the option's real label (the user's yes, 2026-10-30). The plugin's behavior is otherwise unchanged.
 - `apps/web/src/components/site-chrome.tsx`: one footer link.
 - Tests: two existing assertions need the user's yes. `apps/web/src/lib/site/seo.test.ts` pins the sitemap's URL list twice, as "19 URLs" and as every route ready; both gain `/color-analysis-quiz`. New unit, DOM and E2E tests cover the page, the hand-off and the event.
 - No new dependency, no migration, no paid run. The analysis core is untouched, so the eval cannot move.

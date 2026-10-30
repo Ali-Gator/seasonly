@@ -1,17 +1,10 @@
-import { type Family, SEASON_SLUGS, seasonFamily } from "@seasonly/analysis";
+import { SEASON_SLUGS, seasonFamily } from "@seasonly/analysis";
 
 import { Button, Icon } from "@/components/ds";
-import { SeasonLink } from "@/lib/site-content/season-link";
+import { FAMILIES, SeasonLink } from "@/lib/site-content/season-link";
 import { pageMetadata, SEASONS } from "@/lib/site/routes";
 
 export const metadata = pageMetadata("/seasons");
-
-const FAMILIES: [Family, string, string][] = [
-  ["spring", "Spring", "Warm and clear, with a golden glow. Light to medium depth."],
-  ["summer", "Summer", "Cool and soft, with a rosy or blue base. Light to medium depth."],
-  ["autumn", "Autumn", "Warm and muted, with a golden or earthy base. Medium to deep."],
-  ["winter", "Winter", "Cool and clear, with high contrast. From icy to deep."],
-];
 
 const QUESTIONS = [
   ["Warm or cool", "Undertone. Golden for Spring and Autumn, rosy or blue for Summer and Winter."],

@@ -17,6 +17,7 @@ import { AnalysisError, Analyzing, Blocked, NoResult, Reveal } from "./_reveal/s
 import {
   CAMERA_START,
   initialState,
+  presetAnswers,
   type Question,
   QUESTIONS,
   reduce,
@@ -98,20 +99,29 @@ export function Flow() {
     target?.focus({ preventScroll: true });
   }, [step]);
 
-  // The landing's camera link: before the first paint, the camera replaces the guide and the
-  // address drops `start`, keeping the other pairs as written, so a reload opens the guide. The
-  // state is kept: on a fresh load this runs before Next patches history, and an entry without
-  // Next's keys reloads the page on Back.
+  // The landing's camera link and the quiz page's answers: before the first paint, the camera
+  // replaces the guide, the answers are kept when all four pass, and the address drops them and
+  // `start`, keeping the other pairs as written, so a reload opens the guide. The answers go first:
+  // their event only holds on the opening guide. The state is kept: on a fresh load this runs
+  // before Next patches history, and an entry without Next's keys reloads the page on Back.
   // {@link openspec/specs/capture-flow/spec.md#requirement-the-landings-camera-link-opens-the-flow-on-the-camera}
+  // {@link openspec/specs/capture-flow/spec.md#requirement-answers-from-the-quiz-page-skip-the-quiz}
   const routerSync = useRef<string | null>(null);
   useLayoutEffect(() => {
-    if (new URLSearchParams(location.search).get("start") !== "camera") return;
-    opening.current = CAMERA_START;
-    dispatch({ type: "start-camera" });
+    const params = new URLSearchParams(location.search);
+    const camera = params.get("start") === "camera";
+    if (!camera && !QUESTIONS.some((q) => params.has(q))) return;
+    const answers = presetAnswers(location.search);
+    if (answers) dispatch({ type: "preset-answers", answers });
+    if (camera) {
+      opening.current = CAMERA_START;
+      dispatch({ type: "start-camera" });
+    }
+    const strip = new Set<string>(camera ? ["start", ...QUESTIONS] : QUESTIONS);
     const rest = location.search
       .slice(1)
       .split("&")
-      .filter((pair) => pair && !new URLSearchParams(pair).has("start"))
+      .filter((pair) => pair && ![...new URLSearchParams(pair).keys()].some((k) => strip.has(k)))
       .join("&");
     history.replaceState(
       history.state,

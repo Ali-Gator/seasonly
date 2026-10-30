@@ -24,6 +24,7 @@ describe("sitemap", () => {
       "https://seasonly.me/how-it-works",
       "https://seasonly.me/sample-report",
       "https://seasonly.me/color-analysis-gpt-alternative",
+      "https://seasonly.me/color-analysis-quiz",
       "https://seasonly.me/privacy",
       "https://seasonly.me/terms",
     ]);
@@ -32,7 +33,7 @@ describe("sitemap", () => {
 
 describe("core routes", () => {
   /** {@link openspec/specs/site-content/spec.md#scenario-the-core-routes-are-ready} */
-  it("are ready, so the sitemap lists the 19 URLs", () => {
+  it("are ready, so the sitemap lists the 20 URLs", () => {
     expect(indexedUrls()).toEqual([
       "https://seasonly.me",
       "https://seasonly.me/seasons",
@@ -40,6 +41,7 @@ describe("core routes", () => {
       "https://seasonly.me/how-it-works",
       "https://seasonly.me/sample-report",
       "https://seasonly.me/color-analysis-gpt-alternative",
+      "https://seasonly.me/color-analysis-quiz",
       "https://seasonly.me/privacy",
       "https://seasonly.me/terms",
     ]);

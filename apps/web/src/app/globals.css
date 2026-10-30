@@ -255,6 +255,9 @@ body {
   h1[tabindex="-1"]:focus {
     outline: none;
   }
+  h2[tabindex="-1"]:focus {
+    outline: none;
+  }
   /* The report's draping preview while its face outline loads: the faces wait hidden, so the
      photo's background never flashes, and show after 4 s even if the script never runs
      (t19-draping-cutout). */
