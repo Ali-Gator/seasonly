@@ -162,7 +162,8 @@ export default function Page() {
         <p className="text-(--ink-muted)">
           The Seasonly plugin asks you the same four questions in the chat. It gives you your season
           family and 6 of its colors, each with its name and hex code, and a link to the photo
-          analysis here for your exact season.
+          analysis here for your exact season. It is published by Oleg Gordienov, an individual in
+          Bulgaria.
         </p>
         <Note icon="camera" title="It takes no photo">
           Only your four answers reach the plugin, and it stores nothing.

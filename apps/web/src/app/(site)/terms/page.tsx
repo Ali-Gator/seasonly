@@ -44,9 +44,9 @@ const SECTIONS: [heading: string, body: ReactNode, id?: string][] = [
   [
     "Law and contact",
     <>
-      The law of Bulgaria governs these terms. If you live in the EU, you also keep the protection
-      of your own country&apos;s consumer law. Questions go to{" "}
-      <a href="mailto:care@seasonly.me">care@seasonly.me</a>.
+      Seasonly is run by an individual in Bulgaria, Oleg Gordienov. The law of Bulgaria governs
+      these terms. If you live in the EU, you also keep the protection of your own country&apos;s
+      consumer law. Questions go to <a href="mailto:care@seasonly.me">care@seasonly.me</a>.
     </>,
     // The listings' support URL is /terms#contact.
     "contact",
@@ -64,7 +64,7 @@ export default function Page() {
       <div className="flex flex-col gap-(--space-3) border-b border-(--line) pb-(--space-6)">
         <p className="overline">Legal</p>
         <h1 className="h1">Terms of use</h1>
-        <p className="caption text-(--ink-muted)">Last updated October 12, 2026</p>
+        <p className="caption text-(--ink-muted)">Last updated October 30, 2026</p>
         <p className="lead">By using Seasonly you agree to these terms. They are short.</p>
       </div>
       {SECTIONS.map(([heading, body, id]) => (

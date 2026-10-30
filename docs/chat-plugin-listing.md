@@ -107,6 +107,8 @@ In `docs/chat-plugin-screenshots/`, taken in task 6.3 on 2026-10-11, each with i
 
 ## ChatGPT package
 
+**Publisher:** the organization's only verified identity is `Individual — OLEG GORDIENOV`, and the package's `developerName` and `author.name` match it exactly. OpenAI rejected 1.0.0, developer "Seasonly", on 2026-10-30: it could not confirm the brand belongs to a verified person or company. Since 1.0.1 the site's `/privacy`, `/terms#contact` and plugin section name him. Do not verify again in another organization: a person can verify only one, and repeat attempts may block access.
+
 OpenAI takes a plugin ZIP, not a form. Its source is `docs/chat-plugin-openai/` (`plugin.json`, `mcp.json`, `assets/`), built with `zip -X -r seasonly-plugin.zip plugin.json mcp.json assets -x '.*'` from that folder. The review test cases above live in `plugin.json`, except case 5's wording, above; `tools_triggered` is a string. The portal also wants `review.demo_recording_url`, a reviewer-accessible video.
 
 ## Domain challenge (ChatGPT)

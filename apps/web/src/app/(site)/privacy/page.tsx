@@ -63,7 +63,7 @@ export default function Page() {
       <div className="flex flex-col gap-(--space-3) border-b border-(--line) pb-(--space-6)">
         <p className="overline">Legal</p>
         <h1 className="h1">Privacy policy</h1>
-        <p className="caption text-(--ink-muted)">Last updated October 12, 2026</p>
+        <p className="caption text-(--ink-muted)">Last updated October 30, 2026</p>
         <p className="lead">
           Seasonly needs a crop of your face to find your colors. This page says what we keep, who
           else sees it, and how to have it deleted.
@@ -214,7 +214,7 @@ export default function Page() {
       <section className="flex flex-col gap-(--space-3)">
         <h2 className="h2">Who runs Seasonly</h2>
         <p>
-          Seasonly is run by an individual in Bulgaria, not a company. Write to{" "}
+          Seasonly is run by an individual in Bulgaria, Oleg Gordienov, not a company. Write to{" "}
           <a href="mailto:care@seasonly.me">care@seasonly.me</a> about your privacy or a deletion
           request.
         </p>
