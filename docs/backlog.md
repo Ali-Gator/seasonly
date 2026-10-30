@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-114**
+_Next id:_ **BL-115**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -28,6 +28,8 @@ fold items in.
 
 ## Site
 
+- **[BL-114] `/api/mcp` hits Vercel's 300 s timeout** — Vercel logged "Task timed out after 300 seconds" on this route 27 times for 21 users from Oct 20 to Oct 28, while the tool itself answers at once and Sentry shows nothing. Find which request hangs (a stream a host holds open is the first suspect) and answer or close it, since each one holds a function for 5 minutes.
+  _Refs:_ `openspec/specs/chat-plugin/spec.md`, `apps/web/src/app/api/mcp/route.ts` · _Status:_ open
 - **[BL-111] The quiz page's "Why a selfie" button drops the answers** — Its copy says "Your answers come with you, so you won't be asked again", but "Find my colors" under it is a plain `/analyze` link, so a person who finished the quiz and uses it is asked again. Reword the line to name the result's selfie button, or have the button carry the answers; the copy was approved on the canvas, so it needs the user's yes.
   _Refs:_ `openspec/specs/quiz-page/spec.md`, `apps/web/src/app/(site)/color-analysis-quiz/page.tsx` · _Status:_ open
 - **[BL-112] The footer's link to the quiz page wipes its progress when used on that page** — Next replaces the entry without custom state, so the click seems to do nothing and a reload then shows question 1 with the answers gone. Hide the link on this page, or accept it.
