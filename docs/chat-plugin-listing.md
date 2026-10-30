@@ -33,6 +33,8 @@ Everything the Claude Connectors Directory and the OpenAI Platform ask for when 
 
 **Name:** Seasonly
 
+**Publisher:** Oleg Gordienov, an individual in Bulgaria, for both directories; the site's plugin section says so. Details for ChatGPT are under "ChatGPT package".
+
 A brand name; it does not use or imply "GPT", "ChatGPT", "OpenAI", "Claude" or "Anthropic".
 
 **One-liner** (at most 200 characters; 111 here):

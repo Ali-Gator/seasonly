@@ -15,6 +15,7 @@
 
 ## 4. Verify and ship
 
-- [ ] 4.1 `pnpm fix`, `pnpm test`, `pnpm test:eval`
-- [ ] 4.2 Review in a fresh subagent; fix, log the rest in `docs/backlog.md`
-- [ ] 4.3 Archive without the Tracker, push, PR, auto-merge with a merge commit
+- [x] 4.1 `pnpm fix`, `pnpm test`, `pnpm test:eval`
+- [x] 4.2 Review in a fresh subagent; fix, log the rest in `docs/backlog.md`
+- [x] 4.3 Add the 2026-10-30 approval to the `legal-pages` Behavior; log the canvas gap as BL-113
+- [x] 4.4 Archive without the Tracker, push, PR, auto-merge with a merge commit

@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-113**
+_Next id:_ **BL-114**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -218,3 +218,9 @@ fold items in.
   directory listing is live, and sharpen the tool description only if listed connectors still skip it.
   _Refs:_ `openspec/specs/chat-plugin/spec.md`, `docs/chat-plugin-listing.md` · _Status:_ deferred
   — directory listing live (host check 6.3, 2026-10-11)
+
+- **[BL-113] The GPT-alternative boards lack the plugin's publisher line** — `/color-analysis-gpt-alternative`
+  says the plugin is published by Oleg Gordienov, an approved exception to the board's copy. Add the
+  line to both boards so a later design pass does not drop it.
+  _Refs:_ `openspec/specs/site-content/spec.md`, `project/GptAlternative.dc.html`,
+  `project/GptAlternative-1280.dc.html` · _Status:_ gated — the user's canvas approval (backlog-17, 2026-10-30)
