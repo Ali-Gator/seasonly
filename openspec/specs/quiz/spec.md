@@ -13,7 +13,8 @@ function QuizStep(props: {
   answers: QuizAnswers;
   onAnswer: (question: Question, value: string) => void;
   onNext: () => void;
-  onBack: () => void;
+  onBack?: () => void; // none on the quiz page's first question: no Back renders
+  heading?: "h1" | "h2"; // default h1; the quiz page's h1 is its title, so it passes h2
 }): JSX.Element;
 ```
 
@@ -24,6 +25,7 @@ function QuizStep(props: {
 - A pointer choice moves on: the fieldset's click handler, for a click with a click count inside an option, schedules `onNext` 300 ms later, except on the last question. Space gives a click count of 0 and arrow keys fire no click, so keyboard choices stay. The timer is cleared when the question changes or the step unmounts, and it calls the latest `onNext` through a ref. "Tap an answer to go on." sits above the options on every question but the last.
 - The progress row is the flow's `StepProgress` with `sub` (`Step 2 of 3 · Question n of 4`); the quiz has no count line of its own.
 - The veins, jewelry and hair options carry `QUIZ_PHOTOS` from `lib/site-content/images.ts`: 320 px WebP files under `apps/web/public/images/quiz/`, made by `scripts/generate-photos.ts quiz` and approved by the user on 2026-10-13. The jewelry photos show the metals alone.
+- On the quiz page (quiz-page) `QuizStep` renders without `StepProgress`; that page draws its own count line.
 - Answers live in the flow's reducer state, so Back shows the earlier answer still chosen; Change my answers starts at question 1 with every answer kept.
 
 ## Edge Cases
@@ -43,7 +45,7 @@ The quiz SHALL ask four questions, one per step, in the order and wording of can
 3. sun;
 4. natural hair color.
 
-Each option's label and description SHALL match the canvas. Each option's value SHALL be the core's quiz value for that question. "Hard to tell" SHALL be the value `unsure`. Each step SHALL show one progress row, "Step 2 of 3 · Question n of 4", where the step progress marks Quiz as the current step and fills its bar by the share of questions reached. There SHALL be no second "Question n of 4" line.
+Each option's label and description SHALL match the canvas. Each option's value SHALL be the core's quiz value for that question. "Hard to tell" SHALL be the value `unsure`. Inside the analysis flow, each step SHALL show one progress row, "Step 2 of 3 · Question n of 4", where the step progress marks Quiz as the current step and fills its bar by the share of questions reached. There SHALL be no second "Question n of 4" line. On the quiz page the same questions show that page's own progress instead (quiz-page, "The quiz page asks the four questions in its first screen").
 
 #### Scenario: The first question
 
@@ -54,6 +56,11 @@ Each option's label and description SHALL match the canvas. Each option's value 
 
 - **WHEN** the fourth question is shown
 - **THEN** its progress reads "Question 4 of 4" and its primary action is "See my result"
+
+#### Scenario: The questions on the quiz page
+
+- **WHEN** question 1 is shown on `/color-analysis-quiz`
+- **THEN** it reads "Question 1 of 4" with the same legend and options as in the flow, and no "Step 2 of 3" appears
 
 ### Requirement: No answer is chosen for the person
 

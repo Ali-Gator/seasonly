@@ -39,6 +39,8 @@ A page exports `metadata = pageMetadata("/its-path")`, or a `generateMetadata` t
 
 The second names live in one private map in `routes.ts`, one word per season ("Dark" for `deep-autumn`). `SEASON_ALIASES` is derived from it, so a new second name brings its redirect with it. Only the title, the description and the season page's h1 and opener use the double name; the report, share card, header menu and neighbour links keep `seasonName`.
 
+`/color-analysis-quiz` has the quiz page's own client island (quiz-page) and stays statically rendered.
+
 Pages live in three route groups: `(site)` carries the shared header and footer, `(flow)` (`/analyze`) a header bar with only the wordmark, and `(report)` (`/r/[id]`) no chrome, since the report draws its own header (report-page). The root `not-found.tsx` gives unmatched URLs the site chrome; `(report)/r/[id]/not-found.tsx` serves an unknown report under the wordmark-only header.
 
 ## Edge Cases
@@ -64,6 +66,7 @@ The site SHALL serve exactly these public page routes, each with the rendering a
 | `/how-it-works`                   | How the analysis works                     | Static                                   | Yes            |
 | `/sample-report`                  | A full sample report                       | Static                                   | Yes            |
 | `/color-analysis-gpt-alternative` | For users of the retiring GPT              | Static                                   | Yes            |
+| `/color-analysis-quiz`            | The four-question quiz on its own page     | Static                                   | Yes            |
 | `/privacy`                        | Privacy policy                             | Static                                   | Yes            |
 | `/terms`                          | Terms of use                               | Static                                   | Yes            |
 | `/analyze`                        | The analysis flow, every step on one route | Static shell                             | Never          |
@@ -95,6 +98,11 @@ Every other page path SHALL answer 404 and SHALL NOT be indexed; the season-name
 
 - **WHEN** a `page.tsx` under `apps/web/src/app` serves a path that is not in the table
 - **THEN** the unit suite fails, naming the file
+
+#### Scenario: The quiz page answers
+
+- **WHEN** `/color-analysis-quiz` is requested
+- **THEN** it answers 200 and carries no `noindex`
 
 ### Requirement: The 12 season slugs are fixed
 

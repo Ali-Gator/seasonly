@@ -19,7 +19,8 @@ type Step =
   | { name: "no-result"; reason: "no-answers" | "answers-cancel" }
   | { name: "error"; blocked?: true }; // blocked: the route answered 403
 function initialState(): FlowState;
-type FlowEvent = { type: "start-camera" } | { type: "open-camera" } | /* … */; // start-camera: guide → capture in place, only on the opening guide
+type FlowEvent = { type: "start-camera" } | { type: "preset-answers"; answers: QuizAnswers } | { type: "open-camera" } | /* … */; // start-camera: guide → capture in place; preset-answers: answers kept and quiz done; both only on the opening guide
+function presetAnswers(search: string): QuizAnswers | null; // the quiz page's four answers from an address, null unless all four pass
 const CAMERA_START: Step; // the capture step start-camera puts in place, one object
 function reduce(s: FlowState, e: FlowEvent): FlowState; // push = new history entry, replace = same entry, back = pop
 function stepProgress(step: Step): number | null; // Photo 0, Quiz 1, Result 2; none on the reveal
@@ -68,6 +69,7 @@ function photoCheckedProps(o: {
 - A check that throws (an undecodable file, models that failed to load) shows the no-face retake and goes to Sentry.
 - Each new step scrolls to the top and focuses its `main h1`; when `matchMedia("(hover: hover) and (pointer: fine)")` matches, a `main [data-autofocus]` element takes it instead (only the email step's field has one). The effect skips while the step is the one it last handled, which is the opening guide on mount and on StrictMode's second run, so `/analyze` opens without moving focus; Back to the guide still moves it. A camera start skips `CAMERA_START` once through a one-shot `opening` ref, so Back onto the capture step later still moves focus. `globals.css` draws no outline on `h1[tabindex="-1"]:focus`.
 - `?start=camera` is read in a mount-only `useLayoutEffect`, before the first paint of the landing's soft navigation. It dispatches `start-camera` (a replace, not a push, so the capture step owns the entry the flow mounted on and Back leaves the flow) and calls `history.replaceState(history.state, "", target)`, where `target` is the path, the query's raw `&` pairs minus empty ones and those whose decoded key is `start`, so `%73tart` goes too (the rest kept as written, not re-encoded), and the hash. The state keeps Next's `__NA` key: on a fresh load this runs before Next patches history, and entries without it reload the page on Back. A mount-only passive `useEffect` then sets one `setTimeout(sync, 0)` that calls `history.replaceState` again with the same `target` and the state minus `__NA`, `_N` and `__PRIVATE_NEXTJS_INTERNALS_TREE`, so Next's patch syncs its router to the stripped address and a router refresh fetches it. Next's patch is a passive effect of the ancestor `Router`, committed with the flow or earlier, and React runs a commit's passive effects in one synchronous pass, so the timer fires after the patch on a soft navigation and a fresh load alike; checking for the patch would not do, since Sentry and PostHog wrap `history.replaceState` before hydration. The timer does nothing when the address has moved first (Back, a link), since the entry is then another one. Without Next (jsdom) the sync is a plain replace with the same address. A `routerSync` ref carries the target across StrictMode's second run, which finds no `start`; the cleanup clears the timer and the re-run sets it again.
+- The same effect reads the quiz page's four answers. When any of the keys is present it strips all four, and dispatches `preset-answers` when all pass; that goes before `start-camera`, whose step would fail the event's guard. `start` is stripped only when it is `camera`. Router sync runs whenever something was stripped.
 - The retake screen takes the second-failure layout when `offerQuizOnly` is set: the photo as a 96 px thumbnail beside an `h1` styled `h2`, then the notes, then "Retake photo", "Continue with the quiz only" (secondary) and "Upload a different photo".
 - `UploadNotice`, the lock-icon paragraph, is shared by the guide and the capture step, so both say the same thing about the crop.
 - The guide shows one `PhotoTipCard` with the good reference and three bad examples; its actions stack `lg:flex-col-reverse` with `.sn-btn--lg-swap`, so upload is on top and primary from 1024 px while the DOM keeps "Take a selfie" first.
@@ -79,6 +81,8 @@ function photoCheckedProps(o: {
 - A camera already blocked for the site still shows "Take a selfie" on the guide; the capture step then offers upload with the blocked caption.
 - A reload starts again at the guide; answers and photo are not kept across visits.
 - A hard load of `/analyze?start=camera` (a pasted link, a new tab, a tap before the landing hydrates) shows the server-rendered guide until the flow hydrates, then the camera; the guide's actions are disabled until then.
+- `/analyze?veins=purple&…`, or three of the four answers: the keys go from the address and the quiz runs as usual.
+- A shared link with the quiz page's answers fills in the sender's: they are multiple-choice values and weigh 20 % beside the recipient's photo.
 - Forward onto the camera's entry after Back to the landing opens the guide: the entry no longer carries `start`.
 - iOS 16 lacks `AbortSignal.any`, so Back and the 45 s timeout share one controller.
 
@@ -331,7 +335,7 @@ When the flow moves to a new step, focus SHALL move to that step's main heading,
 
 ### Requirement: The landing's camera link opens the flow on the camera
 
-`/analyze?start=camera` SHALL open the flow on the capture step instead of the photo guide. The capture step SHALL then be the flow's first entry, so the browser's Back from it leaves the flow for the page before it. Once the flow has opened, the address SHALL drop the parameter and keep the rest: the path, every other query parameter and the hash, so a reload starts at the photo guide as on any other visit. Next's router SHALL then hold that same address, so a router refresh or a server action on `/analyze` does not write the parameter back. Any other value of `start`, or none, SHALL open the photo guide. This opening is the one step change that adds no history entry, and removing `start` the one change to the address inside the flow; both exceptions hold over "The flow stays on one URL" here and over site-structure's "without changing the URL".
+`/analyze?start=camera` SHALL open the flow on the capture step instead of the photo guide. The capture step SHALL then be the flow's first entry, so the browser's Back from it leaves the flow for the page before it. Once the flow has opened, the address SHALL drop the parameter and keep the rest: the path, every other query parameter and the hash, so a reload starts at the photo guide as on any other visit. Next's router SHALL then hold that same address, so a router refresh or a server action on `/analyze` does not write the parameter back. Any other value of `start`, or none, SHALL open the photo guide. This opening is the one step change that adds no history entry. Removing `start`, and removing the quiz page's answers ("Answers from the quiz page skip the quiz"), are the only changes to the address inside the flow; these exceptions hold over "The flow stays on one URL" here and over site-structure's "without changing the URL".
 
 #### Scenario: Opening on the camera
 
@@ -362,3 +366,37 @@ When the flow moves to a new step, focus SHALL move to that step's main heading,
 
 - **WHEN** a person opens `/analyze?start=camera`, from the landing's link or as a fresh load, and Next's router then refreshes the page
 - **THEN** the address still reads `/analyze` and the capture step is still shown
+
+#### Scenario: The camera link with the quiz page's answers
+
+- **WHEN** `/analyze?start=camera&veins=green&jewelry=gold&sun=burn-tan&hair=dark` opens
+- **THEN** the capture step is shown, the address reads `/analyze`, and a passing photo goes straight to the analysis without the quiz
+
+### Requirement: Answers from the quiz page skip the quiz
+
+`/analyze` SHALL accept the quiz page's four answers in its address as `veins`, `jewelry`, `sun` and `hair` query parameters. When all four are present and each is a value the core accepts for its question (`unsure` included), the flow SHALL keep them as the person's answers and treat the quiz as done: it opens on the photo guide as usual, and once a photo passes the check, or the person continues with the quiz only after two failed checks, the analysis SHALL run with those answers without showing the quiz. When any of the four is missing or not accepted, the flow SHALL ignore all four and run as if none were given. Either way, once the flow has opened, the address SHALL drop the four parameters and keep the path, every other query parameter and the hash, as it does for `start`; a reload then starts at the photo guide with no answers. Nothing SHALL be sent before the photo passes or the quiz-only path is chosen, as "Nothing leaves the device before the quiz is finished" requires.
+
+#### Scenario: Opening with the quiz page's answers
+
+- **WHEN** `/analyze?veins=green&jewelry=gold&sun=burn-tan&hair=dark&utm_source=tiktok` opens
+- **THEN** the photo guide is shown and the address reads `/analyze?utm_source=tiktok`
+
+#### Scenario: A passing photo goes straight to the analysis
+
+- **WHEN** a person who opened `/analyze` with the quiz page's answers takes a photo that passes the check
+- **THEN** one analyze request carries those four answers with the traits and the crop, and no quiz question was shown
+
+#### Scenario: The quiz-only path keeps the answers
+
+- **WHEN** a person who opened `/analyze` with the quiz page's answers fails the check twice and chooses "Continue with the quiz only"
+- **THEN** one analyze request carries those four answers and no crop, and no quiz question was shown
+
+#### Scenario: An answer the core does not accept
+
+- **WHEN** `/analyze?veins=purple&jewelry=gold&sun=burn-tan&hair=dark` opens and a photo then passes
+- **THEN** the address reads `/analyze` and the quiz starts at question 1 with no answer chosen
+
+#### Scenario: Reload after opening with answers
+
+- **WHEN** a person who opened `/analyze` with the quiz page's answers reloads the page and a photo then passes
+- **THEN** the quiz starts at question 1 with no answer chosen
