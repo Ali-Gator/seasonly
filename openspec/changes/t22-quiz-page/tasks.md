@@ -11,7 +11,7 @@
   Reuse the design system's components; no DS change. Verify: the canvas version is noted here, and the board at 375 shows question 1 inside the first screen (812 px). Done 2026-10-30: canvas version 68 (1793361824-88db), boards 23, 23b, 23c; every option ends at about 778 px on the 375 board, and the disabled "Next" sits just below the fold.
 
 - [x] 1.3 Ask the user to approve the board and its copy (CLAUDE.md: the canvas before UI code). If an approved string differs from one the specs fix (the h1, "Question n of 4", the action labels, the note), update `specs/quiz-page/spec.md` first. Verify: the approval and its date are recorded here. No task in groups 3–4 starts before it. Approved by the user 2026-10-30 (canvas version 68), no fixed string changed. Also approved: the shared no-answers message says “Hard to tell” instead of “Not sure”, in `lib/mcp/result.ts`, so the plugin's text changes by that word.
-- [x] 1.4 Existing-test edits, two in one file, need the user's yes (CLAUDE.md). Both are in `apps/web/src/lib/site/seo.test.ts`: "lists exactly these URLs once every route is ready" and "are ready, so the sitemap lists the 19 URLs" each gain `"https://seasonly.me/color-analysis-quiz"` after the GPT-alternative URL, and the second is renamed "…the 20 URLs". No other existing test pins the route list, the footer's links or `QuizStep`'s heading element: the flow keeps `h1` by default. If another breaks anyway, stop and ask. Verify: the approval and its date are recorded here. Approved by the user 2026-10-30. A third edit broke as the plan warned: `routes.test.ts`, "holds exactly the public routes", gains the route (the user's yes, 2026-10-30).
+- [x] 1.4 Existing-test edits, two in one file, need the user's yes (CLAUDE.md). Both are in `apps/web/src/lib/site/seo.test.ts`: "lists exactly these URLs once every route is ready" and "are ready, so the sitemap lists the 19 URLs" each gain `"https://seasonly.me/color-analysis-quiz"` after the GPT-alternative URL, and the second is renamed "…the 20 URLs". No other existing test pins the route list, the footer's links or `QuizStep`'s heading element: the flow keeps `h1` by default. If another breaks anyway, stop and ask. Verify: the approval and its date are recorded here. Approved by the user 2026-10-30. A third edit broke as the plan warned: `routes.test.ts`, "holds exactly the public routes", gains the route (the user's yes, 2026-10-30). A fourth: `e2e/sample-report.spec.ts` scrolled a fixed distance, and the footer's new link left its line 3 px above the screen at the bottom of the page, so it gains one scroll line (the user's yes, 2026-10-30).
 
 ## 2. Tests first (each cites its scenario at the permanent path)
 
@@ -83,7 +83,7 @@
 
 ## 4. Gates, review, archive
 
-- [ ] 4.1 `pnpm fix`, `pnpm test`, `pnpm test:eval` (no eval change expected: the core is untouched). Verify: all green.
+- [x] 4.1 `pnpm fix`, `pnpm test`, `pnpm test:eval` (no eval change expected: the core is untouched). Verify: all green.
 - [x] 4.2 `pnpm --filter web build`, then:
   - grep `.next/static/chunks` for `@modelcontextprotocol` (design decision 5);
   - E2E locally: `e2e/site-structure.spec.ts`, `e2e/funnel.spec.ts`, `e2e/analysis-flow.spec.ts`, `e2e/design-review.spec.ts`;
