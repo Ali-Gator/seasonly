@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-111**
+_Next id:_ **BL-113**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -25,6 +25,13 @@ plan's "Carried in from finished changes" list (Architecture and phases tab), no
 holds what no change owns yet: phase-review findings left unfixed, and defects or gaps found
 along the way that are worth fixing later. CLAUDE.md ("Backlog") says when to add and when to
 fold items in.
+
+## Site
+
+- **[BL-111] The quiz page's "Why a selfie" button drops the answers** — Its copy says "Your answers come with you, so you won't be asked again", but "Find my colors" under it is a plain `/analyze` link, so a person who finished the quiz and uses it is asked again. Reword the line to name the result's selfie button, or have the button carry the answers; the copy was approved on the canvas, so it needs the user's yes.
+  _Refs:_ `openspec/specs/quiz-page/spec.md`, `apps/web/src/app/(site)/color-analysis-quiz/page.tsx` · _Status:_ open
+- **[BL-112] The footer's link to the quiz page wipes its progress when used on that page** — Next replaces the entry without custom state, so the click seems to do nothing and a reload then shows question 1 with the answers gone. Hide the link on this page, or accept it.
+  _Refs:_ `apps/web/src/components/site-chrome.tsx`, `openspec/specs/quiz-page/spec.md` · _Status:_ open
 
 ## Analysis
 

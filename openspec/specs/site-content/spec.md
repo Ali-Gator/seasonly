@@ -69,7 +69,7 @@ The six core routes (`/`, `/seasons`, `/seasons/<slug>`, `/how-it-works`, `/samp
 #### Scenario: The core routes are ready
 
 - **WHEN** the route map is read
-- **THEN** the six core routes are marked ready, and the sitemap lists `/`, `/seasons`, the 12 season pages, `/how-it-works`, `/sample-report` and `/color-analysis-gpt-alternative`, besides `/privacy` and `/terms`: 19 URLs
+- **THEN** the six core routes are marked ready, and the sitemap lists `/`, `/seasons`, the 12 season pages, `/how-it-works`, `/sample-report` and `/color-analysis-gpt-alternative`, besides `/color-analysis-quiz` (quiz-page), `/privacy` and `/terms`: 20 URLs
 
 ### Requirement: The landing shows a sample result and how the photo is handled
 

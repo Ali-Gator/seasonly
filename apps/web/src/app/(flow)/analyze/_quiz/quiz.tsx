@@ -103,12 +103,16 @@ export function QuizStep({
   onAnswer,
   onNext,
   onBack,
+  heading: Heading = "h1",
 }: {
   question: number;
   answers: QuizAnswers;
   onAnswer: (question: Question, value: string) => void;
   onNext: () => void;
-  onBack: () => void;
+  /** None on the quiz page's first question. */
+  onBack?: () => void;
+  /** The quiz page's h1 is its title, so its questions are h2s. */
+  heading?: "h1" | "h2";
 }) {
   const name = QUESTIONS[question] as Question;
   const { legend, options } = QUIZ[name];
@@ -135,9 +139,7 @@ export function QuizStep({
       {/* The click handler only times the move on; the radios inside stay the controls. */}
       <fieldset className="sn-quiz-group" onClick={onTap}>
         <legend className="h3">
-          <h1 className="contents" tabIndex={-1}>
-            {legend}
-          </h1>
+          <Heading tabIndex={-1}>{legend}</Heading>
         </legend>
         {!last && (
           <p className="caption -mt-(--space-1) text-(--ink-muted)">Tap an answer to go on.</p>
@@ -160,9 +162,11 @@ export function QuizStep({
         <Button block disabled={!chosen} onClick={onNext}>
           {last ? "See my result" : "Next"}
         </Button>
-        <Button variant="ghost" block onClick={onBack}>
-          Back
-        </Button>
+        {onBack && (
+          <Button variant="ghost" block onClick={onBack}>
+            Back
+          </Button>
+        )}
       </div>
     </>
   );

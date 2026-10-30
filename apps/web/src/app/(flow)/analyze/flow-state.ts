@@ -1,4 +1,9 @@
-import type { QuizAnswers, RetakeReason, Traits } from "@seasonly/analysis";
+import {
+  type QuizAnswers,
+  QuizAnswersSchema,
+  type RetakeReason,
+  type Traits,
+} from "@seasonly/analysis";
 
 import type { AnalyzeResponse } from "@/lib/analysis/request";
 
@@ -65,6 +70,8 @@ export type FlowEvent =
   | { type: "open-camera" }
   /** `/analyze?start=camera`: the capture step takes the opening guide's place. */
   | { type: "start-camera" }
+  /** The quiz page's answers from the address: the quiz counts as done. */
+  | { type: "preset-answers"; answers: QuizAnswers }
   | { type: "checking"; id: number }
   | ({ type: "checked"; id: number; previewUrl: string | null } & (
       { problem: null; photo: PassedPhoto } | { problem: RetakeReason; photo: null }
@@ -102,6 +109,19 @@ const push = (s: FlowState, step: Step): FlowState => ({
 const replace = (s: FlowState, step: Step): FlowState => ({ ...s, step });
 
 /**
+ * The quiz page's four answers from an address, or null unless all four are there and accepted.
+ * A missing one reads as null, which the schema refuses.
+ *
+ * {@link openspec/specs/capture-flow/spec.md#requirement-answers-from-the-quiz-page-skip-the-quiz}
+ */
+export function presetAnswers(search: string): QuizAnswers | null {
+  const params = new URLSearchParams(search);
+  const answers = Object.fromEntries(QUESTIONS.map((q) => [q, params.get(q)]));
+  const parsed = QuizAnswersSchema.safeParse(answers);
+  return parsed.success ? parsed.data : null;
+}
+
+/**
  * The capture step the flow opens on from `?start=camera`, one object, so the component can tell
  * it from a step reached later: React re-runs the reducer, which would make a fresh one.
  */
@@ -127,6 +147,11 @@ export function reduce(s: FlowState, e: FlowEvent): FlowState {
       // Replaced, so Back from the camera leaves the flow; never once the person has moved on.
       // {@link openspec/specs/capture-flow/spec.md#requirement-the-landings-camera-link-opens-the-flow-on-the-camera}
       return step.name === "guide" && s.trail.length === 0 ? replace(s, CAMERA_START) : s;
+    case "preset-answers":
+      // {@link openspec/specs/capture-flow/spec.md#requirement-answers-from-the-quiz-page-skip-the-quiz}
+      return step.name === "guide" && s.trail.length === 0
+        ? { ...s, answers: e.answers, quizDone: true }
+        : s;
     case "checking":
       // A second tap while checking adds no entry; its result is dropped by id.
       return step.name === "checking" ? s : push(s, { name: "checking", id: e.id });

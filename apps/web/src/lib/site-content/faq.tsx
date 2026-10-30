@@ -23,16 +23,29 @@ export function MoreLink({ href, children }: { href: string; children: string })
   );
 }
 
-export function Faq({ id, title, items }: { id: string; title: string; items: FaqItem[] }) {
+export function Faq({
+  id,
+  title,
+  items,
+  split = false,
+}: {
+  id: string;
+  title: string;
+  items: FaqItem[];
+  /** From 1024 px, the title in a column beside the questions. */
+  split?: boolean;
+}) {
   return (
     <section
       aria-labelledby={id}
-      className="flex flex-col gap-(--space-4) border-t border-(--line) pt-(--space-6)"
+      className={`flex flex-col gap-(--space-4) border-t border-(--line) pt-(--space-6)${split ? " lg:grid lg:grid-cols-12 lg:gap-x-(--space-6) lg:pt-(--space-8)" : ""}`}
     >
-      <h2 className="h2" id={id}>
+      <h2 className={split ? "h2 lg:col-span-4" : "h2"} id={id}>
         {title}
       </h2>
-      <div className="flex flex-col border-b border-(--line)">
+      <div
+        className={`flex flex-col border-b border-(--line)${split ? " lg:col-span-7 lg:col-start-5" : ""}`}
+      >
         {items.map(([question, answer], i) => (
           <details key={question} className="border-t border-(--line)" open={i === 0}>
             <summary className="label cursor-pointer py-[14px]">{question}</summary>

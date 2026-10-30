@@ -1,8 +1,16 @@
-import { PALETTES, type SeasonSlug } from "@seasonly/analysis";
+import { type Family, PALETTES, type SeasonSlug } from "@seasonly/analysis";
 import Link from "next/link";
 
 import { Icon, SwatchGrid, SwatchStrip } from "@/components/ds";
 import { seasonName } from "@/lib/site/routes";
+
+/** The four families with their one-line description, shared by `/seasons` and the quiz page. */
+export const FAMILIES: [Family, string, string][] = [
+  ["spring", "Spring", "Warm and clear, with a golden glow. Light to medium depth."],
+  ["summer", "Summer", "Cool and soft, with a rosy or blue base. Light to medium depth."],
+  ["autumn", "Autumn", "Warm and muted, with a golden or earthy base. Medium to deep."],
+  ["winter", "Winter", "Cool and clear, with high contrast. From icy to deep."],
+];
 
 /**
  * A season's name linking to its page, an optional line, and its first highlight colors: the

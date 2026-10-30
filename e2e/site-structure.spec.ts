@@ -189,3 +189,22 @@ test.describe("swatch grids on narrow phones", () => {
     for (const preview of previews) expect(await columns(preview)).toBe(4);
   });
 });
+
+test.describe("the quiz page", () => {
+  /**
+   * {@link openspec/specs/site-structure/spec.md#scenario-the-quiz-page-answers}
+   * {@link openspec/specs/quiz-page/spec.md#scenario-the-quiz-page-is-indexed}
+   */
+  test("answers 200 with no noindex and its canonical", async ({ page }) => {
+    const response = await page.goto("/color-analysis-quiz");
+    expect(response?.status()).toBe(200);
+    expect(await robotsMeta(page)).not.toContain("noindex");
+    expect(await canonical(page)).toBe("https://seasonly.me/color-analysis-quiz");
+  });
+
+  /** {@link openspec/specs/quiz-page/spec.md#scenario-the-quiz-page-is-indexed} */
+  test("is listed in the sitemap", async ({ request }) => {
+    const body = await (await request.get("/sitemap.xml")).text();
+    expect(body).toContain("<loc>https://seasonly.me/color-analysis-quiz</loc>");
+  });
+});

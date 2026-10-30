@@ -33,6 +33,7 @@ test("the sample report makes no API request and sends no funnel event", async (
   await page.goto("/sample-report");
   await expect(page.getByText("This is a sample Soft Autumn report")).toBeVisible();
   for (let y = 0; y < 12; y++) await page.mouse.wheel(0, 900);
+  await page.getByText("Seasons describe colors, not people.").scrollIntoViewIfNeeded();
   await expect(page.getByText("Seasons describe colors, not people.")).toBeInViewport();
 
   // Leaving for the landing queues its page view after anything the sample page sent.
