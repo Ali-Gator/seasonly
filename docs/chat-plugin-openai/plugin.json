@@ -1,12 +1,12 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "seasonly",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Find your seasonal color family from four quick questions, with 6 of your colors and their hex codes. No photo.",
   "author": {
-    "name": "Seasonly",
+    "name": "OLEG GORDIENOV",
     "email": "care@seasonly.me",
-    "url": "https://seasonly.me"
+    "url": "https://seasonly.me/color-analysis-gpt-alternative#chat-plugin"
   },
   "extensions": {
     "com.openai": {
@@ -14,7 +14,7 @@
         "displayName": "Seasonly",
         "shortDescription": "Find your color season",
         "longDescription": "Seasonly finds your seasonal color family, Spring, Summer, Autumn or Winter, from four questions about your natural coloring: the color of the veins on your wrist, the jewelry that suits you, what your skin does in the sun, and your natural hair color.\n\nYou get your family, a line on what suits it, and 6 of its colors, each with its name and hex code, so you can match them in a shop or an app. Answer \"not sure\" to any question; if your answers point to no season, Seasonly tells you why.\n\nSeasonly takes no photo and stores nothing: only your four answers reach it. For your exact season out of 12 and all 30 of your colors, the result links to the photo analysis on seasonly.me.",
-        "developerName": "Seasonly",
+        "developerName": "OLEG GORDIENOV",
         "category": "Creativity",
         "capabilities": ["Find your season family", "Show 6 of your colors with hex codes"],
         "websiteURL": "https://seasonly.me/color-analysis-gpt-alternative#chat-plugin",
@@ -84,7 +84,7 @@
         "demo_recording_url": "https://drive.google.com/file/d/1ziLlUuBouJ4PTzfw8cd7j74lcSF8B0rx/view?usp=sharing"
       },
       "publication": {
-        "release_notes": "Initial release."
+        "release_notes": "The developer is now the verified individual who owns Seasonly, Oleg Gordienov. The site's privacy policy, terms and plugin documentation name him as operator and publisher. No change to the tool."
       }
     }
   }

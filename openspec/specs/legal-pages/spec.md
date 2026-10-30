@@ -15,7 +15,7 @@ Both use `pageMetadata` from `lib/site/routes.ts` (`ready: true`) and the layout
 
 ## Behavior
 
-The text was drafted from the migrations, the vision call (`lib/report-text/index.ts`), `lib/capture/mediapipe.ts`, a recorded network capture of a photo analysis, the email step and a report page on a preview (2026-10-10), and each service's own retention docs, and approved by the user on 2026-10-10 (draft: https://claude.ai/artifact/Hio6CA23jzRxKPr9q83uLH). The operator is "an individual in Bulgaria"; the governing law is Bulgaria's; the contact is `care@seasonly.me`; the minimum age is 16. The legal check was the user's own review (no outside reviewer, recorded 2026-10-10). On 2026-10-12 (`t11-no-consent-step`) the user approved the new basis for the face crop on `/privacy` (the analysis asked for, not a consent screen) and the face-crop sentence in `/terms`; both pages' "Last updated" became October 12, 2026.
+The text was drafted from the migrations, the vision call (`lib/report-text/index.ts`), `lib/capture/mediapipe.ts`, a recorded network capture of a photo analysis, the email step and a report page on a preview (2026-10-10), and each service's own retention docs, and approved by the user on 2026-10-10 (draft: https://claude.ai/artifact/Hio6CA23jzRxKPr9q83uLH). The operator is "an individual in Bulgaria"; the governing law is Bulgaria's; the contact is `care@seasonly.me`; the minimum age is 16. The legal check was the user's own review (no outside reviewer, recorded 2026-10-10). On 2026-10-12 (`t11-no-consent-step`) the user approved the new basis for the face crop on `/privacy` (the analysis asked for, not a consent screen) and the face-crop sentence in `/terms`; both pages' "Last updated" became October 12, 2026. On 2026-10-30 (`backlog-17`) the user approved naming himself on both pages, the operator being "an individual in Bulgaria, Oleg Gordienov", after OpenAI could not confirm who owns the brand; both dates became October 30, 2026.
 
 Retention stated per service: Vercel request logs 1 hour (Hobby); AI Gateway keeps nothing, Google up to 90 days for abuse checks (Vertex's documented maximum; the Gemini API says "a limited period"); Resend 30 days; PostHog up to 7 years; Sentry 30 days (free plan); jsDelivr aggregated within hours; Google Cloud Storage and the MediaPipe usage log under Google's privacy policy.
 
@@ -96,6 +96,11 @@ It SHALL state the basis for using the face crop and the rest of the data: they 
 - **WHEN** a person reads `/privacy`
 - **THEN** it says the face crop is used because it is needed for the analysis the person asked for, and it does not mention a consent screen
 
+#### Scenario: The privacy policy names the operator
+
+- **WHEN** a person reads `/privacy`
+- **THEN** it says Seasonly is run by an individual in Bulgaria, Oleg Gordienov
+
 ### Requirement: The terms state what the service is and its limits
 
 `/terms` SHALL say:
@@ -106,11 +111,11 @@ It SHALL state the basis for using the face crop and the rest of the data: they 
 - that taking or uploading a photo sends a crop of the face for the analysis, as the privacy policy describes;
 - that the service is provided as is, with no warranty, and the limits of liability;
 - that the terms may change, and how changes are announced;
-- the governing law, and the operator's contact address.
+- the governing law, the operator's name and the operator's contact address.
 
 It SHALL link to `/privacy` and show the date it was last updated.
 
-The section with the contact address SHALL carry the id `contact`, so `https://seasonly.me/terms#contact` is the support URL the chat-plugin listings give.
+The section with the contact address SHALL carry the id `contact`, so `https://seasonly.me/terms#contact` is the support URL the chat-plugin listings give. Since the listings' public URLs must identify the plugin's publisher, that section SHALL name the operator.
 
 #### Scenario: Reading the terms
 
@@ -121,6 +126,11 @@ The section with the contact address SHALL carry the id `contact`, so `https://s
 
 - **WHEN** `/terms` is rendered
 - **THEN** a `section` with `id="contact"` holds the "Law and contact" heading and the `mailto:care@seasonly.me` link
+
+#### Scenario: The terms name the operator
+
+- **WHEN** `/terms` is rendered
+- **THEN** the `section` with `id="contact"` says Seasonly is run by an individual in Bulgaria, Oleg Gordienov
 
 ### Requirement: The legal pages are live and indexed
 

@@ -33,6 +33,8 @@ Everything the Claude Connectors Directory and the OpenAI Platform ask for when 
 
 **Name:** Seasonly
 
+**Publisher:** Oleg Gordienov, an individual in Bulgaria, for both directories; the site's plugin section says so. Details for ChatGPT are under "ChatGPT package".
+
 A brand name; it does not use or imply "GPT", "ChatGPT", "OpenAI", "Claude" or "Anthropic".
 
 **One-liner** (at most 200 characters; 111 here):
@@ -106,6 +108,8 @@ In `docs/chat-plugin-screenshots/`, taken in task 6.3 on 2026-10-11, each with i
 3. `3-no-result.png`: "Run the Seasonly quiz with all four answers as unsure.", the no-result card.
 
 ## ChatGPT package
+
+**Publisher:** the organization's only verified identity is `Individual — OLEG GORDIENOV`, and the package's `developerName` and `author.name` match it exactly. OpenAI rejected 1.0.0, developer "Seasonly", on 2026-10-30: it could not confirm the brand belongs to a verified person or company. Since 1.0.1 the site's `/privacy`, `/terms#contact` and plugin section name him. Do not verify again in another organization: a person can verify only one, and repeat attempts may block access.
 
 OpenAI takes a plugin ZIP, not a form. Its source is `docs/chat-plugin-openai/` (`plugin.json`, `mcp.json`, `assets/`), built with `zip -X -r seasonly-plugin.zip plugin.json mcp.json assets -x '.*'` from that folder. The review test cases above live in `plugin.json`, except case 5's wording, above; `tools_triggered` is a string. The portal also wants `review.demo_recording_url`, a reviewer-accessible video.
 
