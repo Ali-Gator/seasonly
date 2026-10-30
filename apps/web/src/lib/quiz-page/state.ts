@@ -43,13 +43,14 @@ export function restore(historyState: unknown): QuizPageState | null {
 }
 
 /**
- * Back or Forward inside the page: the entry's step with the newest answers, which an older entry
- * may not hold. The entry the page opened on may hold nothing: it is question 1.
+ * Back or Forward inside the page: the entry's step, with its answers under the newest ones. An
+ * older entry may hold fewer; after a reload, the screen may. The entry the page opened on may
+ * hold nothing: it is question 1.
  */
-export const popped = (state: QuizPageState, historyState: unknown): QuizPageState => ({
-  step: restore(historyState)?.step ?? 0,
-  answers: state.answers,
-});
+export function popped(state: QuizPageState, historyState: unknown): QuizPageState {
+  const saved = restore(historyState);
+  return { step: saved?.step ?? 0, answers: { ...saved?.answers, ...state.answers } };
+}
 
 /**
  * The selfie link: the four answers as given, `unsure` included.

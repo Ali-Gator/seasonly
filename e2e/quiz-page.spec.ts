@@ -84,6 +84,48 @@ test.describe("the quiz page", () => {
     await expect(page).toHaveURL(new RegExp(`${PATH}$`));
   });
 
+  /** {@link openspec/specs/quiz-page/spec.md#scenario-a-tap-moves-on-as-in-the-flow} */
+  test("focus moves to each new question's heading", async ({ page }) => {
+    await page.goto(PATH);
+    await page.getByText("Blue or purple", { exact: true }).click();
+    await expect(page.getByRole("heading", { name: /Hold gold and silver/ })).toBeFocused();
+  });
+
+  /** {@link openspec/specs/quiz-page/spec.md#requirement-each-quiz-page-step-is-a-browser-history-entry-that-keeps-the-answers} */
+  test("Forward after a reload keeps every answer the result's entry holds", async ({ page }) => {
+    await toResult(page);
+    for (const n of [4, 3, 2, 1]) {
+      await page.goBack();
+      await expect(page.getByText(`Question ${n} of 4`)).toBeVisible();
+    }
+    await page.reload();
+    await expect(page.getByText("Question 1 of 4")).toBeVisible();
+    for (const n of [2, 3, 4]) {
+      await page.goForward();
+      await expect(page.getByText(`Question ${n} of 4`)).toBeVisible();
+    }
+    await page.goForward();
+    await expect(
+      page.getByRole("link", { name: "Add a selfie for your exact season" }),
+    ).toHaveAttribute("href", "/analyze?veins=blue&jewelry=silver&sun=burn&hair=blonde");
+  });
+
+  /** {@link openspec/specs/quiz-page/spec.md#scenario-reload-on-the-result} */
+  test("an answer changed through Back survives a reload of the result", async ({ page }) => {
+    await toResult(page);
+    await page.goBack();
+    await expect(page.getByText("Question 4 of 4")).toBeVisible();
+    await page.getByText("Red or auburn", { exact: true }).click();
+    await page.goForward();
+    await expect(
+      page.getByRole("link", { name: "Add a selfie for your exact season" }),
+    ).toHaveAttribute("href", /hair=red/);
+    await page.reload();
+    await expect(
+      page.getByRole("link", { name: "Add a selfie for your exact season" }),
+    ).toHaveAttribute("href", /hair=red/);
+  });
+
   /** {@link openspec/specs/quiz-page/spec.md#scenario-nothing-is-sent} */
   test("sends nothing to the API", async ({ page }) => {
     const api: string[] = [];

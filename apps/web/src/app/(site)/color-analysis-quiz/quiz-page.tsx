@@ -69,6 +69,8 @@ export function QuizResult({ answers, onChange }: { answers: QuizAnswers; onChan
   );
 }
 
+const entry = (s: QuizPageState) => ({ ...history.state, quizPage: s });
+
 /**
  * The quiz page's four questions and result. Each step is one browser history entry holding the
  * answers; the page's address never changes. Spreading `history.state` keeps Next's own keys.
@@ -80,7 +82,6 @@ export function QuizPage() {
   const root = useRef<HTMLDivElement>(null);
   // A step the person moved to, which takes focus; set before its state changes.
   const moved = useRef(false);
-  const entry = (s: QuizPageState) => ({ ...history.state, quizPage: s });
 
   // A return from another page or a reload shows the step its entry holds, and takes no focus.
   useLayoutEffect(() => {
@@ -93,12 +94,15 @@ export function QuizPage() {
     const onPop = (e: PopStateEvent) => {
       // Another page's entry is the router's business.
       if (location.pathname !== "/color-analysis-quiz") return;
+      // The entry takes the newest answers too: a reload or a return reads the entry.
+      const to = popped(state, e.state);
+      history.replaceState(entry(to), "");
       moved.current = true;
-      setState((s) => popped(s, e.state));
+      setState(to);
     };
     addEventListener("popstate", onPop);
     return () => removeEventListener("popstate", onPop);
-  }, []);
+  }, [state]);
 
   // {@link openspec/specs/capture-flow/spec.md#requirement-a-new-step-moves-focus-to-its-heading-the-first-screen-does-not}
   useEffect(() => {

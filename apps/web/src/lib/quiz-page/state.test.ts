@@ -33,6 +33,15 @@ describe("moving through the quiz", () => {
     expect(popped({ step: 2, answers: ANSWERS }, entry)).toEqual({ step: 1, answers: ANSWERS });
   });
 
+  /** {@link openspec/specs/quiz-page/spec.md#requirement-each-quiz-page-step-is-a-browser-history-entry-that-keeps-the-answers} */
+  it("fills in what the entry holds and the screen does not, as after a reload", () => {
+    const entry = { quizPage: { step: "result", answers: ANSWERS } };
+    expect(popped({ step: 0, answers: { veins: "blue" } }, entry)).toEqual({
+      step: "result",
+      answers: { ...ANSWERS, veins: "blue" },
+    });
+  });
+
   /** {@link openspec/specs/quiz-page/spec.md#scenario-back-inside-the-quiz} */
   it("shows question 1 on the entry the page opened on, which may hold nothing", () => {
     expect(popped({ step: 1, answers: ANSWERS }, { __NA: true })).toEqual({

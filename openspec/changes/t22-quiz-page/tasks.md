@@ -91,7 +91,7 @@
 
   Verify: no MCP SDK in client chunks, E2E green or any sandbox-only failure named as such, and the screenshots match the board. Done 2026-10-30: 0 chunks hold `@modelcontextprotocol`, the four E2E files plus a new `e2e/quiz-page.spec.ts` pass on the real router, and the 375 and 1280 screenshots match boards 23 and 23b.
 
-- [ ] 4.3 Phase review in a fresh `general-purpose` subagent (`phase-review` skill); fix its findings and log unfixed ones in `docs/backlog.md`.
+- [x] 4.3 Phase review in a fresh `general-purpose` subagent (`phase-review` skill); fix its findings and log unfixed ones in `docs/backlog.md`. Done 2026-10-30: 5 findings, none high. Fixed the question heading that could not take focus (`display: contents`, the flow's too) and two history bugs (Forward after a reload, an answer changed through Back). Logged BL-111 and BL-112.
   - Archive (`/opsx:archive`). Re-add the `quiz-page` spec's Public Interface, Behavior and Edge Cases. Update the capture-flow, quiz, site-structure and analytics notes (the event table row). Add the `quiz-page` row (`apps/web/src/app/(site)/color-analysis-quiz/**`, `apps/web/src/lib/quiz-page/**`) to `openspec/specs/README.md`.
   - Push, open a PR to `main` and turn on auto-merge with a merge commit.
   - Set T22 Done in the Tracker and step 4 in the Launch plan.

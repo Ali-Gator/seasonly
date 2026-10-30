@@ -139,9 +139,7 @@ export function QuizStep({
       {/* The click handler only times the move on; the radios inside stay the controls. */}
       <fieldset className="sn-quiz-group" onClick={onTap}>
         <legend className="h3">
-          <Heading className="contents" tabIndex={-1}>
-            {legend}
-          </Heading>
+          <Heading tabIndex={-1}>{legend}</Heading>
         </legend>
         {!last && (
           <p className="caption -mt-(--space-1) text-(--ink-muted)">Tap an answer to go on.</p>

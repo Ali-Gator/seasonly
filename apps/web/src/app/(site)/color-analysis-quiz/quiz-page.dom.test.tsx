@@ -180,6 +180,26 @@ describe("history", () => {
     expect(option("Green or olive")?.checked).toBe(true);
   });
 
+  /** {@link openspec/specs/quiz-page/spec.md#requirement-each-quiz-page-step-is-a-browser-history-entry-that-keeps-the-answers} */
+  it("writes the newest answers into the entry Back or Forward lands on", () => {
+    answer(SUMMER);
+    pop({
+      quizPage: {
+        step: 3,
+        answers: { veins: "blue", jewelry: "silver", sun: "burn", hair: "blonde" },
+      },
+    });
+    choose("Red or auburn", 0);
+    pop({
+      quizPage: {
+        step: "result",
+        answers: { veins: "blue", jewelry: "silver", sun: "burn", hair: "blonde" },
+      },
+    });
+    expect(history.state.quizPage.answers.hair).toBe("red");
+    expect(link("Add a selfie for your exact season")?.getAttribute("href")).toContain("hair=red");
+  });
+
   /**
    * {@link openspec/specs/quiz-page/spec.md#scenario-back-from-the-photo-guide-returns-to-the-result}
    * {@link openspec/specs/quiz-page/spec.md#scenario-reload-on-the-result}
