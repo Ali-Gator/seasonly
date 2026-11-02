@@ -370,6 +370,31 @@ describe("opening on the camera", () => {
       delete (history as { replaceState?: unknown }).replaceState;
     }
   });
+
+  /** {@link openspec/specs/capture-flow/spec.md#scenario-the-router-sync-runs-before-a-replayed-tap} */
+  it("syncs the router once within a microtask of the mount effects", async () => {
+    act(() => root.unmount());
+    history.replaceState({ __NA: true }, "", "/analyze?start=camera");
+    const replace = vi.spyOn(history, "replaceState");
+    try {
+      root = createRoot(container);
+      // A sync act: the async form yields a macrotask, which would let a timer pass too.
+      act(() =>
+        root.render(
+          <StrictMode>
+            <Flow />
+          </StrictMode>,
+        ),
+      );
+      await Promise.resolve();
+      const synced = replace.mock.calls.filter(
+        ([state]) => !(state as { __NA?: true } | null)?.__NA,
+      );
+      expect(synced).toEqual([[{}, "", "/analyze"]]);
+    } finally {
+      replace.mockRestore();
+    }
+  });
 });
 
 describe("the email step's focus", () => {

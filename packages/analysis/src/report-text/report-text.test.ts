@@ -42,13 +42,23 @@ describe("season copy", () => {
       contrast: "Low to medium",
       neutralsIntro: "Swap black and stark white for these. They carry a whole outfit.",
       metalsIntro: "Brushed and warm beats bright and cool.",
-      makeupIntro: "Stay in the same warm, muted family as your clothes.",
+      makeupIntro: "Stay warm and muted: terracotta nude, warm rosewood and brick rose.",
       hairTip:
         "Go one or two shades warmer than your natural color. Skip ash blonde and blue-black.",
       drapingLine: "Terracotta warms your skin; fuchsia competes with it.",
       revealLine:
         "Colors with a golden base and a little dust in them work with you. Bright, icy and very dark colors compete.",
     });
+  });
+
+  /** {@link openspec/specs/report-text/spec.md#scenario-the-soft-seasons-makeup-lines-name-shades} */
+  it("the soft seasons' makeup lines name shades", () => {
+    expect(SEASON_COPY["soft-summer"].makeupIntro).toBe(
+      "Stay cool and dusty: dusty rose, mauve berry and soft raspberry.",
+    );
+    expect(SEASON_COPY["soft-autumn"].makeupIntro).toBe(
+      "Stay warm and muted: terracotta nude, warm rosewood and brick rose.",
+    );
   });
 });
 

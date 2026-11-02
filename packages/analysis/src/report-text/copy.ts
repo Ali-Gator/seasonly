@@ -102,7 +102,7 @@ export const SEASON_COPY: Record<SeasonSlug, SeasonCopy> = {
     neutralsIntro:
       "Swap black and stark white for charcoal, grey navy and soft white. They carry a whole outfit.",
     metalsIntro: "Brushed silver, pewter and rose gold beat polished gold and copper.",
-    makeupIntro: "Stay in the same cool, dusty family as your clothes.",
+    makeupIntro: "Stay cool and dusty: dusty rose, mauve berry and soft raspberry.",
     hairTip: "Stay soft and cool: ash brown or cool mocha. Skip brassy gold and blue-black.",
     drapingLine: "Dusty rose blends with your skin; orange competes with it.",
     revealLine:
@@ -117,7 +117,7 @@ export const SEASON_COPY: Record<SeasonSlug, SeasonCopy> = {
     contrast: "Low to medium",
     neutralsIntro: "Swap black and stark white for these. They carry a whole outfit.",
     metalsIntro: "Brushed and warm beats bright and cool.",
-    makeupIntro: "Stay in the same warm, muted family as your clothes.",
+    makeupIntro: "Stay warm and muted: terracotta nude, warm rosewood and brick rose.",
     hairTip: "Go one or two shades warmer than your natural color. Skip ash blonde and blue-black.",
     drapingLine: "Terracotta warms your skin; fuchsia competes with it.",
     revealLine:
