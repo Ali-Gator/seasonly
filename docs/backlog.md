@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-115**
+_Next id:_ **BL-116**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -120,6 +120,14 @@ fold items in.
 
 ## Code quality
 
+- **[BL-115] A tap during hydration can still be lost on a quiz-answers address** — on a slow
+  fresh load of `/analyze?veins=green` (answers stripped, no `start=camera`), nothing dispatches,
+  so no passive flush is forced, and a link tap before the scheduled flush can be discarded by the
+  router sync's `replaceState`. The window is one scheduler task. No test performs a real tap: a
+  trusted-click e2e needs CPU throttling or a held scheduler. Unreproduced; known from the design.
+  _Refs:_ `apps/web/src/app/(flow)/analyze/flow.tsx`, `backlog-18` design ("Known gap") ·
+  _Status:_ open
+
 - **[BL-02] A hung crop upload is abandoned, not cancelled** — `upload()` in
   `@supabase/storage-js` 2.117 takes no abort signal, so after the 3 s timeout the request keeps
   running until the function's time limit ends it. It is harmless today because the response is
@@ -139,10 +147,11 @@ fold items in.
   _Refs:_ `e2e/site-structure.spec.ts` (alias loop), `t21-searched-season-names` review · _Status:_ open
 
 - **[BL-107] The router-refresh e2e can read the page before the refresh commits** — `refreshRouter`
-  captures `history.state`'s tree once the sync timer has fired, not after its restore commits; if
+  captures `history.state`'s tree once the sync microtask has run, not after its restore commits; if
   that commit lands between the capture and the refresh, the tree-identity wait passes early and the
   address and heading checks run before the refresh. BL-95 itself stays covered by the request-URL
   `start` check. Capture the tree after the restore commits, or wait for the refresh's own commit.
+  Since backlog-18 its `setTimeout` wait is only margin, so the same edit can drop it.
   _Refs:_ `e2e/analysis-flow.spec.ts` (`refreshRouter`), `backlog-16` review · _Status:_ open
 
 - **[BL-54] TikTok's in-app browser is untested against the bot check** — Instagram's passed on

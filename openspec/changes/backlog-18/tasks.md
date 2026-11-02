@@ -19,6 +19,6 @@
 
 - [x] 3.1 `pnpm fix`, `pnpm test`, `pnpm test:eval`; only if it says `results.json is stale`, run `pnpm eval:run`, commit `evals/results.json`, re-run
 - [x] 3.2 Delete shipped bullets BL-114, BL-111, BL-112, BL-110, BL-108 from `docs/backlog.md`
-- [ ] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
+- [x] 3.3 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
 - [ ] 3.4 Update the permanent specs' non-requirement text, which archive leaves alone: `chat-plugin` Contract endpoint line; `quiz-page` edge cases (remove BL-112; restate BL-111 as "Find my colors in the selfie section is a plain `/analyze` link and keeps no answers"); `site-content` edge case (remove BL-110); `capture-flow` Behavior (`setTimeout(sync, 0)` becomes the microtask, with its reasoning)
 - [ ] 3.5 Archive (`/opsx:archive` flow, no Tracker), preflight, push, PR, auto-merge with a merge commit; in the PR, say the `/api/mcp` check is the `get_runtime_errors` cluster staying empty for about nine days
