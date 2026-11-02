@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 
 import { SEASONS, seasonName } from "@/lib/site/routes";
 
+import { HideOnQuizPage } from "./hide-on-quiz-page";
+
 // Site and flow chrome from the approved canvas (artboards 14 and 02–13) and the 404 (21).
 
 const FAMILIES = ["spring", "summer", "autumn", "winter"] as const;
@@ -33,13 +35,20 @@ function FooterGroup({
         {title}
       </p>
       <ul aria-labelledby={id}>
-        {links.map(([href, label]) => (
-          <li key={href}>
-            <Link href={href} className="caption sn-navlink text-(--ink-muted)">
-              {label}
-            </Link>
-          </li>
-        ))}
+        {links.map(([href, label]) => {
+          const row = (
+            <li key={href}>
+              <Link href={href} className="caption sn-navlink text-(--ink-muted)">
+                {label}
+              </Link>
+            </li>
+          );
+          return href === "/color-analysis-quiz" ? (
+            <HideOnQuizPage key={href}>{row}</HideOnQuizPage>
+          ) : (
+            row
+          );
+        })}
       </ul>
     </div>
   );

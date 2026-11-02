@@ -31,7 +31,7 @@ const TELLS = [
 const FAQ: FaqItem[] = [
   [
     "What season am I?",
-    "Answer the four questions at the top of this page and you get your season family: Spring, Summer, Autumn or Winter, with 6 colors to wear. For your exact season out of 12, add a selfie. Your answers carry over.",
+    "Answer the four questions at the top of this page and you get your season family: Spring, Summer, Autumn or Winter, with 6 colors to wear. For your exact season out of 12, add a selfie from your result. Your answers carry over.",
   ],
   [
     "How accurate is a color analysis quiz?",
@@ -113,9 +113,9 @@ export default function Page() {
             answers can&apos;t reach them.
           </p>
           <p className="text-(--ink-muted)">
-            Your answers come with you, so you won&apos;t be asked again. Your phone checks the
-            photo first, and only a crop of your face is uploaded. We delete our copy within 24
-            hours. Google may keep one up to 90 days for abuse checks.
+            The selfie button on your quiz result keeps your answers, so you won&apos;t be asked
+            again. Your phone checks the photo first, and only a crop of your face is uploaded. We
+            delete our copy within 24 hours. Google may keep one up to 90 days for abuse checks.
           </p>
           <Button href="/analyze" block className="lg:w-auto">
             <Icon name="camera" size={18} />

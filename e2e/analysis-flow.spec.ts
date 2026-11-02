@@ -218,7 +218,7 @@ test("a fresh load of the camera link keeps Back inside the flow, with no reload
 async function refreshRouter(page: Page): Promise<URL> {
   await page.waitForFunction(() => (window as { next?: { router?: unknown } }).next?.router);
   // The capture step the caller waited for renders after the flow's mount commit, so its passive
-  // effects, and the sync timer they set, came first; a timer set now fires after that one.
+  // effects, and the sync microtask they queued, have already run; this timer is only margin.
   await page.evaluate(() => new Promise((done) => setTimeout(done)));
   const refreshed = page.waitForResponse((r) => {
     const headers = r.request().headers();

@@ -40,8 +40,7 @@ function QuizResult(props: { answers: QuizAnswers; onChange: () => void }): JSX.
 - The entry the page opened on holds nothing until an answer writes it: Back onto it shows question 1 with the answers kept.
 - A `quizPage` entry with a bad step or answer, or a result with fewer than four answers, is ignored, and the page opens on question 1.
 - A reload of the result shows the server's question 1 until hydration.
-- The footer's own link to this page replaces the entry without custom state, which loses the progress on a reload (BL-112).
-- A person who finished the quiz and uses "Find my colors" in the selfie section is asked the questions again: that link carries no answers (BL-111).
+- "Find my colors" in the selfie section is a plain `/analyze` link and keeps no answers; the section names the result's selfie button as the one that does.
 
 ## Requirements
 
@@ -140,7 +139,7 @@ The flow then skips the quiz (capture-flow, "Answers from the quiz page skip the
 Below the quiz, the page SHALL show the content of its approved canvas board "Quiz page" at 375 and 1280:
 
 - what each of the four questions tells about coloring;
-- why a selfie is more exact than the quiz alone, naming the three seasons only a photo gives (Soft Autumn, Soft Summer and Bright Spring);
+- why a selfie is more exact than the quiz alone, naming the three seasons only a photo gives (Soft Autumn, Soft Summer and Bright Spring), and saying that the selfie button on the quiz result is the one that keeps the answers;
 - the four season families, linking to all 12 season pages;
 - a short list of questions and answers in How it works' expandable style, one of them answering "What season am I?".
 
@@ -161,11 +160,21 @@ Its main content, counted without the site header and footer and without the qui
 - **WHEN** `/color-analysis-quiz` is fetched
 - **THEN** it carries no `noindex`, its canonical link is `https://seasonly.me/color-analysis-quiz`, and the sitemap lists that URL
 
+#### Scenario: The selfie section names the button that keeps the answers
+
+- **WHEN** `/color-analysis-quiz` is rendered
+- **THEN** its selfie section reads "The selfie button on your quiz result keeps your answers, so you won't be asked again.", its "What season am I?" answer reads "…add a selfie from your result. Your answers carry over.", and "Your answers come with you" appears nowhere
+
 ### Requirement: Every site page links to the quiz page
 
-The footer of every `(site)` page SHALL list "Color analysis quiz", linking to `/color-analysis-quiz`, in its "More" group.
+The footer of every `(site)` page other than the quiz page itself SHALL list "Color analysis quiz", linking to `/color-analysis-quiz`, in its "More" group. The quiz page's own footer SHALL NOT list it: following that link replaces the history entry that holds the person's progress.
 
 #### Scenario: The footer link
 
-- **WHEN** any `(site)` page is rendered, such as `/seasons/soft-autumn`
+- **WHEN** any `(site)` page other than the quiz page is rendered, such as `/seasons/soft-autumn`
 - **THEN** its footer's "More" group links "Color analysis quiz" to `/color-analysis-quiz`
+
+#### Scenario: The footer on the quiz page
+
+- **WHEN** `/color-analysis-quiz` is rendered
+- **THEN** its footer's "More" group has no "Color analysis quiz" row, and its other rows are unchanged

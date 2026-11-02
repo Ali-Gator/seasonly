@@ -132,20 +132,27 @@ export function Flow() {
   }, []);
   // Then the same address goes through Next's history patch without Next's keys, so the router
   // holds it too and a refresh does not write `start` back. The patch is a passive effect of an
-  // ancestor, in this commit or an earlier one; React runs a commit's passive effects in one pass,
-  // so a timer set here fires after it. Without Next (jsdom) it is a plain replace. StrictMode's
-  // second run finds no `start`: the ref carries the target, and the cleanup clears the timer. An
-  // address that moved first (Back, a link) is left alone: the entry is no longer this one.
+  // ancestor, in this commit or an earlier one; React runs a commit's passive effects in one
+  // synchronous pass, so a microtask queued here cannot run before it. It is not a timer because
+  // hydration replays a tap under React's capture listener, and a microtask checkpoint falls between
+  // the capture and bubble listeners of a trusted click, so the sync lands before Link's onClick
+  // pushes. Without Next (jsdom) it is a plain replace. StrictMode's second run finds no `start`:
+  // the ref carries the target, and the cleanup cancels the first run's microtask. An address that
+  // moved first (Back, a link) is left alone: the entry is no longer this one.
   useEffect(() => {
     const target = routerSync.current;
     if (target === null) return;
-    const timer = setTimeout(() => {
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
       routerSync.current = null;
       if (location.pathname + location.search + location.hash !== target) return;
       const { __NA, _N, __PRIVATE_NEXTJS_INTERNALS_TREE, ...state } = history.state ?? {};
       history.replaceState(state, "", target);
     });
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // The models download while the guide is read. The photo's object URLs end with the page.

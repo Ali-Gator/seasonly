@@ -13,7 +13,7 @@ Brings Seasonly into ChatGPT and Claude as an MCP server with one tool. The tool
 | Result | `apps/web/src/lib/mcp/result.ts`    | `quizResult(answers) → { structured: PluginResult, text }`, `PLUGIN_LINK` |
 | Card   | `apps/web/src/lib/mcp/card.ts`      | `renderCard(result) → string`, `CARD_HTML`                                |
 
-- **Endpoint:** `POST https://seasonly.me/api/mcp`, Streamable HTTP, stateless, no credentials (`mcp-handler` 2.3, `@modelcontextprotocol/server` 2.3). `GET` and `DELETE` answer 405.
+- **Endpoint:** `POST https://seasonly.me/api/mcp`, Streamable HTTP, stateless, no credentials (`mcp-handler` 2.3, `@modelcontextprotocol/server` 2.3). `GET` and `DELETE` answer 405. Capabilities set `listChanged: false` for tools and resources, so a `subscriptions/listen` gets its acknowledgement with neither flag honored and a `complete` result at once, instead of holding the function open to its 300 s limit.
 - **Tool:** `find_season_family`, title "Find my season family", input `z.strictObject` of the core's `veins`, `jewelry`, `sun`, `hair` enums, each optional and described in the quiz's words. Annotations `title` (the same words), `readOnlyHint: true`, `destructiveHint: false`, `openWorldHint: false`. `_meta.ui.resourceUri` and `openai/outputTemplate` point at the card.
 - **Result:** one `text` item and `structuredContent`, a `PluginResult`: `{ kind: "season", family, tagline, revealLine, colors: Swatch[6], note, link }` or `{ kind: "no-result", reason: "no-answers" | "answers-cancel", title, message, link }`. `link` is `PLUGIN_LINK`, `https://seasonly.me/analyze?utm_source=chat-plugin&utm_medium=mcp`.
 - **Card resource:** `ui://seasonly/season-card.html`, MIME `text/html;profile=mcp-app`, `_meta.ui.csp` with empty `connectDomains` and `resourceDomains`, `prefersBorder: false`; for ChatGPT `openai/widgetCSP.redirect_domains: ["https://seasonly.me"]` and `openai/widgetDomain: "https://seasonly.me"` (`ui.domain` stays unset: its format is host-dependent).
@@ -38,12 +38,17 @@ An error in the tool or resource callback is reported to Sentry by `reported` be
 
 ### Requirement: The MCP endpoint is public and lists one tool
 
-`/api/mcp` SHALL serve the Model Context Protocol over Streamable HTTP and SHALL answer requests that carry no credentials. Listing the tools SHALL return exactly one tool, the season quiz tool. Its name SHALL be at most 64 characters, and it SHALL have a human-readable title.
+`/api/mcp` SHALL serve the Model Context Protocol over Streamable HTTP and SHALL answer requests that carry no credentials. Listing the tools SHALL return exactly one tool, the season quiz tool. Its name SHALL be at most 64 characters, and it SHALL have a human-readable title. Because the tool and its card never change, the endpoint SHALL NOT advertise `listChanged` for tools or resources, and a `subscriptions/listen` request SHALL end at once instead of holding its stream open.
 
 #### Scenario: Listing the tools without credentials
 
 - **WHEN** a client with no credentials initializes a session at `/api/mcp` and lists the tools
 - **THEN** exactly one tool is listed, with a name of at most 64 characters and a title
+
+#### Scenario: A subscription request ends at once
+
+- **WHEN** a client sends `/api/mcp` a `subscriptions/listen` request that asks for `toolsListChanged` and `resourcesListChanged`
+- **THEN** the response ends without waiting, and neither of the two is honored
 
 ### Requirement: The tool is annotated read-only
 

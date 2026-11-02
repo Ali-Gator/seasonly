@@ -95,6 +95,27 @@ function refusal(reply: RpcReply): string {
   return JSON.stringify(reply.result);
 }
 
+/** The whole body, or a throw naming what was sent when the stream is still open after `ms`. */
+async function bodyWithin(res: Response, ms: number): Promise<string> {
+  const reader = res.body?.getReader();
+  if (!reader) throw new Error("no response body");
+  let timedOut = false;
+  const timer = setTimeout(() => {
+    timedOut = true;
+    void reader.cancel();
+  }, ms);
+  const decoder = new TextDecoder();
+  let body = "";
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    body += decoder.decode(value, { stream: true });
+  }
+  clearTimeout(timer);
+  if (timedOut) throw new Error(`stream still open after ${ms} ms, sent: ${body}`);
+  return body;
+}
+
 describe("/api/mcp", () => {
   /** {@link openspec/specs/chat-plugin/spec.md#scenario-listing-the-tools-without-credentials} */
   it("lists one titled tool to a client with no credentials", async () => {
@@ -186,5 +207,44 @@ describe("/api/mcp", () => {
     expect(reply.result?.structuredContent).toMatchObject({ kind: "season" });
     expect(reply.res.headers.get("set-cookie")).toBeNull();
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  /** {@link openspec/specs/chat-plugin/spec.md#scenario-a-subscription-request-ends-at-once} */
+  it("ends a 2026-07-28 subscription request at once, honoring neither flag", async () => {
+    const revision = "2026-07-28";
+    const res = await POST(
+      new Request("https://seasonly.me/api/mcp", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          accept: "application/json, text/event-stream",
+          "mcp-protocol-version": revision,
+          "mcp-method": "subscriptions/listen",
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: nextId++,
+          method: "subscriptions/listen",
+          params: {
+            _meta: {
+              "io.modelcontextprotocol/protocolVersion": revision,
+              "io.modelcontextprotocol/clientInfo": { name: "test", version: "1" },
+              "io.modelcontextprotocol/clientCapabilities": {},
+            },
+            notifications: { toolsListChanged: true, resourcesListChanged: true },
+          },
+        }),
+      }),
+    );
+    expect(res.status).toBe(200);
+
+    const messages = (await bodyWithin(res, 1000))
+      .split("\n")
+      .filter((l) => l.startsWith("data:"))
+      .map((l) => JSON.parse(l.slice(5)) as RpcReply & { params?: unknown });
+    expect(messages[0]?.params).toMatchObject({ notifications: {} });
+    expect(messages[0]?.params).not.toHaveProperty("notifications.toolsListChanged");
+    expect(messages[0]?.params).not.toHaveProperty("notifications.resourcesListChanged");
+    expect(messages.at(-1)?.result?.resultType).toBe("complete");
   });
 });

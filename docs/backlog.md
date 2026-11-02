@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-115**
+_Next id:_ **BL-116**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -27,13 +27,6 @@ along the way that are worth fixing later. CLAUDE.md ("Backlog") says when to ad
 fold items in.
 
 ## Site
-
-- **[BL-114] `/api/mcp` hits Vercel's 300 s timeout** — Vercel logged "Task timed out after 300 seconds" on this route 27 times for 21 users from Oct 20 to Oct 28, while the tool itself answers at once and Sentry shows nothing. Find which request hangs (a stream a host holds open is the first suspect) and answer or close it, since each one holds a function for 5 minutes.
-  _Refs:_ `openspec/specs/chat-plugin/spec.md`, `apps/web/src/app/api/mcp/route.ts` · _Status:_ open
-- **[BL-111] The quiz page's "Why a selfie" button drops the answers** — Its copy says "Your answers come with you, so you won't be asked again", but "Find my colors" under it is a plain `/analyze` link, so a person who finished the quiz and uses it is asked again. Reword the line to name the result's selfie button, or have the button carry the answers; the copy was approved on the canvas, so it needs the user's yes.
-  _Refs:_ `openspec/specs/quiz-page/spec.md`, `apps/web/src/app/(site)/color-analysis-quiz/page.tsx` · _Status:_ open
-- **[BL-112] The footer's link to the quiz page wipes its progress when used on that page** — Next replaces the entry without custom state, so the click seems to do nothing and a reload then shows question 1 with the answers gone. Hide the link on this page, or accept it.
-  _Refs:_ `apps/web/src/components/site-chrome.tsx`, `openspec/specs/quiz-page/spec.md` · _Status:_ open
 
 ## Analysis
 
@@ -127,12 +120,13 @@ fold items in.
 
 ## Code quality
 
-- **[BL-108] The camera start's router sync can drop a tap made during hydration** — the sync's
-  `replaceState` reaches Next as `ACTION_RESTORE`, which discards any pending router action
-  (`app-router-instance.js` ~:147). On a slow fresh load of `/analyze?start=camera`, a link tap
-  replayed as `router.push` before the 0 ms timer, to a route not yet prefetched, is lost. Try
-  `queueMicrotask` with a cancel flag instead of `setTimeout`, proven by the router-refresh e2e.
-  _Refs:_ `apps/web/src/app/(flow)/analyze/flow.tsx`, `backlog-16` review · _Status:_ open
+- **[BL-115] A tap during hydration can still be lost on a quiz-answers address** — on a slow
+  fresh load of `/analyze?veins=green` (answers stripped, no `start=camera`), nothing dispatches,
+  so no passive flush is forced, and a link tap before the scheduled flush can be discarded by the
+  router sync's `replaceState`. The window is one scheduler task. No test performs a real tap: a
+  trusted-click e2e needs CPU throttling or a held scheduler. Unreproduced; known from the design.
+  _Refs:_ `apps/web/src/app/(flow)/analyze/flow.tsx`, `backlog-18` design ("Known gap") ·
+  _Status:_ open
 
 - **[BL-02] A hung crop upload is abandoned, not cancelled** — `upload()` in
   `@supabase/storage-js` 2.117 takes no abort signal, so after the 3 s timeout the request keeps
@@ -153,10 +147,11 @@ fold items in.
   _Refs:_ `e2e/site-structure.spec.ts` (alias loop), `t21-searched-season-names` review · _Status:_ open
 
 - **[BL-107] The router-refresh e2e can read the page before the refresh commits** — `refreshRouter`
-  captures `history.state`'s tree once the sync timer has fired, not after its restore commits; if
+  captures `history.state`'s tree once the sync microtask has run, not after its restore commits; if
   that commit lands between the capture and the refresh, the tree-identity wait passes early and the
   address and heading checks run before the refresh. BL-95 itself stays covered by the request-URL
   `start` check. Capture the tree after the restore commits, or wait for the refresh's own commit.
+  Since backlog-18 its `setTimeout` wait is only margin, so the same edit can drop it.
   _Refs:_ `e2e/analysis-flow.spec.ts` (`refreshRouter`), `backlog-16` review · _Status:_ open
 
 - **[BL-54] TikTok's in-app browser is untested against the bot check** — Instagram's passed on
@@ -168,12 +163,6 @@ fold items in.
   deferred — until the TikTok account has 1,000 followers and its bio link
 
 ## Design / UX
-
-- **[BL-110] Two season FAQs answer the makeup question with no makeup** — Soft Summer's and Soft
-  Autumn's shared `makeupIntro` is "Stay in the same cool, dusty family as your clothes.": right
-  inside a report, but as the season page's FAQ answer it names no shade. Add shades to those two
-  lines (report copy, needs your approval) or append palette-derived lips and blush to the answer.
-  _Refs:_ `apps/web/src/lib/site-content/faq.tsx` (`seasonFaq`), `packages/analysis/src/report-text/copy.ts`, `t21-searched-season-names` review · _Status:_ open
 
 - **[BL-04] The design system's ShareCard overflows on long names** — the approved
   `bundle.css` sets post-card names at 0.75 em, and "Bright Turquoise" needs about 379 px of a
