@@ -82,7 +82,7 @@ The analysis core SHALL hold, for each of the 12 seasons, the season-level repor
 - a draping line
 - a reveal line: what suits the family's colors, without naming the season
 
-Every string SHALL be non-empty. Each string SHALL be no longer than the limit for its field, so the report layout holds. No reveal line SHALL contain its season's name.
+Every string SHALL be non-empty. Each string SHALL be no longer than the limit for its field, so the report layout holds. No reveal line SHALL contain its season's name. Every makeup intro SHALL name shades, because a season page also uses it alone as its makeup answer.
 
 #### Scenario: All 12 seasons
 
@@ -93,6 +93,11 @@ Every string SHALL be non-empty. Each string SHALL be no longer than the limit f
 
 - **WHEN** the Soft Autumn copy is read
 - **THEN** its tagline is "Warm, soft and earthy.", its undertone is "Warm, leaning neutral", its hair tip is "Go one or two shades warmer than your natural color. Skip ash blonde and blue-black." and its draping line is "Terracotta warms your skin; fuchsia competes with it.", as on the approved MVP canvas's full report (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3), and its reveal line is "Colors with a golden base and a little dust in them work with you. Bright, icy and very dark colors compete.", as on the canvas's season reveal
+
+#### Scenario: The soft seasons' makeup lines name shades
+
+- **WHEN** the makeup intros of Soft Summer and Soft Autumn are read
+- **THEN** Soft Summer's is "Stay cool and dusty: dusty rose, mauve berry and soft raspberry." and Soft Autumn's is "Stay warm and muted: terracotta nude, warm rosewood and brick rose."
 
 ### Requirement: Every agreement case has a note
 

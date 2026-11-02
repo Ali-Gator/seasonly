@@ -39,7 +39,6 @@ A season page's h1 is `searchName` ("Deep (Dark) Autumn") and its summary paragr
 - The landing's sample palette and the GPT page's are picked from the Soft Autumn palette by name: a renamed color throws at build time.
 - `/sample-report` shares its colors with `/seasons/soft-autumn`. Its h1 names it a sample report and it links to the season page, so the two do not compete for the season's name.
 - The GPT page states a future date; it goes stale on December 11, 2026 (BL-27).
-- Soft Summer's and Soft Autumn's shared makeup line names no shade, so their makeup answer names none either (BL-110).
 - Vercel previews send `X-Robots-Tag: noindex` at the platform level; only production is indexed.
 
 ## Requirements
