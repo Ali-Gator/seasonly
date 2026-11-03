@@ -60,24 +60,21 @@ const VIDEO_COPY: Record<string, { caption: string; season?: SeasonSlug; changed
 };
 
 /**
- * Batch 2: Wed Oct 28 (Product Hunt day) to Fri Nov 6, 18:00 US Eastern. Same 10 videos in a new order
- * (step 10 kept every format: batch 1 brought no completed analysis to rank them by); Instagram
- * alternates Reel and the 5 carousels batch 1 did not use; pins start with the 2 seasons it did not pin.
+ * Batch 3: Sat Nov 7 to Fri Nov 13, 18:00 US Eastern. The 7 videos batch 2 posted first, each on a new
+ * weekday (the Nov 2 funnel review kept every format: 2 analyses, none tagged); Instagram alternates
+ * Reel and carousel, the 2 never-posted carousels first; pins take the 7 least recently pinned seasons.
  */
 const BATCH = {
-  name: "Batch 2",
-  note: "Batch 1 (Oct 18 to 27) brought no completed analysis, so every format stays. New here: TikTok captions point to seasonly.me/tt, which opens the site tagged utm_source=tiktok. Schedule TikTok from Oct 27 on, so Nov 6 stays inside its 10-day limit. Music: one track per video from each platform's own commercial music library (TikTok, Instagram, YouTube), picked while scheduling; business accounts cannot use other tracks. Posts marked \"AI label on\" carry the platform's AI-generated content setting.",
+  name: "Batch 3",
+  note: "The Nov 2 funnel review counted 2 completed analyses and no tagged visit from any platform, too few to judge a format, so every format stays. What changed: 7 days instead of 10, each video on a different weekday than in batch 2, the True Spring and Bright Winter carousels for the first time, and pins for the seasons pinned longest ago.",
   days: [
-    ["2026-10-28", "01-draping-same-face", "reel", "true-spring"],
-    ["2026-10-29", "03-veins", "bright-spring", "bright-spring"],
-    ["2026-10-30", "05-twelve-palettes", "reel", "bright-winter"],
-    ["2026-10-31", "08-indoor-light", "deep-winter", "deep-winter"],
-    ["2026-11-01", "10-gpt-retires", "reel", "true-winter"],
-    ["2026-11-02", "02-draping-worst-first", "light-summer", "light-summer"],
-    ["2026-11-03", "04-soft-autumn-palette", "reel", "soft-autumn"],
-    ["2026-11-04", "07-filter-changes-season", "soft-summer", "soft-summer"],
-    ["2026-11-05", "06-wear-skip", "reel", "deep-autumn"],
-    ["2026-11-06", "09-jet-black", "true-autumn", "true-autumn"],
+    ["2026-11-07", "01-draping-same-face", "reel", "light-spring"],
+    ["2026-11-08", "03-veins", "true-spring", "true-spring"],
+    ["2026-11-09", "05-twelve-palettes", "reel", "true-summer"],
+    ["2026-11-10", "08-indoor-light", "bright-winter", "bright-winter"],
+    ["2026-11-11", "10-gpt-retires", "reel", "bright-spring"],
+    ["2026-11-12", "02-draping-worst-first", "soft-autumn", "deep-winter"],
+    ["2026-11-13", "04-soft-autumn-palette", "reel", "true-winter"],
   ] as [string, string, "reel" | SeasonSlug, SeasonSlug][],
 };
 
