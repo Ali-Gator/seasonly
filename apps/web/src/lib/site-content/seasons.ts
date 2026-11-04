@@ -1,12 +1,14 @@
 /**
  * Each season page's own copy: a longer description, three neighbouring seasons and three famous
  * people with credited Commons photos and a linked source for the season. Approved by the user on
- * 2026-10-10 (t9-site-content tasks 1.3 and 1.4). Colors and the shared season copy come from the
- * analysis core, never from here.
+ * 2026-10-10 (t9-site-content tasks 1.3 and 1.4). Three outfits by palette name and more names from
+ * the same studio page were approved on 2026-11-04 (t23-season-page-depth, canvas board 16c); the
+ * names were read from each season's source page that day. Colors and the shared season copy come
+ * from the analysis core, never from here.
  *
  * @see openspec/specs/site-content/spec.md
  */
-import type { SeasonSlug } from "@seasonly/analysis";
+import { PALETTES, type SeasonSlug, type Swatch } from "@seasonly/analysis";
 
 export interface Famous {
   name: string;
@@ -17,11 +19,69 @@ export interface Famous {
   source: { title: string; url: string };
 }
 
+/** An outfit by palette names: one of the 24 best colors, one of the 6 neutrals, one of the metals. */
+type Outfit = readonly [best: string, neutral: string, metal: string];
+
 export interface SeasonContent {
+  /** Everyday, Work and Evening, picked by name from the season's palette (canvas board 16c). */
+  outfits: readonly [Outfit, Outfit, Outfit];
+  /** Three to six more people the same studio page types as the season; no photos. */
+  alsoTyped: readonly [string, string, string, ...string[]];
   /** Paragraphs, at least 120 words in all. */
   about: readonly string[];
   neighbours: readonly { slug: SeasonSlug; why: string }[];
   famous: readonly Famous[];
+}
+
+/** "a" or "an", by the word's first letter: right for every palette name today (BL-116). */
+const an = (word: string) => (/^[aeiou]/i.test(word) ? "an" : "a");
+
+const OUTFIT_LINES = [
+  [
+    "Everyday",
+    (b: string, n: string, m: string) => `${an(b)} ${b} top with ${n} trousers and ${m} jewelry.`,
+  ],
+  [
+    "Work",
+    (b: string, n: string, m: string) =>
+      `${an(b)} ${b} blouse under ${an(n)} ${n} jacket, with ${m} jewelry.`,
+  ],
+  [
+    "Evening",
+    (b: string, n: string, m: string) =>
+      `${an(b)} ${b} dress with ${n} shoes and bag, and ${m} jewelry.`,
+  ],
+] as const;
+
+/** Names as prose: ["A", "B", "C"] → "A, B and C". */
+const and = (names: readonly string[]) => `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+
+/** "The same studio also types … as Soft Autumns." under the famous photos. */
+export const alsoTypedLine = (slug: SeasonSlug, plural: string) =>
+  `The same studio also types ${and(SEASON_CONTENT[slug].alsoTyped)} as ${plural}.`;
+
+/**
+ * The season's three outfits, each name resolved in its palette list. A name missing from the
+ * palette throws, so the build fails rather than show a color the palette does not hold.
+ */
+export function seasonOutfits(slug: SeasonSlug) {
+  const palette = PALETTES[slug];
+  const find = (name: string, list: readonly Swatch[]) => {
+    const swatch = list.find((s) => s.name === name);
+    if (!swatch) throw new Error(`${slug}: no palette color "${name}"`);
+    return swatch;
+  };
+  return SEASON_CONTENT[slug].outfits.map(([best, neutral, metal], i) => {
+    const [title, line] = OUTFIT_LINES[i as 0 | 1 | 2];
+    const colors = [
+      find(best, palette.best),
+      find(neutral, palette.neutrals),
+      find(metal, palette.metals),
+    ] as const;
+    const [b, n, m] = colors.map((c) => c.name.toLowerCase()) as [string, string, string];
+    const sentence = line(b, n, m);
+    return { title, colors, line: sentence.charAt(0).toUpperCase() + sentence.slice(1) };
+  });
 }
 
 /** Above the famous people: `plural` is "Soft Autumns". */
@@ -37,6 +97,19 @@ export const FAMOUS_NOTE = {
 
 export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
   "light-spring": {
+    outfits: [
+      ["Peach", "Cream Beige", "Light Gold"],
+      ["Light Turquoise", "Soft Navy", "Yellow Gold"],
+      ["Clear Coral", "Ivory", "Rose Gold"],
+    ],
+    alsoTyped: [
+      "Sophie Turner",
+      "Lili Reinhart",
+      "Dove Cameron",
+      "Sadie Sink",
+      "Candice Swanepoel",
+      "Elsa Hosk",
+    ],
     about: [
       "Light Spring sits where Spring meets Summer. The warmth is there, but it is delicate: golden-blonde or light strawberry hair, light eyes in blue, green or soft hazel, and skin that flushes peach rather than pink. Nothing about the coloring is heavy, so heavy colors get noticed before the face does.",
       "Dress the way the light falls in spring. Peach, light coral, buttercup yellow, mint and light turquoise belong near the face, with ivory instead of stark white. Keep colors clear rather than dusty, and keep contrast gentle. A light warm navy does the job others give to black. If black is a must, wear it below the waist and bring a light color up to the face.",
@@ -104,6 +177,12 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "true-spring": {
+    outfits: [
+      ["Turquoise", "Warm Beige", "Yellow Gold"],
+      ["Coral", "Warm Navy", "Polished Gold"],
+      ["Poppy Red", "Caramel", "Copper"],
+    ],
+    alsoTyped: ["Blake Lively", "Leslie Mann", "Judy Greer", "Bella Thorne"],
     about: [
       "True Spring is warmth with clarity. Hair is often golden blonde, strawberry, copper or warm light brown, eyes are bright, and skin has a golden or peachy cast that tans easily. The coloring is lively rather than dramatic, with medium contrast.",
       "That warmth wants color with sun in it: coral, poppy red, marigold, grass green and turquoise. Camel and golden brown are the neutrals, with a clear navy for depth. Gold jewelry looks like part of the outfit, while silver can look grey against the skin. Dusty, greyed colors and icy pastels pull the life out of the face.",
@@ -171,6 +250,12 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "bright-spring": {
+    outfits: [
+      ["Bright Turquoise", "Warm Sand", "Yellow Gold"],
+      ["Bright Coral", "Ink Navy", "Polished Gold"],
+      ["Emerald", "Bright Ivory", "Rose Gold"],
+    ],
+    alsoTyped: ["Heather Graham", "Rose McGowan", "Brittany Snow", "Lu Huang"],
     about: [
       "Bright Spring borrows its clarity from Winter and its warmth from Spring. The look is vivid: bright eyes, often clear blue, green or topaz, against darker hair, and skin with a warm or neutral cast. Contrast is high, so the colors around the face need to keep up.",
       "Saturated, clear colors do that best: bright coral, hot pink, emerald, bright turquoise, royal blue and sunflower yellow. Swap black for ink navy or chocolate, and white for bright ivory. Polished gold and shiny finishes suit the clarity better than antique or matte ones. Muted colors such as mushroom, dusty rose and olive drab make the face look tired, because they cannot match its intensity.",
@@ -237,6 +322,19 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "light-summer": {
+    outfits: [
+      ["Powder Blue", "Light Grey", "Silver"],
+      ["Rose Pink", "Soft Navy", "White Gold"],
+      ["Lavender", "Rose Beige", "Platinum"],
+    ],
+    alsoTyped: [
+      "Sabrina Carpenter",
+      "Billie Eilish",
+      "Kirsten Dunst",
+      "January Jones",
+      "Elisha Cuthbert",
+      "Natalia Vodianova",
+    ],
     about: [
       "Light Summer is the airiest of the Summers. Hair is usually ash blonde or light ash brown, eyes are soft blue, grey or green, and skin is fair with a pink or rosy cast. Everything is light and cool, with little contrast between hair, skin and eyes.",
       "Pastels with a cool, rosy base belong here: powder blue, periwinkle, lavender, rose pink and soft teal, with soft white, grey and soft navy as neutrals. Silver, platinum and white gold sit well on the skin. Black, orange and earthy browns are too heavy and too warm, and they reach the eye before the face does.",
@@ -305,6 +403,12 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "true-summer": {
+    outfits: [
+      ["Soft Blue", "Light Cool Grey", "Silver"],
+      ["Periwinkle", "Navy", "White Gold"],
+      ["Raspberry", "Charcoal Blue", "Platinum"],
+    ],
+    alsoTyped: ["Barbara Palvin", "Joey King", "Emily DiDonato"],
     about: [
       "True Summer is the coolest Summer. The undertone is clearly pink or blue, hair is usually ash brown or ash blonde, and eyes are blue, grey or cool green. Depth is medium and contrast soft, so the coloring reads calm rather than bright.",
       "Cool colors with a touch of grey suit that calm: slate blue, soft blue, rose pink, raspberry, plum and sea green. Navy, charcoal blue and cool grey replace black and camel. Silver, platinum and pewter flatter more than yellow gold. Orange, gold and warm browns fight the pink in the skin and can make it look red or sallow.",
@@ -373,6 +477,19 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "soft-summer": {
+    outfits: [
+      ["Dusty Blue", "Light Taupe Grey", "Brushed Silver"],
+      ["Dusty Rose", "Grey Navy", "White Gold"],
+      ["Soft Berry", "Charcoal", "Pewter"],
+    ],
+    alsoTyped: [
+      "Cara Delevingne",
+      "Adriana Lima",
+      "Emma Chamberlain",
+      "Taylor Hill",
+      "Denise Richards",
+      "Bianca Balti",
+    ],
     about: [
       "Soft Summer is cool to neutral, with medium depth and low contrast. Hair is often ash brown or dark ash blonde, eyes grey-green, grey-blue or soft hazel, and skin neutral with a cool lean. The overall impression is gentle and smoky, never sharp.",
       "Colors that look as if they have a little grey mixed in blend with it: dusty rose, slate, smoky teal, grey violet and soft plum. Charcoal, grey navy and soft white work better than black and stark white. Brushed silver, pewter and rose gold suit the softness. Bright, saturated and warm colors overpower it: next to bright yellow, kelly green or orange, the face fades.",
@@ -440,6 +557,19 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "soft-autumn": {
+    outfits: [
+      ["Sage", "Oatmeal", "Brushed Gold"],
+      ["Soft Coral", "Cocoa", "Rose Gold"],
+      ["Deep Teal", "Espresso", "Bronze"],
+    ],
+    alsoTyped: [
+      "Angelina Jolie",
+      "Gigi Hadid",
+      "Hailey Bieber",
+      "Kate Moss",
+      "Gisele Bündchen",
+      "Jessica Biel",
+    ],
     about: [
       "Soft Autumn is warm, but quietly so. Hair is often soft brown, dark blonde or muted auburn, eyes hazel, soft green or warm brown, and skin warm to neutral without much flush. No single feature stands out from the rest: the coloring blends, and the clothes should blend with it.",
       "Earthy colors with a little dust in them do that: terracotta, camel, sage, olive, dusty rose and deep teal. Ivory cream, oatmeal, mushroom and espresso replace black and stark white. Brushed gold, bronze and rose gold sit better than polished silver. Bright, icy and very dark colors compete: fuchsia, electric blue and jet black stand out on their own, apart from the face.",
@@ -506,6 +636,19 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "true-autumn": {
+    outfits: [
+      ["Moss Green", "Warm Beige", "Yellow Gold"],
+      ["Warm Teal", "Coffee", "Antique Gold"],
+      ["Spice Red", "Dark Chocolate", "Copper"],
+    ],
+    alsoTyped: [
+      "Beyoncé",
+      "Lady Gaga",
+      "Lily James",
+      "Jessica Alba",
+      "Sofía Vergara",
+      "Millie Bobby Brown",
+    ],
     about: [
       "True Autumn is golden and earthy through and through. Hair is often auburn, copper, golden brown or warm chestnut, eyes brown, hazel or warm green, and skin golden, peach or bronze, sometimes with freckles. Depth and contrast are both medium.",
       "Rich, warm colors look like they belong: pumpkin, rust, mustard, olive, forest green and peacock teal. Camel, olive and chocolate are the neutrals. Gold, copper and bronze look better than silver. Cool and icy colors, and pinks with a blue base such as fuchsia and bubblegum, drain the skin and leave it grey.",
@@ -573,6 +716,19 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "deep-autumn": {
+    outfits: [
+      ["Olive", "Camel Beige", "Antique Gold"],
+      ["Petrol Teal", "Chocolate", "Bronze"],
+      ["Oxblood", "Espresso", "Burnished Brass"],
+    ],
+    alsoTyped: [
+      "Ariana Grande",
+      "Eva Longoria",
+      "Hailee Steinfeld",
+      "Emily Ratajkowski",
+      "Olivia Munn",
+      "Shay Mitchell",
+    ],
     about: [
       "Deep Autumn is deep, warm and rich. Hair is usually dark brown, chestnut or near black with warm tones, eyes dark brown, hazel or deep olive, and skin warm to neutral at any depth. Contrast runs medium to high, with plenty of depth in the features.",
       "Dark, warm colors match that depth: deep rust, tomato red, oxblood, forest green, deep teal, saffron and aubergine. Espresso and chocolate stand in for black, and cream for stark white. Antique gold, bronze and copper suit the skin better than polished silver. Pastels and icy colors, such as pastel pink, icy blue and lavender, wash it out.",
@@ -639,6 +795,19 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "deep-winter": {
+    outfits: [
+      ["Emerald", "Charcoal", "Silver"],
+      ["Icy Pink", "Dark Navy", "White Gold"],
+      ["True Red", "Black", "Platinum"],
+    ],
+    alsoTyped: [
+      "Anne Hathaway",
+      "Gal Gadot",
+      "Monica Bellucci",
+      "Catherine Zeta-Jones",
+      "Olivia Rodrigo",
+      "Vanessa Hudgens",
+    ],
     about: [
       "Deep Winter has dark hair and eyes, often near black and deep brown, cool to neutral skin at any depth, and high contrast. The coloring has weight, and it can carry colors that would overwhelm lighter seasons.",
       "Dark, saturated colors match it: true red, burgundy, emerald, cobalt, royal purple and navy. Black and pure white both work, along with charcoal and dark navy. A touch of icy pink, blue or mint lifts a dark outfit near the face. Silver, platinum and gunmetal flatter more than yellow gold. Warm, golden and earthy colors, such as mustard, camel and rust, make the skin look tired or sallow.",
@@ -705,6 +874,18 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "true-winter": {
+    outfits: [
+      ["Royal Blue", "Cool Grey", "Silver"],
+      ["Icy Blue", "Charcoal", "White Gold"],
+      ["Blue Red", "Black", "Platinum"],
+    ],
+    alsoTyped: [
+      "Liv Tyler",
+      "Jennifer Connelly",
+      "Ian Somerhalder",
+      "Sherilyn Fenn",
+      "Nicholas Braun",
+    ],
     about: [
       "True Winter has a clearly blue or pink undertone. Hair is usually dark and cool, from cool brown to blue-black, eyes are often dark or a clear cool color, and contrast between hair and skin is high. The look is crisp and graphic.",
       "Clear, bold, cool colors match it: blue red, fuchsia, royal blue, emerald, sapphire and lemon yellow, with icy pastels as accents. Black and pure white work, and so do navy, charcoal and cool grey. Silver, platinum and white gold beat yellow gold. Warm, golden and earthy colors clash: peach, camel, orange and rust turn the skin sallow.",
@@ -772,6 +953,12 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "bright-winter": {
+    outfits: [
+      ["Bright Turquoise", "Pure White", "Polished Silver"],
+      ["Hot Pink", "Ink Navy", "White Gold"],
+      ["Cobalt", "Black", "Platinum"],
+    ],
+    alsoTyped: ["Sophie Ellis-Bextor", "Wes Bentley", "Julia Goldani Telles"],
     about: [
       "Bright Winter has very high contrast, often bright blue, green or grey eyes against dark hair, with cool to neutral skin. The coloring looks clear and sharp, and soft colors look dull beside it.",
       "Vivid, saturated colors match that intensity: hot pink, clear red, electric blue, bright turquoise, bright violet and emerald. Black and pure white work, and so do ink navy and charcoal. Polished silver, platinum and chrome suit the shine, and makeup can be just as clear: a clear red or hot fuchsia lip. Dusty, muted and earthy colors, such as dusty rose, mushroom and olive drab, dull the face.",

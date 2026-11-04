@@ -83,6 +83,31 @@ export function SeasonTraits({ season }: { season: SeasonSlug }) {
   );
 }
 
+/** The season's lip, blush, eye and hair colors under its makeup line, as a report and a season page show them. */
+export function MakeupAndHair({ season, overline }: { season: SeasonSlug; overline: string }) {
+  const copy = SEASON_COPY[season];
+  const palette = PALETTES[season];
+  return (
+    <ReportSection overline={overline} title="Makeup and hair" intro={copy.makeupIntro}>
+      <div className="flex flex-col gap-(--space-6) lg:grid lg:grid-cols-2">
+        <Group title="Lips">
+          <Colors colors={palette.lips} columns={3} label="Lip colors" />
+        </Group>
+        <Group title="Blush">
+          <Colors colors={palette.blush} columns={3} label="Blush colors" />
+        </Group>
+        <Group title="Eyes">
+          <Colors colors={palette.eyes} columns={3} label="Eye colors" />
+        </Group>
+        <Group title="Hair">
+          <p className="text-(--ink-muted)">{copy.hairTip}</p>
+          <Colors colors={palette.hair} columns={3} label="Hair colors" />
+        </Group>
+      </div>
+    </ReportSection>
+  );
+}
+
 export interface ReportSectionsProps {
   season: SeasonSlug;
   agreement: Agreement;
@@ -177,23 +202,7 @@ export function ReportSections({
             </Group>
           </div>
         </ReportSection>
-        <ReportSection overline={overline(5)} title="Makeup and hair" intro={copy.makeupIntro}>
-          <div className="flex flex-col gap-(--space-6) lg:grid lg:grid-cols-2">
-            <Group title="Lips">
-              <Colors colors={palette.lips} columns={3} label="Lip colors" />
-            </Group>
-            <Group title="Blush">
-              <Colors colors={palette.blush} columns={3} label="Blush colors" />
-            </Group>
-            <Group title="Eyes">
-              <Colors colors={palette.eyes} columns={3} label="Eye colors" />
-            </Group>
-            <Group title="Hair">
-              <p className="text-(--ink-muted)">{copy.hairTip}</p>
-              <Colors colors={palette.hair} columns={3} label="Hair colors" />
-            </Group>
-          </div>
-        </ReportSection>
+        <MakeupAndHair season={season} overline={overline(5)} />
         {!quizOnly && (
           <ReportSection
             overline={overline(6)}

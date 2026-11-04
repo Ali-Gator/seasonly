@@ -4,10 +4,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Button, Icon, ReportSection, Slot } from "@/components/ds";
-import { Colors, Group, LEFT, RIGHT, SeasonTraits } from "@/lib/report/sections";
+import { Colors, Group, LEFT, MakeupAndHair, RIGHT, SeasonTraits } from "@/lib/report/sections";
 import { Faq, seasonFaq } from "@/lib/site-content/faq";
 import { SeasonLink } from "@/lib/site-content/season-link";
-import { FAMOUS_NOTE, famousIntro, SEASON_CONTENT } from "@/lib/site-content/seasons";
+import {
+  alsoTypedLine,
+  FAMOUS_NOTE,
+  famousIntro,
+  SEASON_CONTENT,
+  seasonOutfits,
+} from "@/lib/site-content/seasons";
 import {
   familyName,
   pageMetadata,
@@ -49,6 +55,9 @@ function FindOut({ name, className }: { name: string; className?: string }) {
  * {@link openspec/specs/site-content/spec.md#requirement-a-season-page-shows-that-seasons-shared-palette-and-copy}
  * {@link openspec/specs/site-content/spec.md#requirement-famous-people-on-a-season-page-are-sourced-and-credited}
  * {@link openspec/specs/site-content/spec.md#requirement-a-season-page-names-its-second-name}
+ * {@link openspec/specs/site-content/spec.md#requirement-a-season-page-shows-the-seasons-makeup-and-hair-colors}
+ * {@link openspec/specs/site-content/spec.md#requirement-a-season-page-suggests-three-outfits-from-its-own-palette}
+ * {@link openspec/specs/site-content/spec.md#requirement-a-season-page-names-more-people-from-the-same-source}
  */
 export default async function Season({ params }: Props) {
   const { season: slug } = await params;
@@ -124,6 +133,19 @@ export default async function Season({ params }: Props) {
               </Group>
             </div>
           </ReportSection>
+          <MakeupAndHair season={season} overline="Makeup and hair" />
+          <ReportSection
+            overline="Outfits"
+            title="Outfit ideas"
+            intro="A palette color near the face, a neutral below it and a metal that suits you. Swap in any color from the palette."
+          >
+            {seasonOutfits(season).map((o) => (
+              <Group key={o.title} title={o.title}>
+                <Colors colors={o.colors} columns={3} wide={6} label={`${o.title} outfit`} />
+                <p className="text-(--ink-muted)">{o.line}</p>
+              </Group>
+            ))}
+          </ReportSection>
           <ReportSection
             overline={`Famous ${plural}`}
             title={`Famous ${plural}`}
@@ -145,6 +167,7 @@ export default async function Season({ params }: Props) {
                 </li>
               ))}
             </ul>
+            <p>{alsoTypedLine(season, plural)}</p>
             <p className="caption text-(--ink-muted)">
               {FAMOUS_NOTE.before}
               <a href={famous[0]?.source.url}>{FAMOUS_NOTE.studio}</a>

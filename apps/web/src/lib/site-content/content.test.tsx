@@ -273,6 +273,100 @@ describe("/seasons/<slug>", () => {
     expect(page).toContain(`${FAMOUS_NOTE.before}${FAMOUS_NOTE.studio}${FAMOUS_NOTE.after}`);
     expect(page).toContain("No one shown here endorses Seasonly.");
   });
+
+  /**
+   * {@link openspec/specs/site-content/spec.md#scenario-makeup-and-hair-match-the-report}
+   * {@link openspec/specs/site-content/spec.md#scenario-every-season-shows-its-makeup-and-hair}
+   */
+  it.each(SEASON_SLUGS)("%s shows the report's makeup and hair colors", async (slug) => {
+    const out = await seasonPage(slug);
+    const palette = PALETTES[slug];
+    expect(grid(out, "Lip colors")).toEqual(palette.lips);
+    expect(grid(out, "Blush colors")).toEqual(palette.blush);
+    expect(grid(out, "Eye colors")).toEqual(palette.eyes);
+    expect(grid(out, "Hair colors")).toEqual(palette.hair);
+    expect(text(out)).toContain(SEASON_COPY[slug].makeupIntro);
+    // The hair tip opens the Hair group: after the eye colors, just before the hair colors.
+    const tip = out.replace(/&#x27;/g, "'").indexOf(SEASON_COPY[slug].hairTip);
+    expect(tip).toBeGreaterThan(out.indexOf('aria-label="Eye colors"'));
+    expect(tip).toBeLessThan(out.indexOf('aria-label="Hair colors"'));
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-outfits-use-only-the-seasons-own-colors} */
+  it.each(SEASON_SLUGS)("%s suggests three outfits from its own palette", async (slug) => {
+    const out = await seasonPage(slug);
+    const palette = PALETTES[slug];
+    const tops = ["Everyday", "Work", "Evening"].map((title) => {
+      const colors = grid(out, `${title} outfit`);
+      expect(colors).toHaveLength(3);
+      const [top, bottom, metal] = colors;
+      expect(palette.best).toContainEqual(top);
+      expect(palette.neutrals).toContainEqual(bottom);
+      expect(palette.metals).toContainEqual(metal);
+      for (const c of colors) expect(palette.avoid.map((a) => a.hex)).not.toContain(c.hex);
+      return top?.name;
+    });
+    expect(new Set(tops).size).toBe(3);
+    const at = (title: string) => out.indexOf(`aria-label="${title} outfit"`);
+    expect(at("Everyday")).toBeLessThan(at("Work"));
+    expect(at("Work")).toBeLessThan(at("Evening"));
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-an-outfit-reads-as-a-sentence} */
+  it("reads each outfit as one sentence, with a or an", async () => {
+    const out = await seasonPage("soft-autumn");
+    expect(grid(out, "Everyday outfit").map((s) => s.name)).toEqual([
+      "Sage",
+      "Oatmeal",
+      "Brushed Gold",
+    ]);
+    expect(text(out)).toContain("A sage top with oatmeal trousers and brushed gold jewelry.");
+    expect(text(out)).toContain(
+      "A soft coral blouse under a cocoa jacket, with rose gold jewelry.",
+    );
+    expect(text(out)).toContain(
+      "A deep teal dress with espresso shoes and bag, and bronze jewelry.",
+    );
+    expect(text(await seasonPage("deep-winter"))).toContain(
+      "An emerald top with charcoal trousers and silver jewelry.",
+    );
+    expect(text(await seasonPage("bright-spring"))).toContain(
+      "A bright coral blouse under an ink navy jacket, with polished gold jewelry.",
+    );
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-new-sections-sit-before-the-famous-people} */
+  it.each(SEASON_SLUGS)("%s puts makeup and outfits between metals and famous", async (slug) => {
+    const page = text(await seasonPage(slug));
+    const at = (s: string) => page.indexOf(s);
+    expect(at("Best metals")).toBeGreaterThan(-1);
+    expect(at("Makeup and hair")).toBeGreaterThan(at("Best metals"));
+    expect(at("Outfit ideas")).toBeGreaterThan(at("Makeup and hair"));
+    expect(at(`Famous ${seasonName(slug)}s`)).toBeGreaterThan(at("Outfit ideas"));
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-extra-names} */
+  it.each(SEASON_SLUGS)("%s names three to six more people before the note", async (slug) => {
+    const { alsoTyped, famous } = SEASON_CONTENT[slug];
+    expect(alsoTyped.length).toBeGreaterThanOrEqual(3);
+    expect(alsoTyped.length).toBeLessThanOrEqual(6);
+    expect(new Set(alsoTyped).size).toBe(alsoTyped.length);
+    for (const n of alsoTyped) expect(famous.map((f) => f.name)).not.toContain(n);
+    const page = text(await seasonPage(slug));
+    const line = `The same studio also types ${alsoTyped.slice(0, -1).join(", ")} and ${alsoTyped.at(-1)} as ${seasonName(slug)}s.`;
+    expect(page).toContain(line);
+    expect(page.indexOf(FAMOUS_NOTE.before)).toBeGreaterThan(page.indexOf(line));
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-extra-names-on-soft-autumn} */
+  it("names Soft Autumn's extra people", async () => {
+    expect(text(await seasonPage("soft-autumn"))).toContain(
+      "The same studio also types Angelina Jolie, Gigi Hadid, Hailey Bieber, Kate Moss, Gisele Bündchen and Jessica Biel as Soft Autumns.",
+    );
+    expect(text(await seasonPage("true-summer"))).toContain(
+      "The same studio also types Barbara Palvin, Joey King and Emily DiDonato as True Summers.",
+    );
+  });
 });
 
 describe("/seasons/<slug> under its searched names", () => {
