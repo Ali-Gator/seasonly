@@ -21,15 +21,15 @@
 ## 3. Code
 
 - [x] 3.1 `apps/web/src/lib/report/sections.tsx`: export `MakeupAndHair({ season, overline })`; `ReportSections` renders it with the same props as today. Verify: report tests (`view.test.tsx`, sample-report tests) pass unchanged.
-- [x] 3.2 `apps/web/src/lib/site-content/seasons.ts`: `outfits` and `alsoTyped` for the 12 seasons, copied from canvas board 16c (approved); `outfit(season, i)` resolves names and builds the sentence, throwing on a name not in the right list. Verify: 2.1's outfit cases pass.
+- [x] 3.2 `apps/web/src/lib/site-content/seasons.ts`: `outfits` and `alsoTyped` for the 12 seasons, copied from canvas board 16c (approved); `seasonOutfits(slug)` resolves names and builds the sentence, throwing on a name not in the right list. Verify: 2.1's outfit cases pass.
 - [x] 3.3 `apps/web/src/app/(site)/seasons/[season]/page.tsx`: render `MakeupAndHair` and the three outfits after Metals, and the `alsoTyped` line between the photos and `FAMOUS_NOTE`; doc comment cites the three new requirements. Verify: all of 2.1 passes.
 - [x] 3.4 `docs/backlog.md`: delete BL-109 and BL-113. Verify: neither id is in the file.
 
 ## 4. Gates, review, archive, ship
 
-- [ ] 4.1 `pnpm fix`, `pnpm test`, `pnpm test:eval` green (the eval must not report `results.json` stale, since the core is untouched). Verify: the three commands exit 0.
-- [ ] 4.2 Check the page in a browser at 375 and 1280 (local dev server): the sections render as on boards 16. Verify: screenshot.
-- [ ] 4.3 Phase review (`/code-review high`) in a fresh `general-purpose` subagent; fix findings; log what stays unfixed as BL items. Verify: findings and their outcome noted here.
+- [x] 4.1 `pnpm fix`, `pnpm test`, `pnpm test:eval` green (the eval must not report `results.json` stale, since the core is untouched). Verify: the three commands exit 0.
+- [x] 4.2 Check the page in a browser at 375 and 1280 (local dev server): the sections render as on boards 16. Verify: screenshot.
+- [x] 4.3 Phase review (`/code-review high`) in a fresh `general-purpose` subagent; fix findings; log what stays unfixed as BL items. Verify: findings and their outcome noted here. Done 2026-11-04, no blocking issue. Fixed: design and tasks named `outfit()`/`Trio` (now `seasonOutfits`/`Outfit`); `alsoTyped` typed as at least three names and its line built once in `alsoTypedLine`; a second literal names test (True Summer, three names); tests now pin the outfit order and the hair tip opening the Hair group; `an()` returns lower case and the sentence is capitalized once. Logged: BL-116 (a/an by first letter).
 - [ ] 4.4 `/opsx:archive`, then hand-edit `openspec/specs/site-content/spec.md` Public Interface and Behavior for `outfits`, `alsoTyped` and `MakeupAndHair`. Verify: `openspec validate --specs` passes.
 - [ ] 4.5 Push, open the PR to `main`, enable auto-merge with a merge commit. Verify: CI, e2e and validate green; PR merged; production serves the new sections on `/seasons/soft-autumn`.
 - [ ] 4.6 Tracker: T23 Done with a Log line; Launch plan step 5 marked done. Verify: the row and step show.

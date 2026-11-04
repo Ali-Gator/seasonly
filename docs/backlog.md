@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-116**
+_Next id:_ **BL-117**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -27,6 +27,13 @@ along the way that are worth fixing later. CLAUDE.md ("Backlog") says when to ad
 fold items in.
 
 ## Site
+
+- **[BL-116] Outfit lines pick "a" or "an" by first letter** — `seasonOutfits` writes "an" before
+  any palette name starting with a vowel letter, so a future name like "Eucalyptus" or "Ube" would
+  read "an eucalyptus top". Every name in today's 36 outfits reads right. Add an exception list if
+  such a name joins an outfit.
+  _Refs:_ `apps/web/src/lib/site-content/seasons.ts` (`an`), `t23-season-page-depth` review ·
+  _Status:_ deferred — an outfit name whose letter and sound disagree
 
 ## Analysis
 

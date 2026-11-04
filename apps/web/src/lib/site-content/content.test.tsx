@@ -286,7 +286,10 @@ describe("/seasons/<slug>", () => {
     expect(grid(out, "Eye colors")).toEqual(palette.eyes);
     expect(grid(out, "Hair colors")).toEqual(palette.hair);
     expect(text(out)).toContain(SEASON_COPY[slug].makeupIntro);
-    expect(text(out)).toContain(SEASON_COPY[slug].hairTip);
+    // The hair tip opens the Hair group: after the eye colors, just before the hair colors.
+    const tip = out.replace(/&#x27;/g, "'").indexOf(SEASON_COPY[slug].hairTip);
+    expect(tip).toBeGreaterThan(out.indexOf('aria-label="Eye colors"'));
+    expect(tip).toBeLessThan(out.indexOf('aria-label="Hair colors"'));
   });
 
   /** {@link openspec/specs/site-content/spec.md#scenario-outfits-use-only-the-seasons-own-colors} */
@@ -304,6 +307,9 @@ describe("/seasons/<slug>", () => {
       return top?.name;
     });
     expect(new Set(tops).size).toBe(3);
+    const at = (title: string) => out.indexOf(`aria-label="${title} outfit"`);
+    expect(at("Everyday")).toBeLessThan(at("Work"));
+    expect(at("Work")).toBeLessThan(at("Evening"));
   });
 
   /** {@link openspec/specs/site-content/spec.md#scenario-an-outfit-reads-as-a-sentence} */
@@ -356,6 +362,9 @@ describe("/seasons/<slug>", () => {
   it("names Soft Autumn's extra people", async () => {
     expect(text(await seasonPage("soft-autumn"))).toContain(
       "The same studio also types Angelina Jolie, Gigi Hadid, Hailey Bieber, Kate Moss, Gisele Bündchen and Jessica Biel as Soft Autumns.",
+    );
+    expect(text(await seasonPage("true-summer"))).toContain(
+      "The same studio also types Barbara Palvin, Joey King and Emily DiDonato as True Summers.",
     );
   });
 });

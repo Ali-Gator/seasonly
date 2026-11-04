@@ -18,7 +18,7 @@ See proposal.md (Why). The season page (`apps/web/src/app/(site)/seasons/[season
 ## Decisions
 
 1. **Lift `MakeupAndHair` into `lib/report/sections.tsx`.** The report's block becomes `MakeupAndHair({ season, overline })`, rendering the same `ReportSection` titled "Makeup and hair" with the four `Group`s. The report passes "Section 5 of N" as the overline; the season page passes "Makeup and hair". The report's markup stays byte-identical, so its tests stay green. Alternative: copy the 20 lines into the season page. Rejected: the two would drift, and the spec says they show the same thing.
-2. **Outfits are name triples in `SEASON_CONTENT`.** `outfits: readonly [Trio, Trio, Trio]`, where `Trio = readonly [best: string, neutral: string, metal: string]`, in Everyday, Work, Evening order. A helper `outfit(season, i)` in `lib/site-content/seasons.ts` resolves each name in `PALETTES[season].best`, `.neutrals` and `.metals` and throws on a miss, then builds the sentence from the fixed template. A miss throws during the static build, and the unit test catches it first. Alternatives:
+2. **Outfits are name triples in `SEASON_CONTENT`.** `outfits: readonly [Outfit, Outfit, Outfit]`, where `Outfit = readonly [best: string, neutral: string, metal: string]`, in Everyday, Work, Evening order. A helper `seasonOutfits(slug)` in `lib/site-content/seasons.ts` resolves each name in `PALETTES[season].best`, `.neutrals` and `.metals` and throws on a miss, then builds the sentence from the fixed template. A miss throws during the static build, and the unit test catches it first. Alternatives:
    - Store hex codes. Rejected: it could invent a color.
    - Pick outfits by rule (first best plus first neutral). Rejected: it gives dull or clashing pairs; the user approved hand-picked ones on the copy sheet.
 3. **The sentence is built, not stored.** Three templates and an a/an rule ("An emerald dress", "An icy pink blouse", "an ink navy jacket") cover all 36 outfits, so no prose needs separate approval.
@@ -29,7 +29,7 @@ See proposal.md (Why). The season page (`apps/web/src/app/(site)/seasons/[season
 
 - [The studio edits or removes a name] → The link still points at its current list. The names are a dated reading, like the photos. Re-read the 12 pages if a person asks to be removed.
 - [A longer page pushes the FAQ and the actions further down] → The palette-first scenario is unchanged, and the "Find out" action after the description still sits high on the page. No e2e test pins page height.
-- [A palette color is renamed later] → `outfit()` throws, and the unit test that renders all 12 pages fails before deploy.
+- [A palette color is renamed later] → `seasonOutfits()` throws, and the unit test that renders all 12 pages fails before deploy.
 
 ## Migration Plan
 

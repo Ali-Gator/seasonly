@@ -26,31 +26,39 @@ export interface SeasonContent {
   /** Everyday, Work and Evening, picked by name from the season's palette (canvas board 16c). */
   outfits: readonly [Outfit, Outfit, Outfit];
   /** Three to six more people the same studio page types as the season; no photos. */
-  alsoTyped: readonly string[];
+  alsoTyped: readonly [string, string, string, ...string[]];
   /** Paragraphs, at least 120 words in all. */
   about: readonly string[];
   neighbours: readonly { slug: SeasonSlug; why: string }[];
   famous: readonly Famous[];
 }
 
+/** "a" or "an", by the word's first letter: right for every palette name today (BL-116). */
+const an = (word: string) => (/^[aeiou]/i.test(word) ? "an" : "a");
+
 const OUTFIT_LINES = [
   [
     "Everyday",
-    (b: string, n: string, m: string) => `${a(b)} ${b} top with ${n} trousers and ${m} jewelry.`,
+    (b: string, n: string, m: string) => `${an(b)} ${b} top with ${n} trousers and ${m} jewelry.`,
   ],
   [
     "Work",
     (b: string, n: string, m: string) =>
-      `${a(b)} ${b} blouse under ${a(n).toLowerCase()} ${n} jacket, with ${m} jewelry.`,
+      `${an(b)} ${b} blouse under ${an(n)} ${n} jacket, with ${m} jewelry.`,
   ],
   [
     "Evening",
     (b: string, n: string, m: string) =>
-      `${a(b)} ${b} dress with ${n} shoes and bag, and ${m} jewelry.`,
+      `${an(b)} ${b} dress with ${n} shoes and bag, and ${m} jewelry.`,
   ],
 ] as const;
 
-const a = (word: string) => (/^[aeiou]/i.test(word) ? "An" : "A");
+/** Names as prose: ["A", "B", "C"] → "A, B and C". */
+const and = (names: readonly string[]) => `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+
+/** "The same studio also types … as Soft Autumns." under the famous photos. */
+export const alsoTypedLine = (slug: SeasonSlug, plural: string) =>
+  `The same studio also types ${and(SEASON_CONTENT[slug].alsoTyped)} as ${plural}.`;
 
 /**
  * The season's three outfits, each name resolved in its palette list. A name missing from the
@@ -71,7 +79,8 @@ export function seasonOutfits(slug: SeasonSlug) {
       find(metal, palette.metals),
     ] as const;
     const [b, n, m] = colors.map((c) => c.name.toLowerCase()) as [string, string, string];
-    return { title, colors, line: line(b, n, m) };
+    const sentence = line(b, n, m);
+    return { title, colors, line: sentence.charAt(0).toUpperCase() + sentence.slice(1) };
   });
 }
 

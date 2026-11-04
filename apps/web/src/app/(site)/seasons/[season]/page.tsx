@@ -8,6 +8,7 @@ import { Colors, Group, LEFT, MakeupAndHair, RIGHT, SeasonTraits } from "@/lib/r
 import { Faq, seasonFaq } from "@/lib/site-content/faq";
 import { SeasonLink } from "@/lib/site-content/season-link";
 import {
+  alsoTypedLine,
   FAMOUS_NOTE,
   famousIntro,
   SEASON_CONTENT,
@@ -65,7 +66,7 @@ export default async function Season({ params }: Props) {
   const second = secondName(season);
   const copy = SEASON_COPY[season];
   const palette = PALETTES[season];
-  const { about, neighbours, famous, alsoTyped } = SEASON_CONTENT[season];
+  const { about, neighbours, famous } = SEASON_CONTENT[season];
   const plural = `${name}s`;
 
   return (
@@ -166,10 +167,7 @@ export default async function Season({ params }: Props) {
                 </li>
               ))}
             </ul>
-            <p>
-              The same studio also types {alsoTyped.slice(0, -1).join(", ")} and {alsoTyped.at(-1)}{" "}
-              as {plural}.
-            </p>
+            <p>{alsoTypedLine(season, plural)}</p>
             <p className="caption text-(--ink-muted)">
               {FAMOUS_NOTE.before}
               <a href={famous[0]?.source.url}>{FAMOUS_NOTE.studio}</a>
