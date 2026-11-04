@@ -140,12 +140,6 @@ fold items in.
 
 ## Testing
 
-- **[BL-109] No request test cites the dark-name redirect** — the e2e alias loop does request
-  `/seasons/dark-autumn` and `dark-winter`, but cites only "An alternative name"; "A dark name" is
-  cited only by the unit test on the alias map, which makes no request. Add the scenario's link to
-  the loop's doc comment (an edit to an existing test, so it needs your yes).
-  _Refs:_ `e2e/site-structure.spec.ts` (alias loop), `t21-searched-season-names` review · _Status:_ open
-
 - **[BL-107] The router-refresh e2e can read the page before the refresh commits** — `refreshRouter`
   captures `history.state`'s tree once the sync microtask has run, not after its restore commits; if
   that commit lands between the capture and the refresh, the tree-identity wait passes early and the
@@ -209,9 +203,3 @@ fold items in.
   directory listing is live, and sharpen the tool description only if listed connectors still skip it.
   _Refs:_ `openspec/specs/chat-plugin/spec.md`, `docs/chat-plugin-listing.md` · _Status:_ deferred
   — directory listing live (host check 6.3, 2026-10-11)
-
-- **[BL-113] The GPT-alternative boards lack the plugin's publisher line** — `/color-analysis-gpt-alternative`
-  says the plugin is published by Oleg Gordienov, an approved exception to the board's copy. Add the
-  line to both boards so a later design pass does not drop it.
-  _Refs:_ `openspec/specs/site-content/spec.md`, `project/GptAlternative.dc.html`,
-  `project/GptAlternative-1280.dc.html` · _Status:_ gated — the user's canvas approval (backlog-17, 2026-10-30)

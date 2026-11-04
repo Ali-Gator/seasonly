@@ -78,7 +78,10 @@ test.describe("not found", () => {
   }
 });
 
-/** {@link openspec/specs/site-structure/spec.md#scenario-an-alternative-name} */
+/**
+ * {@link openspec/specs/site-structure/spec.md#scenario-an-alternative-name}
+ * {@link openspec/specs/site-structure/spec.md#scenario-a-dark-name}
+ */
 for (const [alias, slug] of Object.entries(SEASON_ALIASES)) {
   test(`/seasons/${alias} redirects 308 to /seasons/${slug}`, async ({ request }) => {
     const response = await request.get(`/seasons/${alias}`, { maxRedirects: 0 });

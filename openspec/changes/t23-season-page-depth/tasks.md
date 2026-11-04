@@ -3,11 +3,11 @@
 - [x] 1.1 MVP canvas (https://claude.ai/artifact/Q83bgjLjtYk2sS1ovCffy3), edited in place: 16 Season 375 and 1280 gain "Makeup and hair", "Outfit ideas" and the extra-names line before Famous; new board 16c holds all 12 seasons' outfits and names; 19 GptAlternative 375 and 1280 gain the publisher line (BL-113). Verify: canvas version noted here. Done 2026-11-04: version 76 (1793802418-6254), boards checked rendering in Chrome.
 - [x] 1.2 Ask the user to approve the boards and the copy sheet. Verify: approval and date recorded here. Approved by the user 2026-11-04 "as drawn".
 - [x] 1.3 Existing-test edit for BL-109 needs the user's yes: the doc comment of the alias loop in `e2e/site-structure.spec.ts` gains `{@link openspec/specs/site-structure/spec.md#scenario-a-dark-name}`. Verify: approval recorded here. Approved by the user 2026-11-04.
-- [ ] 1.4 Tracker (https://claude.ai/artifact/5MZDhho5AxYk1UDasHkdAT): add row T23 "Season page depth (t23-season-page-depth)" In progress, and a Log line naming the change. Verify: the row and Log line show.
+- [x] 1.4 Tracker (https://claude.ai/artifact/5MZDhho5AxYk1UDasHkdAT): add row T23 "Season page depth (t23-season-page-depth)" In progress, and a Log line naming the change. Verify: the row and Log line show.
 
 ## 2. Tests first (each cites its scenario at the permanent path)
 
-- [ ] 2.1 `apps/web/src/lib/site-content/content.test.tsx`, `/seasons/<slug>` block, new cases:
+- [x] 2.1 `apps/web/src/lib/site-content/content.test.tsx`, `/seasons/<slug>` block, new cases:
   - "Makeup and hair match the report" and "Every season shows its makeup and hair": for all 12, the `Lip colors`, `Blush colors`, `Eye colors` and `Hair colors` grids equal `PALETTES[slug]`'s lists; the text holds `makeupIntro` and `hairTip`.
   - "Outfits use only the season's own colors": for all 12, the `Everyday outfit`, `Work outfit` and `Evening outfit` grids are three swatches. The first is in `best`, the second in `neutrals`, the third in `metals`; none is in `avoid`; the three best colors differ.
   - "An outfit reads as a sentence": the Soft Autumn Everyday grid is Sage, Oatmeal, Brushed Gold, and the exact sentence shows. Also unit-check the a/an rule on the helper ("An emerald dress…").
@@ -16,14 +16,14 @@
 
   Verify: the new cases fail on today's code; existing cases unchanged.
 
-- [ ] 2.2 `e2e/site-structure.spec.ts`: BL-109 doc-comment link only (approved in 1.3). Verify: `pnpm test:unit` citation gate passes.
+- [x] 2.2 `e2e/site-structure.spec.ts`: BL-109 doc-comment link only (approved in 1.3). Verify: `pnpm test:unit` citation gate passes.
 
 ## 3. Code
 
-- [ ] 3.1 `apps/web/src/lib/report/sections.tsx`: export `MakeupAndHair({ season, overline, title })`; `ReportSections` renders it with the same props as today. Verify: report tests (`view.test.tsx`, sample-report tests) pass unchanged.
-- [ ] 3.2 `apps/web/src/lib/site-content/seasons.ts`: `outfits` and `alsoTyped` for the 12 seasons, copied from canvas board 16c (approved); `outfit(season, i)` resolves names and builds the sentence, throwing on a name not in the right list. Verify: 2.1's outfit cases pass.
-- [ ] 3.3 `apps/web/src/app/(site)/seasons/[season]/page.tsx`: render `MakeupAndHair` and the three outfits after Metals, and the `alsoTyped` line between the photos and `FAMOUS_NOTE`; doc comment cites the three new requirements. Verify: all of 2.1 passes.
-- [ ] 3.4 `docs/backlog.md`: delete BL-109 and BL-113. Verify: neither id is in the file.
+- [x] 3.1 `apps/web/src/lib/report/sections.tsx`: export `MakeupAndHair({ season, overline })`; `ReportSections` renders it with the same props as today. Verify: report tests (`view.test.tsx`, sample-report tests) pass unchanged.
+- [x] 3.2 `apps/web/src/lib/site-content/seasons.ts`: `outfits` and `alsoTyped` for the 12 seasons, copied from canvas board 16c (approved); `outfit(season, i)` resolves names and builds the sentence, throwing on a name not in the right list. Verify: 2.1's outfit cases pass.
+- [x] 3.3 `apps/web/src/app/(site)/seasons/[season]/page.tsx`: render `MakeupAndHair` and the three outfits after Metals, and the `alsoTyped` line between the photos and `FAMOUS_NOTE`; doc comment cites the three new requirements. Verify: all of 2.1 passes.
+- [x] 3.4 `docs/backlog.md`: delete BL-109 and BL-113. Verify: neither id is in the file.
 
 ## 4. Gates, review, archive, ship
 
