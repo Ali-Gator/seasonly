@@ -11,4 +11,4 @@
 
 - [x] 3.1 `pnpm fix`, `pnpm test`, `pnpm test:eval`
 - [x] 3.2 `/code-review high` in a fresh subagent; fix, log the rest as new BL items
-- [ ] 3.3 Archive (no Tracker), push, PR, auto-merge with a merge commit
+- [x] 3.3 Archive (no Tracker), push, PR, auto-merge with a merge commit

@@ -15,3 +15,5 @@ None: no backlog item covers this. The change follows the plugin's publication.
 **Base branch:** `origin/main` at 3f3f536.
 
 **Approved test edits:** none. The existing test "links no directory listing before one is published" stays as it is; its pattern does not match the ChatGPT plugin URL and still guards the Claude listings.
+
+**Approved copy:** the link text "Add Seasonly in ChatGPT" and the line "Or add it as a custom connector in ChatGPT or Claude, with this server address:", approved by the user on 2026-11-10.

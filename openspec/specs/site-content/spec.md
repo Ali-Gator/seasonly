@@ -241,7 +241,7 @@ Every photo that shows how a selfie should or should not look, and the sample fa
 - what the plugin does: it asks the four quiz questions and gives the season family and 6 of its colors, with a link to the photo analysis for the exact subtype;
 - who publishes it: Oleg Gordienov, an individual in Bulgaria;
 - that it takes no photo;
-- how to add it: the server address `https://seasonly.me/api/mcp` for a custom connector, and, once listed, a link to each directory listing;
+- how to add it: a link to each published directory listing, and the server address `https://seasonly.me/api/mcp` for a custom connector;
 - where its data handling is described, with a link to the plugin section of `/privacy`.
 
 The section SHALL have an anchor that the listings can link to. It SHALL state only what the plugin does at the time it ships: it SHALL NOT link to a directory listing that is not yet published.
@@ -255,6 +255,11 @@ The section SHALL have an anchor that the listings can link to. It SHALL state o
 
 - **WHEN** `/color-analysis-gpt-alternative` is rendered
 - **THEN** the plugin section says the plugin is published by Oleg Gordienov, an individual in Bulgaria
+
+#### Scenario: The plugin section links its ChatGPT listing
+
+- **WHEN** `/color-analysis-gpt-alternative` is rendered
+- **THEN** the plugin section links `https://chatgpt.com/plugins/plugin_asdk_app_6acbdb86f03c81919029b7db183ef3dc`, and still names the server address `https://seasonly.me/api/mcp`
 
 ### Requirement: The sample report puts the palette first on a phone
 
