@@ -16,6 +16,10 @@ const palette = PALETTES["soft-autumn"];
 /** The plugin's server address, for a custom connector. */
 const MCP_URL = `${ORIGIN}/api/mcp`;
 
+/** The published ChatGPT plugin directory listing (2026-11-10). */
+const CHATGPT_LISTING =
+  "https://chatgpt.com/plugins/plugin_asdk_app_6acbdb86f03c81919029b7db183ef3dc";
+
 /** The board's 8 sample colors, read by name from the Soft Autumn palette. */
 const SAMPLE = softAutumnColors([
   "Terracotta",
@@ -153,8 +157,8 @@ export default function Page() {
         </Note>
       </section>
 
-      {/* The plugin's public documentation: both directories link here. No directory listing is
-          linked until one is published. {@link openspec/specs/site-content/spec.md#requirement-the-gpt-alternative-page-documents-the-chat-plugin} */}
+      {/* The plugin's public documentation: both directories link here. A directory listing is
+          linked only once it is published. {@link openspec/specs/site-content/spec.md#requirement-the-gpt-alternative-page-documents-the-chat-plugin} */}
       <section id="chat-plugin" aria-labelledby="plugin-title" className={SECTION}>
         <h2 className="h2" id="plugin-title">
           Use Seasonly in ChatGPT and Claude
@@ -170,8 +174,12 @@ export default function Page() {
         </Note>
         <div className="flex flex-col gap-(--space-3)">
           <h3 className="h3">How to add it</h3>
+          <a href={CHATGPT_LISTING} className="label sn-navlink self-start">
+            Add Seasonly in ChatGPT
+            <Icon name="arrow-right" size={18} />
+          </a>
           <p className="text-(--ink-muted)">
-            Add it as a custom connector in ChatGPT or Claude, with this server address:
+            Or add it as a custom connector in ChatGPT or Claude, with this server address:
           </p>
           <p className="label self-start rounded-(--radius-md) border border-(--line) bg-(--surface) px-(--space-4) py-(--space-3) [overflow-wrap:anywhere]">
             {MCP_URL}
