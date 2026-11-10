@@ -60,21 +60,22 @@ const VIDEO_COPY: Record<string, { caption: string; season?: SeasonSlug; changed
 };
 
 /**
- * Batch 3: Sat Nov 7 to Fri Nov 13, 18:00 US Eastern. The 7 videos batch 2 posted first, each on a new
- * weekday (the Nov 2 funnel review kept every format: 2 analyses, none tagged); Instagram alternates
- * Reel and carousel, the 2 never-posted carousels first; pins take the 7 least recently pinned seasons.
+ * Batch 4: Sat Nov 14 to Fri Nov 20, 18:00 US Eastern. The 3 videos batch 3 skipped first, then the 4 it
+ * posted earliest, each on a new weekday (the Nov 9 funnel review kept every format); Instagram keeps
+ * alternating from batch 3's last Reel, so carousel first, the 4 carousels posted longest ago; pins take the
+ * 7 least recently pinned seasons.
  */
 const BATCH = {
-  name: "Batch 3",
-  note: "The Nov 2 funnel review counted 2 completed analyses and no tagged visit from any platform, too few to judge a format, so every format stays. What changed: 7 days instead of 10, each video on a different weekday than in batch 2, the True Spring and Bright Winter carousels for the first time, and pins for the seasons pinned longest ago.",
+  name: "Batch 4",
+  note: "The Nov 9 funnel review counted 2 completed analyses in 7 days (1 from Pinterest, 1 from Product Hunt) and no tagged visit from TikTok, Instagram or YouTube; batch 3 had posted for one day, too little to judge, so every format stays. What changed: the 3 videos batch 3 left out (wear and skip, filter, Jet Black) come back, every video moves to a new weekday, Instagram gives Reels to videos never posted there as Reels, and carousels and pins go to the seasons posted longest ago.",
   days: [
-    ["2026-11-07", "01-draping-same-face", "reel", "light-spring"],
-    ["2026-11-08", "03-veins", "true-spring", "true-spring"],
-    ["2026-11-09", "05-twelve-palettes", "reel", "true-summer"],
-    ["2026-11-10", "08-indoor-light", "bright-winter", "bright-winter"],
-    ["2026-11-11", "10-gpt-retires", "reel", "bright-spring"],
-    ["2026-11-12", "02-draping-worst-first", "soft-autumn", "deep-winter"],
-    ["2026-11-13", "04-soft-autumn-palette", "reel", "true-winter"],
+    ["2026-11-14", "06-wear-skip", "true-winter", "light-summer"],
+    ["2026-11-15", "09-jet-black", "reel", "soft-autumn"],
+    ["2026-11-16", "01-draping-same-face", "deep-autumn", "deep-autumn"],
+    ["2026-11-17", "03-veins", "reel", "soft-summer"],
+    ["2026-11-18", "07-filter-changes-season", "light-spring", "light-spring"],
+    ["2026-11-19", "08-indoor-light", "reel", "true-autumn"],
+    ["2026-11-20", "05-twelve-palettes", "true-summer", "true-spring"],
   ] as [string, string, "reel" | SeasonSlug, SeasonSlug][],
 };
 
