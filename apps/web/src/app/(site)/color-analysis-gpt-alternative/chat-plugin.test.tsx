@@ -27,6 +27,13 @@ describe("/color-analysis-gpt-alternative#chat-plugin", () => {
     expect(section).toContain('href="/privacy#chat-plugin"');
   });
 
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-plugin-section-links-its-chatgpt-listing} */
+  it("links its ChatGPT listing", () => {
+    expect(section).toContain(
+      'href="https://chatgpt.com/plugins/plugin_asdk_app_6acbdb86f03c81919029b7db183ef3dc"',
+    );
+  });
+
   it("links no directory listing before one is published", () => {
     expect(section).not.toMatch(/chatgpt\.com\/apps|claude\.ai\/directory|claude\.com\/connectors/);
   });
