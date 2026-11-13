@@ -17,10 +17,10 @@ Fixes what each core public page of seasonly.me shows and where its words, color
 
 `apps/web/src/lib/site-content/` holds the site's own content:
 
-- `seasons.ts`: `SEASON_CONTENT: Record<SeasonSlug, SeasonContent>`, with `outfits` (Everyday, Work and Evening, each `[best, neutral, metal]` palette names), `alsoTyped` (three to six more names from the famous people's source), `about` (paragraphs), three `neighbours` (`{ slug, why }`) and three `famous` (`{ name, image, credit: { author, license, licenseUrl, commonsUrl }, source: { title, url } }`); `famousIntro(plural)`, `FAMOUS_NOTE`, `seasonOutfits(slug)` (each outfit's `title`, resolved `colors` and `line`; throws on a name its palette list lacks) and `alsoTypedLine(slug, plural)`.
+- `seasons.ts`: `SEASON_CONTENT: Record<SeasonSlug, SeasonContent>`, with `yellows` (`{ wear: string[]; avoid?: string }`, names from the season's best colors and colors to avoid), `outfits` (Everyday, Work and Evening, each `[best, neutral, metal]` palette names), `alsoTyped` (three to six more names from the famous people's source), `about` (paragraphs), three `neighbours` (`{ slug, why }`) and three `famous` (`{ name, image, credit: { author, license, licenseUrl, commonsUrl }, source: { title, url } }`); `famousIntro(plural)`, `FAMOUS_NOTE`, `seasonOutfits(slug)` (each outfit's `title`, resolved `colors` and `line`; throws on a name its palette list lacks), `seasonYellows(slug)` (the resolved `wear` swatches and `avoid` swatch; throws the same way) and `alsoTypedLine(slug, plural)`.
 - `images.ts`: `TIP_PHOTOS` (light, makeup and filter, each a good and a bad `{ src, alt }`), `SAMPLE_FACE`, `SAMPLE_FACE_MASK` (its outline, `/images/examples/face-mask.png`) and `QUIZ_PHOTOS` (quiz).
 - `sample.ts`: `softAutumnColors(names)`, the sample palettes picked by name from `PALETTES["soft-autumn"]`.
-- `faq.tsx`: `Faq({ id, title, items })`, the expandable question list How it works and every season page share (a section, its h2, one `<details>` per `FaqItem` `[question, answer]`, the first open); `MoreLink({ href, children })`, a text link with an arrow; and `seasonFaq(slug)`, a season page's five or six questions built from `SEASON_COPY` and `PALETTES`.
+- `faq.tsx`: `Faq({ id, title, items })`, the expandable question list How it works and every season page share (a section, its h2, one `<details>` per `FaqItem` `[question, answer]`, the first open); `MoreLink({ href, children })`, a text link with an arrow; and `seasonFaq(slug)`, a season page's seven or eight questions built from `SEASON_COPY`, `PALETTES` and `seasonYellows`.
 - `season-link.tsx`: `SeasonLink({ slug, line?, wide?, compact? })`, a season's name as an `h3` holding its link, an optional line and its first highlight colors (four, or six from 1024 px with `wide`). `compact`, the landing's, shows the four as a chip-only `SwatchStrip` whose names are visually hidden.
 
 Images are WebP under `apps/web/public/images/examples/` (the generated model) and `apps/web/public/images/famous/<slug>/` (Commons photos cropped to 3:4), each at most about 80 KB. The sample report renders `ReportSections` from `lib/report/sections.tsx` (report-page) with a static `DrapingPair` on `SAMPLE_FACE`, cut out with `SAMPLE_FACE_MASK`, as the GPT-alternative page does. The outline is a 384 × 512 PNG made once by `scripts/sample-face-mask.ts` with the phone's person segmenter (t19-draping-cutout).
@@ -31,7 +31,7 @@ Every color and every shared season word comes from the analysis core: `PALETTES
 
 Each page is one DOM in phone reading order, rearranged from 1024 px with `lg:` classes, as the report is. A season page puts its palette straight after the head on a phone; from 1024 px the head and the copy float left and the sections right (`LEFT`, `RIGHT` from `lib/report/sections.tsx`), in a flow root. The landing hero adds a 12-chip `SwatchStrip` below 1024 px and swaps its action fills from 1024 px; its closing "Start with a selfie" is primary. The sample report's banner action is secondary, the season has no overline, and the banner sits 16 px above it on a phone. The famous people come from Four Seasons Studio's "<Season> Celebrities" posts, one source per season, linked once under the three photos; each photo carries "Photo: <author>, <license>, cropped", linking to its Commons page and its license. The GPT page's facts are OpenAI's retirement FAQ, checked 2026-10-10.
 
-A season page's h1 is `searchName` ("Deep (Dark) Autumn") and its summary paragraph opens "Also called Dark Autumn." for the eight seasons with a second name (site-structure). Its "Questions about <Season>" section sits between the neighbours and "Is this you?". Its right column runs Avoid, Neutrals, Metals, Makeup and hair, Outfit ideas, then the famous people. Makeup and hair is the report's own block (`MakeupAndHair` in `lib/report/sections.tsx`, overline "Makeup and hair" here, "Section 5 of N" on a report). The outfits and the extra names were approved on 2026-11-04 (MVP canvas version 76, board 16c); the names were read that day from each season's Four Seasons Studio page, spelled as the person is usually named. The answers name no new color or claim: the first three avoid colors, the hair tip, the makeup line and the metals line with the metal names, lowercased in prose. No `FAQPage` structured data: Google shows FAQ rich results only for government and health sites since August 2023.
+A season page's h1 is `searchName` ("Deep (Dark) Autumn") and its summary paragraph opens "Also called Dark Autumn." for the eight seasons with a second name (site-structure). Its "Questions about <Season>" section sits between the neighbours and "Is this you?". Its right column runs Avoid, Neutrals, Metals, Makeup and hair, Outfit ideas, then the famous people. Makeup and hair is the report's own block (`MakeupAndHair` in `lib/report/sections.tsx`, overline "Makeup and hair" here, "Section 5 of N" on a report). The outfits and the extra names were approved on 2026-11-04 (MVP canvas version 76, board 16c); the names were read that day from each season's Four Seasons Studio page, spelled as the person is usually named. The answers name no new color or claim: the first three avoid colors, the hair tip, the makeup line and the metals line with the metal names, lowercased in prose. Since `t24-search-appearance` two questions follow the avoid question. The black answer says yes when the neutrals hold a color named Black (the three Winters) and otherwise names the darkest neutral by Rec. 709 luma. The yellow answer names the hand-picked `yellows`, because a hue window that catches Mustard also catches Avocado. After Outfit ideas, a "Palette image" section ("Keep the palette on your phone") shows `/images/palette/<slug>` as a plain lazy `<img>`, 96 px wide, beside one line and a plain download link named `seasonly-<slug>-palette.png`. `paletteUrl`, `paletteFile` and `SIZE` in `lib/palette-image/file.ts` are shared with the report's "Save my palette". The link sends no event (BL-118). The block, the two templates and the 12 yellow lists were approved on 2026-11-13 (MVP canvas version 81, boards 16 and 16d). No `FAQPage` structured data: Google shows FAQ rich results only for government and health sites since August 2023.
 
 ## Edge Cases
 
@@ -326,27 +326,64 @@ Each season page SHALL show a "Questions about <Season>" section after the neigh
 
 1. Only for a season with a second name: "Is <Season> the same as <second name> <family>?", answered yes: two names for the same season and the same palette.
 2. "What colors should a <Season> avoid?", naming the first three of the season's colors to avoid from the shared palettes, and saying to keep them away from the face.
-3. "What hair color suits a <Season>?", answered with the season's shared hair tip.
-4. "What makeup suits a <Season>?", answered with the season's shared makeup line.
-5. "Which metals suit a <Season>?", answered with the season's shared metals line and the names of the metals to wear and to go easy on from the shared palettes.
-6. "How do I find out if I'm a <Season>?", answered with one daylight selfie and four quick questions, linking to `/analyze`.
+3. "Can a <Season> wear black?". When the season's neutrals include Black: "Yes. Black is one of the <Season> neutrals, so it works near the face too." Otherwise: "Not near the face. Black is not in the <Season> palette. <Darkest neutral>, its darkest neutral, does the same job. Black trousers, shoes and bags are fine.", where the darkest neutral is the darkest of the season's 6 neutrals in the shared palettes.
+4. "Which yellow suits a <Season>?", naming the season's yellows: the best colors listed for it as yellows, each one of that season's 24 best colors by name. With two or more: "<Yellows>. They are the yellows in the <Season> palette." With one: "<Yellow>. It is the only yellow in the <Season> palette." With none: "None near the face. The <Season> palette has no yellow." When one of the season's colors to avoid is listed as its yellow to avoid, the answer SHALL end "Skip <that color>, one of the <Season> colors to avoid."
+5. "What hair color suits a <Season>?", answered with the season's shared hair tip.
+6. "What makeup suits a <Season>?", answered with the season's shared makeup line.
+7. "Which metals suit a <Season>?", answered with the season's shared metals line and the names of the metals to wear and to go easy on from the shared palettes.
+8. "How do I find out if I'm a <Season>?", answered with one daylight selfie and four quick questions, linking to `/analyze`.
 
 Every color, metal, hair and makeup word in an answer SHALL come from the shared season copy and palettes, so a season page and a report for that season never disagree.
 
 #### Scenario: The questions on a page with a second name
 
 - **WHEN** `/seasons/deep-autumn` is rendered
-- **THEN** its "Questions about Deep Autumn" section lists the six questions in order, the first is "Is Deep Autumn the same as Dark Autumn?" and is open, and the section comes after "Neighbouring seasons" and before "Is this you?"
+- **THEN** its "Questions about Deep Autumn" section lists the eight questions in order, the first is "Is Deep Autumn the same as Dark Autumn?" and is open, and the section comes after "Neighbouring seasons" and before "Is this you?"
 
 #### Scenario: The questions on a page without one
 
 - **WHEN** `/seasons/soft-autumn` is rendered
-- **THEN** its section lists five questions, the first is "What colors should a Soft Autumn avoid?" and is open
+- **THEN** its section lists seven questions, the first is "What colors should a Soft Autumn avoid?" and is open
 
 #### Scenario: Answers match the shared copy
 
 - **WHEN** any season page is rendered
 - **THEN** its avoid answer names the first three of that season's colors to avoid, its hair answer is that season's shared hair tip, its makeup answer is its shared makeup line, its metals answer names each of its metals, and its last answer links to `/analyze`
+
+#### Scenario: Black for a Winter
+
+- **WHEN** `/seasons/true-winter` is rendered
+- **THEN** its black answer is "Yes. Black is one of the True Winter neutrals, so it works near the face too."
+
+#### Scenario: Black for another season
+
+- **WHEN** `/seasons/true-summer` is rendered
+- **THEN** its black answer is "Not near the face. Black is not in the True Summer palette. Navy, its darkest neutral, does the same job. Black trousers, shoes and bags are fine."
+
+#### Scenario: Black on every page
+
+- **WHEN** any season page is rendered
+- **THEN** its black answer says yes exactly when that season's neutrals include Black, and otherwise names the darkest of that season's 6 neutrals
+
+#### Scenario: Yellows for Deep Autumn
+
+- **WHEN** `/seasons/deep-autumn` is rendered
+- **THEN** its yellow answer is "Saffron, mustard and antique gold. They are the yellows in the Deep Autumn palette. Skip baby yellow, one of the Deep Autumn colors to avoid."
+
+#### Scenario: A season with one yellow
+
+- **WHEN** `/seasons/true-summer` is rendered
+- **THEN** its yellow answer is "Light lemon. It is the only yellow in the True Summer palette. Skip golden yellow, one of the True Summer colors to avoid."
+
+#### Scenario: A season without a yellow
+
+- **WHEN** `/seasons/soft-summer` is rendered
+- **THEN** its yellow answer is "None near the face. The Soft Summer palette has no yellow. Skip bright yellow, one of the Soft Summer colors to avoid."
+
+#### Scenario: Every yellow is the season's own
+
+- **WHEN** the yellows of the 12 seasons are read
+- **THEN** every yellow to wear is one of that season's 24 best colors, and every yellow to avoid is one of that season's colors to avoid
 
 ### Requirement: A season page shows the season's makeup and hair colors
 
@@ -408,3 +445,33 @@ Under its three credited photos, each season page SHALL name three to six more p
 
 - **WHEN** `/seasons/soft-autumn` is rendered
 - **THEN** it reads "The same studio also types Angelina Jolie, Gigi Hadid, Hailey Bieber, Kate Moss, Gisele Bündchen and Jessica Biel as Soft Autumns."
+
+### Requirement: A season page shows its palette image
+
+Each season page SHALL show that season's palette image, `/images/palette/<slug>`, as an image in the page. Its alt text SHALL be "<Season> color palette: 24 colors and 6 neutrals, each with its name and hex code". The image SHALL state its width and height, 1080 and 1920, and SHALL load lazily. Its place and look SHALL follow the approved "Season" boards.
+
+**Unenforced:** fidelity to the boards is judged by the user. The change's task list gates the code on the boards' approval.
+
+#### Scenario: True Summer's palette image
+
+- **WHEN** `/seasons/true-summer` is rendered
+- **THEN** it holds one image whose source is `/images/palette/true-summer`, whose alt text is "True Summer color palette: 24 colors and 6 neutrals, each with its name and hex code", with width 1080, height 1920 and lazy loading
+
+#### Scenario: Every season's palette image
+
+- **WHEN** any of the 12 season pages is rendered
+- **THEN** its palette image is that season's own
+
+### Requirement: A season page offers its palette image to save
+
+Beside the palette image, each season page SHALL show a link "Save the palette image" that downloads that season's palette image as `seasonly-<slug>-palette.png`, the file name a report's "Save my palette" uses.
+
+#### Scenario: The save link
+
+- **WHEN** `/seasons/true-summer` is rendered
+- **THEN** it holds a link "Save the palette image" to `/images/palette/true-summer` that downloads as `seasonly-true-summer-palette.png`
+
+#### Scenario: Every season's save link
+
+- **WHEN** any of the 12 season pages is rendered
+- **THEN** its save link points at that season's own palette image

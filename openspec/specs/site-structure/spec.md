@@ -13,7 +13,7 @@ export const SEASONS: readonly { slug: SeasonSlug; summary: string }[]; // famil
 export type SeasonSlug; // the 12 fixed slugs, from @seasonly/analysis
 export const SEASON_SLUGS: readonly SeasonSlug[]; // @seasonly/analysis's list (season-palettes)
 export const SEASON_ALIASES: Readonly<Record<string, SeasonSlug>>; // "dark-autumn" -> "deep-autumn", one per second name
-export function seasonName(slug: SeasonSlug): string; // "soft-autumn" -> "Soft Autumn"
+export function seasonName(slug: SeasonSlug): string; // "soft-autumn" -> "Soft Autumn"; lives in lib/site/season-name.ts, re-exported
 export function secondName(slug: SeasonSlug): string | undefined; // "deep-autumn" -> "Dark Autumn"; undefined for 4 seasons
 export function searchName(slug: SeasonSlug): string; // "deep-autumn" -> "Deep (Dark) Autumn"; else seasonName
 
@@ -28,7 +28,8 @@ export const ROUTES: readonly Route[];
 export function routeAt(path: string, routes?: readonly Route[]): Route | undefined;
 export function pages(routes?: readonly Route[]): Route[]; // concrete pages, seasons expanded
 export function indexedUrls(routes?: readonly Route[]): string[]; // the sitemap
-export function pageMetadata(path: string, routes?: readonly Route[]): Metadata;
+export function pageMetadata(path: string, routes?: readonly Route[]): Metadata; // + openGraph and twitter when indexed
+export const siteJsonLd: () => { "@context": "https://schema.org"; "@type": "WebSite"; name: "Seasonly"; url: typeof ORIGIN };
 ```
 
 `apps/web/src/app/sitemap.ts` and `robots.ts` are Next metadata routes over this module. `next.config.ts` builds its `redirects()` from `SEASON_ALIASES`.
@@ -38,6 +39,8 @@ export function pageMetadata(path: string, routes?: readonly Route[]): Metadata;
 A page exports `metadata = pageMetadata("/its-path")`, or a `generateMetadata` that calls it with the concrete path. Adding a page means adding one `ROUTES` entry and its `page.tsx`; the unit suite fails until both exist. Shipping a page's content means flipping its `ready` in the same change; nothing else moves. The season pages share one entry, so one flag covers all 12.
 
 The second names live in one private map in `routes.ts`, one word per season ("Dark" for `deep-autumn`). `SEASON_ALIASES` is derived from it, so a new second name brings its redirect with it. Only the title, the description and the season page's h1 and opener use the double name; the report, share card, header menu and neighbour links keep `seasonName`.
+
+Since `t24-search-appearance`, `pageMetadata` also returns `openGraph` (title, description, canonical URL, site name "Seasonly", type "website", one image) and a `summary` Twitter card with the same title, description and image, for an indexed route only; a route that is not indexed gets `robots: { index: false }` and no preview. The image is the post card of the page's season, or Soft Autumn's on every other page, at `SIZES.post` with `shareCardAlt(slug, "post")` (share-card's `alt.ts`, which imports no renderer). `routes.ts` and `alt.ts` import by relative paths and `seasonName` sits in its own module, because `next.config.ts`, scripts and e2e load the route map without the `@/` alias. The home page writes `siteJsonLd()` into one `<script type="application/ld+json">`, `<` escaped as `\u003c`; no other page carries a `WebSite` block.
 
 `/color-analysis-quiz` has the quiz page's own client island (quiz-page) and stays statically rendered.
 
@@ -212,3 +215,50 @@ The page title and the meta description of a season with a second name SHALL nam
 
 - **WHEN** the metadata of `/seasons/soft-autumn` is built
 - **THEN** its title is "Soft Autumn color palette and colors to avoid · Seasonly"
+
+### Requirement: Every indexed page carries link-preview tags
+
+Every page that may be indexed SHALL carry Open Graph tags for its title, description, URL, site name, type and one image, and a Twitter card of type `summary` with the same title, description and image. The title and description SHALL equal the page's own title and meta description, and the URL its canonical link. The site name SHALL be "Seasonly" and the type "website". A page that is never indexed, such as the flow or a report, SHALL carry none of these tags.
+
+#### Scenario: A season page's preview text
+
+- **WHEN** the metadata of `/seasons/true-summer` is built
+- **THEN** its Open Graph title is "True (Cool) Summer color palette and colors to avoid · Seasonly", its Open Graph description equals its meta description, its Open Graph URL is `https://seasonly.me/seasons/true-summer`, its site name is "Seasonly", and its Twitter card is `summary` with the same title and description
+
+#### Scenario: Every indexed page
+
+- **WHEN** the metadata of each URL in the sitemap is built
+- **THEN** each has an Open Graph title, description, URL and image, and the URL equals that page's canonical link
+
+#### Scenario: A report
+
+- **WHEN** the metadata of `/r/abc123` or `/analyze` is built
+- **THEN** it has no Open Graph and no Twitter tags
+
+### Requirement: A link preview shows a season's share card
+
+The preview image of a season page SHALL be that season's post card, `/images/share/<slug>/post`. The preview image of every other indexed page SHALL be Soft Autumn's post card, the season of the sample result. The image URL SHALL be absolute on `https://seasonly.me`, and the tags SHALL state its size, 1080 × 1080, and the card's own alt text.
+
+#### Scenario: A season page's preview image
+
+- **WHEN** the metadata of `/seasons/true-summer` is built
+- **THEN** its Open Graph image and its Twitter image are `https://seasonly.me/images/share/true-summer/post`, 1080 wide and 1080 high, with the True Summer post card's alt text
+
+#### Scenario: Another page's preview image
+
+- **WHEN** the metadata of `/`, `/seasons` or `/how-it-works` is built
+- **THEN** its Open Graph image is `https://seasonly.me/images/share/soft-autumn/post`
+
+### Requirement: The home page names the site for search engines
+
+The home page SHALL carry one schema.org `WebSite` block as JSON-LD, naming the site "Seasonly" with the URL `https://seasonly.me`, so a search result is labeled with the site's name and not its domain. No other page SHALL carry a `WebSite` block.
+
+#### Scenario: The home page
+
+- **WHEN** `/` is rendered
+- **THEN** its HTML holds exactly one `application/ld+json` script, and its JSON has `@context` "https://schema.org", `@type` "WebSite", `name` "Seasonly" and `url` "https://seasonly.me"
+
+#### Scenario: Another page
+
+- **WHEN** `/seasons/soft-autumn` is rendered
+- **THEN** its HTML holds no `WebSite` block
