@@ -1,5 +1,7 @@
 import type { SeasonSlug } from "@seasonly/analysis";
 
+import { paletteFile } from "@/lib/palette-image/file";
+
 /**
  * Share and save, pure so they are unit-tested. iOS Safari refuses `navigator.share` once the
  * tap's activation was spent awaiting a fetch, so the files are fetched when the page mounts and
@@ -79,7 +81,7 @@ export async function savePalette({
     }
   }
   try {
-    download(file, `seasonly-${slug}-palette.png`);
+    download(file, paletteFile(slug));
     return "saved";
   } catch {
     return "idle";

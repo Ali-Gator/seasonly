@@ -11,7 +11,10 @@ import {
 } from "@seasonly/analysis";
 import type { Metadata } from "next";
 
-import { shareCardAlt } from "../share-card/alt";
+import { shareCardAlt, SIZES } from "../share-card/alt";
+import { seasonName } from "./season-name";
+
+export { seasonName };
 
 /** The canonical host. A constant: it never changes per environment. */
 export const ORIGIN = "https://seasonly.me";
@@ -82,14 +85,6 @@ export const SEASON_ALIASES: Readonly<Record<string, SeasonSlug>> = Object.fromE
 export function familyName(slug: SeasonSlug): string {
   const family = seasonFamily(slug);
   return family.charAt(0).toUpperCase() + family.slice(1);
-}
-
-/** "soft-autumn" → "Soft Autumn". */
-export function seasonName(slug: SeasonSlug): string {
-  return slug.replace(
-    /(^|-)(\w)/g,
-    (_, sep: string, c: string) => `${sep ? " " : ""}${c.toUpperCase()}`,
-  );
 }
 
 export interface Route {
@@ -237,8 +232,7 @@ function previewImage(path: string) {
   const slug = SEASON_SLUGS.find((s) => path === `/seasons/${s}`) ?? "soft-autumn";
   return {
     url: `${ORIGIN}/images/share/${slug}/post`,
-    width: 1080,
-    height: 1080,
+    ...SIZES.post,
     alt: shareCardAlt(slug, "post"),
   };
 }

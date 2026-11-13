@@ -289,7 +289,7 @@ describe("link previews", () => {
     expect(og.images[0]?.url).toBe("https://seasonly.me/images/share/soft-autumn/post");
   });
 
-  /** {@link openspec/specs/site-structure/spec.md#requirement-the-home-page-names-the-site-for-search-engines} */
+  /** {@link openspec/specs/site-structure/spec.md#scenario-the-home-page} */
   it("names the site in one WebSite block", () => {
     expect(siteJsonLd()).toEqual({
       "@context": "https://schema.org",

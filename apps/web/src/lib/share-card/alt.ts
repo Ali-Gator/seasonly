@@ -1,6 +1,6 @@
 import { PALETTES, type SeasonSlug } from "@seasonly/analysis";
 
-import { seasonName } from "../site/routes";
+import { seasonName } from "../site/season-name";
 
 /**
  * The cards' ratios, colors and alt text, with no renderer or font, so pages can import them.
@@ -9,6 +9,11 @@ import { seasonName } from "../site/routes";
  */
 export const RATIOS = ["story", "post"] as const;
 export type Ratio = (typeof RATIOS)[number];
+
+export const SIZES: Record<Ratio, { width: number; height: number }> = {
+  story: { width: 1080, height: 1920 },
+  post: { width: 1080, height: 1080 },
+};
 
 /** {@link openspec/specs/share-card/spec.md#requirement-a-card-shows-the-season-its-highlights-and-the-address-and-nothing-personal} */
 export const shown = (slug: SeasonSlug, ratio: Ratio) =>

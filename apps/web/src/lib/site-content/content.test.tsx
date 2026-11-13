@@ -34,7 +34,7 @@ import { FAMOUS_NOTE, SEASON_CONTENT } from "./seasons";
 /** The page's visible text: scripts and tags dropped, entities decoded, whitespace collapsed and no space before punctuation. */
 const text = (html: string) =>
   html
-    .replace(/<script[^>]*>.*?<\/script>/g, " ")
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/g, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/&#x27;/g, "'")
     .replace(/&quot;/g, '"')
@@ -568,10 +568,17 @@ describe("/seasons/<slug> under its searched names", () => {
     );
   });
 
-  /** Rec. 709 luma of a `#RRGGBB` color. */
-  const luma = (hex: string) => {
-    const [r = 0, g = 0, b = 0] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  /** The darkest of each season's 6 neutrals, read off the palettes (design.md decision 6). */
+  const DARKEST: Partial<Record<SeasonSlug, string>> = {
+    "light-spring": "Soft Navy",
+    "true-spring": "Warm Navy",
+    "bright-spring": "Ink Navy",
+    "light-summer": "Soft Navy",
+    "true-summer": "Navy",
+    "soft-summer": "Grey Navy",
+    "soft-autumn": "Espresso",
+    "true-autumn": "Dark Chocolate",
+    "deep-autumn": "Espresso",
   };
 
   /** {@link openspec/specs/site-content/spec.md#scenario-black-on-every-page} */
@@ -581,11 +588,13 @@ describe("/seasons/<slug> under its searched names", () => {
       const name = seasonName(slug);
       const black = await answerOn(slug, `Can a ${name} wear black?`);
       const neutrals = PALETTES[slug].neutrals;
-      if (neutrals.some((n) => n.name === "Black")) {
-        expect(black).toMatch(/^Yes\. /);
+      const darkest = DARKEST[slug];
+      expect(neutrals.some((n) => n.name === "Black")).toBe(!darkest);
+      if (darkest) {
+        expect(neutrals.map((n) => n.name)).toContain(darkest);
+        expect(black).toContain(`${darkest}, its darkest neutral`);
       } else {
-        const darkest = [...neutrals].sort((a, b) => luma(a.hex) - luma(b.hex))[0];
-        expect(black).toContain(`${darkest?.name}, its darkest neutral`);
+        expect(black).toMatch(/^Yes\. /);
       }
     },
   );

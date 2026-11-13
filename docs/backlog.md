@@ -14,7 +14,7 @@ below and bumps that line by one. Do not use the highest id still in the file, b
 every time a shipped item is deleted. Ids are **never reused**, so a `BL-nn` in a commit message
 or an archived change always means the same item.
 
-_Next id:_ **BL-118**
+_Next id:_ **BL-121**
 
 **Status** is one of: **open** (actionable now), **gated — X** (blocked on a named decision or
 dependency), **deferred — X** (waiting on purpose for a named trigger). Split a multi-part item
@@ -34,6 +34,24 @@ fold items in.
   such a name joins an outfit.
   _Refs:_ `apps/web/src/lib/site-content/seasons.ts` (`an`), `t23-season-page-depth` review ·
   _Status:_ deferred — an outfit name whose letter and sound disagree
+
+- **[BL-118] A season page's palette save sends no event** — "Save the palette image" on a
+  season page is a plain download link, so season-page saves never reach the funnel review, and
+  on iOS the file lands in Files, not Photos. Reusing the report's `savePalette` (share sheet plus
+  `palette_saved`) needs a client component and an analytics spec decision on the event's source.
+  _Refs:_ `apps/web/src/app/(site)/seasons/[season]/page.tsx`, `t24-search-appearance` review ·
+  _Status:_ open
+
+- **[BL-119] The palette thumbnail loads the full 200 KB image** — the 96 px thumbnail on each
+  season page downloads the 1080 × 1920 PNG. It loads lazily below the first screen. A small
+  variant with `srcset` would save the bytes, but a second URL splits what image search indexes.
+  _Refs:_ `apps/web/src/app/(site)/seasons/[season]/page.tsx`, `t24-search-appearance` design.md
+  decision 5 · _Status:_ deferred — page-weight work, or Search Console showing the image indexed
+
+- **[BL-120] Board 16 Season 375 is cut off on the canvas** — the canvas caps a board at 8000
+  px and the phone season page is taller, so the board stops after the famous people; the
+  neighbours, questions and footer don't show. Split the board in two (top and bottom halves).
+  _Refs:_ MVP canvas `Season.dc.html`, `t24-search-appearance` task 1.2 · _Status:_ open
 
 ## Analysis
 
