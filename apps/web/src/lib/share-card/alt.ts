@@ -1,6 +1,6 @@
 import { PALETTES, type SeasonSlug } from "@seasonly/analysis";
 
-import { seasonName } from "@/lib/site/routes";
+import { seasonName } from "../site/routes";
 
 /**
  * The cards' ratios, colors and alt text, with no renderer or font, so pages can import them.

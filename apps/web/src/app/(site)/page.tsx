@@ -5,7 +5,7 @@ import { Button, Icon, Note, PhotoTipCard, SwatchGrid, SwatchStrip } from "@/com
 import { TIP_PHOTOS } from "@/lib/site-content/images";
 import { SeasonLink } from "@/lib/site-content/season-link";
 import { softAutumnColors } from "@/lib/site-content/sample";
-import { pageMetadata } from "@/lib/site/routes";
+import { pageMetadata, siteJsonLd } from "@/lib/site/routes";
 
 export const metadata = pageMetadata("/");
 
@@ -48,10 +48,15 @@ const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
  * 1024 px.
  *
  * {@link openspec/specs/site-content/spec.md#requirement-the-landing-shows-a-sample-result-and-how-the-photo-is-handled}
+ * {@link openspec/specs/site-structure/spec.md#requirement-the-home-page-names-the-site-for-search-engines}
  */
 export default function Page() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd()).replace(/</g, "\\u003c") }}
+      />
       <section className="flex flex-col gap-(--space-12) lg:grid lg:grid-cols-12 lg:items-center lg:gap-x-(--space-6)">
         <div className="flex flex-col gap-(--space-4) lg:col-span-5">
           <p className="overline">Seasonal color analysis</p>

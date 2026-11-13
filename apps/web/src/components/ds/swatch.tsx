@@ -11,9 +11,10 @@ export interface SwatchProps extends Color {
 
 /**
  * One palette color: a chip hidden from assistive technology, then its name and uppercase hex as
- * text. Ported from the design system's bundle.js.
+ * text. Ported from the design system's bundle.js. The hex code is marked `data-nosnippet`, so a
+ * search snippet lists the palette by name.
  *
- * @see openspec/specs/ui-components/spec.md
+ * {@link openspec/specs/ui-components/spec.md#requirement-a-swatch-keeps-its-hex-code-out-of-search-snippets}
  */
 export function Swatch({ name, hex, size, className }: SwatchProps) {
   return (
@@ -21,7 +22,9 @@ export function Swatch({ name, hex, size, className }: SwatchProps) {
       <div className="sn-swatch__chip" style={{ background: hex }} aria-hidden="true" />
       <figcaption>
         <span className="sn-swatch__name">{name}</span>
-        <span className="sn-swatch__hex">{hex.toUpperCase()}</span>
+        <span data-nosnippet="" className="sn-swatch__hex">
+          {hex.toUpperCase()}
+        </span>
       </figcaption>
     </figure>
   );

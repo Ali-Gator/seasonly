@@ -23,6 +23,11 @@ export interface Famous {
 type Outfit = readonly [best: string, neutral: string, metal: string];
 
 export interface SeasonContent {
+  /**
+   * The yellows among the 24 best colors and the yellow among the colors to avoid, by name (canvas
+   * board 16d): picked by hand, since a hue window that catches Mustard also catches Avocado.
+   */
+  yellows: { wear: readonly string[]; avoid?: string };
   /** Everyday, Work and Evening, picked by name from the season's palette (canvas board 16c). */
   outfits: readonly [Outfit, Outfit, Outfit];
   /** Three to six more people the same studio page types as the season; no photos. */
@@ -84,6 +89,24 @@ export function seasonOutfits(slug: SeasonSlug) {
   });
 }
 
+/**
+ * The season's yellows to wear and to avoid, each name resolved in its palette list. A name missing
+ * from the list throws, so the build fails rather than name a color the palette does not hold.
+ */
+export function seasonYellows(slug: SeasonSlug): { wear: Swatch[]; avoid?: Swatch } {
+  const palette = PALETTES[slug];
+  const { wear, avoid } = SEASON_CONTENT[slug].yellows;
+  const find = (name: string, list: readonly Swatch[], where: string) => {
+    const swatch = list.find((s) => s.name === name);
+    if (!swatch) throw new Error(`${slug}: no ${where} color "${name}"`);
+    return swatch;
+  };
+  return {
+    wear: wear.map((name) => find(name, palette.best, "best")),
+    ...(avoid ? { avoid: find(avoid, palette.avoid, "avoid") } : {}),
+  };
+}
+
 /** Above the famous people: `plural` is "Soft Autumns". */
 export const famousIntro = (plural: string) =>
   `Public figures a color analysis studio has typed as ${plural}, from public photos.`;
@@ -97,6 +120,7 @@ export const FAMOUS_NOTE = {
 
 export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
   "light-spring": {
+    yellows: { wear: ["Buttercup", "Pale Daffodil", "Light Gold"] },
     outfits: [
       ["Peach", "Cream Beige", "Light Gold"],
       ["Light Turquoise", "Soft Navy", "Yellow Gold"],
@@ -177,6 +201,7 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "true-spring": {
+    yellows: { wear: ["Marigold", "Golden Yellow", "Daffodil"] },
     outfits: [
       ["Turquoise", "Warm Beige", "Yellow Gold"],
       ["Coral", "Warm Navy", "Polished Gold"],
@@ -250,6 +275,7 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "bright-spring": {
+    yellows: { wear: ["Sunflower", "Lemon Sorbet"] },
     outfits: [
       ["Bright Turquoise", "Warm Sand", "Yellow Gold"],
       ["Bright Coral", "Ink Navy", "Polished Gold"],
@@ -322,6 +348,7 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "light-summer": {
+    yellows: { wear: ["Light Lemon"], avoid: "Mustard" },
     outfits: [
       ["Powder Blue", "Light Grey", "Silver"],
       ["Rose Pink", "Soft Navy", "White Gold"],
@@ -403,6 +430,7 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "true-summer": {
+    yellows: { wear: ["Light Lemon"], avoid: "Golden Yellow" },
     outfits: [
       ["Soft Blue", "Light Cool Grey", "Silver"],
       ["Periwinkle", "Navy", "White Gold"],
@@ -477,6 +505,7 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "soft-summer": {
+    yellows: { wear: [], avoid: "Bright Yellow" },
     outfits: [
       ["Dusty Blue", "Light Taupe Grey", "Brushed Silver"],
       ["Dusty Rose", "Grey Navy", "White Gold"],
@@ -557,6 +586,7 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "soft-autumn": {
+    yellows: { wear: ["Honey", "Mustard"], avoid: "Lemon Yellow" },
     outfits: [
       ["Sage", "Oatmeal", "Brushed Gold"],
       ["Soft Coral", "Cocoa", "Rose Gold"],
@@ -636,6 +666,7 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "true-autumn": {
+    yellows: { wear: ["Saffron", "Golden Yellow", "Mustard"] },
     outfits: [
       ["Moss Green", "Warm Beige", "Yellow Gold"],
       ["Warm Teal", "Coffee", "Antique Gold"],
@@ -716,6 +747,7 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "deep-autumn": {
+    yellows: { wear: ["Saffron", "Mustard", "Antique Gold"], avoid: "Baby Yellow" },
     outfits: [
       ["Olive", "Camel Beige", "Antique Gold"],
       ["Petrol Teal", "Chocolate", "Bronze"],
@@ -795,6 +827,7 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "deep-winter": {
+    yellows: { wear: ["Icy Lemon"], avoid: "Mustard" },
     outfits: [
       ["Emerald", "Charcoal", "Silver"],
       ["Icy Pink", "Dark Navy", "White Gold"],
@@ -874,6 +907,7 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "true-winter": {
+    yellows: { wear: ["Lemon Yellow"] },
     outfits: [
       ["Royal Blue", "Cool Grey", "Silver"],
       ["Icy Blue", "Charcoal", "White Gold"],
@@ -953,6 +987,7 @@ export const SEASON_CONTENT: Record<SeasonSlug, SeasonContent> = {
     ],
   },
   "bright-winter": {
+    yellows: { wear: ["Lemon Yellow", "Icy Lemon"] },
     outfits: [
       ["Bright Turquoise", "Pure White", "Polished Silver"],
       ["Hot Pink", "Ink Navy", "White Gold"],

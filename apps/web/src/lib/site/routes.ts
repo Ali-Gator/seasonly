@@ -11,6 +11,8 @@ import {
 } from "@seasonly/analysis";
 import type { Metadata } from "next";
 
+import { shareCardAlt } from "../share-card/alt";
+
 /** The canonical host. A constant: it never changes per environment. */
 export const ORIGIN = "https://seasonly.me";
 
@@ -225,14 +227,57 @@ export function indexedUrls(routes: readonly Route[] = ROUTES): string[] {
     .map((r) => url(r.path));
 }
 
-/** Title, description, apex canonical and robots for the page at `path`. */
+/**
+ * The preview image of an indexed page: its season's post card on a season page, Soft Autumn's,
+ * the sample season, everywhere else.
+ *
+ * {@link openspec/specs/site-structure/spec.md#requirement-a-link-preview-shows-a-seasons-share-card}
+ */
+function previewImage(path: string) {
+  const slug = SEASON_SLUGS.find((s) => path === `/seasons/${s}`) ?? "soft-autumn";
+  return {
+    url: `${ORIGIN}/images/share/${slug}/post`,
+    width: 1080,
+    height: 1080,
+    alt: shareCardAlt(slug, "post"),
+  };
+}
+
+/**
+ * Title, description, apex canonical and robots for the page at `path`; an indexed page also gets
+ * its link-preview tags, a page never indexed gets none.
+ *
+ * {@link openspec/specs/site-structure/spec.md#requirement-every-indexed-page-carries-link-preview-tags}
+ */
 export function pageMetadata(path: string, routes: readonly Route[] = ROUTES): Metadata {
   const route = routeAt(path, routes);
   if (!route) throw new Error(`No route in the route map serves ${path}`);
+  const { title, description } = route;
+  const base = { title, description, alternates: { canonical: url(path) } };
+  if (!isIndexed(route)) return { ...base, robots: { index: false } };
+  const image = previewImage(path);
   return {
-    title: route.title,
-    description: route.description,
-    alternates: { canonical: url(path) },
-    ...(isIndexed(route) ? {} : { robots: { index: false } }),
+    ...base,
+    openGraph: {
+      title,
+      description,
+      url: url(path),
+      siteName: "Seasonly",
+      type: "website",
+      images: [image],
+    },
+    twitter: { card: "summary", title, description, images: [image] },
   };
 }
+
+/**
+ * The home page's schema.org `WebSite` block, so a search result names the site.
+ *
+ * {@link openspec/specs/site-structure/spec.md#requirement-the-home-page-names-the-site-for-search-engines}
+ */
+export const siteJsonLd = () => ({
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Seasonly",
+  url: ORIGIN,
+});

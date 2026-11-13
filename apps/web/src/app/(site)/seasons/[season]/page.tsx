@@ -58,6 +58,8 @@ function FindOut({ name, className }: { name: string; className?: string }) {
  * {@link openspec/specs/site-content/spec.md#requirement-a-season-page-shows-the-seasons-makeup-and-hair-colors}
  * {@link openspec/specs/site-content/spec.md#requirement-a-season-page-suggests-three-outfits-from-its-own-palette}
  * {@link openspec/specs/site-content/spec.md#requirement-a-season-page-names-more-people-from-the-same-source}
+ * {@link openspec/specs/site-content/spec.md#requirement-a-season-page-shows-its-palette-image}
+ * {@link openspec/specs/site-content/spec.md#requirement-a-season-page-offers-its-palette-image-to-save}
  */
 export default async function Season({ params }: Props) {
   const { season: slug } = await params;
@@ -145,6 +147,30 @@ export default async function Season({ params }: Props) {
                 <p className="text-(--ink-muted)">{o.line}</p>
               </Group>
             ))}
+          </ReportSection>
+          {/* A plain img and link, server-rendered, so image search sees the picture (design.md 5). */}
+          <ReportSection overline="Palette image" title="Keep the palette on your phone">
+            <div className="flex items-start gap-(--space-4)">
+              {/* eslint-disable-next-line @next/next/no-img-element -- one URL for image search, as the report saves it */}
+              <img
+                src={`/images/palette/${season}`}
+                alt={`${name} color palette: 24 colors and 6 neutrals, each with its name and hex code`}
+                width={1080}
+                height={1920}
+                loading="lazy"
+                className="h-auto w-24 flex-none rounded-(--radius-sm) border border-(--line)"
+              />
+              <div className="flex flex-col gap-(--space-2)">
+                <p>All 30 {name} colors in one image, sized for your phone.</p>
+                <a
+                  href={`/images/palette/${season}`}
+                  download={`seasonly-${season}-palette.png`}
+                  className="label sn-navlink self-start"
+                >
+                  Save the palette image
+                </a>
+              </div>
+            </div>
           </ReportSection>
           <ReportSection
             overline={`Famous ${plural}`}
