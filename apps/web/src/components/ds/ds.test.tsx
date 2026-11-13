@@ -48,6 +48,26 @@ describe("Swatch", () => {
   });
 });
 
+describe("hex codes out of search snippets", () => {
+  /** {@link openspec/specs/ui-components/spec.md#scenario-a-swatchs-hex-code-is-marked} */
+  it("marks the hex code and leaves the name quotable", () => {
+    const out = html(<Swatch name="Soft Blue" hex="#6F95C8" />);
+    expect(out).toMatch(/<span data-nosnippet="" class="sn-swatch__hex">#6F95C8<\/span>/);
+    expect(out).toContain('<span class="sn-swatch__name">Soft Blue</span>');
+  });
+
+  /** {@link openspec/specs/ui-components/spec.md#scenario-a-grid-marks-every-hex-code} */
+  it("marks each of a season's 24 hex codes and keeps the grid's text", () => {
+    const best = PALETTES["true-summer"].best;
+    const out = html(<SwatchGrid colors={best} />);
+    const marked = [...out.matchAll(/<[a-z]+ data-nosnippet=""[^>]*>([^<]*)</g)].map((m) => m[1]);
+    expect(marked).toEqual(best.map((c) => c.hex.toUpperCase()));
+    for (const hex of marked) expect(hex).toMatch(/^#[0-9A-F]{6}$/);
+    const visible = (markup: string) => markup.replace(/<[^>]+>/g, " ");
+    expect(visible(out)).toBe(visible(out.replaceAll(' data-nosnippet=""', "")));
+  });
+});
+
 describe("SwatchGrid", () => {
   const best = PALETTES["soft-autumn"].best;
 

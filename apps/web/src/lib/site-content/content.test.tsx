@@ -31,9 +31,10 @@ import { seasonName } from "@/lib/site/routes";
 import { SAMPLE_FACE, TIP_PHOTOS } from "./images";
 import { FAMOUS_NOTE, SEASON_CONTENT } from "./seasons";
 
-/** The page's visible text: tags dropped, entities decoded, whitespace collapsed and no space before punctuation. */
+/** The page's visible text: scripts and tags dropped, entities decoded, whitespace collapsed and no space before punctuation. */
 const text = (html: string) =>
   html
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/g, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/&#x27;/g, "'")
     .replace(/&quot;/g, '"')
@@ -189,6 +190,33 @@ describe("/", () => {
         PALETTES[slug].highlights.slice(0, 4),
       );
     }
+  });
+});
+
+/** The JSON of each `application/ld+json` script in the page. */
+const jsonLd = (html: string) =>
+  [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(
+    ([, json = ""]) => JSON.parse(json) as Record<string, unknown>,
+  );
+
+describe("the site name in structured data", () => {
+  /** {@link openspec/specs/site-structure/spec.md#scenario-the-home-page} */
+  it("/ holds exactly one WebSite block", () => {
+    expect(jsonLd(html(<Landing />))).toEqual([
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "Seasonly",
+        url: "https://seasonly.me",
+      },
+    ]);
+  });
+
+  /** {@link openspec/specs/site-structure/spec.md#scenario-another-page} */
+  it("/seasons/soft-autumn holds none", async () => {
+    expect(jsonLd(await seasonPage("soft-autumn")).filter((j) => j["@type"] === "WebSite")).toEqual(
+      [],
+    );
   });
 });
 
@@ -369,6 +397,51 @@ describe("/seasons/<slug>", () => {
   });
 });
 
+describe("/seasons/<slug> palette image", () => {
+  /** The `<img>` of the season's palette image, as its attributes. */
+  const paletteImg = (html: string, slug: SeasonSlug) => {
+    const tag = new RegExp(`<img [^>]*src="/images/palette/${slug}"[^>]*>`).exec(html)?.[0];
+    if (!tag) throw new Error(`No palette image for ${slug}`);
+    return Object.fromEntries(
+      [...tag.matchAll(/([a-zA-Z-]+)="([^"]*)"/g)].map(([, k, v]) => [k, v]),
+    );
+  };
+  const saveLink = (html: string) => /<a [^>]*>Save the palette image<\/a>/.exec(html)?.[0] ?? "";
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-true-summers-palette-image} */
+  it("shows True Summer's palette image, sized and lazy, after the outfits", async () => {
+    const out = await seasonPage("true-summer");
+    expect(out.match(/<img [^>]*src="\/images\/palette\//g)).toHaveLength(1);
+    expect(paletteImg(out, "true-summer")).toMatchObject({
+      alt: "True Summer color palette: 24 colors and 6 neutrals, each with its name and hex code",
+      width: "1080",
+      height: "1920",
+      loading: "lazy",
+    });
+    const at = out.indexOf('src="/images/palette/true-summer"');
+    expect(out.indexOf("Outfit ideas")).toBeLessThan(at);
+    expect(at).toBeLessThan(out.indexOf("Famous True Summers"));
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-the-save-link} */
+  it("offers True Summer's palette image to save under the report's file name", async () => {
+    const link = saveLink(await seasonPage("true-summer"));
+    expect(link).toContain('href="/images/palette/true-summer"');
+    expect(link).toContain('download="seasonly-true-summer-palette.png"');
+  });
+
+  /**
+   * {@link openspec/specs/site-content/spec.md#scenario-every-seasons-palette-image}
+   * {@link openspec/specs/site-content/spec.md#scenario-every-seasons-save-link}
+   */
+  it.each(SEASON_SLUGS)("%s shows and saves its own palette image", async (slug) => {
+    const out = await seasonPage(slug);
+    expect(paletteImg(out, slug).alt).toMatch(new RegExp(`^${seasonName(slug)} color palette: `));
+    expect(saveLink(out)).toContain(`href="/images/palette/${slug}"`);
+    expect(saveLink(out)).toContain(`download="seasonly-${slug}-palette.png"`);
+  });
+});
+
 describe("/seasons/<slug> under its searched names", () => {
   const h1 = (html: string) => text(/<h1[^>]*>(.*?)<\/h1>/.exec(html)?.[1] ?? "").trim();
   /** The "Questions about <Season>" section's markup. */
@@ -384,6 +457,8 @@ describe("/seasons/<slug> under its searched names", () => {
   const firstOpen = (section: string) => /<details[^>]*>/.exec(section)?.[0].includes(" open=");
   const ask = (name: string) => [
     `What colors should a ${name} avoid?`,
+    `Can a ${name} wear black?`,
+    `Which yellow suits a ${name}?`,
     `What hair color suits a ${name}?`,
     `What makeup suits a ${name}?`,
     `Which metals suit a ${name}?`,
@@ -407,7 +482,7 @@ describe("/seasons/<slug> under its searched names", () => {
   });
 
   /** {@link openspec/specs/site-content/spec.md#scenario-the-questions-on-a-page-with-a-second-name} */
-  it("asks six questions on a page with a second name, between the neighbours and Is this you?", async () => {
+  it("asks eight questions on a page with a second name, between the neighbours and Is this you?", async () => {
     const out = await seasonPage("deep-autumn");
     const section = faq(out);
     expect(text(section)).toContain("Questions about Deep Autumn");
@@ -423,7 +498,7 @@ describe("/seasons/<slug> under its searched names", () => {
   });
 
   /** {@link openspec/specs/site-content/spec.md#scenario-the-questions-on-a-page-without-one} */
-  it("asks five questions on a page without one, the avoid question open", async () => {
+  it("asks seven questions on a page without one, the avoid question open", async () => {
     const section = faq(await seasonPage("soft-autumn"));
     expect(questions(section)).toEqual(ask("Soft Autumn"));
     expect(firstOpen(section)).toBe(true);
@@ -442,7 +517,9 @@ describe("/seasons/<slug> under its searched names", () => {
   it.each(SEASON_SLUGS)("%s answers from the shared copy and palettes", async (slug) => {
     const section = faq(await seasonPage(slug));
     const name = seasonName(slug);
-    const [avoid, hair, makeup, metals, findOut] = ask(name).map((q) => answers(section).get(q));
+    const [avoid, black, yellow, hair, makeup, metals, findOut] = ask(name).map((q) =>
+      answers(section).get(q),
+    );
     const copy = SEASON_COPY[slug];
     const palette = PALETTES[slug];
     const lower = (s: { name: string }) => s.name.toLowerCase();
@@ -457,6 +534,8 @@ describe("/seasons/<slug> under its searched names", () => {
       .split(" Go easy on ");
     for (const metal of palette.metals.map(lower)) expect(wear).toContain(metal);
     for (const metal of palette.metalsAvoid.map(lower)) expect(easy).toContain(metal);
+    expect(black).toMatch(/^(Yes|Not near the face)\./);
+    expect(yellow).toMatch(/\b(palette|avoid)\.$/);
     expect(findOut).toContain("one daylight selfie and answer four quick questions");
     expect(section).toMatch(
       /<details[^>]*>(?:(?!<\/details>).)*href="\/analyze"(?:(?!<\/details>).)*<\/details>\s*<\/div>\s*$/,
@@ -469,6 +548,84 @@ describe("/seasons/<slug> under its searched names", () => {
     expect(answers(section).get("Is Bright Winter the same as Clear Winter?")).toBe(
       "Yes. Clear Winter and Bright Winter are two names for the same season, with the same palette.",
     );
+  });
+
+  /** The answer to `question` on the season page of `slug`. */
+  const answerOn = async (slug: SeasonSlug, question: string) =>
+    answers(faq(await seasonPage(slug))).get(question);
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-black-for-a-winter} */
+  it("says yes to black for a Winter", async () => {
+    expect(await answerOn("true-winter", "Can a True Winter wear black?")).toBe(
+      "Yes. Black is one of the True Winter neutrals, so it works near the face too.",
+    );
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-black-for-another-season} */
+  it("swaps black for the darkest neutral on another season", async () => {
+    expect(await answerOn("true-summer", "Can a True Summer wear black?")).toBe(
+      "Not near the face. Black is not in the True Summer palette. Navy, its darkest neutral, does the same job. Black trousers, shoes and bags are fine.",
+    );
+  });
+
+  /** The darkest of each season's 6 neutrals, read off the palettes (design.md decision 6). */
+  const DARKEST: Partial<Record<SeasonSlug, string>> = {
+    "light-spring": "Soft Navy",
+    "true-spring": "Warm Navy",
+    "bright-spring": "Ink Navy",
+    "light-summer": "Soft Navy",
+    "true-summer": "Navy",
+    "soft-summer": "Grey Navy",
+    "soft-autumn": "Espresso",
+    "true-autumn": "Dark Chocolate",
+    "deep-autumn": "Espresso",
+  };
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-black-on-every-page} */
+  it.each(SEASON_SLUGS)(
+    "%s says yes to black exactly when its neutrals hold Black",
+    async (slug) => {
+      const name = seasonName(slug);
+      const black = await answerOn(slug, `Can a ${name} wear black?`);
+      const neutrals = PALETTES[slug].neutrals;
+      const darkest = DARKEST[slug];
+      expect(neutrals.some((n) => n.name === "Black")).toBe(!darkest);
+      if (darkest) {
+        expect(neutrals.map((n) => n.name)).toContain(darkest);
+        expect(black).toContain(`${darkest}, its darkest neutral`);
+      } else {
+        expect(black).toMatch(/^Yes\. /);
+      }
+    },
+  );
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-yellows-for-deep-autumn} */
+  it("names Deep Autumn's yellows and the one to skip", async () => {
+    expect(await answerOn("deep-autumn", "Which yellow suits a Deep Autumn?")).toBe(
+      "Saffron, mustard and antique gold. They are the yellows in the Deep Autumn palette. Skip baby yellow, one of the Deep Autumn colors to avoid.",
+    );
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-a-season-with-one-yellow} */
+  it("names a season's only yellow", async () => {
+    expect(await answerOn("true-summer", "Which yellow suits a True Summer?")).toBe(
+      "Light lemon. It is the only yellow in the True Summer palette. Skip golden yellow, one of the True Summer colors to avoid.",
+    );
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-a-season-without-a-yellow} */
+  it("says when a palette has no yellow", async () => {
+    expect(await answerOn("soft-summer", "Which yellow suits a Soft Summer?")).toBe(
+      "None near the face. The Soft Summer palette has no yellow. Skip bright yellow, one of the Soft Summer colors to avoid.",
+    );
+  });
+
+  /** {@link openspec/specs/site-content/spec.md#scenario-every-yellow-is-the-seasons-own} */
+  it.each(SEASON_SLUGS)("%s picks its yellows from its own palette", (slug) => {
+    const { wear, avoid } = SEASON_CONTENT[slug].yellows;
+    const names = (list: readonly Swatch[]) => list.map((c) => c.name);
+    for (const name of wear) expect(names(PALETTES[slug].best)).toContain(name);
+    if (avoid) expect(names(PALETTES[slug].avoid)).toContain(avoid);
   });
 });
 

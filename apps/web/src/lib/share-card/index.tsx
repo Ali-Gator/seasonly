@@ -11,12 +11,7 @@ import { type Ratio, shown } from "./alt";
  *
  * @see openspec/specs/share-card/spec.md
  */
-export { type Ratio, RATIOS, shareCardAlt } from "./alt";
-
-export const SIZES: Record<Ratio, { width: number; height: number }> = {
-  story: { width: 1080, height: 1920 },
-  post: { width: 1080, height: 1080 },
-};
+export { type Ratio, RATIOS, shareCardAlt, SIZES } from "./alt";
 
 const name = (c: Swatch, size: number, lineHeight: number, whiteSpace = "normal") => (
   <span style={{ fontSize: size * EM, lineHeight, fontWeight: 600, whiteSpace }}>{c.name}</span>

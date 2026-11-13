@@ -11,7 +11,7 @@ import { seasonName } from "@/lib/site/routes";
  *
  * @see openspec/specs/palette-image/spec.md
  */
-export const SIZE = { width: 1080, height: 1920 };
+export { SIZE } from "./file";
 
 const cell = (c: Swatch) => (
   <div

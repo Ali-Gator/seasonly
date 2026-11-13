@@ -39,7 +39,7 @@ const grid = (markup: string, label: string) => {
   const list = new RegExp(`<ul[^>]*aria-label="${label}"[^>]*>([\\s\\S]*?)</ul>`).exec(markup)?.[1];
   return [
     ...(list ?? "").matchAll(
-      /<span class="sn-swatch__name">([^<]+)<\/span><span class="sn-swatch__hex">([^<]+)<\/span>/g,
+      /<span class="sn-swatch__name">([^<]+)<\/span><span [^>]*class="sn-swatch__hex">([^<]+)<\/span>/g,
     ),
   ].map((m) => `${m[1]} ${m[2]}`);
 };

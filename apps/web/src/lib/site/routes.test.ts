@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { PALETTES } from "@seasonly/analysis";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -15,6 +16,7 @@ import {
   searchName,
   seasonName,
   secondName,
+  siteJsonLd,
   type Route,
 } from "./routes";
 
@@ -225,5 +227,75 @@ describe("pageMetadata", () => {
   it("never indexes a report, even when ready", () => {
     expect(pageMetadata("/r/k7m2qx", allReady(ROUTES)).robots).toEqual({ index: false });
     expect(indexedUrls(allReady(ROUTES)).filter((u) => /\/(r|analyze)\b/.test(u))).toEqual([]);
+  });
+});
+
+describe("link previews", () => {
+  const TRUE_SUMMER_ALT =
+    "My color season: True Summer. " +
+    `${PALETTES["true-summer"].highlights
+      .slice(0, 6)
+      .map((c) => c.name)
+      .join(", ")}.`;
+
+  /** {@link openspec/specs/site-structure/spec.md#scenario-a-season-pages-preview-text} */
+  it("gives a season page its title, description, canonical and site name", () => {
+    const meta = pageMetadata("/seasons/true-summer");
+    const title = "True (Cool) Summer color palette and colors to avoid · Seasonly";
+    expect(meta.openGraph).toMatchObject({
+      title,
+      description: meta.description,
+      url: "https://seasonly.me/seasons/true-summer",
+      siteName: "Seasonly",
+      type: "website",
+    });
+    expect(meta.twitter).toMatchObject({ card: "summary", title, description: meta.description });
+  });
+
+  /** {@link openspec/specs/site-structure/spec.md#scenario-a-season-pages-preview-image} */
+  it("shows a season page's own post card, sized and described", () => {
+    const meta = pageMetadata("/seasons/true-summer");
+    const image = {
+      url: "https://seasonly.me/images/share/true-summer/post",
+      width: 1080,
+      height: 1080,
+      alt: TRUE_SUMMER_ALT,
+    };
+    expect(meta.openGraph?.images).toEqual([image]);
+    expect(meta.twitter?.images).toEqual([image]);
+  });
+
+  /** {@link openspec/specs/site-structure/spec.md#scenario-every-indexed-page} */
+  it.each(indexedUrls())("%s has a preview with its canonical URL and an image", (address) => {
+    const meta = pageMetadata(address.slice(ORIGIN.length) || "/");
+    const og = meta.openGraph as Record<string, unknown> & { images: { url: string }[] };
+    expect(og.title).toBe(meta.title);
+    expect(og.description).toBe(meta.description);
+    expect(og.url).toBe(meta.alternates?.canonical);
+    expect(og.url).toBe(address);
+    expect(og.images[0]?.url).toMatch(/^https:\/\/seasonly\.me\/images\/share\/[a-z-]+\/post$/);
+  });
+
+  /** {@link openspec/specs/site-structure/spec.md#scenario-a-report} */
+  it.each(["/r/abc123", "/analyze"])("%s has no preview tags", (path) => {
+    const meta = pageMetadata(path);
+    expect(meta.openGraph).toBeUndefined();
+    expect(meta.twitter).toBeUndefined();
+  });
+
+  /** {@link openspec/specs/site-structure/spec.md#scenario-another-pages-preview-image} */
+  it.each(["/", "/seasons", "/how-it-works"])("%s shows Soft Autumn's post card", (path) => {
+    const og = pageMetadata(path).openGraph as { images: { url: string }[] };
+    expect(og.images[0]?.url).toBe("https://seasonly.me/images/share/soft-autumn/post");
+  });
+
+  /** {@link openspec/specs/site-structure/spec.md#scenario-the-home-page} */
+  it("names the site in one WebSite block", () => {
+    expect(siteJsonLd()).toEqual({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "Seasonly",
+      url: "https://seasonly.me",
+    });
   });
 });

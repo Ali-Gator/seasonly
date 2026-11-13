@@ -134,6 +134,7 @@ Each component is a JSX port of its function in the design system's `bundle.js` 
 
 - A Button with `href` renders `next/link`, so navigation stays client-side. Every other prop passes through, `aria-disabled` included.
 - Swatches take the analysis core's `Swatch` type, so a `PALETTES` entry renders without mapping.
+- Since `t24-search-appearance`, a swatch's hex span carries `data-nosnippet=""`, written before `className`, so Google's snippet lists the palette by name. The name span stays quotable. The bundle has no such attribute: it changes nothing on screen. The draping pair's two hex codes stay unmarked.
 - `Slot` is public here, while the bundle keeps it internal, and takes an optional `loading` passed to its `img`, which the bundle's has not.
 
 They are server components: no state, no effects, no `"use client"`. ReportSection uses `useId()` for its heading id when no `id` is given.
@@ -452,3 +453,17 @@ A photo slot SHALL render its image with the alt text it is given, empty when no
 
 - **WHEN** a photo slot is given no image
 - **THEN** it shows its label, "Photo" by default, and renders no image
+
+### Requirement: A swatch keeps its hex code out of search snippets
+
+A swatch SHALL mark its hex code, and only its hex code, as text a search engine does not quote in a result snippet. The color's name SHALL stay quotable, so a snippet can list a palette by its names. The mark SHALL change nothing a person sees or a screen reader reads.
+
+#### Scenario: A swatch's hex code is marked
+
+- **WHEN** a swatch is rendered for `{ name: "Soft Blue", hex: "#6F95C8" }`
+- **THEN** the element holding "#6F95C8" carries `data-nosnippet`, and the element holding "Soft Blue" does not
+
+#### Scenario: A grid marks every hex code
+
+- **WHEN** a swatch grid is rendered with the 24 best colors of a season in `PALETTES`
+- **THEN** exactly 24 elements carry `data-nosnippet`, each holding one uppercase hex code, and the grid's text is the same as without the mark

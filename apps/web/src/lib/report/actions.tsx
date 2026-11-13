@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { Button, Icon } from "@/components/ds";
 import { track } from "@/lib/analytics";
 
+import { paletteFile, paletteUrl } from "@/lib/palette-image/file";
+
 import { downloadFile, fileFor, savePalette, shareSeason } from "./share";
 
 /**
@@ -18,7 +20,6 @@ import { downloadFile, fileFor, savePalette, shareSeason } from "./share";
  */
 const storyUrl = (slug: SeasonSlug) => `/images/share/${slug}/story`;
 const postUrl = (slug: SeasonSlug) => `/images/share/${slug}/post`;
-const paletteUrl = (slug: SeasonSlug) => `/images/palette/${slug}`;
 
 /** {@link openspec/specs/report-page/spec.md#requirement-share-my-season-hands-over-the-share-cards} */
 export function ShareButton({
@@ -122,7 +123,7 @@ export function SaveButtonView({ saved, onClick }: { saved: boolean; onClick: ()
 /** {@link openspec/specs/report-page/spec.md#requirement-save-my-palette-saves-the-palette-image} */
 export function SaveButton({ slug }: { slug: SeasonSlug }) {
   const [saved, setSaved] = useState(false);
-  const name = `seasonly-${slug}-palette.png`;
+  const name = paletteFile(slug);
   useEffect(() => {
     void fileFor(paletteUrl(slug), name);
   }, [slug, name]);
